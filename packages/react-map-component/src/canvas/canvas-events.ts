@@ -209,7 +209,10 @@ function useClickHandler() {
 			const hasPopup = hasTargetPopup(targetIds.length);
 
 			// Sent before anything is selected, so a click the host takes leaves no selection
-			if (isHosted && isTarget && sendHostIntent({ hasPopup, kind: 'target' })) return;
+			if (isHosted && isTarget && sendHostIntent({ hasPopup, kind: 'target' })) {
+				setHoveredId(undefined);
+				return;
+			}
 
 			if (isTarget && !hasPopup) return;
 

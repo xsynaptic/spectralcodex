@@ -1,24 +1,205 @@
+import type { AtlasScreen, AtlasSheetRest } from '#lib/atlas/atlas-layout-factory.ts';
+
+import { atlasSheetRest } from '#lib/atlas/atlas-constants.ts';
+
+export type AtlasSheetLines = Record<AtlasSheetRest, number>;
+
 const moveViewportShare = 0.2;
 
-export function getSheetDragOffset({ deltaY, restPx }: { deltaY: number; restPx: number }) {
-	const maxPx = restPx > 0 ? restPx : Infinity;
+const restOrder = [atlasSheetRest.raised, atlasSheetRest.half, atlasSheetRest.down] as const;
 
-	return Math.min(maxPx, Math.max(0, restPx + deltaY));
+export function getSheetRests(hasHalf: boolean): Array<AtlasSheetRest> {
+	return restOrder.filter((rest) => hasHalf || rest !== atlasSheetRest.half);
 }
 
-export function getSheetRelease({
-	eventType,
-	isDragged,
-	travelPx,
+export function getSheetDragLine({
+	deltaY,
+	from,
+	lines,
+}: {
+	deltaY: number;
+	from: AtlasSheetRest;
+	lines: AtlasSheetLines;
+}) {
+	return Math.min(lines.down, Math.max(lines.raised, lines[from] + deltaY));
+}
+
+function getMarginPx(from: AtlasSheetRest, lines: AtlasSheetLines) {
+	return from === atlasSheetRest.half ? lines.half : 0;
+}
+
+export function getSheetFold({ linePx, paneTop }: { linePx: number; paneTop: number }) {
+	return Math.max(0, linePx - paneTop);
+}
+
+export function getSheetTranslate({
+	from,
+	linePx,
+	lines,
+}: {
+	from: AtlasSheetRest;
+	linePx: number;
+	lines: AtlasSheetLines;
+}) {
+	return linePx - getMarginPx(from, lines);
+}
+
+export function getSheetSlide({
+	foldPx,
+	from,
+	lines,
+	scrollMaxY,
+	scrollY,
+	to,
+}: {
+	foldPx: number;
+	from: AtlasSheetRest;
+	lines: AtlasSheetLines;
+	scrollMaxY: number;
+	scrollY: number;
+	to: AtlasSheetRest;
+}) {
+	const marginPx = getMarginPx(from, lines);
+	const translatePx = getSheetTranslate({ from, linePx: lines[to], lines });
+
+	if (to !== atlasSheetRest.raised) return { clipPx: undefined, translatePx };
+
+	const clampPx = Math.min(marginPx, Math.max(0, scrollY - (scrollMaxY - marginPx)));
+
+	if (clampPx === 0) return { clipPx: undefined, translatePx };
+
+	return { clipPx: foldPx - clampPx, translatePx: translatePx + clampPx };
+}
+
+function getNearestRest({
+	from,
+	linePx,
+	lines,
+	rests,
+}: {
+	from: AtlasSheetRest;
+	linePx: number;
+	lines: AtlasSheetLines;
+	rests: Array<AtlasSheetRest>;
+}) {
+	const isDownward = linePx > lines[from];
+	let nearest = from;
+	let nearestPx = Infinity;
+
+	for (const rest of rests) {
+		const isAhead = isDownward ? lines[rest] > lines[from] : lines[rest] < lines[from];
+		const distancePx = Math.abs(lines[rest] - linePx);
+
+		if (!(isAhead && distancePx < nearestPx)) {
+			continue;
+		}
+
+		nearest = rest;
+		nearestPx = distancePx;
+	}
+
+	return nearest;
+}
+
+export function getSheetTapRest({
+	from,
+	preferred,
+}: {
+	from: AtlasSheetRest;
+	preferred: AtlasSheetRest;
+}) {
+	return from === atlasSheetRest.down ? preferred : atlasSheetRest.down;
+}
+
+export type AtlasSheetReleaseKind = 'cancel' | 'drag' | 'tap';
+
+export function getSheetReleaseRest({
+	from,
+	kind,
+	linePx,
+	lines,
+	preferred,
+	rests,
 	viewportHeight,
 }: {
-	eventType: string;
-	isDragged: boolean;
-	travelPx: number;
+	from: AtlasSheetRest;
+	kind: AtlasSheetReleaseKind;
+	linePx: number;
+	lines: AtlasSheetLines;
+	preferred: AtlasSheetRest;
+	rests: Array<AtlasSheetRest>;
 	viewportHeight: number;
 }) {
-	if (eventType !== 'pointerup') return 'settle';
-	if (!isDragged) return 'toggle';
+	if (kind === 'cancel') return from;
+	if (kind === 'tap') return getSheetTapRest({ from, preferred });
 
-	return travelPx >= viewportHeight * moveViewportShare ? 'toggle' : 'settle';
+	if (Math.abs(linePx - lines[from]) < viewportHeight * moveViewportShare) return from;
+
+	return getNearestRest({ from, linePx, lines, rests });
+}
+
+export function getSheetStepRest({
+	direction,
+	from,
+	rests,
+}: {
+	direction: 'down' | 'up';
+	from: AtlasSheetRest;
+	rests: Array<AtlasSheetRest>;
+}) {
+	const index = rests.indexOf(from) + (direction === 'up' ? -1 : 1);
+
+	return rests[index] ?? from;
+}
+
+function isOpenRest(value: unknown): value is Exclude<AtlasSheetRest, 'down'> {
+	return value === atlasSheetRest.half || value === atlasSheetRest.raised;
+}
+
+export function getPreferredSheetRest({
+	hasHalf,
+	stored,
+}: {
+	hasHalf: boolean;
+	stored: string | undefined;
+}) {
+	if (!hasHalf) return atlasSheetRest.raised;
+
+	return isOpenRest(stored) ? stored : atlasSheetRest.half;
+}
+
+export function getSheetEnterRest(hasHalf: boolean) {
+	return hasHalf ? atlasSheetRest.half : atlasSheetRest.down;
+}
+
+export function getSheetArrivalRest({
+	from,
+	hasHalf,
+	stored,
+}: {
+	from: AtlasScreen;
+	hasHalf: boolean;
+	stored: string | undefined;
+}) {
+	if (!hasHalf) return atlasSheetRest.raised;
+	if (isOpenRest(stored)) return stored;
+
+	if (from.layout === 'map') return atlasSheetRest.half;
+	if (from.layout !== 'sheet') return atlasSheetRest.raised;
+
+	return from.rest === atlasSheetRest.raised ? atlasSheetRest.raised : atlasSheetRest.half;
+}
+
+export function isSheetArrivalAtStart({
+	hasHash,
+	navigationType,
+	rest,
+	scrollY,
+}: {
+	hasHash: boolean;
+	navigationType: string;
+	rest: AtlasSheetRest;
+	scrollY: number;
+}) {
+	return rest === atlasSheetRest.half && navigationType !== 'traverse' && !hasHash && scrollY <= 0;
 }

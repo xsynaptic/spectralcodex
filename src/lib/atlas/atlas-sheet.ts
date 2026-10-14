@@ -1,12 +1,34 @@
+import type { TransitionBeforeSwapEvent } from 'astro:transitions/client';
+
+import type { AtlasScreen, AtlasSheetRest } from '#lib/atlas/atlas-layout-factory.ts';
+import type { AtlasSheetLines, AtlasSheetReleaseKind } from '#lib/atlas/atlas-sheet-factory.ts';
+
 import {
+	atlasPaneMainSelector,
 	atlasPaneSelector,
 	atlasSheetAttribute,
-	atlasSheetDown,
 	atlasSheetFoldProperty,
 	atlasSheetGrabbingAttribute,
+	atlasSheetHalfMediaQuery,
+	atlasSheetHandleSelector,
+	atlasSheetRest,
+	atlasSheetRestProperty,
+	atlasSheetRestStorageKey,
+	atlasSheetSplitProperty,
 } from '#lib/atlas/atlas-constants.ts';
-import { getSheetDragOffset } from '#lib/atlas/atlas-sheet-factory.ts';
-import { dispatchSync } from '#lib/atlas/atlas-sync.ts';
+import { readAtlasLayout, readSheetRest } from '#lib/atlas/atlas-layout.ts';
+import {
+	getPreferredSheetRest,
+	getSheetArrivalRest,
+	getSheetDragLine,
+	getSheetEnterRest,
+	getSheetFold,
+	getSheetReleaseRest,
+	getSheetRests,
+	getSheetSlide,
+	getSheetTranslate,
+	isSheetArrivalAtStart,
+} from '#lib/atlas/atlas-sheet-factory.ts';
 
 const sheetMoveDurationMs = 200;
 
@@ -17,51 +39,160 @@ function getPane() {
 	return document.querySelector<HTMLElement>(atlasPaneSelector) ?? undefined;
 }
 
-function getRestPx(pane: HTMLElement) {
-	const [, restPx] = getComputedStyle(pane).translate.split(' ', 2);
+function readLengthPx(property: string) {
+	const length = getComputedStyle(document.documentElement).getPropertyValue(property);
 
-	return restPx ? Number(restPx.replace('px', '')) : 0;
+	return Number(length.replace('px', '')) || 0;
 }
 
-function setSheetDown(isDown: boolean) {
-	const root = document.documentElement;
-	const wasDown = isSheetDown();
+function hasHalfRest() {
+	return matchMedia(atlasSheetHalfMediaQuery).matches;
+}
 
-	if (isDown) {
-		root.setAttribute(atlasSheetAttribute, atlasSheetDown);
-	} else {
+function readLines(): AtlasSheetLines {
+	return {
+		down: readLengthPx(atlasSheetRestProperty),
+		half: readLengthPx(atlasSheetSplitProperty),
+		raised: 0,
+	};
+}
+
+function readStoredRest() {
+	try {
+		return localStorage.getItem(atlasSheetRestStorageKey) ?? undefined;
+	} catch {
+		// localStorage unavailable
+		return;
+	}
+}
+
+function writeRest(root: HTMLElement, rest: AtlasSheetRest) {
+	if (rest === atlasSheetRest.raised) {
 		root.removeAttribute(atlasSheetAttribute);
-		root.style.removeProperty(atlasSheetFoldProperty);
+		return;
 	}
 
-	getPane()?.removeAttribute(atlasSheetGrabbingAttribute);
-
-	if (isDown !== wasDown) dispatchSync();
+	root.setAttribute(atlasSheetAttribute, rest);
 }
 
-function holdSheet() {
+function readFoldPx() {
+	const fold = document.documentElement.style.getPropertyValue(atlasSheetFoldProperty);
+
+	return Number(fold.replace('px', '')) || 0;
+}
+
+function writeFoldPx(linePx: number, paneTop: number) {
+	const foldPx = getSheetFold({ linePx, paneTop });
+
+	document.documentElement.style.setProperty(atlasSheetFoldProperty, `${String(foldPx)}px`);
+}
+
+export function setSheet(rest: AtlasSheetRest) {
+	const root = document.documentElement;
+	const pane = getPane();
+	const from = readSheetRest();
+
+	writeRest(root, rest);
+
+	if (rest !== atlasSheetRest.down) {
+		root.style.removeProperty(atlasSheetFoldProperty);
+	} else if (pane && from !== atlasSheetRest.down) {
+		// Read once the attribute has landed: the margin leaving can clamp the scroll offset at the end of a page
+		writeFoldPx(0, pane.offsetTop - window.scrollY);
+	}
+
+	pane?.removeAttribute(atlasSheetGrabbingAttribute);
+}
+
+function holdSheet(lines: AtlasSheetLines) {
 	const pane = getPane();
 
 	if (!pane || pane.getAnimations().length > 0) return;
 	if (pane.hasAttribute(atlasSheetGrabbingAttribute)) return pane;
 
-	if (!isSheetDown()) {
-		const foldPx = Math.max(0, -pane.getBoundingClientRect().top);
+	const from = readSheetRest();
 
-		document.documentElement.style.setProperty(atlasSheetFoldProperty, `${String(foldPx)}px`);
-	}
+	if (from !== atlasSheetRest.down) writeFoldPx(lines[from], pane.getBoundingClientRect().top);
 
 	pane.toggleAttribute(atlasSheetGrabbingAttribute, true);
 
 	return pane;
 }
 
-export function isSheetDown() {
-	return document.documentElement.getAttribute(atlasSheetAttribute) === atlasSheetDown;
+export function readSheetRests() {
+	return getSheetRests(hasHalfRest());
+}
+
+export function readPreferredSheetRest() {
+	return getPreferredSheetRest({ hasHalf: hasHalfRest(), stored: readStoredRest() });
+}
+
+export function readSheetEnterRest() {
+	return getSheetEnterRest(hasHalfRest());
+}
+
+export function storeSheetRest(rest: AtlasSheetRest) {
+	if (rest === atlasSheetRest.down) return;
+
+	try {
+		localStorage.setItem(atlasSheetRestStorageKey, rest);
+	} catch {
+		// localStorage unavailable
+	}
 }
 
 export function isSheetGrabbed() {
 	return getPane()?.hasAttribute(atlasSheetGrabbingAttribute) ?? false;
+}
+
+export function scrollToSheetStart(
+	behavior: ScrollBehavior,
+	element = document.querySelector(atlasPaneMainSelector),
+) {
+	if (!element) return;
+
+	const handle = document.querySelector(atlasSheetHandleSelector);
+	const startPx = readLengthPx(atlasSheetSplitProperty) + (handle?.clientHeight ?? 0);
+
+	window.scrollBy({ behavior, top: element.getBoundingClientRect().top - startPx });
+}
+
+function startSheetArrival(navigationType: string) {
+	const isAtStart = isSheetArrivalAtStart({
+		hasHash: location.hash !== '',
+		navigationType,
+		rest: readSheetRest(),
+		scrollY: window.scrollY,
+	});
+
+	if (isAtStart) scrollToSheetStart('instant');
+}
+
+export function prepareSheetArrival(event: TransitionBeforeSwapEvent, from: AtlasScreen) {
+	const incomingRoot = event.newDocument.documentElement;
+	const isSheet = readAtlasLayout(incomingRoot) === 'sheet';
+
+	writeRest(
+		incomingRoot,
+		isSheet
+			? getSheetArrivalRest({ from, hasHalf: hasHalfRest(), stored: readStoredRest() })
+			: atlasSheetRest.raised,
+	);
+
+	document.addEventListener(
+		'astro:after-swap',
+		() => {
+			startSheetArrival(event.navigationType);
+		},
+		{ once: true },
+	);
+}
+
+export function startColdSheetArrival() {
+	const [entry] = performance.getEntriesByType('navigation');
+	const isNavigate = entry instanceof PerformanceNavigationTiming && entry.type === 'navigate';
+
+	startSheetArrival(isNavigate ? 'push' : 'traverse');
 }
 
 export function resetSheet() {
@@ -73,24 +204,45 @@ export function resetSheet() {
 
 	if (pane) pane.style.translate = '';
 
-	setSheetDown(false);
+	setSheet(atlasSheetRest.raised);
 }
 
-export async function moveSheet(isDown: boolean) {
-	const pane = holdSheet();
+function getMoveKeyframe(from: AtlasSheetRest, to: AtlasSheetRest, lines: AtlasSheetLines) {
+	const root = document.documentElement;
+	const { clipPx, translatePx } = getSheetSlide({
+		foldPx: readFoldPx(),
+		from,
+		lines,
+		scrollMaxY: root.scrollHeight - root.clientHeight,
+		scrollY: window.scrollY,
+		to,
+	});
+	const translate = `0 ${String(translatePx)}px`;
+
+	if (clipPx === undefined) return { translate };
+
+	return { clipPath: `inset(${String(clipPx)}px 0 0 0)`, translate };
+}
+
+function slidePane(pane: HTMLElement, keyframe: PropertyIndexedKeyframes, rest: AtlasSheetRest) {
+	return pane.animate(keyframe, {
+		duration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : sheetMoveDurationMs,
+		easing: rest === atlasSheetRest.down ? 'ease-in' : 'ease-out',
+		fill: 'forwards',
+	});
+}
+
+export async function moveSheet(rest: AtlasSheetRest) {
+	const from = readSheetRest();
+
+	if (rest === from && !isSheetGrabbed()) return;
+
+	const lines = readLines();
+	const pane = holdSheet(lines);
 
 	if (!pane) return;
 
-	const isReducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-	const move = pane.animate(
-		{ translate: isDown ? '0 var(--atlas-sheet-rest)' : '0 0' },
-		{
-			duration: isReducedMotion ? 0 : sheetMoveDurationMs,
-			easing: isDown ? 'ease-in' : 'ease-out',
-			fill: 'forwards',
-		},
-	);
+	const move = slidePane(pane, getMoveKeyframe(from, rest, lines), rest);
 
 	currentDrag = undefined;
 	currentMove = move;
@@ -103,34 +255,46 @@ export async function moveSheet(isDown: boolean) {
 
 	if (move !== currentMove || !pane.isConnected) return;
 
-	setSheetDown(isDown);
+	setSheet(rest);
+	// Firefox's scroll anchoring scrolls the page by the split unless the rest is laid out while the slide still holds the pane
+	pane.getBoundingClientRect();
 	pane.style.translate = '';
 	move.cancel();
 }
 
 export function grabSheet() {
-	const pane = holdSheet();
+	const lines = readLines();
+	const pane = holdSheet(lines);
 
 	if (!pane) return;
 
-	const restPx = getRestPx(pane);
+	const from = readSheetRest();
+	const rests = readSheetRests();
+	let linePx = lines[from];
 
 	const drag = {
 		move(offsetPx: number) {
-			if (drag !== currentDrag) return 0;
+			if (drag !== currentDrag) return;
 
-			const translatePx = getSheetDragOffset({ deltaY: offsetPx, restPx });
-
-			pane.style.translate = `0 ${String(translatePx)}px`;
-
-			return Math.abs(translatePx - restPx);
+			linePx = getSheetDragLine({ deltaY: offsetPx, from, lines });
+			pane.style.translate = `0 ${String(getSheetTranslate({ from, linePx, lines }))}px`;
 		},
-		release(isDown: boolean) {
-			if (drag !== currentDrag) return false;
+		release(kind: AtlasSheetReleaseKind) {
+			if (drag !== currentDrag) return;
 
-			void moveSheet(isDown);
+			const rest = getSheetReleaseRest({
+				from,
+				kind,
+				linePx,
+				lines,
+				preferred: readPreferredSheetRest(),
+				rests,
+				viewportHeight: window.innerHeight,
+			});
 
-			return true;
+			void moveSheet(rest);
+
+			return rest === from ? undefined : rest;
 		},
 	};
 

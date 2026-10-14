@@ -79,8 +79,10 @@ class ProgressReading extends HTMLElement {
 		if (!this.#target) return;
 
 		const rect = this.#target.getBoundingClientRect();
-		const scrollable = Math.max(1, rect.height - window.innerHeight);
-		const progress = Math.min(Math.max(0, -rect.top / scrollable), 1);
+		const { scrollPaddingTop } = getComputedStyle(document.documentElement);
+		const coveredPx = Number(scrollPaddingTop.replace('px', '')) || 0;
+		const scrollable = Math.max(1, rect.height - (window.innerHeight - coveredPx));
+		const progress = Math.min(Math.max(0, (coveredPx - rect.top) / scrollable), 1);
 
 		setProgressBarValue(this, progress);
 

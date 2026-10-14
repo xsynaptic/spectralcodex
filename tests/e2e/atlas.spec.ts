@@ -11,12 +11,19 @@ const t = getTranslations();
 const atlasPath = '/atlas/';
 const probeLimit = 8;
 const viewport = { height: 844, width: 390 };
+const landscapeViewport = { height: 390, width: 844 };
+
+const splitPx = viewport.height * 0.4;
+const handlePx = 24;
+const sheetRestStorageKey = 'scx-atlas-sheet-rest';
 
 // The map reads what is under the pointer a frame or more after it moves
 const cursorSettleMs = 80;
 
 // The zoom control animates for 300ms; a click before it finishes zooms less than a full step
 const zoomSettleMs = 400;
+
+const labelSettleMs = 150;
 
 const locationViewPattern = /data-map-view="{&quot;targetIds/;
 const singlePointViewPattern = /data-map-view="{&quot;targetIds&quot;:\[&quot;[^&]+&quot;]}"/;
@@ -113,24 +120,23 @@ async function dragHandle(page: Page, handle: Locator, distance: number) {
 	await page.mouse.up();
 }
 
-// Clear of the map's controls, nearest the centre first: the map centres on the Location it last showed
 function getTapPositions({ height, width }: { height: number; width: number }) {
 	const step = 26;
+	const centreY = splitPx / 2;
 	const positions: Array<{ x: number; y: number }> = [];
 
 	for (let x = 60; x <= width - 60; x += step) {
-		for (let y = 150; y <= height - 80; y += step) positions.push({ x, y });
+		for (let y = 70; y <= height - 80; y += step) positions.push({ x, y });
 	}
 
 	return positions.toSorted(
 		(a, b) =>
-			Math.hypot(a.x - width / 2, a.y - height / 2) - Math.hypot(b.x - width / 2, b.y - height / 2),
+			Math.hypot(a.x - width / 2, a.y - centreY) - Math.hypot(b.x - width / 2, b.y - centreY),
 	);
 }
 
-// A pointer cursor is a Point or a cluster; a cluster zooms where a Point opens its page
 async function tapPoint(page: Page, canvas: Locator) {
-	const root = page.locator('html[data-atlas-page="pane"]:not([data-atlas-sheet])');
+	const root = page.locator('html[data-atlas-page="pane"]:not([data-atlas-sheet="down"])');
 
 	// The address changes before the swap, so the page being left can still be in the document
 	await expect(root).toHaveCount(0);
@@ -144,7 +150,7 @@ async function tapPoint(page: Page, canvas: Locator) {
 
 		const cursor = await canvas.evaluate((element) => getComputedStyle(element).cursor);
 
-		if (cursor !== 'pointer') continue;
+		if (cursor !== 'pointer' && cursor !== 'zoom-in') continue;
 
 		await page.mouse.click(x, y);
 
@@ -165,6 +171,7 @@ async function openSheetFromMap(page: Page, url: string) {
 		timeout: 10_000,
 	});
 	await openFromMap(page, url);
+	await expect(page.locator('html')).not.toHaveAttribute('data-atlas-from');
 }
 
 async function lowerSheet(page: Page, handle: Locator) {
@@ -183,11 +190,44 @@ async function openSettledSheet(page: Page, url: string) {
 	await openSheetFromMap(page, url);
 	await lowerSheet(page, handle);
 	await handle.press('Enter');
-	await expect(page.locator('html')).not.toHaveAttribute('data-atlas-sheet');
+	await expect(page.locator('html')).toHaveAttribute('data-atlas-sheet', 'half');
+}
+
+async function getTop(locator: Locator) {
+	const box = await locator.boundingBox();
+
+	return box?.y;
 }
 
 async function getScrollY(page: Page) {
 	return page.evaluate(() => window.scrollY);
+}
+
+async function readMapInset(page: Page) {
+	const inset = await page
+		.locator('.atlas-shell')
+		.evaluate((shell) => getComputedStyle(shell).getPropertyValue('--map-inset-bottom'));
+
+	return Number(inset.replace('px', ''));
+}
+
+async function getSettledShot(
+	page: Page,
+	clip: { height: number; width: number; x: number; y: number },
+) {
+	let shot = await page.screenshot({ clip });
+
+	await expect(async () => {
+		await page.waitForTimeout(labelSettleMs);
+
+		const next = await page.screenshot({ clip });
+		const isSettled = next.equals(shot);
+
+		shot = next;
+		expect(isSettled).toBe(true);
+	}).toPass();
+
+	return shot;
 }
 
 // A rebuilt map would get a new canvas without this flag
@@ -422,7 +462,7 @@ test.describe('on a wide viewport', () => {
 test.describe('a sheet on a phone viewport', () => {
 	test.use({ viewport });
 
-	test('a lowered sheet keeps its page, and a Point tap opens the next one raised', async ({
+	test('a lowered sheet keeps its page, and a Point tap opens the next one at half', async ({
 		page,
 	}) => {
 		test.slow();
@@ -440,7 +480,7 @@ test.describe('a sheet on a phone viewport', () => {
 		for (let bounce = 0; bounce < 3; bounce += 1) {
 			await lowerSheet(page, handle);
 			await handle.press('Enter');
-			await expect(root).not.toHaveAttribute('data-atlas-sheet');
+			await expect(root).toHaveAttribute('data-atlas-sheet', 'half');
 		}
 
 		await handle.click();
@@ -461,7 +501,7 @@ test.describe('a sheet on a phone viewport', () => {
 	});
 
 	test(
-		'the sheet holds through a short drag and comes back where it was read',
+		'the sheet holds through a short drag and comes back through each rest where it was read',
 		{ tag: '@firefox' },
 		async ({ page, request }) => {
 			const locationUrl = await getRegionLocation(request);
@@ -477,7 +517,7 @@ test.describe('a sheet on a phone viewport', () => {
 			await dragHandle(page, handle, viewport.height * 0.15);
 
 			await expect(pane).toHaveCSS('translate', 'none');
-			await expect(root).not.toHaveAttribute('data-atlas-sheet');
+			await expect(root).toHaveAttribute('data-atlas-sheet', 'half');
 
 			await dragHandle(page, handle, viewport.height * 0.3);
 
@@ -498,7 +538,7 @@ test.describe('a sheet on a phone viewport', () => {
 
 			await dragHandle(page, handle, viewport.height * -0.3);
 
-			await expect(root).not.toHaveAttribute('data-atlas-sheet');
+			await expect(root).toHaveAttribute('data-atlas-sheet', 'half');
 			await expect(pane).toHaveCSS('translate', 'none');
 			expect(await getScrollY(page)).toBe(scrollY);
 			expect(new URL(page.url()).pathname).toBe(locationUrl);
@@ -562,7 +602,7 @@ test.describe('a sheet and its map on a phone viewport', () => {
 
 		await page.mouse.up();
 
-		await expect(root).not.toHaveAttribute('data-atlas-sheet');
+		await expect(root).toHaveAttribute('data-atlas-sheet', 'half');
 	});
 
 	test('the back button returns from a sheet to the map', async ({ page, request }) => {
@@ -581,7 +621,7 @@ test.describe('a sheet and its map on a phone viewport', () => {
 		await expectSameCanvas(canvas);
 	});
 
-	test("a tap on the open Location's own Point raises a lowered sheet", async ({
+	test("a tap on the open Location's own Point brings a lowered sheet back to half", async ({
 		page,
 		request,
 	}) => {
@@ -600,7 +640,7 @@ test.describe('a sheet and its map on a phone viewport', () => {
 			await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
 
 			await expect(shell.locator('.maplibregl-popup')).toHaveCount(0);
-			await expect(root).not.toHaveAttribute('data-atlas-sheet', { timeout: 1000 });
+			await expect(root).toHaveAttribute('data-atlas-sheet', 'half', { timeout: 1000 });
 		}).toPass();
 
 		expect(new URL(page.url()).pathname).toBe(locationUrl);
@@ -623,6 +663,217 @@ test.describe('a sheet and its map on a phone viewport', () => {
 		await expect(handle).toBeHidden();
 		await expect(page.locator('h1')).toBeVisible();
 		expect(new URL(page.url()).pathname).toBe(locationUrl);
+	});
+});
+
+test.describe('a half sheet on a phone viewport', () => {
+	test.use({ viewport });
+
+	test('a pull up from half raises the sheet where it was read', async ({ page, request }) => {
+		const locationUrl = await getRegionLocation(request);
+		const root = page.locator('html');
+		const handle = page.locator('atlas-sheet-handle button');
+
+		await openSheetFromMap(page, locationUrl);
+		await expect(root).toHaveAttribute('data-atlas-sheet', 'half');
+		await expect(handle).toHaveAttribute('aria-expanded', 'true');
+		expect(await getTop(handle)).toBeCloseTo(splitPx, 0);
+
+		await page.evaluate(() => {
+			window.scrollTo({ behavior: 'instant', top: 600 });
+		});
+
+		const titleTop = await getTop(page.locator('h1'));
+
+		await dragHandle(page, handle, viewport.height * -0.3);
+
+		await expect(root).not.toHaveAttribute('data-atlas-sheet');
+		await expect(page.locator('.main-pane')).toHaveCSS('translate', 'none');
+		expect(await getScrollY(page)).toBe(600);
+		expect(await getTop(page.locator('h1'))).toBeCloseTo((titleTop ?? 0) - splitPx, 0);
+	});
+
+	test('the X on the map at half leaves the page where it was read', async ({ page, request }) => {
+		const locationUrl = await getRegionLocation(request);
+		const root = page.locator('html');
+		const shell = page.locator('.atlas-shell');
+		const title = page.locator('h1');
+
+		await openSheetFromMap(page, locationUrl);
+		await expect(root).toHaveAttribute('data-atlas-sheet', 'half');
+
+		await page.evaluate(() => {
+			window.scrollTo({ behavior: 'instant', top: 900 });
+		});
+
+		const titleTop = await getTop(title);
+
+		await shell.locator('.maplibregl-ctrl-exit').click();
+
+		await expect(root).not.toHaveAttribute('data-atlas');
+		await expect(root).not.toHaveAttribute('data-atlas-sheet');
+		await expect(shell).toBeHidden();
+
+		expect(await getTop(title)).toBeCloseTo(titleTop ?? 0, 0);
+	});
+
+	test('a page arrives at half below the site header, its Target in the map above the split', async ({
+		page,
+		request,
+	}) => {
+		const locationUrl = await getRegionLocation(request, singlePointViewPattern);
+		const root = page.locator('html');
+		const shell = page.locator('.atlas-shell');
+		const marker = shell.locator('.maplibregl-marker').first();
+		const handle = page.locator('atlas-sheet-handle button');
+
+		await openSheetFromMap(page, locationUrl);
+
+		await expect(root).toHaveAttribute('data-atlas-sheet', 'half');
+		await expect(marker).toBeVisible();
+
+		const mainBox = await page.locator('.main-pane > main').boundingBox();
+		const markerBox = await marker.boundingBox();
+
+		if (!markerBox) throw new Error('The Target has no marker');
+
+		expect(mainBox?.y).toBeCloseTo(splitPx + handlePx, 0);
+		expect(markerBox.y + markerBox.height).toBeLessThan(splitPx);
+		await expect(page.locator('.atlas-inline-map')).toBeHidden();
+
+		await lowerSheet(page, handle);
+		expect(await marker.boundingBox()).toEqual(markerBox);
+
+		await handle.press('ArrowUp');
+		await expect(root).toHaveAttribute('data-atlas-sheet', 'half');
+		await handle.press('ArrowUp');
+		await expect(root).not.toHaveAttribute('data-atlas-sheet');
+		await handle.press('Enter');
+		await expect(root).toHaveAttribute('data-atlas-sheet', 'down');
+		expect(await marker.boundingBox()).toEqual(markerBox);
+	});
+
+	test('an element scrolled into view at half lands below the split', async ({ page, request }) => {
+		const locationUrl = await getRegionLocation(request);
+		const title = page.locator('h1');
+
+		await openSheetFromMap(page, locationUrl);
+		await expect(page.locator('html')).toHaveAttribute('data-atlas-sheet', 'half');
+
+		await page.evaluate(() => {
+			window.scrollTo({ behavior: 'instant', top: document.documentElement.scrollHeight });
+		});
+		await title.evaluate((element) => {
+			element.scrollIntoView({ behavior: 'instant', block: 'start' });
+		});
+
+		expect(await getTop(title)).toBeCloseTo(splitPx + handlePx, 0);
+	});
+
+	test('the open rest a reader chose decides every later arrival', async ({ page, request }) => {
+		const locationUrl = await getRegionLocation(request);
+		const root = page.locator('html');
+		const handle = page.locator('atlas-sheet-handle button');
+
+		await openSheetFromMap(page, locationUrl);
+		await expect(root).toHaveAttribute('data-atlas-sheet', 'half');
+
+		await handle.press('ArrowUp');
+		await expect(root).not.toHaveAttribute('data-atlas-sheet');
+
+		await page.goBack();
+		await page.waitForURL(`**${atlasPath}`);
+		await openFromMap(page, paths.regionDetail);
+
+		await expect(root).toHaveAttribute('data-atlas-page', 'pane');
+		await expect(root).not.toHaveAttribute('data-atlas-sheet');
+
+		await handle.press('ArrowDown');
+		await expect(root).toHaveAttribute('data-atlas-sheet', 'half');
+
+		await page.reload({ waitUntil: 'domcontentloaded' });
+
+		await expect(root).toHaveAttribute('data-atlas-sheet', 'half');
+	});
+});
+
+test.describe('a Target on a half sheet', () => {
+	// The Target's ring pulses over the label otherwise, and no two shots agree
+	test.use({ reducedMotion: 'reduce', viewport });
+
+	test("a tap on the open Location's own Point leaves no label on the map", async ({
+		page,
+		request,
+	}) => {
+		const locationUrl = await getRegionLocation(request, singlePointViewPattern);
+		const marker = page.locator('.atlas-shell .maplibregl-marker').first();
+
+		await openSheetFromMap(page, locationUrl);
+		await expect(page.locator('html')).toHaveAttribute('data-atlas-sheet', 'half');
+		await expect(marker).toBeVisible();
+
+		const box = await marker.boundingBox();
+
+		if (!box) throw new Error('The Target has no marker to tap');
+
+		const x = box.x + box.width / 2;
+		const y = box.y + box.height / 2;
+		const top = Math.max(0, y - 60);
+		const clip = { height: Math.min(splitPx, y + 30) - top, width: viewport.width, x: 0, y: top };
+
+		const idle = await getSettledShot(page, clip);
+
+		await page.mouse.move(x, y);
+		await expect.poll(async () => idle.equals(await page.screenshot({ clip }))).toBe(false);
+
+		const hovered = await getSettledShot(page, clip);
+
+		await page.mouse.click(x, y);
+
+		await expect.poll(async () => hovered.equals(await page.screenshot({ clip }))).toBe(false);
+	});
+});
+
+test.describe('a sheet on a phone held sideways', () => {
+	test.use({ viewport: landscapeViewport });
+
+	test('there is no half rest under the height gate', async ({ page, request }) => {
+		const locationUrl = await getRegionLocation(request);
+		const root = page.locator('html');
+		const handle = page.locator('atlas-sheet-handle button');
+
+		await page.addInitScript((storageKey) => {
+			localStorage.setItem(storageKey, 'half');
+		}, sheetRestStorageKey);
+
+		await openSheetFromMap(page, locationUrl);
+
+		await expect(root).toHaveAttribute('data-atlas-page', 'pane');
+		await expect(root).not.toHaveAttribute('data-atlas-sheet');
+		await expect.poll(() => readMapInset(page)).toBe(0);
+
+		await handle.press('ArrowDown');
+		await expect(root).toHaveAttribute('data-atlas-sheet', 'down');
+
+		await handle.press('Enter');
+		await expect(root).not.toHaveAttribute('data-atlas-sheet');
+	});
+
+	test('a half sheet falls to raised when the screen turns', async ({ page, request }) => {
+		const locationUrl = await getRegionLocation(request);
+		const root = page.locator('html');
+
+		await page.setViewportSize(viewport);
+		await openSheetFromMap(page, locationUrl);
+		await expect(root).toHaveAttribute('data-atlas-sheet', 'half');
+		await expect
+			.poll(() => readMapInset(page))
+			.toBeCloseTo(viewport.height - handlePx - splitPx, 0);
+
+		await page.setViewportSize(landscapeViewport);
+
+		await expect(root).not.toHaveAttribute('data-atlas-sheet');
+		await expect.poll(() => readMapInset(page)).toBe(0);
 	});
 });
 
@@ -655,7 +906,7 @@ test.describe('a Region sheet on a phone viewport', () => {
 
 		await scopeName.click();
 
-		await expect(root).not.toHaveAttribute('data-atlas-sheet');
+		await expect(root).toHaveAttribute('data-atlas-sheet', 'half');
 		expect(new URL(page.url()).pathname).toBe(paths.regionDetail);
 
 		await handle.click();
@@ -667,32 +918,26 @@ test.describe('a Region sheet on a phone viewport', () => {
 		await expect(metrics).toHaveText(fullMetrics);
 	});
 
-	test('the globe on a page lowers it in place over the map', async ({ page }) => {
+	test('the globe on a page takes it to half, and the page goes on from what followed its map', async ({
+		page,
+	}) => {
 		const root = page.locator('html');
 		const canvas = page.locator('.atlas-shell canvas.maplibregl-canvas');
-		const handle = page.locator('atlas-sheet-handle button');
-
 		const inlineMap = page.locator('.atlas-inline-map');
+		const next = page.locator('.atlas-inline-map + *');
 
 		await visit(page, paths.regionDetail);
-		await inlineMap.scrollIntoViewIfNeeded();
-
-		const inlineMapBox = await inlineMap.boundingBox();
-
 		await enterAtlas(page);
 
-		await expect(root).toHaveAttribute('data-atlas-sheet', 'down');
+		await expect(root).toHaveAttribute('data-atlas-sheet', 'half');
 		await expect(root).toHaveAttribute('data-atlas');
 		await expect(canvas).toBeVisible({ timeout: 10_000 });
+		await expect(inlineMap).toBeHidden();
 		expect(new URL(page.url()).pathname).toBe(paths.regionDetail);
+		expect(await getTop(next)).toBeCloseTo(splitPx + handlePx, 0);
 
-		const scrollY = await getScrollY(page);
-
-		await handle.click();
-
-		await expect(root).not.toHaveAttribute('data-atlas-sheet');
-		await expect(page.locator('.main-pane')).toHaveCSS('translate', 'none');
-		expect(await getScrollY(page)).toBe(scrollY);
-		expect(await inlineMap.boundingBox()).toEqual(inlineMapBox);
+		expect(
+			await page.evaluate((storageKey) => localStorage.getItem(storageKey), sheetRestStorageKey),
+		).toBeNull();
 	});
 });

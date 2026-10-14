@@ -1,13 +1,36 @@
 import { trackMap } from '@spectralcodex/react-map-component/track';
 
-import { atlasSheetAttribute } from '#lib/atlas/atlas-constants.ts';
-import { getSheetRelease } from '#lib/atlas/atlas-sheet-factory.ts';
-import { grabSheet, isSheetDown, isSheetGrabbed, moveSheet } from '#lib/atlas/atlas-sheet.ts';
+import type { AtlasSheetRest } from '#lib/atlas/atlas-layout-factory.ts';
+
+import { atlasSheetAttribute, atlasSheetRest } from '#lib/atlas/atlas-constants.ts';
+import { readSheetRest } from '#lib/atlas/atlas-layout.ts';
+import { getSheetStepRest, getSheetTapRest } from '#lib/atlas/atlas-sheet-factory.ts';
+import {
+	grabSheet,
+	isSheetGrabbed,
+	moveSheet,
+	readPreferredSheetRest,
+	readSheetRests,
+	storeSheetRest,
+} from '#lib/atlas/atlas-sheet.ts';
 
 const tapTolerancePx = 4;
 
-function trackSheetToggle(isDown: boolean) {
-	trackMap({ data: { down: isDown }, name: 'map-sheet-toggle' });
+const stepDirections: Record<string, 'down' | 'up'> = { ArrowDown: 'down', ArrowUp: 'up' };
+
+function commitRest(rest: AtlasSheetRest) {
+	trackMap({ data: { rest }, name: 'map-sheet-toggle' });
+	storeSheetRest(rest);
+}
+
+function getReleaseKind(eventType: string, isDragged: boolean) {
+	if (eventType !== 'pointerup') return 'cancel';
+
+	return isDragged ? 'drag' : 'tap';
+}
+
+function getTapRest() {
+	return getSheetTapRest({ from: readSheetRest(), preferred: readPreferredSheetRest() });
 }
 
 class AtlasSheetHandle extends HTMLElement {
@@ -17,7 +40,6 @@ class AtlasSheetHandle extends HTMLElement {
 	#fromY = 0;
 	#isDragged = false;
 	#pointerId: number | undefined;
-	#travelPx = 0;
 
 	connectedCallback() {
 		const button = this.querySelector('button');
@@ -30,7 +52,7 @@ class AtlasSheetHandle extends HTMLElement {
 
 		const stuckObserver = new IntersectionObserver(
 			([entry]) => {
-				if (!entry || isSheetGrabbed() || isSheetDown()) return;
+				if (!entry || isSheetGrabbed() || readSheetRest() !== atlasSheetRest.raised) return;
 
 				this.toggleAttribute('data-stuck', entry.intersectionRatio < 1);
 			},
@@ -38,7 +60,7 @@ class AtlasSheetHandle extends HTMLElement {
 		);
 
 		const updateButton = () => {
-			const isDown = isSheetDown();
+			const isDown = readSheetRest() === atlasSheetRest.down;
 			const label = isDown ? this.dataset.labelRaise : this.dataset.labelLower;
 
 			button.setAttribute('aria-expanded', String(!isDown));
@@ -59,6 +81,7 @@ class AtlasSheetHandle extends HTMLElement {
 
 		document.addEventListener('dragstart', this.#handleDragStart, { signal });
 		button.addEventListener('click', this.#handleClick, { signal });
+		button.addEventListener('keydown', this.#handleKeyDown, { signal });
 		button.addEventListener('pointercancel', this.#handlePointerEnd, { signal });
 		button.addEventListener('pointerdown', this.#handlePointerDown, { signal });
 		button.addEventListener('pointermove', this.#handlePointerMove, { signal });
@@ -73,11 +96,20 @@ class AtlasSheetHandle extends HTMLElement {
 	#handleClick = (event: MouseEvent) => {
 		const isKeyboard = event.detail === 0;
 
-		if (isKeyboard) this.#toggle();
+		if (isKeyboard) this.#moveTo(getTapRest());
 	};
 
 	#handleDragStart = (event: DragEvent) => {
 		if (this.#pointerId !== undefined) event.preventDefault();
+	};
+
+	#handleKeyDown = (event: KeyboardEvent) => {
+		const direction = stepDirections[event.key];
+
+		if (!direction) return;
+
+		event.preventDefault();
+		this.#moveTo(getSheetStepRest({ direction, from: readSheetRest(), rests: readSheetRests() }));
 	};
 
 	#handlePointerDown = (event: PointerEvent) => {
@@ -92,7 +124,6 @@ class AtlasSheetHandle extends HTMLElement {
 		this.#pointerId = event.pointerId;
 		this.#fromX = event.clientX;
 		this.#fromY = event.clientY;
-		this.#travelPx = 0;
 		this.#isDragged = false;
 
 		event.currentTarget.setPointerCapture(event.pointerId);
@@ -101,21 +132,16 @@ class AtlasSheetHandle extends HTMLElement {
 	#handlePointerEnd = (event: PointerEvent) => {
 		if (event.pointerId !== this.#pointerId) return;
 
-		const isToggled =
-			getSheetRelease({
-				eventType: event.type,
-				isDragged: this.#isDragged,
-				travelPx: this.#travelPx,
-				viewportHeight: window.innerHeight,
-			}) === 'toggle';
-		const isDown = isSheetDown() !== isToggled;
-
-		const isReleased = this.#drag?.release(isDown) ?? false;
-
-		if (isToggled && isReleased) trackSheetToggle(isDown);
+		const drag = this.#drag;
 
 		this.#drag = undefined;
 		this.#pointerId = undefined;
+
+		if (!drag) return;
+
+		const rest = drag.release(getReleaseKind(event.type, this.#isDragged));
+
+		if (rest) commitRest(rest);
 	};
 
 	#handlePointerMove = (event: PointerEvent) => {
@@ -125,15 +151,15 @@ class AtlasSheetHandle extends HTMLElement {
 
 		if (pointerPx > tapTolerancePx) this.#isDragged = true;
 
-		this.#travelPx = this.#drag.move(event.clientY - this.#fromY);
+		this.#drag.move(event.clientY - this.#fromY);
 	};
 
-	#toggle() {
-		const isDown = !isSheetDown();
+	#moveTo(rest: AtlasSheetRest) {
+		if (isSheetGrabbed() || rest === readSheetRest()) return;
 
-		trackSheetToggle(isDown);
+		commitRest(rest);
 
-		void moveSheet(isDown);
+		void moveSheet(rest);
 	}
 }
 

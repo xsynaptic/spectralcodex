@@ -2,8 +2,13 @@
 import {
 	atlasFlagStorageKey,
 	atlasPage,
+	atlasPaneMediaQuery,
 	atlasPaneSizeProperty,
 	atlasPaneStorageKey,
+	atlasSheetAttribute,
+	atlasSheetHalfMediaQuery,
+	atlasSheetRest,
+	atlasSheetRestStorageKey,
 } from '#lib/atlas/atlas-constants.ts';
 ---
 
@@ -11,8 +16,14 @@ import {
 	define:vars={{
 		flagStorageKey: atlasFlagStorageKey,
 		mapPage: atlasPage.map,
+		paneMediaQuery: atlasPaneMediaQuery,
+		panePage: atlasPage.pane,
 		paneSizeProperty: atlasPaneSizeProperty,
 		paneStorageKey: atlasPaneStorageKey,
+		sheetAttribute: atlasSheetAttribute,
+		sheetHalf: atlasSheetRest.half,
+		sheetHalfMediaQuery: atlasSheetHalfMediaQuery,
+		sheetRestStorageKey: atlasSheetRestStorageKey,
 	}}
 	is:inline
 >
@@ -40,6 +51,24 @@ import {
 
 	if (Number.isFinite(paneSize) && paneSize > 0) {
 		root.style.setProperty(paneSizeProperty, `${paneSize}px`);
+	}
+
+	let sheetRest;
+
+	try {
+		sheetRest = localStorage.getItem(sheetRestStorageKey);
+	} catch {
+		// localStorage unavailable
+	}
+
+	if (
+		isEnabled &&
+		sheetRest === sheetHalf &&
+		root.dataset.atlasPage === panePage &&
+		!matchMedia(paneMediaQuery).matches &&
+		matchMedia(sheetHalfMediaQuery).matches
+	) {
+		root.setAttribute(sheetAttribute, sheetHalf);
 	}
 </script>
 

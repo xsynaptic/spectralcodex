@@ -161,15 +161,50 @@
 	}
 }
 
+@property --atlas-sheet-split {
+	syntax: '<length>';
+	inherits: true;
+	initial-value: 0;
+}
+
+@property --atlas-sheet-rest {
+	syntax: '<length>';
+	inherits: true;
+	initial-value: 0;
+}
+
 @media (width < 64rem) {
-	:root[data-atlas][data-atlas-page='pane'] {
+	:root {
 		--atlas-sheet-handle-size: 1.5rem;
 		--atlas-sheet-handle-reach: 0.5rem;
+		--atlas-sheet-split: 40svh;
 		--atlas-sheet-rest: calc(100dvh - var(--atlas-sheet-handle-size));
+	}
 
+	/* The large viewport never changes, so a collapsing toolbar cannot resize the canvas under a scrolling page */
+	.atlas-shell {
+		bottom: auto;
+		height: 100lvh;
+	}
+
+	.atlas-shell :is(.maplibregl-ctrl-bottom-left, .maplibregl-ctrl-bottom-right) {
+		bottom: calc(100lvh - 100dvh);
+	}
+
+	:root[data-atlas][data-atlas-page='pane'] {
 		.atlas-shell {
 			visibility: visible;
 			padding-bottom: var(--atlas-sheet-handle-size);
+
+			@media (height >= 30rem) {
+				--map-inset-bottom: calc(
+					100lvh - var(--atlas-sheet-handle-size) - var(--atlas-sheet-split)
+				);
+			}
+		}
+
+		.atlas-inline-map {
+			display: none;
 		}
 
 		.atlas-shell .maplibregl-ctrl:has(> .maplibregl-ctrl-expand) {
@@ -183,7 +218,7 @@
 		}
 
 		/* Named only to slide in over the map; between sheets the page crossfades whole, as any page does */
-		&:is([data-atlas-from='map'], [data-atlas-sheet='down']) .atlas-shell {
+		&:is([data-atlas-from='map'], [data-atlas-sheet]) .atlas-shell {
 			view-transition-name: atlas-map;
 		}
 
@@ -215,8 +250,16 @@
 			padding-top: var(--atlas-sheet-handle-size);
 		}
 
+		&[data-atlas-sheet='half'] .main-pane {
+			margin-top: var(--atlas-sheet-split);
+		}
+
+		&[data-atlas-sheet='half'] .atlas-sheet-handle {
+			top: var(--atlas-sheet-split);
+		}
+
 		.atlas-sheet-handle[data-stuck],
-		&[data-atlas-sheet='down'] .atlas-sheet-handle,
+		&[data-atlas-sheet] .atlas-sheet-handle,
 		.main-pane[data-grabbing] > .atlas-sheet-handle {
 			background-color: light-dark(var(--color-primary-100), var(--color-primary-800));
 		}
@@ -246,13 +289,26 @@
 				);
 			}
 
-			.atlas-sheet-handle {
+			&:not([data-atlas-sheet='half']) .atlas-sheet-handle {
 				top: 0;
 			}
 
-			.progress-bar,
+			progress-reading,
 			top-button {
 				visibility: hidden;
+			}
+		}
+
+		&[data-atlas-sheet='half'] {
+			scroll-padding-top: calc(var(--atlas-sheet-split) + var(--atlas-sheet-handle-size));
+
+			&:not(:has(.main-pane[data-grabbing])) .atlas-shell {
+				z-index: var(--z-index-sheet-map);
+				clip-path: inset(0 0 calc(100% - var(--atlas-sheet-split)) 0);
+			}
+
+			.atlas-shell :is(.maplibregl-ctrl-bottom-left, .maplibregl-ctrl-bottom-right) {
+				bottom: calc(100% - var(--atlas-sheet-split));
 			}
 		}
 	}
