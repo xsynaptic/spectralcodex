@@ -37,7 +37,7 @@ export const MapSelectionFeatureState: FC = function MapSelectionFeatureState() 
 		selectedFeatureIdRef.current = selectedId;
 	}, [map, selectedId]);
 
-	// Toggling dark mode replaces the whole style (`styleDiffing` is off), which wipes feature-state
+	// Toggling dark mode re-adds every source, diffed or not, which wipes feature-state
 	useEffect(() => {
 		if (!map || selectedId === undefined) return;
 

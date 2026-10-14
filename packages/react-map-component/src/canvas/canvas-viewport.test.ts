@@ -49,14 +49,14 @@ describe('readSavedViewport', () => {
 		expect(readSavedViewport('objectives', { now: () => savedAt, storage })).toBeUndefined();
 	});
 
-	test('keeps a viewport for thirty minutes and no longer', () => {
+	test('keeps a viewport for two hours and no longer', () => {
 		const storage = createSavedStorage();
 
-		expect(readSavedViewport('atlas', { now: () => savedAt + 30 * minuteMs, storage })).toEqual(
+		expect(readSavedViewport('atlas', { now: () => savedAt + 120 * minuteMs, storage })).toEqual(
 			viewport,
 		);
 		expect(
-			readSavedViewport('atlas', { now: () => savedAt + 30 * minuteMs + 1, storage }),
+			readSavedViewport('atlas', { now: () => savedAt + 120 * minuteMs + 1, storage }),
 		).toBeUndefined();
 	});
 

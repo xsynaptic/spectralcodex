@@ -4,7 +4,7 @@ import type { MapComponentProps, MapInitialViewState } from '#types.ts';
 
 import { mapViewportStorageKeyPrefix } from '#constants.ts';
 
-const staleTimeMs = 30 * 60 * 1000;
+const staleTimeMs = 2 * 60 * 60 * 1000;
 const defaultZoom = 12;
 const fitBoundsOptions = { padding: { bottom: 20, left: 50, right: 50, top: 20 } };
 
