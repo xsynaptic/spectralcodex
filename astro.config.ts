@@ -16,6 +16,7 @@ import pagefind from 'astro-pagefind';
 import { defineConfig, envField, fontProviders } from 'astro/config';
 import { loadEnv } from 'vite';
 
+import { mdxComponentFiles } from '#constants.ts';
 import devInventory from '#dev/inventory/inventory-integration.ts';
 import atlas from '#lib/atlas/atlas-integration.ts';
 
@@ -199,18 +200,12 @@ export default defineConfig({
 			mdastPlugins: [
 				autoImport({
 					imports: [
-						{
-							'./src/components/mdx/build-stats.astro': [['default', 'BuildStats']],
-							'./src/components/mdx/email.astro': [['default', 'Email']],
-							'./src/components/mdx/hide.astro': [['default', 'Hide']],
-							'./src/components/mdx/img-group.astro': [['default', 'ImgGroup']],
-							'./src/components/mdx/img.astro': [['default', 'Img']],
-							'./src/components/mdx/link.astro': [['default', 'Link']],
-							'./src/components/mdx/locations-table.astro': [['default', 'LocationsTable']],
-							'./src/components/mdx/map.astro': [['default', 'Map']],
-							'./src/components/mdx/more.astro': [['default', 'More']],
-							'./src/components/mdx/resource.astro': [['default', 'Resource']],
-						},
+						Object.fromEntries(
+							Object.entries(mdxComponentFiles).map(([name, file]) => [
+								`./src/components/mdx/${file}.astro`,
+								[['default', name]],
+							]),
+						),
 					],
 				}),
 				imgGroupSatteriPlugin({

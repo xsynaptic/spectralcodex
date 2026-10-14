@@ -41,17 +41,21 @@ export const mapDisplayRegionIds = new Set([
 	'vietnam',
 ]);
 
-export const mdxComponents = [
-	'Email',
-	'Hide',
-	'Img',
-	'ImgGroup',
-	'Link',
-	'LocationsTable',
-	'Map',
-	'More',
-	'Resource',
-];
+// Auto-imported into every MDX file and stripped from word counts and descriptions
+export const mdxComponentFiles = {
+	BuildStats: 'build-stats',
+	Email: 'email',
+	Hide: 'hide',
+	Img: 'img',
+	ImgGroup: 'img-group',
+	Link: 'link',
+	LocationsTable: 'locations-table',
+	Map: 'map',
+	More: 'more',
+	Resource: 'resource',
+} as const;
+
+export const mdxComponents = Object.keys(mdxComponentFiles);
 
 // Not sure how useful this is nowadays
 export const openGraphTwitterUsername = '@spectralcodex';
