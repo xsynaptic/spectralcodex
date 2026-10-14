@@ -669,7 +669,10 @@ test.describe('a sheet and its map on a phone viewport', () => {
 test.describe('a half sheet on a phone viewport', () => {
 	test.use({ viewport });
 
-	test('a pull up from half raises the sheet where it was read', async ({ page, request }) => {
+	test('a pull up from half raises the sheet where it was read @firefox', async ({
+		page,
+		request,
+	}) => {
 		const locationUrl = await getRegionLocation(request);
 		const root = page.locator('html');
 		const handle = page.locator('atlas-sheet-handle button');

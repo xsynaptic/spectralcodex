@@ -13,9 +13,11 @@
 	display: block;
 	width: calc(var(--spacing) * 10);
 	height: calc(var(--spacing) * 10);
+	user-select: none;
 	list-style: none;
 	opacity: 0.8;
 	transition: opacity 300ms var(--default-transition-timing-function) 200ms;
+	-webkit-touch-callout: none;
 
 	&::-webkit-details-marker {
 		display: none;

@@ -256,8 +256,6 @@ export async function moveSheet(rest: AtlasSheetRest) {
 	if (move !== currentMove || !pane.isConnected) return;
 
 	setSheet(rest);
-	// Firefox's scroll anchoring scrolls the page by the split unless the rest is laid out while the slide still holds the pane
-	pane.getBoundingClientRect();
 	pane.style.translate = '';
 	move.cancel();
 }

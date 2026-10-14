@@ -1,5 +1,5 @@
 import type { LocationStatus, LocationStatusMetadata } from '@spectralcodex/shared/map';
-import type { FC, PropsWithChildren } from 'react';
+import type { CSSProperties, FC, PropsWithChildren } from 'react';
 import type { ControlPosition } from 'react-map-gl/maplibre';
 
 import { locationStatusOrder, LocationStatusRecords } from '@spectralcodex/shared/map';
@@ -231,6 +231,11 @@ const MapFilterObjectiveMenuItem: FC = function MapFilterObjectiveMenuItem() {
 	);
 };
 
+interface FilterMenuStyle extends CSSProperties {
+	'--map-filter-x': string;
+	'--map-filter-y': string;
+}
+
 const MapControlsFilterMenu: FC<{
 	filterPopupOffset?: number;
 	id: string;
@@ -244,9 +249,12 @@ const MapControlsFilterMenu: FC<{
 		<div
 			className="maplibregl-popup maplibregl-popup-anchor-left map-filter-menu"
 			id={id}
-			style={{
-				transform: `translate(0, -50%) translate(${String(filterPosition.x + filterPopupOffset)}px, ${String(filterPosition.y)}px)`,
-			}}
+			style={
+				{
+					'--map-filter-x': `${String(filterPosition.x + filterPopupOffset)}px`,
+					'--map-filter-y': `${String(filterPosition.y)}px`,
+				} satisfies FilterMenuStyle
+			}
 		>
 			<div className="maplibregl-popup-tip"></div>
 			<div className="maplibregl-popup-content">

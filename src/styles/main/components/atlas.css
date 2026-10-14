@@ -183,15 +183,16 @@
 
 	/* The large viewport never changes, so a collapsing toolbar cannot resize the canvas under a scrolling page */
 	.atlas-shell {
+		--map-cover-bottom: calc(100lvh - 100dvh);
+
 		bottom: auto;
 		height: 100lvh;
 	}
 
-	.atlas-shell :is(.maplibregl-ctrl-bottom-left, .maplibregl-ctrl-bottom-right) {
-		bottom: calc(100lvh - 100dvh);
-	}
-
 	:root[data-atlas][data-atlas-page='pane'] {
+		/* Every rest change keeps the scroll offset itself; Gecko and WebKit anchoring follow the moving pane and undo it on settle */
+		overflow-anchor: none;
+
 		.atlas-shell {
 			visibility: visible;
 			padding-bottom: var(--atlas-sheet-handle-size);
@@ -278,10 +279,8 @@
 			}
 		}
 
-		/* Firefox's scroll anchoring follows a translated pane and scrolls the document under it */
 		&:is([data-atlas-sheet='down'], :has(.main-pane[data-grabbing])) {
 			overflow: clip;
-			overflow-anchor: none;
 
 			.main-pane {
 				clip-path: inset(
@@ -302,13 +301,15 @@
 		&[data-atlas-sheet='half'] {
 			scroll-padding-top: calc(var(--atlas-sheet-split) + var(--atlas-sheet-handle-size));
 
+			.atlas-shell {
+				--map-cover-bottom: calc(
+					100lvh - var(--atlas-sheet-handle-size) - var(--atlas-sheet-split)
+				);
+			}
+
 			&:not(:has(.main-pane[data-grabbing])) .atlas-shell {
 				z-index: var(--z-index-sheet-map);
 				clip-path: inset(0 0 calc(100% - var(--atlas-sheet-split)) 0);
-			}
-
-			.atlas-shell :is(.maplibregl-ctrl-bottom-left, .maplibregl-ctrl-bottom-right) {
-				bottom: calc(100% - var(--atlas-sheet-split));
 			}
 		}
 	}

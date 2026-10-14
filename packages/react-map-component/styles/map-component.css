@@ -7,6 +7,12 @@
 	initial-value: 0;
 }
 
+@property --map-cover-bottom {
+	syntax: '<length>';
+	inherits: true;
+	initial-value: 0;
+}
+
 /*
  * Theme tokens; neutral defaults render standalone, a host overrides the ramp on [data-map-root]
  * Dark mode is a per-element ramp-step choice via light-dark(), so the ramp tokens never flip
@@ -276,12 +282,22 @@ button.maplibregl-popup-close-button {
 }
 
 .map-filter-menu {
+	--map-filter-gap: 8px;
+
 	z-index: 10;
 	max-width: min(350px, 80vw);
-	max-height: calc(100% - 40px);
+	max-height: min(
+		100% - var(--map-cover-bottom) - 2 * var(--map-filter-gap),
+		2 * (var(--map-filter-y) - var(--map-filter-gap)),
+		2 * (100% - var(--map-cover-bottom) - var(--map-filter-y) - var(--map-filter-gap))
+	);
+	transform: translate(var(--map-filter-x), var(--map-filter-y)) translateY(-50%);
 }
 
 .map-filter-menu .maplibregl-popup-content {
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	scrollbar-width: none;
 	box-shadow: 0 0 0 2px rgb(0 0 0 / 10%);
 }
 
@@ -673,6 +689,11 @@ button.maplibregl-popup-close-button {
 .maplibregl-ctrl-bottom-left {
 	display: flex;
 	font-size: 10px;
+}
+
+.maplibregl-ctrl-bottom-left,
+.maplibregl-ctrl-bottom-right {
+	bottom: var(--map-cover-bottom);
 }
 
 .maplibregl-ctrl-metrics-loading {
