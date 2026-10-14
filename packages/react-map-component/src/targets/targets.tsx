@@ -10,6 +10,7 @@ import type { MapComponentProps, MapScope } from '#types.ts';
 
 import { useSourceDataQuery } from '#data/data-source.tsx';
 import { useMapHost } from '#host/host-context.tsx';
+import { applyHostInset, useHostInset } from '#host/host-inset.ts';
 import { useHostSyncValue } from '#host/host-view.ts';
 import { useMapStoreActions } from '#store/store.ts';
 import {
@@ -31,13 +32,10 @@ interface MapFitView {
 
 // Pan distance to a position, in map widths at the current zoom
 function getScreensTo(map: MapRef, center: LngLatLike) {
-	const container = map.getContainer();
-	const point = map.project(center);
+	const from = map.project(map.getCenter());
+	const to = map.project(center);
 
-	return (
-		Math.hypot(point.x - container.clientWidth / 2, point.y - container.clientHeight / 2) /
-		container.clientWidth
-	);
+	return Math.hypot(to.x - from.x, to.y - from.y) / map.getContainer().clientWidth;
 }
 
 function getViewFit(map: MapRef, sourceData: ReadonlyArray<MapSourceItem>, view: MapFitView) {
@@ -59,10 +57,16 @@ function getViewFit(map: MapRef, sourceData: ReadonlyArray<MapSourceItem>, view:
 }
 
 // True once the camera has settled on the current Targets, or on the view's bounds when it has none
-function useTargetFit(view: MapFitView) {
+function useViewFit(view: MapFitView) {
 	const { current: map } = useMap();
 	const { data: sourceData } = useSourceDataQuery();
 	const { setFilterOpen, setSelectedId } = useMapStoreActions();
+	const inset = useHostInset(map);
+
+	// Declared before the fit, which measures against the padding
+	useEffect(() => {
+		if (map) applyHostInset(map, inset);
+	}, [inset, map]);
 
 	const getWidth = useCallback(() => map?.getContainer().clientWidth ?? 0, [map]);
 
@@ -112,7 +116,7 @@ function useTargetFit(view: MapFitView) {
 const MapSyncedTargets: FC = function MapSyncedTargets() {
 	const view = useMapView();
 	const { targetIds } = view;
-	const isSettled = useTargetFit(view);
+	const isSettled = useViewFit(view);
 
 	return (
 		<>

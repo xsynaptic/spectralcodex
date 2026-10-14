@@ -1,6 +1,12 @@
 /** MapLibre GL vendor styles (lazy-loaded on map pages only) */
 @import 'maplibre-gl/dist/maplibre-gl.css';
 
+@property --map-inset-bottom {
+	syntax: '<length>';
+	inherits: true;
+	initial-value: 0;
+}
+
 /*
  * Theme tokens; neutral defaults render standalone, a host overrides the ramp on [data-map-root]
  * Dark mode is a per-element ramp-step choice via light-dark(), so the ramp tokens never flip

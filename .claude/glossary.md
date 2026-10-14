@@ -102,7 +102,7 @@ Map Scope, Map Filter, Map Target and Map View keep the prefix everywhere outsid
 
 **Pane**: The part of the Atlas that holds the page: one side of the Split, or the surface that covers the map in the Sheet. _Avoid_: sidebar, panel, drawer.
 
-**Sheet**: The Atlas layout on a screen too narrow for the Split: the page covers the map, and the reader can lower it out of the way to reach the map, then raise it again without losing their place. _Avoid_: drawer, modal, overlay, bottom sheet.
+**Sheet**: The Atlas layout on a screen too narrow for the Split: the page sits over the map at one of three rests (raised, half, lowered), and the reader moves it between them without losing their place. _Avoid_: drawer, modal, overlay, bottom sheet, detent, snap point (a rest).
 
 **Map Target**: A Feature a map is asked to open or center on when it loads, typically the Location whose page is being read. _Avoid_: focus, selected, active, objective.
 

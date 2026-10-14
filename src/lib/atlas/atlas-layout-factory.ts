@@ -1,4 +1,11 @@
+import type { atlasSheetRest } from '#lib/atlas/atlas-constants.ts';
+
 import { atlasPage } from '#lib/atlas/atlas-constants.ts';
+
+export type AtlasSheetRest = (typeof atlasSheetRest)[keyof typeof atlasSheetRest];
+
+export type AtlasScreen =
+	{ layout: 'map' | 'regular' | 'split' } | { layout: 'sheet'; rest: AtlasSheetRest };
 
 export interface AtlasLayoutState {
 	hasFlag: boolean;

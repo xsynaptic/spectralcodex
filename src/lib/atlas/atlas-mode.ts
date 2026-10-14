@@ -3,29 +3,47 @@ import {
 	mapExitEventName,
 	mapExpandEventName,
 	mapIntentEventName,
+	mapSyncEventName,
 } from '@spectralcodex/react-map-component/constants';
 import { navigate } from 'astro:transitions/client';
 
+import type { AtlasScreen } from '#lib/atlas/atlas-layout-factory.ts';
+
 import {
 	atlasFlagStorageKey,
+	atlasInlineMapSelector,
 	atlasPage,
+	atlasPaneMainSelector,
 	atlasPaneMediaQuery,
 	atlasPaneSelector,
 	atlasPaneSizeProperty,
 	atlasPersistName,
 	atlasReturnStorageKey,
+	atlasSheetHalfMediaQuery,
+	atlasSheetRest,
 } from '#lib/atlas/atlas-constants.ts';
 import { getAtlasExitAction } from '#lib/atlas/atlas-exit-factory.ts';
-import { readAtlasLayout } from '#lib/atlas/atlas-layout.ts';
+import { readAtlasLayout, readAtlasScreen, readSheetRest } from '#lib/atlas/atlas-layout.ts';
 import { getAtlasOpenAction } from '#lib/atlas/atlas-open-factory.ts';
 import { updateHeroSizes } from '#lib/atlas/atlas-pane.ts';
-import { isSheetDown, moveSheet, resetSheet } from '#lib/atlas/atlas-sheet.ts';
-import { dispatchSync } from '#lib/atlas/atlas-sync.ts';
+import {
+	moveSheet,
+	prepareSheetArrival,
+	readPreferredSheetRest,
+	readSheetEnterRest,
+	resetSheet,
+	scrollToSheetStart,
+	setSheet,
+	startColdSheetArrival,
+} from '#lib/atlas/atlas-sheet.ts';
 import { getSitePath } from '#lib/utils/routing.ts';
 
 const paneAnchorSelector = `${atlasPaneSelector} a[href]`;
-const paneMainSelector = `${atlasPaneSelector} > main`;
 const shellSelector = `[data-astro-transition-persist="${atlasPersistName}"]`;
+
+function dispatchSync() {
+	document.dispatchEvent(new Event(mapSyncEventName));
+}
 
 // Following an outbound link in the same tab unloads the map; internal links swap into the pane
 function updateExternalLinks() {
@@ -56,13 +74,14 @@ function storeFlag(isEnabled: boolean) {
 function getSheetMainTop() {
 	if (matchMedia(atlasPaneMediaQuery).matches) return 0;
 
-	return document.querySelector(paneMainSelector)?.getBoundingClientRect().top ?? 0;
+	return document.querySelector(atlasPaneMainSelector)?.getBoundingClientRect().top ?? 0;
 }
 
 function setFlag(isEnabled: boolean) {
-	if (!isEnabled) resetSheet();
-
 	const mainTop = getSheetMainTop();
+
+	// Inside the measure, so a half rest's margin leaving does not move the page either
+	if (!isEnabled) resetSheet();
 
 	document.documentElement.toggleAttribute('data-atlas', isEnabled);
 	window.scrollBy({ behavior: 'instant', top: getSheetMainTop() - mainTop });
@@ -81,6 +100,22 @@ function getReturnPath() {
 	}
 }
 
+function openSheet() {
+	const rest = readSheetEnterRest();
+
+	if (rest === atlasSheetRest.down) {
+		void moveSheet(rest);
+		return;
+	}
+
+	const inlineMap = document.querySelector(atlasInlineMapSelector);
+	const next = inlineMap?.nextElementSibling ?? inlineMap?.parentElement?.nextElementSibling;
+
+	setSheet(rest);
+
+	if (next) scrollToSheetStart('instant', next);
+}
+
 function openAtlas() {
 	if (document.fullscreenElement) void document.exitFullscreen();
 
@@ -89,7 +124,7 @@ function openAtlas() {
 	document.querySelector<HTMLElement>(shellSelector)?.focus({ preventScroll: true });
 
 	if (readAtlasLayout() === 'sheet') {
-		void moveSheet(true);
+		openSheet();
 		return;
 	}
 
@@ -115,7 +150,11 @@ function runOpenAction(action: ReturnType<typeof getAtlasOpenAction>) {
 			break;
 		}
 		case 'raise': {
-			void moveSheet(false);
+			void moveSheet(readPreferredSheetRest());
+			break;
+		}
+		case 'start': {
+			scrollToSheetStart('smooth');
 			break;
 		}
 		case 'top': {
@@ -126,7 +165,7 @@ function runOpenAction(action: ReturnType<typeof getAtlasOpenAction>) {
 }
 
 async function closeAtlas() {
-	if (isSheetDown()) await moveSheet(false);
+	if (readSheetRest() === atlasSheetRest.down) await moveSheet(atlasSheetRest.raised);
 
 	const hasShellFocus = document.querySelector(shellSelector)?.contains(document.activeElement);
 
@@ -152,6 +191,12 @@ async function closeAtlas() {
 	);
 }
 
+function getFromPage(screen: AtlasScreen) {
+	const isLowered = screen.layout === 'sheet' && screen.rest === atlasSheetRest.down;
+
+	return isLowered ? atlasPage.map : document.documentElement.dataset.atlasPage;
+}
+
 async function clearFromWhenFinished(transition: ViewTransition) {
 	await transition.finished;
 
@@ -164,7 +209,7 @@ export function startAtlasMode() {
 		const action = getAtlasOpenAction({
 			intent: event.detail,
 			pathname: location.pathname,
-			sheet: isSheetDown() ? 'down' : 'raised',
+			screen: readAtlasScreen(),
 		});
 
 		// Left uncancelled, the map spends the click on its own popup
@@ -176,6 +221,13 @@ export function startAtlasMode() {
 	matchMedia(atlasPaneMediaQuery).addEventListener('change', () => {
 		resetSheet();
 		updateSplit();
+		dispatchSync();
+	});
+
+	matchMedia(atlasSheetHalfMediaQuery).addEventListener('change', () => {
+		if (readSheetRest() === atlasSheetRest.half) resetSheet();
+
+		dispatchSync();
 	});
 
 	document.addEventListener(mapEnterEventName, openAtlas);
@@ -199,9 +251,12 @@ export function startAtlasMode() {
 
 		if (paneSize) incomingRoot.style.setProperty(atlasPaneSizeProperty, paneSize);
 
-		const from = isSheetDown() ? atlasPage.map : root.dataset.atlasPage;
+		const screen = readAtlasScreen();
+		const from = getFromPage(screen);
 
 		if (from) incomingRoot.dataset.atlasFrom = from;
+
+		prepareSheetArrival(event, screen);
 
 		updateHeroSizes(event.newDocument);
 
@@ -216,6 +271,8 @@ export function startAtlasMode() {
 		target.dataset.astroTransitionPersist = atlasPersistName;
 		event.newDocument.body.append(target);
 	});
+
+	document.addEventListener('astro:page-load', startColdSheetArrival, { once: true });
 
 	document.addEventListener('astro:page-load', () => {
 		if (readAtlasLayout() !== 'map') {

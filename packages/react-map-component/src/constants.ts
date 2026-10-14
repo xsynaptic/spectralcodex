@@ -16,6 +16,7 @@ export const mapExpandEventName = 'map:expand';
 export const mapIntentEventName = 'map:intent';
 export const mapSyncEventName = 'map:sync';
 export const mapViewAttribute = 'data-map-view';
+export const mapInsetProperty = '--map-inset-bottom';
 
 declare global {
 	interface DocumentEventMap {
