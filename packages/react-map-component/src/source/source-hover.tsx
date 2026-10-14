@@ -32,6 +32,14 @@ function getClustersLabelHoverLayerStyle() {
 	} satisfies SymbolLayerSpecification;
 }
 
+export function getPointsLabelPaint(isDarkMode: boolean) {
+	return {
+		'text-color': isDarkMode ? tailwindColors.zinc200 : tailwindColors.zinc700,
+		'text-halo-color': isDarkMode ? 'rgba(0, 0, 0, 0.4)' : 'rgba(255, 255, 255, 0.8)',
+		'text-halo-width': 1.2,
+	} satisfies SymbolLayerSpecification['paint'];
+}
+
 // Text labels for individual points on hover
 function getPointsLabelLayerStyle(isDarkMode: boolean) {
 	return {
@@ -48,11 +56,7 @@ function getPointsLabelLayerStyle(isDarkMode: boolean) {
 			// We'd like to interpolate these values but there is a type issue with MapLibre
 			'text-variable-anchor-offset': ['bottom', [0, -0.9], 'right', [-0.8, 0]],
 		},
-		paint: {
-			'text-color': isDarkMode ? tailwindColors.zinc200 : tailwindColors.zinc700,
-			'text-halo-color': isDarkMode ? 'rgba(0, 0, 0, 0.4)' : 'rgba(255, 255, 255, 0.8)',
-			'text-halo-width': 1.2,
-		},
+		paint: getPointsLabelPaint(isDarkMode),
 		source: MapSourceIdEnum.HoverCollection,
 		type: 'symbol',
 	} satisfies SymbolLayerSpecification;

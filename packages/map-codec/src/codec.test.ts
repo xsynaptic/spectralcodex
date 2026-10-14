@@ -187,6 +187,7 @@ describe('round trips', () => {
 				id: 'a',
 				objective: 2,
 				outlier: true,
+				pointTitle: 'Point (點)',
 				precision: 3,
 				rating: 5,
 				regionOrdinals: [1, 2],

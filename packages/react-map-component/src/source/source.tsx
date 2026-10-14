@@ -8,6 +8,7 @@ import { useMapApiDivisionData } from '#data/data-division.ts';
 import { MapSourceDebug } from '#source/source-debug.tsx';
 import { MapSourceDivisions } from '#source/source-divisions.tsx';
 import { MapSourceHover } from '#source/source-hover.tsx';
+import { MapSourceLabels } from '#source/source-labels.tsx';
 import { MapSourceLines } from '#source/source-lines.tsx';
 import { MapSourcePoints } from '#source/source-points.tsx';
 import { useIsMapCanvasInteractive } from '#store/store.ts';
@@ -47,6 +48,7 @@ export const MapSource: FC<
 				data={pointCollection ?? emptyFeatureCollection}
 				interactive={isInteractive}
 			/>
+			<MapSourceLabels />
 			<MapSourceHover />
 			{isDebug && bounds ? <MapSourceDebug bounds={bounds} /> : undefined}
 		</>

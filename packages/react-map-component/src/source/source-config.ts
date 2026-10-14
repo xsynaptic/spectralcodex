@@ -12,6 +12,7 @@ export const MapLayerIdEnum = {
 	PointsTarget: 'points-target',
 	Polygon: 'polygon',
 	PolygonOutline: 'polygon-outline',
+	TargetsLabel: 'targets-label',
 } as const satisfies Record<string, string>;
 
 export const MapSourceIdEnum = {

@@ -176,7 +176,7 @@
 @media (width < 64rem) {
 	:root {
 		--atlas-sheet-handle-size: 1.5rem;
-		--atlas-sheet-handle-reach: 0.5rem;
+		--atlas-sheet-handle-reach: 0.25rem;
 		--atlas-sheet-split: 40svh;
 		--atlas-sheet-rest: calc(100dvh - var(--atlas-sheet-handle-size));
 	}
@@ -292,10 +292,13 @@
 				top: 0;
 			}
 
-			progress-reading,
 			top-button {
 				visibility: hidden;
 			}
+		}
+
+		&[data-atlas-sheet='down'] progress-reading {
+			visibility: hidden;
 		}
 
 		&[data-atlas-sheet='half'] {

@@ -11,6 +11,7 @@ export const atlasPaneSelector = '.main-pane';
 export const atlasPaneMainSelector = `${atlasPaneSelector} > main`;
 export const atlasSheetHandleSelector = '.atlas-sheet-handle';
 export const atlasInlineMapSelector = '.atlas-inline-map';
+export const atlasSheetStartSelector = `${atlasPaneMainSelector} [data-atlas-sheet-start]`;
 
 // Values of `data-atlas-page` on the root; atlas.css writes the same two
 export const atlasPage = { map: 'map', pane: 'pane' } as const;

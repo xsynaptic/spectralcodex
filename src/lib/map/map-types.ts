@@ -27,6 +27,7 @@ export interface MapFeatureProperties {
 	objective?: number | undefined;
 	outlier?: boolean | undefined;
 	own?: number | undefined;
+	pointTitle?: string | undefined;
 	precision: number;
 	rating: number;
 	status: LocationStatus;

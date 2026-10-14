@@ -116,6 +116,31 @@ describe('getLocationsFeatureCollection', () => {
 		expect(result?.features[0]?.properties.titleMultilingualValue).toBe('剝皮寮：北街');
 	});
 
+	test('each Point of a Location with several carries its own title, its multilingual title in brackets', () => {
+		const result = getLocationsFeatureCollection([
+			makeLocation('bopiliao', {
+				geometry: [
+					makePoint(121.5, 25, { title: 'North Block', title_zh: '北街' }),
+					makePoint(121.51, 25.01, { title: 'South Block' }),
+					makePoint(121.52, 25.02),
+				],
+				title: 'Bopiliao',
+				title_zh: '剝皮寮',
+			}),
+			makeLocation('longshan-temple', {
+				geometry: [makePoint(121.49, 25.03, { title: 'Main Hall' })],
+				title: 'Longshan Temple',
+			}),
+		]);
+
+		expect(result?.features.map((feature) => feature.properties.pointTitle)).toEqual([
+			'North Block (北街)',
+			'South Block',
+			undefined,
+			undefined,
+		]);
+	});
+
 	test('hideSensitiveLocations filters hidden locations, and false keeps them', () => {
 		const locations = [
 			makeLocation('sensitive-site', {

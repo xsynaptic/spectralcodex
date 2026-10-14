@@ -158,6 +158,9 @@ export function getLocationsMapSourceData(
 				...(feature.properties.outlier === undefined
 					? {}
 					: { outlier: feature.properties.outlier }),
+				...(feature.properties.pointTitle === undefined
+					? {}
+					: { pointTitle: stripDiacritics(feature.properties.pointTitle) }),
 				hasImage: feature.properties.image !== undefined,
 			},
 		} satisfies MapSourceItem;
@@ -198,7 +201,12 @@ function buildLocationFeatures(
 		id: featureIds[index] ?? entry.id,
 		properties: {
 			...entryProperties,
-			...getFeatureTitleProperties(entry, geometry, entryTitleMultilingual),
+			...getFeatureTitleProperties({
+				entry,
+				entryTitleMultilingual,
+				geometry,
+				isMultiPoint: geometryArray.length > 1,
+			}),
 			...getGeometryFeatureProperties(entry, geometry, geometryArray.length > 1),
 		},
 		type: 'Feature' as const,
@@ -223,20 +231,37 @@ function getFeatureId(feature: Pick<Feature, 'id'>, index: number) {
 	return typeof feature.id === 'string' ? feature.id : `feature-${String(index)}`;
 }
 
-function getFeatureTitleProperties(
-	entry: CollectionEntry<'locations'>,
-	geometry: LocationGeometry,
-	entryTitleMultilingual: MultilingualContent | undefined,
-) {
+function getFeatureTitleProperties({
+	entry,
+	entryTitleMultilingual,
+	geometry,
+	isMultiPoint,
+}: {
+	entry: CollectionEntry<'locations'>;
+	entryTitleMultilingual: MultilingualContent | undefined;
+	geometry: LocationGeometry;
+	isMultiPoint: boolean;
+}) {
 	const geometryTitleMultilingual = getMultilingualContent({
 		data: geometry,
 		prop: 'title',
 	})?.primary;
+	const pointTitle = isMultiPoint
+		? getPointTitle(geometry.title, geometryTitleMultilingual)
+		: undefined;
 
 	return {
 		title: geometry.title ? `${entry.data.title}: ${geometry.title}` : entry.data.title,
 		...getMultilingualTitleProperties(entryTitleMultilingual, geometryTitleMultilingual),
+		...(pointTitle === undefined ? {} : { pointTitle }),
 	};
+}
+
+function getPointTitle(title: string | undefined, multilingual: MultilingualContent | undefined) {
+	if (title === undefined) return multilingual?.value;
+	if (multilingual === undefined) return title;
+
+	return `${title} (${multilingual.value})`;
 }
 
 function getGeometryFeatureProperties(

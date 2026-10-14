@@ -40,7 +40,7 @@ interface MapCloseFilterAction {
 
 type MapCoordinates = [number, number];
 
-type MapCursor = 'grab' | 'pointer' | 'zoom-in';
+type MapCursor = '' | 'pointer' | 'zoom-in';
 
 interface MapExpandClusterAction {
 	center: MapCoordinates;
@@ -132,7 +132,7 @@ export function decideHoverIntent(input: MapHoverInput): MapHoverIntent {
 		}
 		default: {
 			return {
-				cursor: 'grab',
+				cursor: '',
 				featureStateChanges: getFeatureStateChanges(hoveredFeatureId, undefined),
 				hoveredFeatureId: undefined,
 				storeHoveredIdUpdate: getStoreHoveredIdUpdate(storeHoveredId, undefined),

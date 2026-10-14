@@ -15,6 +15,7 @@ import {
 	atlasSheetRestProperty,
 	atlasSheetRestStorageKey,
 	atlasSheetSplitProperty,
+	atlasSheetStartSelector,
 } from '#lib/atlas/atlas-constants.ts';
 import { readAtlasLayout, readSheetRest } from '#lib/atlas/atlas-layout.ts';
 import {
@@ -30,7 +31,7 @@ import {
 	isSheetArrivalAtStart,
 } from '#lib/atlas/atlas-sheet-factory.ts';
 
-const sheetMoveDurationMs = 200;
+const sheetMoveDurationMs = { lower: 150, raise: 200 } as const;
 
 let currentDrag: object | undefined;
 let currentMove: Animation | undefined;
@@ -147,7 +148,8 @@ export function isSheetGrabbed() {
 
 export function scrollToSheetStart(
 	behavior: ScrollBehavior,
-	element = document.querySelector(atlasPaneMainSelector),
+	element = document.querySelector(atlasSheetStartSelector) ??
+		document.querySelector(atlasPaneMainSelector),
 ) {
 	if (!element) return;
 
@@ -224,9 +226,15 @@ function getMoveKeyframe(from: AtlasSheetRest, to: AtlasSheetRest, lines: AtlasS
 	return { clipPath: `inset(${String(clipPx)}px 0 0 0)`, translate };
 }
 
+function getMoveDuration(rest: AtlasSheetRest) {
+	if (matchMedia('(prefers-reduced-motion: reduce)').matches) return 0;
+
+	return rest === atlasSheetRest.down ? sheetMoveDurationMs.lower : sheetMoveDurationMs.raise;
+}
+
 function slidePane(pane: HTMLElement, keyframe: PropertyIndexedKeyframes, rest: AtlasSheetRest) {
 	return pane.animate(keyframe, {
-		duration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : sheetMoveDurationMs,
+		duration: getMoveDuration(rest),
 		easing: rest === atlasSheetRest.down ? 'ease-in' : 'ease-out',
 		fill: 'forwards',
 	});

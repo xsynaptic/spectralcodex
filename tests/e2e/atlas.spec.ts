@@ -111,6 +111,8 @@ async function dragHandle(page: Page, handle: Locator, distance: number) {
 
 	if (!box) throw new Error('The sheet handle has no box to drag');
 
+	await page.waitForFunction(() => customElements.get('atlas-sheet-handle') !== undefined);
+
 	const x = box.x + box.width / 2;
 	const y = box.y + box.height / 2;
 
@@ -720,7 +722,7 @@ test.describe('a half sheet on a phone viewport', () => {
 		expect(await getTop(title)).toBeCloseTo(titleTop ?? 0, 0);
 	});
 
-	test('a page arrives at half below the site header, its Target in the map above the split', async ({
+	test('a page arrives at half with its title under the handle, its Target in the map above the split', async ({
 		page,
 		request,
 	}) => {
@@ -729,18 +731,18 @@ test.describe('a half sheet on a phone viewport', () => {
 		const shell = page.locator('.atlas-shell');
 		const marker = shell.locator('.maplibregl-marker').first();
 		const handle = page.locator('atlas-sheet-handle button');
+		const title = page.locator('main .content-column > :first-child').first();
 
 		await openSheetFromMap(page, locationUrl);
 
 		await expect(root).toHaveAttribute('data-atlas-sheet', 'half');
 		await expect(marker).toBeVisible();
 
-		const mainBox = await page.locator('.main-pane > main').boundingBox();
 		const markerBox = await marker.boundingBox();
 
 		if (!markerBox) throw new Error('The Target has no marker');
 
-		expect(mainBox?.y).toBeCloseTo(splitPx + handlePx, 0);
+		expect(await getTop(title)).toBeCloseTo(splitPx + handlePx, 0);
 		expect(markerBox.y + markerBox.height).toBeLessThan(splitPx);
 		await expect(page.locator('.atlas-inline-map')).toBeHidden();
 

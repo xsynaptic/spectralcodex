@@ -7,7 +7,7 @@ import type {
 } from 'react-map-gl/maplibre';
 
 import { GeometryTypeEnum } from '@spectralcodex/shared/map';
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef, useSyncExternalStore } from 'react';
 import * as R from 'remeda';
 
 import type { MapClickInput, MapHoverInput } from '#canvas/canvas-events-factory.ts';
@@ -31,23 +31,13 @@ import {
 } from '#store/store.ts';
 import { useMapTargetIds } from '#view/view.tsx';
 
+const hoverQuery = '(hover: hover)';
+
 const isMapGeojsonSource = (input?: Source): input is GeoJSONSource => input?.type === 'geojson';
 
 type MapClickEvent = Parameters<NonNullable<MapCallbacks['onClick']>>[0];
 
 type MapClickFeature = NonNullable<MapClickEvent['features']>[number];
-
-function createGrabCursorHandler(
-	cursor: 'grab' | 'grabbing',
-): NonNullable<MapCallbacks['onMouseDown']> {
-	return ({ features, target: mapInstance }) => {
-		const feature = features?.[0];
-
-		if (feature?.layer.id !== undefined) return;
-
-		mapInstance.getCanvas().style.cursor = cursor;
-	};
-}
 
 async function expandCluster(
 	mapInstance: MapClickEvent['target'],
@@ -135,13 +125,25 @@ function easeToPopup(
 	});
 }
 
-const onMouseDown = createGrabCursorHandler('grabbing');
-const onMouseUp = createGrabCursorHandler('grab');
+function subscribeHover(callback: () => void) {
+	const query = matchMedia(hoverQuery);
+
+	query.addEventListener('change', callback);
+
+	return () => {
+		query.removeEventListener('change', callback);
+	};
+}
+
+function canHover() {
+	return matchMedia(hoverQuery).matches;
+}
 
 export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 	const { isLoading: isSourceDataLoading } = useSourceDataQuery();
 
 	const isInteractive = useIsMapCanvasInteractive();
+	const isHoverable = useSyncExternalStore(subscribeHover, canHover, () => false);
 
 	const { setCanvasLoading } = useMapStoreActions();
 	const trackMap = useTrackMap();
@@ -179,11 +181,9 @@ export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 		...(isInteractive
 			? {
 					onClick,
-					onMouseDown,
-					onMouseUp,
 					onMoveEnd,
 					onResize: debouncedFilterControlSetup.call,
-					...(isSourceDataLoading
+					...(isSourceDataLoading || !isHoverable
 						? {}
 						: {
 								onMouseMove: throttledOnMouseMove.call,

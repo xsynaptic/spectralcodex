@@ -228,7 +228,7 @@ describe('decideHoverIntent clearing hover', () => {
 				}),
 			),
 		).toEqual({
-			cursor: 'grab',
+			cursor: '',
 			featureStateChanges: [{ featureId: 'location-id', hover: false }],
 			hoveredFeatureId: undefined,
 			storeHoveredIdUpdate: { hoveredId: undefined },
@@ -247,7 +247,7 @@ describe('decideHoverIntent clearing hover', () => {
 				}),
 			),
 		).toEqual({
-			cursor: 'grab',
+			cursor: '',
 			featureStateChanges: [{ featureId: 'location-id', hover: false }],
 			hoveredFeatureId: undefined,
 			storeHoveredIdUpdate: { hoveredId: undefined },
@@ -260,7 +260,7 @@ describe('decideHoverIntent clearing hover', () => {
 				makeHoverInput({ featureId: undefined, layerId: undefined, pointId: undefined }),
 			),
 		).toEqual({
-			cursor: 'grab',
+			cursor: '',
 			featureStateChanges: [],
 			hoveredFeatureId: undefined,
 			storeHoveredIdUpdate: undefined,

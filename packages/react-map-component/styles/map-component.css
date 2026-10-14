@@ -281,17 +281,30 @@ button.maplibregl-popup-close-button {
 	color: light-dark(var(--map-color-neutral-700), var(--map-color-neutral-400));
 }
 
+.maplibregl-map {
+	container-type: size;
+}
+
 .map-filter-menu {
 	--map-filter-gap: 8px;
+	--map-filter-shift: clamp(
+		var(--map-filter-gap) - var(--map-filter-y),
+		-50%,
+		100cqh - var(--map-cover-bottom) - var(--map-filter-gap) - var(--map-filter-y) - 100%
+	);
 
 	z-index: 10;
 	max-width: min(350px, 80vw);
-	max-height: min(
-		100% - var(--map-cover-bottom) - 2 * var(--map-filter-gap),
-		2 * (var(--map-filter-y) - var(--map-filter-gap)),
-		2 * (100% - var(--map-cover-bottom) - var(--map-filter-y) - var(--map-filter-gap))
-	);
-	transform: translate(var(--map-filter-x), var(--map-filter-y)) translateY(-50%);
+	max-height: calc(100% - var(--map-cover-bottom) - 2 * var(--map-filter-gap));
+	padding-left: 10px;
+	transform: translate(var(--map-filter-x), var(--map-filter-y)) translateY(var(--map-filter-shift));
+}
+
+.map-filter-menu .maplibregl-popup-tip {
+	position: absolute;
+	top: calc(-1 * var(--map-filter-shift));
+	left: 0;
+	translate: 0 -50%;
 }
 
 .map-filter-menu .maplibregl-popup-content {
