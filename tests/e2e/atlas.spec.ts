@@ -191,8 +191,6 @@ async function openSheetFromMap(page: Page, url: string) {
 	});
 	await openFromMap(page, url);
 	await expect(page.locator('html')).not.toHaveAttribute('data-atlas-from');
-	// The handle's script only loads after the swap from /atlas/, and a press before it is defined does nothing
-	await page.waitForFunction(() => customElements.get('atlas-sheet-handle') !== undefined);
 }
 
 async function lowerSheet(page: Page, handle: Locator) {
@@ -933,6 +931,7 @@ test.describe('the map menu on a half sheet', () => {
 
 		await openSheetFromMap(page, locationUrl);
 		await expect(page.locator('html')).toHaveAttribute('data-atlas-sheet', 'half');
+		await expect(shell.locator('.maplibregl-marker').first()).toBeVisible();
 
 		await shell.locator('.maplibregl-ctrl-filter').click();
 		await expect(menu).toBeVisible();

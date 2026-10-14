@@ -233,38 +233,32 @@ function useTargetMarkers(targetIds: Array<string>): Array<TargetMarker> {
 			if (isRevealing) setVisible(true);
 		}
 
+		let isStale = true;
+
 		function onMoveEnd() {
 			isRevealing = true;
+			isStale = true;
 			void refreshMarkers();
 		}
 
-		let refreshFrame: number | undefined;
-
-		// Position refresh only; revealing after a zoom is moveend's job
-		function onSourceData(event: {
-			isSourceLoaded: boolean;
-			sourceDataType?: string;
-			sourceId: string;
-		}) {
+		function onSourceData(event: { sourceDataType?: string; sourceId: string }) {
 			if (event.sourceId !== MapSourceIdEnum.PointCollection) return;
 			if (event.sourceDataType === 'content') leafIds = new Map();
-			if (refreshFrame !== undefined || !event.isSourceLoaded) return;
 
-			refreshFrame = requestAnimationFrame(() => {
-				refreshFrame = undefined;
-				void refreshMarkers();
-			});
+			isStale = true;
 		}
 
-		function onFirstRender() {
+		function onIdle() {
+			if (!isStale) return;
+
+			isStale = false;
 			void refreshMarkers();
 		}
 
 		map.on('zoomstart', hideMarkers);
 		map.on('moveend', onMoveEnd);
 		map.on('sourcedata', onSourceData);
-		// A camera that jumped before mount (reduced motion, a first fit) is not drawn yet, so this query can still read the old frame
-		map.once('render', onFirstRender);
+		map.on('idle', onIdle);
 
 		void refreshMarkers();
 
@@ -274,9 +268,7 @@ function useTargetMarkers(targetIds: Array<string>): Array<TargetMarker> {
 			map.off('zoomstart', hideMarkers);
 			map.off('moveend', onMoveEnd);
 			map.off('sourcedata', onSourceData);
-			map.off('render', onFirstRender);
-
-			if (refreshFrame !== undefined) cancelAnimationFrame(refreshFrame);
+			map.off('idle', onIdle);
 		};
 	}, [map, targetIds, targetPoints, isDark]);
 
