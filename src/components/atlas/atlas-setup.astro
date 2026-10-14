@@ -1,6 +1,7 @@
 ---
 import {
 	atlasFlagStorageKey,
+	atlasLinkParam,
 	atlasPage,
 	atlasPaneMediaQuery,
 	atlasPaneSizeProperty,
@@ -15,6 +16,7 @@ import {
 <script
 	define:vars={{
 		flagStorageKey: atlasFlagStorageKey,
+		linkParam: atlasLinkParam,
 		mapPage: atlasPage.map,
 		paneMediaQuery: atlasPaneMediaQuery,
 		panePage: atlasPage.pane,
@@ -23,14 +25,23 @@ import {
 		sheetAttribute: atlasSheetAttribute,
 		sheetHalf: atlasSheetRest.half,
 		sheetHalfMediaQuery: atlasSheetHalfMediaQuery,
+		sheetRaised: atlasSheetRest.raised,
 		sheetRestStorageKey: atlasSheetRestStorageKey,
 	}}
 	is:inline
 >
 	// Cold load only; atlas-mode.ts stamps every later document before its swap
 	const root = document.documentElement;
+	const url = new URL(location.href);
+	const hasLink = url.searchParams.has(linkParam);
 
-	let isEnabled = root.dataset.atlasPage === mapPage;
+	// Removed before the return path and analytics read the URL, so a reload or Back does not force the mode again
+	if (hasLink) {
+		url.searchParams.delete(linkParam);
+		history.replaceState(history.state, '', url);
+	}
+
+	let isEnabled = root.dataset.atlasPage === mapPage || (hasLink && 'atlasPage' in root.dataset);
 
 	try {
 		if (isEnabled) sessionStorage.setItem(flagStorageKey, '1');
@@ -63,7 +74,7 @@ import {
 
 	if (
 		isEnabled &&
-		sheetRest === sheetHalf &&
+		sheetRest !== sheetRaised &&
 		root.dataset.atlasPage === panePage &&
 		!matchMedia(paneMediaQuery).matches &&
 		matchMedia(sheetHalfMediaQuery).matches

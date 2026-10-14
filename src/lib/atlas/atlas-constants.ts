@@ -3,6 +3,8 @@ export const atlasPaneStorageKey = 'scx-atlas-pane-width';
 export const atlasReturnStorageKey = 'scx-atlas-return';
 export const atlasSheetRestStorageKey = 'scx-atlas-sheet-rest';
 
+export const atlasLinkParam = 'atlas';
+
 export const atlasPersistName = 'atlas-map';
 
 export const atlasRootId = 'atlas-root';

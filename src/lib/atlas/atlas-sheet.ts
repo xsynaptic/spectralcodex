@@ -1,6 +1,6 @@
 import type { TransitionBeforeSwapEvent } from 'astro:transitions/client';
 
-import type { AtlasScreen, AtlasSheetRest } from '#lib/atlas/atlas-layout-factory.ts';
+import type { AtlasSheetRest } from '#lib/atlas/atlas-layout-factory.ts';
 import type { AtlasSheetLines, AtlasSheetReleaseKind } from '#lib/atlas/atlas-sheet-factory.ts';
 
 import {
@@ -20,7 +20,6 @@ import {
 import { readAtlasLayout, readSheetRest } from '#lib/atlas/atlas-layout.ts';
 import {
 	getPreferredSheetRest,
-	getSheetArrivalRest,
 	getSheetDragLine,
 	getSheetEnterRest,
 	getSheetFold,
@@ -170,16 +169,11 @@ function startSheetArrival(navigationType: string) {
 	if (isAtStart) scrollToSheetStart('instant');
 }
 
-export function prepareSheetArrival(event: TransitionBeforeSwapEvent, from: AtlasScreen) {
+export function prepareSheetArrival(event: TransitionBeforeSwapEvent) {
 	const incomingRoot = event.newDocument.documentElement;
 	const isSheet = readAtlasLayout(incomingRoot) === 'sheet';
 
-	writeRest(
-		incomingRoot,
-		isSheet
-			? getSheetArrivalRest({ from, hasHalf: hasHalfRest(), stored: readStoredRest() })
-			: atlasSheetRest.raised,
-	);
+	writeRest(incomingRoot, isSheet ? readPreferredSheetRest() : atlasSheetRest.raised);
 
 	document.addEventListener(
 		'astro:after-swap',

@@ -15,6 +15,7 @@ const landscapeViewport = { height: 390, width: 844 };
 
 const splitPx = viewport.height * 0.4;
 const handlePx = 24;
+const returnStorageKey = 'scx-atlas-return';
 const sheetRestStorageKey = 'scx-atlas-sheet-rest';
 
 // The map reads what is under the pointer a frame or more after it moves
@@ -731,12 +732,45 @@ test.describe('a half sheet on a phone viewport', () => {
 		await expect(root).toHaveAttribute('data-atlas-page', 'pane');
 		await expect(root).not.toHaveAttribute('data-atlas-sheet');
 
+		await page.reload({ waitUntil: 'domcontentloaded' });
+
+		await expect(root).toHaveAttribute('data-atlas-page', 'pane');
+		await expect(root).not.toHaveAttribute('data-atlas-sheet');
+
 		await handle.press('ArrowDown');
 		await expect(root).toHaveAttribute('data-atlas-sheet', 'half');
 
-		await page.reload({ waitUntil: 'domcontentloaded' });
+		await page.goBack();
+		await page.waitForURL(`**${atlasPath}`);
+		await openFromMap(page, locationUrl);
+
+		await expect(root).toHaveAttribute('data-atlas-page', 'pane');
+		await expect(root).toHaveAttribute('data-atlas-sheet', 'half');
+	});
+});
+
+test.describe('an atlas link on a phone viewport', () => {
+	test.use({ viewport });
+
+	test('lands at half with its title under the handle, the link spent', async ({
+		page,
+		request,
+	}) => {
+		const locationUrl = await getRegionLocation(request, singlePointViewPattern);
+		const root = page.locator('html');
+		const title = page.locator('main .content-column > :first-child').first();
+
+		await visit(page, `${locationUrl}?atlas`);
 
 		await expect(root).toHaveAttribute('data-atlas-sheet', 'half');
+		await expect(page.locator('.atlas-shell canvas.maplibregl-canvas')).toBeVisible({
+			timeout: 10_000,
+		});
+		expect(new URL(page.url()).search).toBe('');
+		await expect
+			.poll(() => page.evaluate((key) => sessionStorage.getItem(key), returnStorageKey))
+			.toBe(locationUrl);
+		expect(await getTop(title)).toBeCloseTo(splitPx + handlePx, 0);
 	});
 });
 

@@ -1,4 +1,4 @@
-import type { AtlasScreen, AtlasSheetRest } from '#lib/atlas/atlas-layout-factory.ts';
+import type { AtlasSheetRest } from '#lib/atlas/atlas-layout-factory.ts';
 
 import { atlasSheetRest } from '#lib/atlas/atlas-constants.ts';
 
@@ -170,24 +170,6 @@ export function getPreferredSheetRest({
 
 export function getSheetEnterRest(hasHalf: boolean) {
 	return hasHalf ? atlasSheetRest.half : atlasSheetRest.down;
-}
-
-export function getSheetArrivalRest({
-	from,
-	hasHalf,
-	stored,
-}: {
-	from: AtlasScreen;
-	hasHalf: boolean;
-	stored: string | undefined;
-}) {
-	if (!hasHalf) return atlasSheetRest.raised;
-	if (isOpenRest(stored)) return stored;
-
-	if (from.layout === 'map') return atlasSheetRest.half;
-	if (from.layout !== 'sheet') return atlasSheetRest.raised;
-
-	return from.rest === atlasSheetRest.raised ? atlasSheetRest.raised : atlasSheetRest.half;
 }
 
 export function isSheetArrivalAtStart({

@@ -251,12 +251,11 @@ export function startAtlasMode() {
 
 		if (paneSize) incomingRoot.style.setProperty(atlasPaneSizeProperty, paneSize);
 
-		const screen = readAtlasScreen();
-		const from = getFromPage(screen);
+		const from = getFromPage(readAtlasScreen());
 
 		if (from) incomingRoot.dataset.atlasFrom = from;
 
-		prepareSheetArrival(event, screen);
+		prepareSheetArrival(event);
 
 		updateHeroSizes(event.newDocument);
 

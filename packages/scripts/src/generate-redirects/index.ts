@@ -45,7 +45,7 @@ if (redirects.length === 0) {
 	const lines = ['# Auto-generated redirects from formerIds; do not edit manually', ''];
 
 	for (const { fromPath, toPath } of redirects) {
-		lines.push(`redir ${fromPath} ${toPath} 301`);
+		lines.push(`redir ${fromPath} ${toPath}{?query} 301`);
 	}
 
 	lines.push('');

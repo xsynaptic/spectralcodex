@@ -2,7 +2,6 @@ import { describe, expect, test } from 'vitest';
 
 import {
 	getPreferredSheetRest,
-	getSheetArrivalRest,
 	getSheetDragLine,
 	getSheetFold,
 	getSheetReleaseRest,
@@ -200,57 +199,19 @@ describe('getSheetStepRest', () => {
 });
 
 describe('getPreferredSheetRest', () => {
-	test('a stored open rest is the preference', () => {
+	test('a stored open rest decides every arrival', () => {
 		expect(getPreferredSheetRest({ hasHalf: true, stored: 'raised' })).toBe('raised');
 		expect(getPreferredSheetRest({ hasHalf: true, stored: 'half' })).toBe('half');
 	});
 
-	test('with nothing usable stored the preference is half', () => {
+	test('with nothing usable stored every arrival is half', () => {
 		expect(getPreferredSheetRest({ hasHalf: true, stored: undefined })).toBe('half');
 		expect(getPreferredSheetRest({ hasHalf: true, stored: 'down' })).toBe('half');
 	});
 
-	test('where the height gate fails every preference is raised', () => {
+	test('where the height gate fails every arrival is raised', () => {
 		expect(getPreferredSheetRest({ hasHalf: false, stored: 'half' })).toBe('raised');
 		expect(getPreferredSheetRest({ hasHalf: false, stored: undefined })).toBe('raised');
-	});
-});
-
-describe('getSheetArrivalRest', () => {
-	const map = { layout: 'map' } as const;
-	const raised = { layout: 'sheet', rest: 'raised' } as const;
-	const half = { layout: 'sheet', rest: 'half' } as const;
-	const down = { layout: 'sheet', rest: 'down' } as const;
-	const others = [{ layout: 'regular' }, { layout: 'split' }] as const;
-	const froms = [map, raised, half, down, ...others];
-
-	test('a stored preference decides every arrival', () => {
-		for (const from of froms) {
-			expect(getSheetArrivalRest({ from, hasHalf: true, stored: 'raised' })).toBe('raised');
-			expect(getSheetArrivalRest({ from, hasHalf: true, stored: 'half' })).toBe('half');
-		}
-	});
-
-	test('with none stored, the map and a lowered sheet arrive at half', () => {
-		expect(getSheetArrivalRest({ from: map, hasHalf: true, stored: undefined })).toBe('half');
-		expect(getSheetArrivalRest({ from: down, hasHalf: true, stored: undefined })).toBe('half');
-	});
-
-	test('with none stored, a sheet keeps the open rest it left', () => {
-		expect(getSheetArrivalRest({ from: half, hasHalf: true, stored: undefined })).toBe('half');
-		expect(getSheetArrivalRest({ from: raised, hasHalf: true, stored: undefined })).toBe('raised');
-	});
-
-	test('with none stored, a page with no sheet arrives raised', () => {
-		for (const from of others) {
-			expect(getSheetArrivalRest({ from, hasHalf: true, stored: undefined })).toBe('raised');
-		}
-	});
-
-	test('where the height gate fails every arrival is raised', () => {
-		for (const from of froms) {
-			expect(getSheetArrivalRest({ from, hasHalf: false, stored: 'half' })).toBe('raised');
-		}
 	});
 });
 
