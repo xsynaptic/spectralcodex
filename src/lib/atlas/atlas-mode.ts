@@ -271,6 +271,8 @@ export function startAtlasMode() {
 		event.newDocument.body.append(target);
 	});
 
+	document.addEventListener('astro:after-swap', dispatchSync);
+
 	document.addEventListener('astro:page-load', startColdSheetArrival, { once: true });
 
 	document.addEventListener('astro:page-load', () => {

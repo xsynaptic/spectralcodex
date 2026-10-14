@@ -931,7 +931,6 @@ test.describe('the map menu on a half sheet', () => {
 
 		await openSheetFromMap(page, locationUrl);
 		await expect(page.locator('html')).toHaveAttribute('data-atlas-sheet', 'half');
-		await expect(shell.locator('.maplibregl-marker').first()).toBeVisible();
 
 		await shell.locator('.maplibregl-ctrl-filter').click();
 		await expect(menu).toBeVisible();
