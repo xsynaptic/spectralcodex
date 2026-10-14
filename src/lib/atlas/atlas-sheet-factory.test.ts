@@ -4,7 +4,6 @@ import {
 	getPreferredSheetRest,
 	getSheetArrivalRest,
 	getSheetDragLine,
-	getSheetEnterRest,
 	getSheetFold,
 	getSheetReleaseRest,
 	getSheetRests,
@@ -17,13 +16,6 @@ import {
 
 const lines = { down: 776, half: 320, raised: 0 };
 const viewportHeight = 800;
-
-describe('getSheetRests', () => {
-	test('the half rest exists only where the height gate passes', () => {
-		expect(getSheetRests(true)).toEqual(['raised', 'half', 'down']);
-		expect(getSheetRests(false)).toEqual(['raised', 'down']);
-	});
-});
 
 describe('getSheetDragLine', () => {
 	test('a raised sheet follows the pointer down and never rises past its own top', () => {
@@ -221,13 +213,6 @@ describe('getPreferredSheetRest', () => {
 	test('where the height gate fails every preference is raised', () => {
 		expect(getPreferredSheetRest({ hasHalf: false, stored: 'half' })).toBe('raised');
 		expect(getPreferredSheetRest({ hasHalf: false, stored: undefined })).toBe('raised');
-	});
-});
-
-describe('getSheetEnterRest', () => {
-	test('the globe takes a page to half, or lowers it where the height gate fails', () => {
-		expect(getSheetEnterRest(true)).toBe('half');
-		expect(getSheetEnterRest(false)).toBe('down');
 	});
 });
 

@@ -11,6 +11,7 @@ export default defineConfig({
 			use: { ...devices['Desktop Chrome'], launchOptions: { args: ['--enable-gpu'] } },
 		},
 		{ grep: /@firefox/, name: 'firefox', use: { ...devices['Desktop Firefox'] } },
+		{ grep: /@webkit/, name: 'webkit', use: { ...devices['Desktop Safari'] } },
 	],
 	reporter: [['list'], ['html', { open: 'never', outputFolder: './temp/playwright-report' }]],
 	retries: 0,

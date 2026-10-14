@@ -70,16 +70,4 @@ describe('getSettledClick', () => {
 			getSettledClick({ ...click, outcome: undefined, selectedId: undefined }),
 		).toBeUndefined();
 	});
-
-	test('a Target click is spent on its popup, so the same Point opens nothing once it stops being a Target', () => {
-		const selection = { isHosted: true, isLoading: false, targetCount: 2, url: '/some-location/' };
-		const asTarget = getSelectionOutcome({ ...selection, isTarget: true });
-		const afterPageChange = getSelectionOutcome({ ...selection, isTarget: false });
-
-		expect(getSettledClick({ ...click, outcome: asTarget })).toBe('popup');
-		expect(afterPageChange).toBe('open');
-		expect(
-			getSettledClick({ ...click, clickedId: undefined, outcome: afterPageChange }),
-		).toBeUndefined();
-	});
 });

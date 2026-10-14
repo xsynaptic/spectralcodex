@@ -256,9 +256,15 @@ function useTargetMarkers(targetIds: Array<string>): Array<TargetMarker> {
 			});
 		}
 
+		function onFirstRender() {
+			void refreshMarkers();
+		}
+
 		map.on('zoomstart', hideMarkers);
 		map.on('moveend', onMoveEnd);
 		map.on('sourcedata', onSourceData);
+		// A camera that jumped before mount (reduced motion, a first fit) is not drawn yet, so this query can still read the old frame
+		map.once('render', onFirstRender);
 
 		void refreshMarkers();
 
@@ -268,6 +274,7 @@ function useTargetMarkers(targetIds: Array<string>): Array<TargetMarker> {
 			map.off('zoomstart', hideMarkers);
 			map.off('moveend', onMoveEnd);
 			map.off('sourcedata', onSourceData);
+			map.off('render', onFirstRender);
 
 			if (refreshFrame !== undefined) cancelAnimationFrame(refreshFrame);
 		};
