@@ -162,7 +162,7 @@ export default defineConfig({
 			provider: fontProviders.fontsource(),
 			styles: ['normal', 'italic'],
 			subsets: ['latin', 'vietnamese'],
-			weights: ['300 700'],
+			weights: ['400 700'],
 		},
 	],
 	integrations: [
