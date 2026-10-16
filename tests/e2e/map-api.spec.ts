@@ -1,8 +1,8 @@
 import { expect, test } from '@playwright/test';
-import { MapDataKeysCompressed } from '@spectralcodex/map-codec';
+import { mapSourceKeys } from '@spectralcodex/map-codec';
 
-const id = MapDataKeysCompressed.Id;
-const chunkKey = MapDataKeysCompressed.ChunkKey;
+const id = mapSourceKeys.id;
+const chunkKey = mapSourceKeys.chunkKey;
 
 type MapApiItem = Record<string, unknown>;
 

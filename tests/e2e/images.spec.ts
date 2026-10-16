@@ -1,6 +1,9 @@
 import type { Locator, Page } from '@playwright/test';
 
+import { isDev } from '#e2e/constants.ts';
 import { expect, test, visit } from '#e2e/test.ts';
+
+test.skip(isDev, 'images need the image server stack');
 
 const heroWidthMaximum = 1800;
 const contentWidthMaximum = 1400;
@@ -14,7 +17,7 @@ function getHeroImage(page: Page): Locator {
 	return page.locator('img[fetchpriority="high"]').first();
 }
 
-// currentSrc reflects the browser's per-viewport selection without fetching bytes; stays hermetic
+// `currentSrc` shows which candidate the browser picked for this viewport without fetching the image
 async function getSelectedWidth(image: Locator): Promise<number> {
 	await image.scrollIntoViewIfNeeded();
 	await expect

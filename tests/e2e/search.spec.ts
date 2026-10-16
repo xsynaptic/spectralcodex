@@ -62,7 +62,7 @@ test('the shortcut opens search from a cold start without dropping the keypress'
 
 	expect(await page.evaluate(() => customElements.get('pagefind-modal') === undefined)).toBe(true);
 
-	// The toggle picks the modifier from the page's user agent, not the host running the test
+	// The shortcut follows the page's user agent, not the machine running the test
 	const isMac = await page.evaluate(() => /mac/i.test(navigator.userAgent));
 
 	await page.keyboard.press(isMac ? 'Meta+k' : 'Control+k');

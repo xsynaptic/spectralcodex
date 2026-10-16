@@ -29,10 +29,10 @@ test('a pointer-driven change navigates immediately', async ({ page }) => {
 
 	const select = page.getByRole('combobox', { name: t('site.pagination.select.label') });
 
-	// dispatchEvent waits only for attachment; a visible form means the listener is bound
+	// `dispatchEvent` only waits for the element to attach, and a visible form means its listener is bound
 	await expect(select).toBeVisible();
 
-	// Stands in for opening the picker, which Playwright cannot drive on a native select
+	// Playwright cannot open a native select's picker, so this stands in for it
 	await select.dispatchEvent('pointerdown');
 	await select.selectOption({ label: getPageOptionLabel(2) });
 
@@ -54,7 +54,7 @@ test('a pointer-driven year pick on the Chronology index navigates to that year'
 });
 
 test.describe('on a coarse pointer', () => {
-	// A device descriptor cannot go in a describe; these are what make the pointer coarse
+	// A device descriptor can't be used inside a describe block, so these set a coarse pointer by hand
 	test.use({ hasTouch: true, isMobile: true, viewport: { height: 851, width: 393 } });
 
 	test('a pointer-driven change still waits for Go', async ({ page }) => {

@@ -1,6 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 
-import { getBaseUrl, isProd, localPort, localUrl } from '#e2e/constants.ts';
+import { getBaseUrl, isDev, isProd, localPort, localUrl } from '#e2e/constants.ts';
 
 export default defineConfig({
 	fullyParallel: true,
@@ -16,11 +16,12 @@ export default defineConfig({
 	reporter: [['list'], ['html', { open: 'never', outputFolder: './temp/playwright-report' }]],
 	retries: 0,
 	testDir: './tests/e2e',
-	timeout: 15_000,
+	timeout: isDev ? 30_000 : 15_000,
 	use: {
 		baseURL: getBaseUrl(),
 	},
-	...(isProd
+	...(isDev ? { workers: 4 } : {}),
+	...(isProd || isDev
 		? {}
 		: {
 				webServer: {

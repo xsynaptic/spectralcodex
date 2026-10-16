@@ -1,12 +1,13 @@
 import type { Page } from '@playwright/test';
 
+import { mapControlClassName } from '@spectralcodex/react-map-component/constants';
+
 import { paths } from '#e2e/constants.ts';
 import { expect, test, visit } from '#e2e/test.ts';
 
 test('the map loads on a Location', { tag: '@smoke' }, async ({ page, site }) => {
 	await visit(page, site.locationDetail);
 
-	// The island is server-rendered; the canvas only follows once client:visible hydrates it
 	const island = page.locator(
 		'astro-island[client="visible"][component-export="ReactMapComponent"]',
 	);
@@ -28,7 +29,7 @@ async function clickOwnPoint(page: Page, path: string) {
 	await island.scrollIntoViewIfNeeded();
 	await expect(ownPoint).toBeVisible({ timeout: 10_000 });
 
-	// A pointer cursor means the Point under the ring is drawn and takes a click
+	// The cursor turns to a pointer only once the Point is drawn and takes a click
 	await expect(async () => {
 		await page.mouse.move(0, 0);
 		await ownPoint.hover();
@@ -45,7 +46,7 @@ async function clickOwnPoint(page: Page, path: string) {
 
 test('one of the Points of a Location opens its own popup', async ({ page }) => {
 	const { island } = await clickOwnPoint(page, paths.locationMultiPoint);
-	const popupTitle = island.locator('.maplibregl-popup .map-popup-title');
+	const popupTitle = island.locator(`.maplibregl-popup .${mapControlClassName.popupTitle}`);
 
 	await expect(popupTitle).toBeVisible({ timeout: 10_000 });
 	await expect(popupTitle.locator('a')).toHaveCount(0);
@@ -57,9 +58,27 @@ test('the only Point of a Location opens no popup and leaves the page where it i
 }) => {
 	const { island, scrollY } = await clickOwnPoint(page, site.locationDetail);
 
-	// A popup would have opened by now
 	await page.waitForTimeout(500);
 
 	await expect(island.locator('.maplibregl-popup')).toHaveCount(0);
 	expect(await page.evaluate(() => window.scrollY)).toBe(scrollY);
+});
+
+test('a Region map draws its Division from the versioned mask', async ({ page }) => {
+	const maskResponse = page.waitForResponse((response) =>
+		response.url().includes('/api/map/divisions/tainan.json?v='),
+	);
+
+	await visit(page, paths.regionDetail);
+
+	const island = page.locator(
+		'astro-island[client="visible"][component-export="ReactMapComponent"]',
+	);
+
+	await island.scrollIntoViewIfNeeded();
+
+	const response = await maskResponse;
+
+	expect(response.ok()).toBe(true);
+	expect(((await response.json()) as { type: string }).type).toMatch(/^(Multi)?Polygon$/);
 });

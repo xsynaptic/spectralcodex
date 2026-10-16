@@ -4,9 +4,10 @@ import { expect, test } from '@playwright/test';
 import { getCollectionEntries, withAstroContent } from '@spectralcodex/scripts/astro-content';
 import { getPublicId } from '@spectralcodex/shared/entries';
 
-import { contentManifestPath } from '#e2e/constants.ts';
+import { contentManifestPath, isDev } from '#e2e/constants.ts';
 
-// Failure messages carry counts, never paths; a real ID in a report is itself a leak
+test.skip(isDev, 'content policy is off in dev');
+
 const mapManifestPath = '/api/map/map-manifest.json';
 const feedPaths = ['/sitemap-0.xml', contentManifestPath, '/rss.xml'];
 
@@ -25,7 +26,6 @@ async function readSensitiveLocations() {
 	};
 }
 
-// Root-level paths only, so a Region or Theme sharing a slug is not mistaken for the Location
 function getRootPaths(body: string) {
 	const pattern = /(?:["'>\s]|https?:\/\/[^/"'<>\s]+)(\/[^/"'<>\s\\?#]+\/)(?=["'<\s\\?#])/g;
 
@@ -40,7 +40,7 @@ async function readRootPaths(request: APIRequestContext, surface: string) {
 	return getRootPaths(await response.text());
 }
 
-// A refused connection would otherwise report the path it was asking for
+// Without this, a refused connection's error would print the path it asked for
 async function readStatus(request: APIRequestContext, target: string) {
 	try {
 		const response = await request.get(target);

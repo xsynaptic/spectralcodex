@@ -23,12 +23,11 @@ interface ProbeOptions {
 
 const probeLimit = 8;
 
-// A hero carousel alone carries several images, so a lone hero never clears this
 const entryImageMinimum = 3;
 
 let discovered: Promise<SitePaths> | undefined;
 
-// The request context this was built from is disposed with its test; the resolved value is not
+// The request context is disposed with its test, but the discovered paths outlive it
 export function getSitePaths(request: APIRequestContext): Promise<SitePaths> {
 	if (!discovered) discovered = discover(request);
 
@@ -60,7 +59,6 @@ async function discover(request: APIRequestContext): Promise<SitePaths> {
 	};
 }
 
-// Both collections' detail routes sit at the root, so the JSON-LD type is what tells them apart
 function isLocation(html: string): boolean {
 	return html.includes('"@type":"Place"') && html.includes('component-export="ReactMapComponent"');
 }
@@ -82,7 +80,6 @@ async function probe({
 	const index = await readText(request, indexPath);
 	const main = /<main[\s\S]*?<\/main>/.exec(index)?.[0] ?? '';
 
-	// Scoped to `main` so the site navigation's own links never become candidates
 	const urls = [...main.matchAll(/href="(\/[^"/]+\/)"/g)].map(([, url = '']) => url);
 	const candidates = [...new Set(urls)]
 		.map((url) => ({ title: titles.get(url), url }))
