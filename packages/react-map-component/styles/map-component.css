@@ -1,4 +1,4 @@
-@import 'maplibre-gl/dist/maplibre-gl.css';
+@import 'maplibre-gl/dist/maplibre-gl.css' layer(maplibre);
 
 @property --map-inset-bottom {
 	syntax: '<length>';
@@ -81,7 +81,7 @@
 	z-index: 5;
 }
 
-div.maplibregl-popup-content {
+.maplibregl-popup-content {
 	padding: 0;
 	overflow: auto;
 	color: var(--map-text);
@@ -90,7 +90,7 @@ div.maplibregl-popup-content {
 	box-shadow: var(--map-elevation);
 }
 
-button.maplibregl-popup-close-button {
+.maplibregl-popup-close-button {
 	width: 20px;
 	font-size: 16px;
 	color: #fff;
@@ -118,6 +118,22 @@ button.maplibregl-popup-close-button {
 
 .maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
 	border-top-color: var(--map-surface);
+}
+
+.maplibregl-popup-anchor-top-left .maplibregl-popup-content {
+	border-top-left-radius: 0;
+}
+
+.maplibregl-popup-anchor-top-right .maplibregl-popup-content {
+	border-top-right-radius: 0;
+}
+
+.maplibregl-popup-anchor-bottom-left .maplibregl-popup-content {
+	border-bottom-left-radius: 0;
+}
+
+.maplibregl-popup-anchor-bottom-right .maplibregl-popup-content {
+	border-bottom-right-radius: 0;
 }
 
 .map-popup-frame {
@@ -181,7 +197,6 @@ button.maplibregl-popup-close-button {
 	color: var(--map-text);
 	border-bottom: 1px solid var(--map-divider);
 
-	/* stylelint-disable-next-line no-descending-specificity -- unrelated popup-link rules; reordering would scatter the vendor-override grouping */
 	& a {
 		color: inherit;
 	}
@@ -353,6 +368,11 @@ button.maplibregl-popup-close-button {
 	border-style: solid;
 	border-width: 1px;
 	border-radius: var(--map-radius-full);
+}
+
+.map-filter-swatch {
+	background-color: light-dark(var(--map-status-fill), var(--map-status-fill-dark));
+	border-color: light-dark(var(--map-status-edge), var(--map-status-edge-dark));
 }
 
 .map-filter-swatch-showhide {
@@ -741,6 +761,89 @@ button.maplibregl-popup-close-button {
 	border-top: 1px solid var(--map-divider);
 }
 
+.maplibregl-ctrl-group {
+	background-color: var(--map-surface);
+	border-radius: var(--map-radius-sm);
+
+	&:not(:empty) {
+		box-shadow: var(--map-elevation);
+	}
+
+	& button + button {
+		border-top-color: var(--map-divider);
+	}
+
+	& button:first-child {
+		border-start-start-radius: inherit;
+		border-start-end-radius: inherit;
+	}
+
+	& button:last-child {
+		border-end-start-radius: inherit;
+		border-end-end-radius: inherit;
+	}
+}
+
+.maplibregl-ctrl-attrib.maplibregl-compact {
+	color: var(--map-text);
+	background-color: var(--map-surface);
+	border-radius: var(--map-radius-sm);
+	box-shadow: var(--map-elevation);
+
+	& a {
+		color: inherit;
+	}
+}
+
+/* MapLibre forces the open attribution visible, which shows through a host hiding the map with `visibility` */
+.maplibregl-ctrl-attrib.maplibregl-compact-show {
+	visibility: inherit;
+}
+
+.maplibregl-ctrl-attrib-button {
+	background-color: transparent;
+	border-radius: var(--map-radius-sm);
+
+	.maplibregl-compact-show & {
+		background-color: var(--map-surface-hover);
+	}
+}
+
+/* MapLibre's blue focus glow would stack with the ring */
+.maplibregl-ctrl-group button:focus,
+.maplibregl-ctrl-attrib-button:focus {
+	box-shadow: none;
+}
+
+@media (hover: hover) {
+	.maplibregl-ctrl button:not(:disabled):hover {
+		background-color: var(--map-surface-hover);
+	}
+}
+
+.maplibregl-ctrl button:not(:disabled):active {
+	background-color: var(--map-surface-hover);
+}
+
+@media not (forced-colors: active) {
+	[data-map-mode='dark'] .maplibregl-ctrl-icon,
+	[data-map-mode='dark'] .maplibregl-ctrl-attrib-button {
+		filter: invert(1) hue-rotate(180deg);
+	}
+
+	/* The filter inverts the button's own fill too, so it resolves roles as light */
+	[data-map-mode='dark'] .maplibregl-ctrl-attrib-button {
+		color-scheme: light;
+	}
+}
+
+/* MapLibre's forced-colours attribution icon targets a `::after` its markup no longer draws */
+@media (forced-colors: active) and (prefers-color-scheme: dark) {
+	.maplibregl-ctrl-attrib-button {
+		filter: invert(1);
+	}
+}
+
 /* Forced colours drop every `box-shadow`, MapLibre's `ButtonText` edge included, and a tint alone vanishes */
 @media (forced-colors: active) {
 	.map-scope-bar,
@@ -755,6 +858,7 @@ button.maplibregl-popup-close-button {
 		forced-color-adjust: none;
 	}
 
+	.maplibregl-ctrl-group button + button,
 	.map-scope-toggle,
 	.map-scope-search,
 	.map-search-list,
@@ -771,82 +875,6 @@ button.maplibregl-popup-close-button {
 			color: inherit;
 		}
 	}
-}
-
-.maplibregl-ctrl-group button:first-child {
-	border-start-start-radius: inherit;
-	border-start-end-radius: inherit;
-}
-
-.maplibregl-ctrl-group button:last-child {
-	border-end-start-radius: inherit;
-	border-end-end-radius: inherit;
-}
-
-[data-map-root] .maplibregl-ctrl-group {
-	background-color: var(--map-surface);
-	border-radius: var(--map-radius-sm);
-
-	&:not(:empty) {
-		box-shadow: var(--map-elevation);
-	}
-
-	& button + button {
-		border-top-color: var(--map-divider);
-	}
-}
-
-@media (hover: hover) {
-	[data-map-root] .maplibregl-ctrl button:not(:disabled):hover {
-		background-color: var(--map-surface-hover);
-	}
-}
-
-[data-map-root] .maplibregl-ctrl button:not(:disabled):active {
-	background-color: var(--map-surface-hover);
-}
-
-[data-map-root] .maplibregl-ctrl-attrib.maplibregl-compact {
-	color: var(--map-text);
-	background-color: var(--map-surface);
-	border-radius: var(--map-radius-sm);
-	box-shadow: var(--map-elevation);
-
-	& a {
-		color: inherit;
-	}
-}
-
-[data-map-root] .maplibregl-ctrl-attrib-button {
-	background-color: transparent;
-	border-radius: var(--map-radius-sm);
-}
-
-/* MapLibre's blue focus glow would stack with the ring; compound class outranks its `:focus:focus-visible` */
-[data-map-root] .maplibregl-ctrl.maplibregl-ctrl-group button:focus,
-[data-map-root] .maplibregl-ctrl-attrib-button:focus {
-	box-shadow: none;
-}
-
-[data-map-root] .maplibregl-ctrl-attrib.maplibregl-compact-show .maplibregl-ctrl-attrib-button {
-	background-color: var(--map-surface-hover);
-}
-
-@media not (forced-colors: active) {
-	[data-map-mode='dark'] .maplibregl-ctrl-icon,
-	[data-map-mode='dark'] .maplibregl-ctrl-attrib-button {
-		filter: invert(1) hue-rotate(180deg);
-	}
-
-	/* The filter inverts the button's own fill too, so it resolves roles as light */
-	[data-map-mode='dark'] .maplibregl-ctrl-attrib-button {
-		color-scheme: light;
-	}
-}
-
-/* MapLibre forces the open attribution visible, which shows through a host hiding the map with `visibility` */
-[data-map-root] .maplibregl-ctrl-attrib.maplibregl-compact-show {
-	visibility: inherit;
 }
 
 .maplibregl-ctrl-attrib,

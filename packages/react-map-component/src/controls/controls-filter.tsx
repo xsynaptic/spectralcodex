@@ -1,5 +1,5 @@
 import type { LocationStatus, LocationStatusMetadata } from '@spectralcodex/shared/map';
-import type { FC, PropsWithChildren, RefObject } from 'react';
+import type { CSSProperties, FC, PropsWithChildren, RefObject } from 'react';
 import type { ControlPosition } from 'react-map-gl/maplibre';
 
 import { locationStatusOrder, LocationStatusRecords } from '@spectralcodex/shared/map';
@@ -10,7 +10,6 @@ import { CustomControlPortal } from '#controls/controls-custom.tsx';
 import { useOverlay } from '#controls/controls-overlay.ts';
 import { useIsMapLoading } from '#data/data-query.ts';
 import { useMapConfig } from '#lib/config.tsx';
-import { useIsDarkMode } from '#lib/dark-mode.ts';
 import { MapControlIcon, MapIconFilters, MapIconRating } from '#lib/icons.tsx';
 import { useTrackMap } from '#lib/track-hook.ts';
 import { hasActiveFilter } from '#store/store-factory.ts';
@@ -26,6 +25,22 @@ const filterLevels = [1, 2, 3, 4, 5] as const;
 
 function getActiveAttribute(isActive: boolean) {
 	return { [mapActiveAttribute]: isActive ? '' : undefined };
+}
+
+interface StatusSwatchStyle extends CSSProperties {
+	'--map-status-edge': string;
+	'--map-status-edge-dark': string;
+	'--map-status-fill': string;
+	'--map-status-fill-dark': string;
+}
+
+function getStatusSwatchStyle(data: LocationStatusMetadata): StatusSwatchStyle {
+	return {
+		'--map-status-edge': data.stroke,
+		'--map-status-edge-dark': data.strokeDark,
+		'--map-status-fill': data.color,
+		'--map-status-fill-dark': data.colorDark,
+	};
 }
 
 const MapFilterLabel: FC<{ title: string; titleZh: string }> = function MapFilterLabel({
@@ -56,7 +71,6 @@ const MapFilterStatusMenuItem: FC<{
 	isFiltered: boolean;
 	status: LocationStatus;
 }> = memo(function MapFilterStatusMenuItem({ data, isFiltered, status }) {
-	const isDarkMode = useIsDarkMode();
 	const store = useMapStoreApi();
 	const { setFilter } = useMapStore((state) => state.actions);
 
@@ -76,13 +90,7 @@ const MapFilterStatusMenuItem: FC<{
 				}}
 				type="button"
 			>
-				<span
-					className="map-filter-swatch"
-					style={{
-						backgroundColor: isDarkMode ? data.colorDark : data.color,
-						borderColor: isDarkMode ? data.strokeDark : data.stroke,
-					}}
-				></span>
+				<span className="map-filter-swatch" style={getStatusSwatchStyle(data)}></span>
 				<MapFilterLabel title={data.title} titleZh={data.title_zh} />
 			</button>
 		</MapFilterMenuItem>
