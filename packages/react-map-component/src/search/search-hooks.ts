@@ -18,7 +18,7 @@ async function queryScopeList(client: QueryClient, apiSourceUrl: string) {
 	try {
 		return await client.query(scopeListQueryOptions(apiSourceUrl));
 	} catch {
-		return [];
+		return;
 	}
 }
 
@@ -34,9 +34,10 @@ function searchIndexQueryOptions(apiSourceUrl: string, mapFeaturesRule: MapFeatu
 				queryScopeList(client, apiSourceUrl),
 			]);
 
-			return createSearchIndex(rows, scopes);
+			return { index: createSearchIndex(rows, scopes ?? []), isComplete: scopes !== undefined };
 		},
 		queryKey: ['search-index', apiSourceUrl, mapFeaturesRule],
+		staleTime: (query) => (query.state.data?.isComplete ? Infinity : 0),
 	});
 }
 
@@ -65,7 +66,7 @@ function useSearchPick(close: (how: MapOverlayClose) => void) {
 
 export function useMapSearch(query: string, onClose: (how: MapOverlayClose) => void) {
 	const { apiSourceUrl, mapFeaturesRule } = useMapConfig();
-	const { data: index } = useQuery(searchIndexQueryOptions(apiSourceUrl, mapFeaturesRule));
+	const index = useQuery(searchIndexQueryOptions(apiSourceUrl, mapFeaturesRule)).data?.index;
 	const deferredQuery = useDeferredValue(query);
 	const results = useMemo(
 		() => (index ? searchMap(index, deferredQuery) : undefined),
