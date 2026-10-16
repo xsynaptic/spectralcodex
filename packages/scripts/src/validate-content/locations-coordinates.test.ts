@@ -4,7 +4,6 @@ import { describe, expect, test } from 'vitest';
 import { validateLocationsCoordinates } from '#validate-content/locations-coordinates.ts';
 import { makeEntry, makeRegionRefs } from '#validate-content/validate-test-utils.ts';
 
-// Real Taipei boundary copied from public/divisions
 const divisionsPath = path.join(import.meta.dirname, 'fixtures');
 
 const taipeiCoordinates: [number, number] = [121.5654, 25.033];
@@ -74,7 +73,6 @@ describe('validateLocationsCoordinates', () => {
 			}),
 		];
 
-		// Pinned: zero checked locations counts as failure
 		await expect(validateLocationsCoordinates(entries, divisionsPath)).resolves.toStrictEqual({
 			issues: [],
 			notes: [],

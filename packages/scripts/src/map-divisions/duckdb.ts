@@ -61,7 +61,6 @@ export async function fetchDivisionData({
 	}
 
 	for (const [index, row] of rows.entries()) {
-		// Key results and cache by the ID from content, whichever column it matched
 		const id = uncachedIds.has(row.areaId) ? row.areaId : row.parentDivisionId;
 
 		console.log(chalk.gray(`  Match ${chalk.cyan(String(index + 1))}: ${chalk.cyan(id)}`));
@@ -132,10 +131,9 @@ function buildQuery(baseUrl: string, divisionIds: Set<string>, boundingBox?: Geo
 		);
 	}
 
-	// Exclude maritime areas; coastal divisions have a second territorial-waters polygon
 	conditions.push(`class = 'land'`);
 
-	// Match division_area IDs (legacy content) and division IDs (what the Explorer provides in 2026)
+	// Older content stores division_area IDs and the Overture Explorer now gives division IDs, so either matches
 	const quotedIds = [...divisionIds].map((id) => `'${id}'`).join(', ');
 	conditions.push(`(id IN (${quotedIds}) OR division_id IN (${quotedIds}))`);
 

@@ -49,7 +49,6 @@ export function parseRegionData(entries: Array<ContentEntry>) {
 	return { allRegions: regions, regionsWithDivisionIds };
 }
 
-// Resolve a bounding box hierarchically by walking up the ancestry chain
 export function resolveBoundingBox(
 	region: RegionMetadata,
 	regionsById: Map<string, RegionMetadata>,
@@ -64,11 +63,6 @@ export function resolveBoundingBox(
 	return undefined;
 }
 
-/**
- * Derive regionPathIds (ancestor chain) from filePath
- * e.g. "packages/content/collections/regions/asia/japan/tokyo.mdx"
- * → ["tokyo", "japan", "asia"] (self + ancestors from immediate parent to root)
- */
 function getRegionPathIds(filePath: string, id: string): Array<string> {
 	const collectionMarker = 'collections/regions/';
 	const index = filePath.indexOf(collectionMarker);
@@ -80,7 +74,6 @@ function getRegionPathIds(filePath: string, id: string): Array<string> {
 	const pathWithoutExt = relativePath.replace(ext, '');
 	const parts = pathWithoutExt.split('/');
 
-	// Start with self then add ancestors from immediate parent to root
 	const regionPathIds: Array<string> = [id];
 
 	for (let i = parts.length - 2; i >= 0; i--) {
