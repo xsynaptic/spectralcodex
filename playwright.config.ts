@@ -16,11 +16,12 @@ export default defineConfig({
 	reporter: [['list'], ['html', { open: 'never', outputFolder: './temp/playwright-report' }]],
 	retries: 0,
 	testDir: './tests/e2e',
-	timeout: isDev ? 30_000 : 15_000,
+	timeout: isDev ? 60_000 : 15_000,
 	use: {
 		baseURL: getBaseUrl(),
 	},
-	...(isDev ? { workers: 4 } : {}),
+	// The dev server renders each page on request, taking seconds per page once workers contend for it
+	...(isDev ? { expect: { timeout: 12_000 }, workers: 3 } : {}),
 	...(isProd || isDev
 		? {}
 		: {

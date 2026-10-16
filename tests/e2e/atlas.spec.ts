@@ -7,7 +7,7 @@ import {
 	mapControlClassName,
 } from '@spectralcodex/react-map-component/constants';
 
-import { paths } from '#e2e/constants.ts';
+import { isDev, paths } from '#e2e/constants.ts';
 import { expect, test, visit } from '#e2e/test.ts';
 import {
 	atlasFlagAttribute,
@@ -30,7 +30,7 @@ const phoneViewport = { height: 844, width: 390 };
 const phoneSidewaysViewport = { height: 390, width: 844 };
 const wideViewport = { height: 900, width: 1440 };
 
-const mapLoadTimeout = 10_000;
+const mapLoadTimeout = isDev ? 20_000 : 10_000;
 
 function getAtlas(page: Page) {
 	const shell = page.locator(atlasShellSelector);
@@ -69,7 +69,7 @@ async function openInPane(page: Page, link: Locator) {
 	await page.waitForURL(`**${href}`);
 	await expect(page.locator('html')).toHaveAttribute(atlasPageAttribute, atlasPage.pane);
 
-	return href;
+	return getHeading(page);
 }
 
 function getPreviewLink(page: Page) {
@@ -130,6 +130,11 @@ async function getHeading(page: Page) {
 	return ((await page.locator('h1').textContent()) ?? '').trim();
 }
 
+// History moves the address before the page is fetched and swapped, so the heading marks the arrival
+async function expectHistoryArrival(page: Page, heading: string) {
+	await expect(page.locator('h1')).toHaveText(heading);
+}
+
 function getSlugQuery(path: string) {
 	return path.replaceAll('/', '').replaceAll('-', ' ');
 }
@@ -164,7 +169,7 @@ test.describe('on a wide viewport', () => {
 			await expect(shell).toBeFocused();
 			await keepCanvas(canvas);
 
-			const paneUrl = await openInPane(page, getPreviewLink(page));
+			const paneTitle = await openInPane(page, getPreviewLink(page));
 
 			await expectSameCanvas(canvas);
 
@@ -173,7 +178,7 @@ test.describe('on a wide viewport', () => {
 			await expectSameCanvas(canvas);
 
 			await shell.getByRole('button', { name: t('atlas.close.label') }).click();
-			await page.waitForURL(`**${paneUrl}`);
+			await expectHistoryArrival(page, paneTitle);
 
 			await expect(root).not.toHaveAttribute(atlasFlagAttribute);
 			await expectShellGone(shell);
@@ -253,6 +258,9 @@ test.describe('on a wide viewport', () => {
 		const topRating = shell.locator(`.${mapControlClassName.filterRating} button`).last();
 
 		await visit(page, paths.regionDetail);
+
+		const regionTitle = await getHeading(page);
+
 		await enterAtlas(page);
 		await expect(metrics).toBeVisible();
 
@@ -268,7 +276,7 @@ test.describe('on a wide viewport', () => {
 		await page.keyboard.press('Escape');
 		await openInPane(page, getPreviewLink(page));
 		await page.goBack();
-		await page.waitForURL(`**${paths.regionDetail}`);
+		await expectHistoryArrival(page, regionTitle);
 
 		await expect(metrics).toHaveText(filteredMetrics);
 		await filterButton.click();
@@ -308,7 +316,8 @@ test.describe('a Scope on a wide viewport', () => {
 		await enterAtlas(page);
 
 		const scopedMetrics = await expectScopeHeld(page, title);
-		const paneUrl = await openInPane(page, getPreviewLink(page));
+
+		const paneTitle = await openInPane(page, getPreviewLink(page));
 
 		await expectScopeHeld(page, title);
 
@@ -324,13 +333,11 @@ test.describe('a Scope on a wide viewport', () => {
 		await expect(scopeBar).not.toHaveAttribute(mapActiveAttribute);
 
 		await page.goBack();
-		await page.waitForURL(`**${paneUrl}`);
-		await expect(page.locator('h1')).not.toHaveText(title);
+		await expectHistoryArrival(page, paneTitle);
 		await expect(scopeBar).not.toHaveAttribute(mapActiveAttribute);
 
 		await page.goForward();
-		await page.waitForURL(`**${paths.themeDetail}`);
-
+		await expectHistoryArrival(page, title);
 		await expect(scopeBar).toHaveAttribute(mapActiveAttribute);
 	});
 
@@ -531,22 +538,6 @@ test.describe('a sheet on a phone viewport', () => {
 		expect(new URL(page.url()).pathname).toBe(paths.locationSinglePoint);
 	});
 
-	test('the back button returns from a pane page to the atlas page before it', async ({ page }) => {
-		const { canvas, root } = getAtlas(page);
-
-		await visit(page, paths.regionDetail);
-		await enterAtlas(page);
-		await keepCanvas(canvas);
-
-		await openInPane(page, getPreviewLink(page));
-
-		await page.goBack();
-		await page.waitForURL(`**${paths.regionDetail}`);
-
-		await expect(root).toHaveAttribute(atlasPageAttribute, atlasPage.pane);
-		await expectSameCanvas(canvas);
-	});
-
 	test('the open rest a reader chose decides every later arrival', async ({ page }) => {
 		const { handle, root } = getAtlas(page);
 
@@ -609,6 +600,28 @@ test.describe('a sheet on a phone viewport', () => {
 		await expect(root).toHaveAttribute(atlasSheetAttribute, atlasSheetRest.half);
 		await expect(popup).toHaveCount(0);
 		expect(new URL(page.url()).pathname).toBe(paths.locationSinglePoint);
+	});
+});
+
+test.describe('history on a phone viewport', () => {
+	test.use({ viewport: phoneViewport });
+
+	test('the back button returns from a pane page to the atlas page before it', async ({ page }) => {
+		const { canvas, root } = getAtlas(page);
+
+		await visit(page, paths.regionDetail);
+		await enterAtlas(page);
+		await keepCanvas(canvas);
+
+		const regionTitle = await getHeading(page);
+
+		await openInPane(page, getPreviewLink(page));
+
+		await page.goBack();
+		await expectHistoryArrival(page, regionTitle);
+
+		await expect(root).toHaveAttribute(atlasPageAttribute, atlasPage.pane);
+		await expectSameCanvas(canvas);
 	});
 });
 
