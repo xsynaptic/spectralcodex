@@ -5,7 +5,7 @@ import type { CollectionEntry } from 'astro:content';
 import { render } from 'astro:content';
 
 import SeriesSection from '#components/series/series-section.astro';
-import { createSeriesByIdFunction } from '#lib/collections/series/series-utils.ts';
+import { createSeriesByEntryFunction } from '#lib/collections/series/series-queries.ts';
 import { getContentPath } from '#lib/utils/routing.ts';
 
 interface Props extends HTMLAttributes<'div'> {
@@ -14,9 +14,9 @@ interface Props extends HTMLAttributes<'div'> {
 
 const { entry, ...props } = Astro.props;
 
-const getSeriesById = await createSeriesByIdFunction();
+const getSeriesByEntry = await createSeriesByEntryFunction();
 
-const seriesData = getSeriesById({ collection: entry.collection, id: entry.id });
+const seriesData = getSeriesByEntry({ collection: entry.collection, id: entry.id });
 ---
 
 {seriesData.map(async ({ catalogItems, entry: seriesEntry }) => {

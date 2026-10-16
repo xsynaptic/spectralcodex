@@ -43,7 +43,8 @@ vi.mock('#lib/map/map-locations.ts', () => ({
 	hasEntryMap: () => false,
 }));
 
-const { createQueryThemesEntryFunction } = await import('#lib/collections/themes/themes-utils.ts');
+const { createQueryThemesEntryFunction } =
+	await import('#lib/collections/themes/themes-queries.ts');
 
 const locations = makeListingLocations();
 const posts = [makeEntry('posts', 'post', { imageFeatured: 'image' })];

@@ -9,7 +9,7 @@ import sharp from 'sharp';
 
 import type { ImageFitOption, ImagePlaceholderProps } from '#lib/image/image-types.ts';
 
-import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
+import { getImageByIdFunction } from '#lib/collections/images/images-data.ts';
 import { ImageFitOptionEnum } from '#lib/image/image-types.ts';
 
 const imagePlaceholderPixelCountHighQuality = 1600;

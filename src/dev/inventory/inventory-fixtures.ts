@@ -9,14 +9,14 @@ import type { WebmentionReply } from '#components/webmentions/webmentions-data.t
 import type { CatalogItem, ImageFeaturedWithCaption } from '#lib/catalog/catalog-types.ts';
 import type { ChronologyDailyCounts } from '#lib/collections/chronology/chronology-types.ts';
 import type { Citation } from '#lib/collections/resources/resources-citation.ts';
-import type { ResourceLink, ResourceSource } from '#lib/collections/resources/resources-utils.ts';
+import type { ResourceLink, ResourceSource } from '#lib/collections/resources/resources-data.ts';
 import type { MultilingualContent } from '#lib/i18n/i18n-types.ts';
 import type { ImageComponentProps, ImagePlaceholderProps } from '#lib/image/image-types.ts';
 import type { DateRecordedEntry } from '#lib/utils/date.ts';
 
 import { getImagesCollection } from '#lib/collections/images/images-data.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
-import { getLocationsNearbyList } from '#lib/collections/locations/locations-utils.ts';
+import { getLocationsNearbyList } from '#lib/collections/locations/locations-queries.ts';
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
 import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';
 import { getResourcesCollection } from '#lib/collections/resources/resources-data.ts';

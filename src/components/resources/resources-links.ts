@@ -1,4 +1,4 @@
-import type { ResourceLink } from '#lib/collections/resources/resources-utils.ts';
+import type { ResourceLink } from '#lib/collections/resources/resources-data.ts';
 
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';

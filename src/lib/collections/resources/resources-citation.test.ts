@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import type { ResourceSource } from '#lib/collections/resources/resources-utils.ts';
+import type { ResourceSource } from '#lib/collections/resources/resources-data.ts';
 
 import { buildSourceCitations } from '#lib/collections/resources/resources-citation.ts';
 

@@ -1,5 +1,6 @@
+import { getDateTimeFormat } from '@spectralcodex/shared/i18n';
+
 import { millisecondsPerDay } from '#constants.ts';
-import { getDateTimeFormat } from '#lib/i18n/i18n-formatters.ts';
 import { getDayKey } from '#lib/utils/date.ts';
 
 export interface ActivityGraphData {

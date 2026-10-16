@@ -43,7 +43,7 @@ vi.mock('#lib/map/map-data.ts', () => ({
 vi.mock('#lib/map/map-locations.ts', () => ({ getLocationsMapRule: vi.fn() }));
 
 const { createQueryResourcesEntryFunction } =
-	await import('#lib/collections/resources/resources-utils.ts');
+	await import('#lib/collections/resources/resources-queries.ts');
 
 const ids = (items: ReadonlyArray<CatalogItem | { id: string }>) => items.map((item) => item.id);
 

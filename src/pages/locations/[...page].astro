@@ -2,7 +2,7 @@
 import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
 import LocationList from '#layouts/location-list.astro';
-import { queryLocationsIndex } from '#lib/collections/locations/locations-utils.ts';
+import { queryLocationsIndex } from '#lib/collections/locations/locations-queries.ts';
 
 export const getStaticPaths = (async ({ paginate }) => {
 	const results = await queryLocationsIndex();

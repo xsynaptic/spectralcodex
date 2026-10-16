@@ -9,6 +9,7 @@ import { buildEntryCatalogItems } from '#lib/catalog/catalog-utils.ts';
 import { createLocationsByIdsFunction } from '#lib/collections/locations/locations-data.ts';
 import { createPostsByIdsFunction } from '#lib/collections/posts/posts-data.ts';
 import {
+	createRegionAncestorsFunction,
 	createRegionsByIdsFunction,
 	getRegionsCollection,
 } from '#lib/collections/regions/regions-data.ts';
@@ -76,38 +77,13 @@ export async function createQueryRegionsEntryFunction() {
 	};
 }
 
-export async function createQueryRegionsRelatedFunction() {
+export async function createRegionsRelatedFunction() {
 	const getRegionsByIds = await createRegionsByIdsFunction();
 
-	return function queryRegionsRelated(ids: Array<string> | undefined, limit: number) {
+	return function getRegionsRelated(ids: Array<string> | undefined, limit: number) {
 		return ids
 			? R.pipe(ids, getRegionsByIds, R.filter(hasEntries), R.sort(sortByEntryCount), R.take(limit))
 			: [];
-	};
-}
-
-// References are not the complete entry; they still need to be fetched from the collection
-export async function createRegionAncestorsByIdFunction() {
-	const { entriesMap } = await getRegionsCollection();
-	const getRegionAncestors = await createRegionAncestorsFunction();
-
-	return function getRegionAncestorsById(regionId: string) {
-		const region = entriesMap.get(regionId);
-
-		if (!region)
-			throw new Error(`Error: could not find "${regionId}" in the "regions" collection.`);
-
-		return getRegionAncestors(region) satisfies Array<CollectionEntry<'regions'>>;
-	};
-}
-
-export async function createRegionAncestorsFunction() {
-	const getRegionsById = await createRegionsByIdsFunction();
-
-	return function getRegionAncestors(region: CollectionEntry<'regions'>) {
-		const ancestors = region.data._ancestors ? getRegionsById(region.data._ancestors) : [];
-
-		return [region, ...ancestors] satisfies Array<CollectionEntry<'regions'>>;
 	};
 }
 

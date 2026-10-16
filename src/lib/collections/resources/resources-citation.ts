@@ -1,4 +1,4 @@
-import type { ResourceSource } from '#lib/collections/resources/resources-utils.ts';
+import type { ResourceSource } from '#lib/collections/resources/resources-data.ts';
 import type { LanguageCode } from '#lib/i18n/i18n-types.ts';
 
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';

@@ -1,6 +1,10 @@
 import type { CollectionEntry } from 'astro:content';
 
-import { createCollectionData, getRawCollection } from '#lib/utils/collections.ts';
+import {
+	createCollectionData,
+	createCollectionLookupByIds,
+	getRawCollection,
+} from '#lib/utils/collections.ts';
 import { collectUnlistedLocationIds, populateContentCounts } from '#lib/utils/content-policy.ts';
 
 // Direct membership only; unlike regions, themes do not roll up their children
@@ -45,3 +49,5 @@ export const getThemesCollection = createCollectionData({
 		}
 	},
 });
+
+export const createThemesByIdsFunction = createCollectionLookupByIds('Themes', getThemesCollection);

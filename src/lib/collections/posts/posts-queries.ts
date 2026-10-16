@@ -2,8 +2,6 @@ import type { CollectionEntry } from 'astro:content';
 
 import * as R from 'remeda';
 
-import type { Thing } from '#lib/utils/seo-structured-data.ts';
-
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { isEditorialEntry } from '#lib/catalog/catalog-utils.ts';
 import { createLocationsByPostsFunction } from '#lib/collections/locations/locations-data.ts';
@@ -14,12 +12,6 @@ import { createMapDataFunction } from '#lib/map/map-data.ts';
 import { getLocationsMapRule } from '#lib/map/map-locations.ts';
 import { isListedQuality } from '#lib/utils/content-policy.ts';
 import { sortByDateReverseChronological } from '#lib/utils/date.ts';
-import { getDescriptionRenderedText } from '#lib/utils/description-data.ts';
-import {
-	buildArticleSchema,
-	buildAuthorSchema,
-	buildEntryBreadcrumbSchema,
-} from '#lib/utils/seo-structured-data.ts';
 
 export async function createQueryPostsEntryFunction() {
 	const getLocationsByPosts = await createLocationsByPostsFunction();
@@ -42,28 +34,6 @@ export async function createQueryPostsEntryFunction() {
 
 		return { backlinks, mapData };
 	};
-}
-
-export function getPostSchema(
-	entry: CollectionEntry<'posts'>,
-	props: { imageUrl: string | undefined; url: string },
-): Array<Thing> {
-	return [
-		buildEntryBreadcrumbSchema({
-			collection: 'posts',
-			title: entry.data.title,
-			url: props.url,
-		}),
-		buildArticleSchema({
-			dateCreated: entry.data.dateCreated,
-			dateUpdated: entry.data.dateUpdated,
-			description: getDescriptionRenderedText(entry),
-			imageUrl: props.imageUrl,
-			title: entry.data.title,
-			url: props.url,
-		}),
-		buildAuthorSchema(),
-	];
 }
 
 export async function queryPostsIndex() {

@@ -5,7 +5,7 @@ import { getPublicId } from '@spectralcodex/shared/entries';
 
 import LocationDetail from '#layouts/location-detail.astro';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
-import { createQueryLocationsEntryFunction } from '#lib/collections/locations/locations-utils.ts';
+import { createQueryLocationsEntryFunction } from '#lib/collections/locations/locations-queries.ts';
 
 export const getStaticPaths = (async () => {
 	const { entries } = await getLocationsCollection();

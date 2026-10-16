@@ -9,7 +9,7 @@ const { getCatalogMock } = vi.hoisted(() => ({ getCatalogMock: vi.fn() }));
 
 vi.mock('#lib/catalog/catalog-data.ts', () => ({ getCatalog: getCatalogMock }));
 
-const { queryHomeData } = await import('#lib/collections/home/home-utils.ts');
+const { queryHomeData } = await import('#lib/collections/home/home-queries.ts');
 
 function makeItems(
 	collection: CatalogCollectionKey,

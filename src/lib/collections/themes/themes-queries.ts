@@ -14,14 +14,8 @@ import { getMapLanguages } from '#lib/i18n/i18n-utils.ts';
 import { createMapDataFunction } from '#lib/map/map-data.ts';
 import { getMapThemeIndexById } from '#lib/map/map-directory.ts';
 import { getThemeMapRule, hasEntryMap } from '#lib/map/map-locations.ts';
-import {
-	createCollectionLookupByIds,
-	hasEntries,
-	sortByEntryCount,
-} from '#lib/utils/collections.ts';
+import { hasEntries, sortByEntryCount } from '#lib/utils/collections.ts';
 import { isListed, isListedQuality } from '#lib/utils/content-policy.ts';
-
-export const createThemesByIdsFunction = createCollectionLookupByIds('Themes', getThemesCollection);
 
 export async function createQueryThemesEntryFunction() {
 	const { entries: themes } = await getThemesCollection();

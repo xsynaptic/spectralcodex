@@ -17,11 +17,9 @@ import * as R from 'remeda';
 
 import { atlasRegionId } from '#constants.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
-import { getObjectiveLocations } from '#lib/collections/locations/locations-queries.ts';
-import {
-	getRegionsCollection,
-	resolveLocationRegions,
-} from '#lib/collections/regions/regions-data.ts';
+import { getObjectiveLocations } from '#lib/collections/locations/locations-subsets.ts';
+import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';
+import { resolveLocationRegions } from '#lib/collections/regions/regions-factory.ts';
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { assignChunks } from '#lib/map/map-chunks.ts';
 import { hashMapPayloads } from '#lib/map/map-directory-hash.ts';

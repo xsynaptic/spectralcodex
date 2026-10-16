@@ -1,5 +1,6 @@
 import type { CollectionEntry } from 'astro:content';
 
+import { getDateTimeFormat } from '@spectralcodex/shared/i18n';
 import * as R from 'remeda';
 
 import type { CatalogCollectionKey, CatalogItem } from '#lib/catalog/catalog-types.ts';
@@ -11,7 +12,6 @@ import type {
 } from '#lib/collections/chronology/chronology-types.ts';
 
 import { millisecondsPerDay } from '#constants.ts';
-import { getDateTimeFormat } from '#lib/i18n/i18n-formatters.ts';
 import { getDateRanges, getDayKey } from '#lib/utils/date.ts';
 
 interface ChronologyData {

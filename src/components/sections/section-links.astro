@@ -4,7 +4,7 @@ import type { CollectionEntry } from 'astro:content';
 
 import ContentSection from '#components/content/content-section.astro';
 import ResourcesLinks from '#components/resources/resources-links.astro';
-import { createResolveResourceLinksFunction } from '#lib/collections/resources/resources-utils.ts';
+import { createResolveResourceLinksFunction } from '#lib/collections/resources/resources-data.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 interface Props extends HTMLAttributes<'div'> {

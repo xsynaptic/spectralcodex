@@ -1,3 +1,4 @@
+import { getDateTimeFormat } from '@spectralcodex/shared/i18n';
 import { scaleLinear, scaleLog } from 'd3-scale';
 import { utcMonth } from 'd3-time';
 import * as R from 'remeda';
@@ -13,7 +14,6 @@ import {
 	getRollingMedian,
 	getUtcDayStart,
 } from '#lib/build-stats/build-stats-utils.ts';
-import { getDateTimeFormat } from '#lib/i18n/i18n-formatters.ts';
 import { getDateDisplay } from '#lib/utils/date.ts';
 import { formatNumber } from '#lib/utils/text.ts';
 

@@ -3,7 +3,7 @@ import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
 import PostDetail from '#layouts/post-detail.astro';
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
-import { createQueryPostsEntryFunction } from '#lib/collections/posts/posts-utils.ts';
+import { createQueryPostsEntryFunction } from '#lib/collections/posts/posts-queries.ts';
 
 export const getStaticPaths = (async () => {
 	const { entries } = await getPostsCollection();

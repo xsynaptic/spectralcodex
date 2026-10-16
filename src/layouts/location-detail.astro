@@ -25,10 +25,8 @@ import SectionSources from '#components/sections/section-sources.astro';
 import SectionThemes from '#components/sections/section-themes.astro';
 import SectionWebmentions from '#components/sections/section-webmentions.astro';
 import { getAtlasPage } from '#lib/atlas/atlas-data.ts';
-import {
-	createLocationEntryDisplayFunction,
-	getLocationSchemas,
-} from '#lib/collections/locations/locations-utils.ts';
+import { createLocationEntryDisplayFunction } from '#lib/collections/locations/locations-queries.ts';
+import { getLocationStructuredData } from '#lib/collections/locations/locations-structured-data.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getImageFeaturedId, getImageHeroId } from '#lib/image/image-featured.ts';
 import { hasEntryContent } from '#lib/utils/astro.ts';
@@ -71,7 +69,7 @@ const t = getTranslations();
 <ContentEntryArticle
 	atlas={atlas}
 	entry={entry}
-	schemas={await getLocationSchemas(entry, { url: Astro.url.toString() })}
+	schemas={await getLocationStructuredData(entry, { url: Astro.url.toString() })}
 	titleMultilingual={titleMultilingual}
 	titleMultilingualAdditional={titleMultilingualAdditional}
 >

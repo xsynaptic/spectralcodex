@@ -95,6 +95,17 @@
 			},
 			{ "name": "map-base", "patterns": ["packages/react-map-component/src/**"] },
 			{ "name": "packages", "patterns": ["packages/**"] },
+			// The read path sits below the Catalog and Map Directory, which import it
+			{
+				"name": "assembly",
+				"patterns": [
+					"src/lib/catalog/**",
+					"src/lib/map/**",
+					"src/lib/collections/*/*-queries.ts",
+					"src/lib/collections/chronology/chronology-data.ts",
+				],
+			},
+			{ "name": "read-path", "patterns": ["src/lib/collections/*/*-data.ts"] },
 			{ "name": "lib", "patterns": ["src/lib/**"] },
 			{ "name": "components", "patterns": ["src/components/**", "src/layouts/**", "src/pages/**"] },
 		],
@@ -104,8 +115,19 @@
 			{ "from": "map-base", "allow": ["packages"] },
 			// Vite/Rolldown build breaks when packages import the app
 			{ "from": "packages", "allow": ["packages"] },
-			{ "from": "lib", "allow": ["lib", "packages", "map-ui", "map-base"] },
-			{ "from": "components", "allow": ["components", "lib", "packages", "map-ui", "map-base"] },
+			{ "from": "read-path", "allow": ["read-path", "lib", "packages"] },
+			{
+				"from": "assembly",
+				"allow": ["assembly", "read-path", "lib", "packages", "map-ui", "map-base"],
+			},
+			{
+				"from": "lib",
+				"allow": ["lib", "assembly", "read-path", "packages", "map-ui", "map-base"],
+			},
+			{
+				"from": "components",
+				"allow": ["components", "lib", "assembly", "read-path", "packages", "map-ui", "map-base"],
+			},
 		],
 	},
 }

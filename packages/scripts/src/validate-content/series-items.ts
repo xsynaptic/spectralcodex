@@ -4,7 +4,7 @@ import { toValidationResult } from '#validate-content/validation-result.ts';
 
 /**
  * Series items are plain strings because a series mixes collections, so `reference()` cannot serve them
- * An unresolved item is dropped silently at render (`series-utils.ts` filters the catalog lookup)
+ * An unresolved item is dropped silently at render (`series-queries.ts` filters the catalog lookup)
  */
 export function validateSeriesItems(
 	entries: Array<ContentEntry>,

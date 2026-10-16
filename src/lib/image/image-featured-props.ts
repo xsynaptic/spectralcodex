@@ -2,7 +2,7 @@ import type { ImageFormat } from 'unpic';
 
 import type { ImageComponentProps, ImagePlaceholderProps } from '#lib/image/image-types.ts';
 
-import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
+import { getImageByIdFunction } from '#lib/collections/images/images-data.ts';
 import { getImageBreakpoints } from '#lib/image/image-layout.ts';
 import { ImageFitOptionEnum } from '#lib/image/image-types.ts';
 import { sanitizeImageAltAttribute } from '#lib/utils/text.ts';

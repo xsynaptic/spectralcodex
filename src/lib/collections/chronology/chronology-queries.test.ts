@@ -13,7 +13,7 @@ const {
 	createChronologyImageFeaturedGroupFunction,
 	getChronologyActivityData,
 	getChronologyYearPagination,
-} = await import('#lib/collections/chronology/chronology-utils.ts');
+} = await import('#lib/collections/chronology/chronology-queries.ts');
 
 describe('getChronologyYearPagination', () => {
 	const years = ['2026', '2024', '2019'];

@@ -45,12 +45,12 @@ export async function createQuerySeriesEntryFunction() {
 	};
 }
 
-export async function createSeriesByIdFunction() {
+export async function createSeriesByEntryFunction() {
 	const { entries: series } = await getSeriesCollection();
 
 	const getSeriesCatalogItems = await createSeriesCatalogItemsFunction();
 
-	return function getSeriesById({
+	return function getSeriesByEntry({
 		collection,
 		id,
 	}: {

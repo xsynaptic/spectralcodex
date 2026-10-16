@@ -14,8 +14,6 @@ import {
 	getRawCollection,
 } from '#lib/utils/collections.ts';
 
-export { resolveLocationRegions } from '#lib/collections/regions/regions-factory.ts';
-
 export const getRegionsCollection = createCollectionData({
 	collection: 'regions',
 	async extend(entries) {
@@ -57,5 +55,30 @@ export async function createFirstRegionByReferenceFunction() {
 		const regionId = regions.at(0)?.id;
 
 		return regionId ? entriesMap.get(regionId) : undefined;
+	};
+}
+
+// References are not the complete entry; they still need to be fetched from the collection
+export async function createRegionAncestorsByIdFunction() {
+	const { entriesMap } = await getRegionsCollection();
+	const getRegionAncestors = await createRegionAncestorsFunction();
+
+	return function getRegionAncestorsById(regionId: string) {
+		const region = entriesMap.get(regionId);
+
+		if (!region)
+			throw new Error(`Error: could not find "${regionId}" in the "regions" collection.`);
+
+		return getRegionAncestors(region) satisfies Array<CollectionEntry<'regions'>>;
+	};
+}
+
+export async function createRegionAncestorsFunction() {
+	const getRegionsById = await createRegionsByIdsFunction();
+
+	return function getRegionAncestors(region: CollectionEntry<'regions'>) {
+		const ancestors = region.data._ancestors ? getRegionsById(region.data._ancestors) : [];
+
+		return [region, ...ancestors] satisfies Array<CollectionEntry<'regions'>>;
 	};
 }

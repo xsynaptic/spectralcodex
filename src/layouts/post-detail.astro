@@ -22,7 +22,7 @@ import SectionSources from '#components/sections/section-sources.astro';
 import SectionThemes from '#components/sections/section-themes.astro';
 import SectionWebmentions from '#components/sections/section-webmentions.astro';
 import { getAtlasPage } from '#lib/atlas/atlas-data.ts';
-import { getPostSchema } from '#lib/collections/posts/posts-utils.ts';
+import { getPostStructuredData } from '#lib/collections/posts/posts-structured-data.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getSeoArticleProps, getSeoImageProps } from '#lib/utils/seo.ts';
@@ -58,7 +58,7 @@ const atlas = await getAtlasPage(entry, mapData);
 			dateUpdated: entry.data.dateUpdated,
 		}),
 	}}
-	schemas={getPostSchema(entry, { imageUrl: seoImage.url, url: Astro.url.toString() })}
+	schemas={getPostStructuredData(entry, { imageUrl: seoImage.url, url: Astro.url.toString() })}
 	titleMultilingual={titleMultilingual}
 >
 	<Fragment slot="header-subtitle">

@@ -7,7 +7,7 @@ import { hash } from 'ohash';
 import type { ImageThumbnail } from '#lib/schemas/index.ts';
 
 import { hashShortLength, imageLowQualityFormat, imageLowQualityValue } from '#constants.ts';
-import { getImageByIdFunction } from '#lib/collections/images/images-utils.ts';
+import { getImageByIdFunction } from '#lib/collections/images/images-data.ts';
 import {
 	createGenerateLocationPostDataFunction,
 	getLocationThumbnailProps,

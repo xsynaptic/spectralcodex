@@ -29,6 +29,8 @@ vi.mock('#lib/collections/posts/posts-data.ts', () => ({
 	createPostsByIdsFunction: () => Promise.resolve(getPostsByIdsMock),
 }));
 vi.mock('#lib/collections/regions/regions-data.ts', () => ({
+	createRegionAncestorsFunction: () =>
+		Promise.resolve((region: CollectionEntry<'regions'>) => [region]),
 	createRegionsByIdsFunction: () => Promise.resolve(() => []),
 	getRegionsCollection: getRegionsCollectionMock,
 }));
@@ -44,7 +46,7 @@ vi.mock('#lib/map/map-locations.ts', () => ({
 }));
 
 const { createQueryRegionsEntryFunction } =
-	await import('#lib/collections/regions/regions-utils.ts');
+	await import('#lib/collections/regions/regions-queries.ts');
 
 const locations = makeListingLocations();
 const posts = [makeEntry('posts', 'post', { imageFeatured: 'image' })];

@@ -1,9 +1,8 @@
+import { getNumberFormat } from '@spectralcodex/shared/i18n';
 import { trailingSlash } from '@xsynaptic/satteri-trailing-slash';
 import { wrapCjk } from '@xsynaptic/satteri-wrap-cjk';
 import { stripTags } from '@xsynaptic/unified-tools';
 import { markdownToHtml } from 'satteri';
-
-import { getNumberFormat } from '#lib/i18n/i18n-formatters.ts';
 
 // Locale-independent word segmentation; split(' ') counts space-free scripts (CJK, Thai) as one word
 const wordSegmenter = new Intl.Segmenter(undefined, { granularity: 'word' });

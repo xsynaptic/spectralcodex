@@ -2,7 +2,7 @@ import { describe, expect, test, vi } from 'vitest';
 
 const { getImageByIdMock } = vi.hoisted(() => ({ getImageByIdMock: vi.fn() }));
 
-vi.mock('#lib/collections/images/images-utils.ts', () => ({
+vi.mock('#lib/collections/images/images-data.ts', () => ({
 	getImageByIdFunction: () => Promise.resolve(getImageByIdMock),
 }));
 
