@@ -167,7 +167,7 @@ export default defineConfig({
 	],
 	integrations: [
 		react({
-			include: ['packages/react**/*'],
+			include: ['**/packages/react-*/**/*.{ts,tsx}', '@spectralcodex/react-*'],
 		}),
 		mdx(),
 		sitemap({
