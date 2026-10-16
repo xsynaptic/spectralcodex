@@ -1,65 +1,63 @@
-import {
-	mapEnterEventName,
-	mapExitEventName,
-	mapExpandEventName,
-	mapIntentEventName,
-	mapSyncEventName,
-} from '@spectralcodex/react-map-component/constants';
-import { navigate } from 'astro:transitions/client';
+import { mapSyncEventName } from '@spectralcodex/react-map-component/constants';
 
-import type { AtlasScreen } from '#lib/atlas/atlas-layout-factory.ts';
+import type { AtlasPaneLayout, AtlasScreen } from '#lib/atlas/atlas-layout-factory.ts';
 
 import {
+	atlasFlagAttribute,
 	atlasFlagStorageKey,
-	atlasInlineMapSelector,
+	atlasFromAttribute,
 	atlasPage,
+	atlasPaneLayoutProperty,
 	atlasPaneMainSelector,
-	atlasPaneMediaQuery,
 	atlasPaneSelector,
-	atlasPaneSizeProperty,
 	atlasPersistName,
-	atlasReturnStorageKey,
-	atlasSheetHalfMediaQuery,
 	atlasSheetRest,
+	atlasShellSelector,
 } from '#lib/atlas/atlas-constants.ts';
-import { getAtlasExitAction } from '#lib/atlas/atlas-exit-factory.ts';
-import { readAtlasLayout, readAtlasScreen, readSheetRest } from '#lib/atlas/atlas-layout.ts';
-import { getAtlasOpenAction } from '#lib/atlas/atlas-open-factory.ts';
-import { updateHeroSizes } from '#lib/atlas/atlas-pane.ts';
+import { getAtlasLayout, readAtlasFlags } from '#lib/atlas/atlas-layout-factory.ts';
+import { stampPaneSize, updateHeroSizes } from '#lib/atlas/atlas-pane.ts';
 import {
-	moveSheet,
+	hasHalfRest,
 	prepareSheetArrival,
-	readPreferredSheetRest,
-	readSheetEnterRest,
+	readSheetRest,
 	resetSheet,
-	scrollToSheetStart,
-	setSheet,
 	startColdSheetArrival,
 } from '#lib/atlas/atlas-sheet.ts';
-import { getSitePath } from '#lib/utils/routing.ts';
 
 const paneAnchorSelector = `${atlasPaneSelector} a[href]`;
-const shellSelector = `[data-astro-transition-persist="${atlasPersistName}"]`;
+
+function readPaneLayout(): AtlasPaneLayout {
+	const value = getComputedStyle(document.documentElement).getPropertyValue(
+		atlasPaneLayoutProperty,
+	);
+
+	return value.trim() === 'split' ? 'split' : 'sheet';
+}
+
+export function readAtlasLayout(root: HTMLElement = document.documentElement) {
+	return getAtlasLayout({ ...readAtlasFlags(root), paneLayout: readPaneLayout() });
+}
+
+export function readAtlasScreen(): AtlasScreen {
+	const layout = readAtlasLayout();
+
+	return layout === 'sheet' ? { layout, rest: readSheetRest() } : { layout };
+}
 
 function dispatchSync() {
 	document.dispatchEvent(new Event(mapSyncEventName));
 }
 
-// Following an outbound link in the same tab unloads the map; internal links swap into the pane
-function updateExternalLinks() {
-	const isSplit = readAtlasLayout() === 'split';
+function handleLinkClick(event: MouseEvent) {
+	if (!(event.target instanceof Element)) return;
 
-	for (const anchor of document.querySelectorAll<HTMLAnchorElement>(paneAnchorSelector)) {
-		if (anchor.origin === location.origin || !anchor.protocol.startsWith('http')) continue;
+	const anchor = event.target.closest(paneAnchorSelector);
 
-		if (isSplit) anchor.target = '_blank';
-		else anchor.removeAttribute('target');
-	}
-}
+	if (!(anchor instanceof HTMLAnchorElement)) return;
+	if (anchor.origin === location.origin || !anchor.protocol.startsWith('http')) return;
 
-function updateSplit() {
-	updateHeroSizes();
-	updateExternalLinks();
+	if (readAtlasLayout() === 'split') anchor.target = '_blank';
+	else anchor.removeAttribute('target');
 }
 
 function storeFlag(isEnabled: boolean) {
@@ -72,198 +70,96 @@ function storeFlag(isEnabled: boolean) {
 }
 
 function getSheetMainTop() {
-	if (matchMedia(atlasPaneMediaQuery).matches) return 0;
+	if (readPaneLayout() === 'split') return 0;
 
 	return document.querySelector(atlasPaneMainSelector)?.getBoundingClientRect().top ?? 0;
 }
 
-function setFlag(isEnabled: boolean) {
+export function setFlag(isEnabled: boolean) {
+	// The header pads by the handle only while the flag is on, so the page is held by main's top
 	const mainTop = getSheetMainTop();
 
 	// Inside the measure, so a half rest's margin leaving does not move the page either
 	if (!isEnabled) resetSheet();
 
-	document.documentElement.toggleAttribute('data-atlas', isEnabled);
+	document.documentElement.toggleAttribute(atlasFlagAttribute, isEnabled);
 	window.scrollBy({ behavior: 'instant', top: getSheetMainTop() - mainTop });
 
 	storeFlag(isEnabled);
-	updateSplit();
+	updateHeroSizes(readAtlasLayout() === 'split');
 	dispatchSync();
-}
-
-function getReturnPath() {
-	try {
-		return sessionStorage.getItem(atlasReturnStorageKey) ?? undefined;
-	} catch {
-		// sessionStorage unavailable
-		return;
-	}
-}
-
-function openSheet() {
-	const rest = readSheetEnterRest();
-
-	if (rest === atlasSheetRest.down) {
-		void moveSheet(rest);
-		return;
-	}
-
-	const inlineMap = document.querySelector(atlasInlineMapSelector);
-	const next = inlineMap?.nextElementSibling ?? inlineMap?.parentElement?.nextElementSibling;
-
-	setSheet(rest);
-
-	if (next) scrollToSheetStart('instant', next);
-}
-
-function openAtlas() {
-	if (document.fullscreenElement) void document.exitFullscreen();
-
-	setFlag(true);
-
-	document.querySelector<HTMLElement>(shellSelector)?.focus({ preventScroll: true });
-
-	if (readAtlasLayout() === 'sheet') {
-		openSheet();
-		return;
-	}
-
-	window.scrollTo({ behavior: 'instant', top: 0 });
-}
-
-function runExitAction(action: ReturnType<typeof getAtlasExitAction>) {
-	if (action.type === 'back') {
-		history.back();
-		return;
-	}
-
-	void navigate(action.path, { history: action.type });
-}
-
-function runOpenAction(action: ReturnType<typeof getAtlasOpenAction>) {
-	switch (action.type) {
-		case 'navigate': {
-			void navigate(action.url);
-			break;
-		}
-		case 'none': {
-			break;
-		}
-		case 'raise': {
-			void moveSheet(readPreferredSheetRest());
-			break;
-		}
-		case 'start': {
-			scrollToSheetStart('smooth');
-			break;
-		}
-		case 'top': {
-			window.scrollTo({ top: 0 });
-			break;
-		}
-	}
-}
-
-async function closeAtlas() {
-	if (readSheetRest() === atlasSheetRest.down) await moveSheet(atlasSheetRest.raised);
-
-	const hasShellFocus = document.querySelector(shellSelector)?.contains(document.activeElement);
-
-	const layout = readAtlasLayout();
-
-	setFlag(false);
-
-	// In the split, clearing the flag has already turned the pane back into the regular page
-	if (layout !== 'map') {
-		if (hasShellFocus) {
-			document.querySelector<HTMLElement>(atlasPaneSelector)?.focus({ preventScroll: true });
-		}
-
-		return;
-	}
-
-	runExitAction(
-		getAtlasExitAction({
-			canGoBack: 'navigation' in globalThis && navigation.canGoBack,
-			homePath: getSitePath(),
-			returnPath: getReturnPath(),
-		}),
-	);
 }
 
 function getFromPage(screen: AtlasScreen) {
 	const isLowered = screen.layout === 'sheet' && screen.rest === atlasSheetRest.down;
 
-	return isLowered ? atlasPage.map : document.documentElement.dataset.atlasPage;
+	return isLowered ? atlasPage.map : readAtlasFlags(document.documentElement).page;
 }
 
 async function clearFromWhenFinished(transition: ViewTransition) {
 	await transition.finished;
 
-	delete document.documentElement.dataset.atlasFrom;
+	document.documentElement.removeAttribute(atlasFromAttribute);
 }
 
-// Called once by the setup script on every page; bundled scripts do not run again after a swap
+// The setup script calls this on every page because bundled scripts do not run again after a swap
 export function startAtlasMode() {
-	document.addEventListener(mapIntentEventName, (event) => {
-		const action = getAtlasOpenAction({
-			intent: event.detail,
-			pathname: location.pathname,
-			screen: readAtlasScreen(),
-		});
+	let paneLayout = readPaneLayout();
+	let hasHalf = hasHalfRest();
 
-		// Left uncancelled, the map spends the click on its own popup
-		if (action.type !== 'none') event.preventDefault();
-
-		runOpenAction(action);
-	});
-
-	matchMedia(atlasPaneMediaQuery).addEventListener('change', () => {
+	// The setup script stamps a half rest before the stylesheet can say whether this screen has one
+	if (readSheetRest() === atlasSheetRest.half && !(hasHalf && readAtlasLayout() === 'sheet')) {
 		resetSheet();
-		updateSplit();
+	}
+
+	window.addEventListener('resize', () => {
+		const nextPaneLayout = readPaneLayout();
+		const hasNextHalf = hasHalfRest();
+		const isPaneLayoutChange = nextPaneLayout !== paneLayout;
+		const isSplit = readAtlasLayout() === 'split';
+
+		if (isSplit || isPaneLayoutChange) updateHeroSizes(isSplit);
+		if (!isPaneLayoutChange && hasNextHalf === hasHalf) return;
+
+		paneLayout = nextPaneLayout;
+		hasHalf = hasNextHalf;
+
+		if (isPaneLayoutChange || readSheetRest() === atlasSheetRest.half) resetSheet();
+
 		dispatchSync();
 	});
 
-	matchMedia(atlasSheetHalfMediaQuery).addEventListener('change', () => {
-		if (readSheetRest() === atlasSheetRest.half) resetSheet();
+	document.addEventListener('click', handleLinkClick);
 
-		dispatchSync();
-	});
-
-	document.addEventListener(mapEnterEventName, openAtlas);
-	document.addEventListener(mapExitEventName, () => {
-		void closeAtlas();
-	});
-	document.addEventListener(mapExpandEventName, () => {
-		void navigate(getSitePath('atlas'));
-	});
-
-	// The swap copies the incoming root's attributes and inline style verbatim, so mode state is stamped here
+	// The swap copies the incoming root's attributes and inline style as they are, so the mode state is stamped here
 	document.addEventListener('astro:before-swap', (event) => {
-		const root = document.documentElement;
 		const incomingRoot = event.newDocument.documentElement;
-		const isMap = incomingRoot.dataset.atlasPage === atlasPage.map;
-		const paneSize = root.style.getPropertyValue(atlasPaneSizeProperty);
+		const isMap = readAtlasFlags(incomingRoot).page === atlasPage.map;
 
 		if (isMap) storeFlag(true);
 
-		incomingRoot.toggleAttribute('data-atlas', isMap || 'atlas' in root.dataset);
-
-		if (paneSize) incomingRoot.style.setProperty(atlasPaneSizeProperty, paneSize);
+		incomingRoot.toggleAttribute(
+			atlasFlagAttribute,
+			isMap || readAtlasFlags(document.documentElement).hasFlag,
+		);
+		stampPaneSize(incomingRoot);
 
 		const from = getFromPage(readAtlasScreen());
 
-		if (from) incomingRoot.dataset.atlasFrom = from;
+		if (from) incomingRoot.setAttribute(atlasFromAttribute, from);
 
-		prepareSheetArrival(event);
+		const incomingLayout = readAtlasLayout(incomingRoot);
 
-		updateHeroSizes(event.newDocument);
+		prepareSheetArrival(event, incomingLayout === 'sheet');
+
+		updateHeroSizes(incomingLayout === 'split', event.newDocument);
 
 		void clearFromWhenFinished(event.viewTransition);
 
-		// Only atlas pages render the shell; a live one needs a target in the incoming page or the swap drops it
-		if (!document.querySelector(shellSelector)) return;
-		if (event.newDocument.querySelector(shellSelector)) return;
+		// The swap drops a persisted shell unless the incoming page has a target for it
+		// Never render a static placeholder here, since it would replace the real island on a later swap
+		if (!document.querySelector(atlasShellSelector)) return;
+		if (event.newDocument.querySelector(atlasShellSelector)) return;
 
 		const target = event.newDocument.createElement('div');
 
@@ -271,20 +167,8 @@ export function startAtlasMode() {
 		event.newDocument.body.append(target);
 	});
 
+	// Astro fires page-load 300 to 700ms later, and fitting the map then could close a menu the reader already opened
 	document.addEventListener('astro:after-swap', dispatchSync);
 
 	document.addEventListener('astro:page-load', startColdSheetArrival, { once: true });
-
-	document.addEventListener('astro:page-load', () => {
-		if (readAtlasLayout() !== 'map') {
-			try {
-				sessionStorage.setItem(atlasReturnStorageKey, location.pathname + location.search);
-			} catch {
-				// sessionStorage unavailable
-			}
-		}
-
-		updateExternalLinks();
-		dispatchSync();
-	});
 }

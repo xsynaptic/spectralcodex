@@ -10,9 +10,8 @@ import { createLocationsByPostsFunction } from '#lib/collections/locations/locat
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
 import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-data.ts';
 import { getMapLanguages } from '#lib/i18n/i18n-utils.ts';
-import { getMapData } from '#lib/map/map-data.ts';
-import { getMapDirectoryData } from '#lib/map/map-directory.ts';
-import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
+import { createMapDataFunction } from '#lib/map/map-data.ts';
+import { getLocationsMapRule } from '#lib/map/map-locations.ts';
 import { sortByDateReverseChronological } from '#lib/utils/date.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description-data.ts';
 import {
@@ -21,12 +20,11 @@ import {
 	buildEntryBreadcrumbSchema,
 } from '#lib/utils/seo-structured-data.ts';
 
-// Data for a single post entry page: map data and backlinks
 export async function createQueryPostsEntryFunction() {
 	const getLocationsByPosts = await createLocationsByPostsFunction();
 	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
 	const catalog = await getCatalog();
-	const { chunkKeyById, version } = await getMapDirectoryData();
+	const getMapData = await createMapDataFunction();
 
 	return function queryPostsEntry(entry: CollectionEntry<'posts'>) {
 		const regionPrimary = getFirstRegionByReference(entry.data.regions);
@@ -34,11 +32,8 @@ export async function createQueryPostsEntryFunction() {
 		const postLocations = getLocationsByPosts(entry);
 
 		const mapData = getMapData({
-			chunkKeyById,
-			featureCollection: getLocationsFeatureCollection(postLocations),
-			locationCount: postLocations.length,
 			mapId: `${entry.collection}/${entry.id}`,
-			version,
+			rule: getLocationsMapRule(postLocations),
 			...getMapLanguages(regionPrimary?.data._langCode),
 		});
 

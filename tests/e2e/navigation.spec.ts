@@ -35,7 +35,7 @@ test('the keyboard opens a submenu and Escape hands focus back to its trigger', 
 	const nav = page.getByRole('navigation', { name: t('site.navigation.header.label') });
 	const trigger = nav.getByRole('link', { name: t('collection.regions.labelPlural') });
 
-	// The element announces the collapsed state once it is listening for keys
+	// The element sets `aria-expanded` only once it is listening for keys
 	await expect(trigger).toHaveAttribute('aria-expanded', 'false');
 
 	await trigger.focus();
@@ -76,7 +76,7 @@ test(
 	async ({ page }) => {
 		await visit(page, paths.postsIndex);
 
-		// A window property dies with its document, where a `load` count races the URL assertion on a slow host
+		// A window property is lost when the document is replaced, whereas counting `load` events races the URL check on a slow host
 		await page.evaluate(() => Object.assign(window, { survivesSwap: true }));
 
 		await page

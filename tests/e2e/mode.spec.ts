@@ -1,3 +1,5 @@
+import { modeAttribute } from '@spectralcodex/shared/constants';
+
 import { expect, test, visit } from '#e2e/test.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
@@ -10,25 +12,25 @@ test('a chosen colour mode survives a reload without a flash of the other', asyn
 
 	const root = page.locator('html');
 
-	await expect(root).toHaveAttribute('data-mode', 'light');
+	await expect(root).toHaveAttribute(modeAttribute, 'light');
 
 	await page.getByRole('button', { name: t('site.mode.toggle.dark.label') }).click();
-	await expect(root).toHaveAttribute('data-mode', 'dark');
+	await expect(root).toHaveAttribute(modeAttribute, 'dark');
 
-	// The system still asks for light, so a light value at any point in the load is a flash
-	await page.addInitScript(() => {
-		const modesSeen: Array<string | undefined> = [];
+	// The system still prefers light, so a light value at any point during the load is a flash
+	await page.addInitScript((attribute) => {
+		const modesSeen: Array<null | string> = [];
 
 		new MutationObserver(() => {
-			modesSeen.push(document.documentElement.dataset.mode);
-		}).observe(document, { attributeFilter: ['data-mode'], attributes: true, subtree: true });
+			modesSeen.push(document.documentElement.getAttribute(attribute));
+		}).observe(document, { attributeFilter: [attribute], attributes: true, subtree: true });
 
 		Object.assign(window, { modesSeen });
-	});
+	}, modeAttribute);
 
 	await page.reload({ waitUntil: 'domcontentloaded' });
 
-	await expect(root).toHaveAttribute('data-mode', 'dark');
+	await expect(root).toHaveAttribute(modeAttribute, 'dark');
 	await expect(page.getByRole('button', { name: t('site.mode.toggle.light.label') })).toBeVisible();
 
 	const modesSeen = await page.evaluate(() => (window as { modesSeen?: Array<string> }).modesSeen);

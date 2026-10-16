@@ -3,15 +3,8 @@ import type { CollectionEntry } from 'astro:content';
 import { LocationStatusEnum } from '@spectralcodex/shared/map';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
-const {
-	getFeatureCollectionMock,
-	getLocationsCollectionMock,
-	getMapDataDedicatedMock,
-	getRegionsByIdsMock,
-} = vi.hoisted(() => ({
-	getFeatureCollectionMock: vi.fn(),
+const { getLocationsCollectionMock, getRegionsByIdsMock } = vi.hoisted(() => ({
 	getLocationsCollectionMock: vi.fn(),
-	getMapDataDedicatedMock: vi.fn(),
 	getRegionsByIdsMock: vi.fn(),
 }));
 
@@ -21,12 +14,8 @@ vi.mock('#lib/collections/locations/locations-data.ts', () => ({
 vi.mock('#lib/collections/regions/regions-data.ts', () => ({
 	createRegionsByIdsFunction: () => Promise.resolve(getRegionsByIdsMock),
 }));
-vi.mock('#lib/map/map-data.ts', () => ({ getMapDataDedicated: getMapDataDedicatedMock }));
-vi.mock('#lib/map/map-locations.ts', () => ({
-	getLocationsFeatureCollection: getFeatureCollectionMock,
-}));
 
-const { getObjectiveLocations, getObjectiveMapData, getTheaterLocations } =
+const { getObjectiveLocations, getTheaterLocations } =
 	await import('#lib/collections/locations/locations-queries.ts');
 
 function makeLocation(
@@ -95,22 +84,6 @@ describe('getObjectiveLocations', () => {
 		setLocations([makeLocation('unplaced', { objective: 5, regions: [] })]);
 
 		expect(await getObjectiveLocations()).toStrictEqual([]);
-	});
-});
-
-describe('getObjectiveMapData', () => {
-	test('the dedicated endpoint keeps sensitive points and filters by objective', async () => {
-		setLocations([makeLocation('rated', { objective: 3 })]);
-		getFeatureCollectionMock.mockReturnValue({ features: [], type: 'FeatureCollection' });
-
-		await getObjectiveMapData();
-
-		expect(getFeatureCollectionMock).toHaveBeenCalledWith(expect.anything(), {
-			hideSensitiveLocations: false,
-		});
-		expect(getMapDataDedicatedMock).toHaveBeenCalledWith(
-			expect.objectContaining({ isObjectiveFilterEnabled: true, mapId: 'objectives' }),
-		);
 	});
 });
 

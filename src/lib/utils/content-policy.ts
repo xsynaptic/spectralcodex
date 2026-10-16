@@ -5,11 +5,15 @@ interface ContentPolicy {
 	hideSensitiveLocations: boolean;
 }
 
-// Two fields from one condition so call sites name the rule they implement, not the environment
+// Two fields from one condition, so call sites name the rule they implement rather than the environment
 export const contentPolicy = {
 	applyOverrides: !import.meta.env.DEV,
 	hideSensitiveLocations: !import.meta.env.DEV,
 } satisfies ContentPolicy;
+
+export function isLocationHidden(entry: CollectionEntry<'locations'>) {
+	return entry.data.hideLocation === true && contentPolicy.hideSensitiveLocations;
+}
 
 export function collectHiddenLocationIds(
 	locations: Array<CollectionEntry<'locations'>>,

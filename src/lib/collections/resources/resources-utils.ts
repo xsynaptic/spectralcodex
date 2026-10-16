@@ -13,15 +13,12 @@ import {
 	getResourcesCollection,
 } from '#lib/collections/resources/resources-data.ts';
 import { getMapLanguages } from '#lib/i18n/i18n-utils.ts';
-import { getMapData } from '#lib/map/map-data.ts';
-import { getMapDirectoryData } from '#lib/map/map-directory.ts';
-import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
+import { createMapDataFunction } from '#lib/map/map-data.ts';
+import { getLocationsMapRule } from '#lib/map/map-locations.ts';
 import { hasEntries, sortByEntryCount } from '#lib/utils/collections.ts';
 
-// Either a Resource entry flattened onto its id, or a link written inline in frontmatter
 export type ResourceLink = NonNullable<ReturnType<ResolveResourceLinks>>[number];
 
-// A cited work, either a Resource entry flattened onto its ID or one written inline in frontmatter
 export type ResourceSource = NonNullable<ReturnType<ResolveResourceSources>>[number];
 
 type ResolveResourceLinks = Awaited<ReturnType<typeof createResolveResourceLinksFunction>>;
@@ -33,7 +30,7 @@ export async function createQueryResourcesEntryFunction() {
 	const getPostsByResource = await createPostsByResourceFunction();
 	const catalog = await getCatalog();
 	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
-	const { chunkKeyById, version } = await getMapDirectoryData();
+	const getMapData = await createMapDataFunction();
 
 	return function queryResourcesEntry(entry: CollectionEntry<'resources'>) {
 		const regionPrimary = getFirstRegionByReference(entry.data.regions);
@@ -56,11 +53,8 @@ export async function createQueryResourcesEntryFunction() {
 		);
 
 		const mapData = getMapData({
-			chunkKeyById,
-			featureCollection: getLocationsFeatureCollection(locationsFiltered),
-			locationCount: locationsFiltered.length,
 			mapId: `${entry.collection}/${entry.id}`,
-			version,
+			rule: getLocationsMapRule(locationsFiltered),
 			...getMapLanguages(regionPrimary?.data._langCode),
 		});
 
@@ -129,7 +123,6 @@ export async function queryResourcesIndex() {
 	);
 }
 
-// Matched via links URL or sources ID
 async function createLocationsByResourceFunction() {
 	const { entriesMap } = await getLocationsCollection();
 	const { locationIdsByResourceId } = await getResourceAssociation();
@@ -143,7 +136,6 @@ async function createLocationsByResourceFunction() {
 	};
 }
 
-// Matched via links URL or sources ID
 async function createPostsByResourceFunction() {
 	const { entriesMap } = await getPostsCollection();
 	const { postIdsByResourceId } = await getResourceAssociation();

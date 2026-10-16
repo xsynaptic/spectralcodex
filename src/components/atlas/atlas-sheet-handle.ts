@@ -3,13 +3,13 @@ import { trackMap } from '@spectralcodex/react-map-component/track';
 import type { AtlasSheetRest } from '#lib/atlas/atlas-layout-factory.ts';
 
 import { atlasSheetAttribute, atlasSheetRest } from '#lib/atlas/atlas-constants.ts';
-import { readSheetRest } from '#lib/atlas/atlas-layout.ts';
 import { getSheetStepRest, getSheetTapRest } from '#lib/atlas/atlas-sheet-factory.ts';
 import {
 	grabSheet,
 	isSheetGrabbed,
 	moveSheet,
 	readPreferredSheetRest,
+	readSheetRest,
 	readSheetRests,
 	storeSheetRest,
 } from '#lib/atlas/atlas-sheet.ts';
@@ -99,6 +99,7 @@ class AtlasSheetHandle extends HTMLElement {
 		if (isKeyboard) this.#moveTo(getTapRest());
 	};
 
+	// Chromium hit-tests a moving press again and drags the link now under it, which cancels the pointer
 	#handleDragStart = (event: DragEvent) => {
 		if (this.#pointerId !== undefined) event.preventDefault();
 	};

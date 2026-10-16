@@ -1,26 +1,27 @@
 import type { MapSourceItem } from '@spectralcodex/map-codec';
-import type { LngLatLike } from 'maplibre-gl';
+import type { LngLatBoundsLike, LngLatLike } from 'maplibre-gl';
 import type { FC } from 'react';
 import type { MapRef } from 'react-map-gl/maplibre';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useMap } from 'react-map-gl/maplibre';
 
 import type { MapComponentProps, MapScope } from '#types.ts';
 
-import { useSourceDataQuery } from '#data/data-source.tsx';
-import { useMapHost } from '#host/host-context.tsx';
+import { mapSyncEventName } from '#constants.ts';
+import { useMapRows } from '#data/data-query.ts';
 import { applyHostInset, useHostInset } from '#host/host-inset.ts';
-import { useHostSyncValue } from '#host/host-view.ts';
-import { useMapStoreActions } from '#store/store.ts';
+import { useDocumentEventValue } from '#lib/document-event.ts';
+import { selectScope, selectTargetIds } from '#store/store-factory.ts';
+import { useMapStore } from '#store/store.tsx';
 import {
 	getTargetBounds,
 	getTargetDuration,
-	getTargetPositions,
 	getTargetZoom,
+	isInView,
 } from '#targets/targets-fit-factory.ts';
-import { MapSelectedMarker, MapTargetMarkers } from '#targets/targets-markers.tsx';
-import { useMapView } from '#view/view.tsx';
+import { getTargetPoints } from '#targets/targets-markers-factory.ts';
+import { MapTargetMarkers } from '#targets/targets-markers.tsx';
 
 const fitPadding = 50;
 
@@ -38,15 +39,45 @@ function getScreensTo(map: MapRef, center: LngLatLike) {
 	return Math.hypot(to.x - from.x, to.y - from.y) / map.getContainer().clientWidth;
 }
 
+function isTargetInView(map: MapRef, positions: ReadonlyArray<[number, number]>) {
+	const { clientHeight, clientWidth } = map.getContainer();
+	const { bottom = 0, left = 0, right = 0, top = 0 } = map.getPadding();
+	const frame = {
+		bottom: clientHeight - bottom - fitPadding,
+		left: left + fitPadding,
+		right: clientWidth - right - fitPadding,
+		top: top + fitPadding,
+	};
+
+	return isInView(
+		positions.map((position) => map.project(position)),
+		frame,
+		map.getZoom(),
+	);
+}
+
+function getBoundsCamera(map: MapRef, bounds: LngLatBoundsLike | undefined) {
+	const camera = bounds ? map.cameraForBounds(bounds, { padding: fitPadding }) : undefined;
+
+	if (!camera?.center || camera.zoom === undefined) return;
+
+	return { center: camera.center, zoom: camera.zoom };
+}
+
 function getViewFit(map: MapRef, sourceData: ReadonlyArray<MapSourceItem>, view: MapFitView) {
-	const targetBounds = getTargetBounds(getTargetPositions(sourceData, view.targetIds));
-	// A Scope the user cleared is not fitted again when the map resizes
-	const bounds = targetBounds ?? (view.scope ? view.bounds : undefined);
-	const fit = bounds ? map.cameraForBounds(bounds, { padding: fitPadding }) : undefined;
+	const positions = getTargetPoints(sourceData, view.targetIds).map(
+		({ coordinates }) => coordinates,
+	);
 
-	if (!fit?.center || fit.zoom === undefined) return;
+	if (isTargetInView(map, positions)) {
+		return { center: map.getCenter(), duration: 0, zoom: map.getZoom() };
+	}
 
-	// Build-time bounds already carry a minimum buffer, so only a Target fit is clamped
+	const targetBounds = getTargetBounds(positions);
+	const fit = getBoundsCamera(map, targetBounds ?? (view.scope ? view.bounds : undefined));
+
+	if (!fit) return;
+
 	const zoom = targetBounds ? getTargetZoom(map.getZoom(), fit.zoom) : fit.zoom;
 
 	return {
@@ -56,28 +87,22 @@ function getViewFit(map: MapRef, sourceData: ReadonlyArray<MapSourceItem>, view:
 	};
 }
 
-// True once the camera has settled on the current Targets, or on the view's bounds when it has none
 function useViewFit(view: MapFitView) {
 	const { current: map } = useMap();
-	const { data: sourceData } = useSourceDataQuery();
-	const { setFilterOpen, setSelectedId } = useMapStoreActions();
+	const { data: sourceData } = useMapRows();
 	const inset = useHostInset(map);
 
-	// Declared before the fit, which measures against the padding
 	useEffect(() => {
 		if (map) applyHostInset(map, inset);
 	}, [inset, map]);
 
 	const getWidth = useCallback(() => map?.getContainer().clientWidth ?? 0, [map]);
 
-	// The host resizes the container as chrome beside the map comes and goes
-	const width = useHostSyncValue(getWidth, 0);
+	const width = useDocumentEventValue(mapSyncEventName, getWidth, 0);
 
 	const key = `${view.targetIds.join(' ')} ${JSON.stringify(view.bounds)} ${String(width)}`;
 
-	// Filters and re-renders must not re-run the fit for a Target already handled
 	const handledKeyRef = useRef<string | undefined>(undefined);
-	const [settledKey, setSettledKey] = useState<string | undefined>();
 
 	useEffect(() => {
 		if (!map || !sourceData || handledKeyRef.current === key) return;
@@ -85,11 +110,7 @@ function useViewFit(view: MapFitView) {
 		const isFirstFit = handledKeyRef.current === undefined;
 
 		handledKeyRef.current = key;
-		setSelectedId(undefined);
-		setFilterOpen(false);
 
-		// An interrupted move fires its `moveend` here, before the listener below can take it for ours
-		map.stop();
 		// MapLibre resizes from a throttled observer; until then the fit measures the old width
 		map.resize();
 
@@ -97,45 +118,20 @@ function useViewFit(view: MapFitView) {
 
 		if (!fit) return;
 
-		// Attached first; under reduced motion `moveend` fires inside the call
-		void map.once('moveend', () => {
-			setSettledKey(key);
-		});
-
 		map.easeTo({
 			center: fit.center,
-			// The first fit lands as the map appears; easing there reads as lag
 			duration: isFirstFit ? 0 : fit.duration,
 			zoom: fit.zoom,
 		});
-	}, [key, map, setFilterOpen, setSelectedId, sourceData, view]);
-
-	return settledKey === key;
+	}, [key, map, sourceData, view]);
 }
 
-const MapSyncedTargets: FC = function MapSyncedTargets() {
-	const view = useMapView();
-	const { targetIds } = view;
-	const isSettled = useViewFit(view);
-
-	return (
-		<>
-			{isSettled ? <MapTargetMarkers targetIds={targetIds} /> : undefined}
-			<MapSelectedMarker targetIds={targetIds} />
-		</>
-	);
-};
-
 export const MapTargets: FC = function MapTargets() {
-	const host = useMapHost();
-	const { targetIds } = useMapView();
+	const targetIds = useMapStore(selectTargetIds);
+	const bounds = useMapStore((state) => state.view.scope?.bounds);
+	const scope = useMapStore(selectScope);
 
-	if (host) return <MapSyncedTargets />;
+	useViewFit(useMemo(() => ({ bounds, scope, targetIds }), [bounds, scope, targetIds]));
 
-	return (
-		<>
-			<MapTargetMarkers targetIds={targetIds} />
-			<MapSelectedMarker targetIds={targetIds} />
-		</>
-	);
+	return <MapTargetMarkers />;
 };

@@ -34,7 +34,6 @@ test.describe('rss feed', { tag: '@smoke' }, () => {
 
 			expect(getElementText(item, /<title>(.*?)<\/title>/)).not.toBe('');
 			expect(getElementText(item, /<link>(.*?)<\/link>/)).not.toBe('');
-			// Catches the blank publish bug
 			expect(content.length).toBeGreaterThan(100);
 		}
 	});

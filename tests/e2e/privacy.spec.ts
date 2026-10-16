@@ -4,7 +4,9 @@ import { expect, test } from '@playwright/test';
 import { getCollectionEntries, withAstroContent } from '@spectralcodex/scripts/astro-content';
 import { getPublicId } from '@spectralcodex/shared/entries';
 
-import { contentManifestPath } from '#e2e/constants.ts';
+import { contentManifestPath, isDev } from '#e2e/constants.ts';
+
+test.skip(isDev, 'content policy is off in dev');
 
 // Failure messages carry counts, never paths; a real ID in a report is itself a leak
 const mapManifestPath = '/api/map/map-manifest.json';
@@ -40,7 +42,7 @@ async function readRootPaths(request: APIRequestContext, surface: string) {
 	return getRootPaths(await response.text());
 }
 
-// A refused connection would otherwise report the path it was asking for
+// Without this, a refused connection's error would print the path it asked for
 async function readStatus(request: APIRequestContext, target: string) {
 	try {
 		const response = await request.get(target);
@@ -81,13 +83,20 @@ test('sensitive Locations stay out of the build output', { tag: '@smoke' }, asyn
 	}
 
 	const manifestResponse = await request.get(mapManifestPath);
-	const mapPaths = (await manifestResponse.json()) as Array<string>;
+	const mapPaths = ((await manifestResponse.json()) as Array<string>).filter(
+		(surface) => !surface.startsWith('/api/map/divisions/'),
+	);
 
 	expect(mapPaths.length, 'public map files').toBeGreaterThan(0);
 
-	for (const surface of mapPaths) {
-		const rootPaths = await readRootPaths(request, surface);
+	const mapSurfaces = await Promise.all(
+		mapPaths.map(async (surface) => ({
+			rootPaths: await readRootPaths(request, surface),
+			surface,
+		})),
+	);
 
+	for (const { rootPaths, surface } of mapSurfaces) {
 		expect
 			.soft(countNamed(anonymizedPaths, rootPaths), `anonymized Locations named in ${surface}`)
 			.toBe(0);

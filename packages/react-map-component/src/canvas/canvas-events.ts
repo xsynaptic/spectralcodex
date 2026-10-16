@@ -1,35 +1,22 @@
 import type { GeoJSONSource, MapGeoJSONFeature, Source } from 'maplibre-gl';
-import type {
-	MapCallbacks,
-	MapEvent,
-	MapLayerMouseEvent,
-	ViewStateChangeEvent,
-} from 'react-map-gl/maplibre';
+import type { MapCallbacks, MapLayerMouseEvent, ViewStateChangeEvent } from 'react-map-gl/maplibre';
 
 import { GeometryTypeEnum } from '@spectralcodex/shared/map';
 import { useCallback, useMemo, useRef, useSyncExternalStore } from 'react';
 import * as R from 'remeda';
 
-import type { MapClickInput, MapHoverInput } from '#canvas/canvas-events-factory.ts';
-import type { MapHoverFeature } from '#types.ts';
+import type { MapCanvasClickInput, MapHoverInput } from '#canvas/canvas-events-factory.ts';
+import type { MapHoverCluster } from '#types.ts';
 
-import { decideClickActions, decideHoverIntent } from '#canvas/canvas-events-factory.ts';
+import { decideHoverIntent, getCanvasClickHit } from '#canvas/canvas-events-factory.ts';
 import { writeSavedViewport } from '#canvas/canvas-viewport.ts';
-import { controlFilterId } from '#constants.ts';
-import { useSourceDataQuery } from '#data/data-source.tsx';
-import { useMapHost } from '#host/host-context.tsx';
-import { sendHostIntent } from '#host/host-intent.ts';
-import { useTrackMap } from '#lib/track-context.tsx';
-import { trackMapErrorOnce } from '#lib/track.ts';
-import { getPopupLayout } from '#popup/popup-factory.ts';
-import { hasTargetPopup } from '#popup/popup-selection-factory.ts';
-import { MapSourceIdEnum } from '#source/source-config.ts';
-import {
-	useIsMapCanvasInteractive,
-	useMapStoreActions,
-	useMapStoreInstance,
-} from '#store/store.ts';
-import { useMapTargetIds } from '#view/view.tsx';
+import { useMapRows } from '#data/data-query.ts';
+import { useMapClick } from '#host/host-click.ts';
+import { useMapConfig } from '#lib/config.tsx';
+import { useTrackMap } from '#lib/track-hook.ts';
+import { MapLayerIdEnum, MapSourceIdEnum } from '#source/source-config.ts';
+import { useMapStore, useMapStoreApi } from '#store/store.tsx';
+import { trackMapErrorOnce } from '#track.ts';
 
 const hoverQuery = '(hover: hover)';
 
@@ -61,7 +48,7 @@ async function expandCluster(
 	}
 }
 
-function getClickInput(feature: MapClickFeature | undefined): MapClickInput {
+function getClickInput(feature: MapClickFeature | undefined): MapCanvasClickInput {
 	const geometry = feature?.geometry;
 
 	return {
@@ -88,8 +75,10 @@ function getHoverInput(
 	};
 }
 
-function getHoverFeature(feature: MapGeoJSONFeature | undefined): MapHoverFeature | undefined {
-	if (feature?.geometry.type !== GeometryTypeEnum.Point) return;
+// The count label needs MapLibre's own cluster feature, since `point_count` exists nowhere else
+function getHoverCluster(feature: MapGeoJSONFeature | undefined): MapHoverCluster | undefined {
+	if (feature?.layer.id !== MapLayerIdEnum.Clusters) return;
+	if (feature.geometry.type !== GeometryTypeEnum.Point) return;
 
 	return { geometry: feature.geometry, properties: { ...feature.properties }, type: 'Feature' };
 }
@@ -97,32 +86,6 @@ function getHoverFeature(feature: MapGeoJSONFeature | undefined): MapHoverFeatur
 interface MapHoverEvent {
 	feature: MapGeoJSONFeature | undefined;
 	mapInstance: MapLayerMouseEvent['target'];
-}
-
-function easeToPopup(
-	mapInstance: MapClickEvent['target'],
-	center: [number, number] | undefined,
-	setPopupVisible: (isVisible: boolean) => void,
-) {
-	if (!center) return;
-
-	// Stopping a running ease fires its `moveend` now, so it can neither trigger the listener below nor undo the hide
-	mapInstance.stop();
-
-	setPopupVisible(false);
-
-	// Under reduced motion MapLibre zeroes the duration and fires `moveend` synchronously inside `easeTo`
-	void mapInstance.once('moveend', () => {
-		setPopupVisible(true);
-	});
-
-	mapInstance.easeTo({
-		center,
-		duration: 150,
-		padding: getPopupLayout(mapInstance.getContainer().clientWidth).isNarrow
-			? { bottom: 180, left: 0, right: 0, top: 0 }
-			: { bottom: 0, left: 0, right: 180, top: 0 },
-	});
 }
 
 function subscribeHover(callback: () => void) {
@@ -135,22 +98,22 @@ function subscribeHover(callback: () => void) {
 	};
 }
 
+// A tap hovers through its compatibility mousemove and never leaves, so its label would stick
 function canHover() {
 	return matchMedia(hoverQuery).matches;
 }
 
-export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
-	const { isLoading: isSourceDataLoading } = useSourceDataQuery();
+export function useMapCanvasEvents() {
+	const { isLoading: isSourceDataLoading } = useMapRows();
 
-	const isInteractive = useIsMapCanvasInteractive();
+	const { isInteractive, mapId } = useMapConfig();
 	const isHoverable = useSyncExternalStore(subscribeHover, canHover, () => false);
 
-	const { setCanvasLoading } = useMapStoreActions();
+	const { setCanvasLoading } = useMapStore((state) => state.actions);
 	const trackMap = useTrackMap();
 
 	const onClick = useClickHandler();
 	const throttledOnMouseMove = useThrottledMouseMoveHandler();
-	const debouncedFilterControlSetup = useDebouncedFilterControlSetup();
 
 	const onMoveEnd = useCallback(
 		(event: ViewStateChangeEvent) => {
@@ -172,17 +135,14 @@ export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 			trackMapErrorOnce('canvas');
 			console.warn('[Map]', error.message);
 		},
-		onLoad: (event: MapEvent) => {
+		onLoad: () => {
 			setCanvasLoading(false);
 			trackMap({ name: 'map-load' });
-
-			if (isInteractive) debouncedFilterControlSetup.call(event);
 		},
 		...(isInteractive
 			? {
 					onClick,
 					onMoveEnd,
-					onResize: debouncedFilterControlSetup.call,
 					...(isSourceDataLoading || !isHoverable
 						? {}
 						: {
@@ -194,121 +154,25 @@ export function useMapCanvasEvents({ mapId }: { mapId: string | undefined }) {
 }
 
 function useClickHandler() {
-	const isHosted = useMapHost() !== undefined;
-	const { setClickedId, setFilterOpen, setHoveredId, setPopupVisible, setSelectedId } =
-		useMapStoreActions();
-	const targetIds = useMapTargetIds();
-
-	const selectPoint = useCallback(
-		(
-			mapInstance: MapClickEvent['target'],
-			pointId: string,
-			center: [number, number] | undefined,
-		) => {
-			const isTarget = targetIds.includes(pointId);
-			const hasPopup = hasTargetPopup(targetIds.length);
-
-			// Sent before anything is selected, so a click the host takes leaves no selection
-			if (isHosted && isTarget && sendHostIntent({ hasPopup, kind: 'target' })) {
-				setHoveredId(undefined);
-				return;
-			}
-
-			if (isTarget && !hasPopup) return;
-
-			setSelectedId(pointId);
-			setClickedId(pointId);
-			setHoveredId(undefined);
-
-			// A Target's popup opens on whichever side has room, and a hosted map opens the page instead
-			if (isTarget || isHosted) return;
-
-			easeToPopup(mapInstance, center, setPopupVisible);
-		},
-		[isHosted, setSelectedId, setClickedId, setHoveredId, setPopupVisible, targetIds],
-	);
+	const click = useMapClick();
 
 	return useCallback<NonNullable<MapCallbacks['onClick']>>(
 		({ features, target: mapInstance }) => {
-			const actions = decideClickActions(getClickInput(features?.[0]));
+			const outcome = click(getCanvasClickHit(getClickInput(features?.[0])), mapInstance);
 
-			for (const action of actions) {
-				switch (action.kind) {
-					case 'clear-selection': {
-						setSelectedId(undefined);
-						setHoveredId(undefined);
-						break;
-					}
-					case 'close-filter': {
-						setFilterOpen(false);
-						break;
-					}
-					case 'expand-cluster': {
-						void expandCluster(mapInstance, action.clusterId, action.center);
-						break;
-					}
-					case 'select-point': {
-						selectPoint(mapInstance, action.pointId, action.center);
-						break;
-					}
-				}
+			if (outcome.kind === 'expand-cluster') {
+				void expandCluster(mapInstance, outcome.clusterId, outcome.center);
 			}
 		},
-		[selectPoint, setFilterOpen, setSelectedId, setHoveredId],
-	);
-}
-
-function useDebouncedFilterControlSetup() {
-	const { setFilterPosition } = useMapStoreActions();
-
-	return useMemo(
-		() =>
-			R.funnel<Array<MapEvent>, HTMLElement | undefined>(
-				(container) => {
-					if (!container) {
-						console.warn('[Map] Map instance not found!');
-						return;
-					}
-
-					const filterControl = container.querySelector<HTMLButtonElement>(`#${controlFilterId}`);
-
-					if (!filterControl) {
-						console.warn('[Map] Filter control not found!');
-						return;
-					}
-
-					const { x: containerX, y: containerY } = container.getBoundingClientRect();
-					const {
-						height: controlHeight,
-						width: controlWidth,
-						x: controlX,
-						y: controlY,
-					} = filterControl.getBoundingClientRect();
-
-					setFilterPosition({
-						x: controlX - containerX + controlWidth,
-						y: controlY - containerY + controlHeight / 2,
-					});
-				},
-				{
-					minQuietPeriodMs: 300,
-					reducer: (_previousElement, ...args: Array<MapEvent>) => {
-						if (args.length === 0 || !args[0]) return;
-
-						return args[0].target.getContainer();
-					},
-				},
-			),
-		[setFilterPosition],
+		[click],
 	);
 }
 
 function useThrottledMouseMoveHandler() {
-	const mapStoreInstance = useMapStoreInstance();
+	const mapStoreInstance = useMapStoreApi();
 
-	const { setHoveredId } = useMapStoreActions();
+	const { setHoveredId } = useMapStore((state) => state.actions);
 
-	// Kept in a ref, not the store, so hover updates never trigger a React render
 	const hoveredFeatureIdRef = useRef<number | string | undefined>(undefined);
 
 	const onMouseMove = useCallback(
@@ -330,11 +194,10 @@ function useThrottledMouseMoveHandler() {
 
 			hoveredFeatureIdRef.current = intent.hoveredFeatureId;
 
-			// Store hoveredId feeds the popup preload
 			if (intent.storeHoveredIdUpdate) {
 				const { hoveredId } = intent.storeHoveredIdUpdate;
 
-				setHoveredId(hoveredId, hoveredId ? getHoverFeature(feature) : undefined);
+				setHoveredId(hoveredId, hoveredId ? getHoverCluster(feature) : undefined);
 			}
 
 			mapInstance.getCanvas().style.cursor = intent.cursor;

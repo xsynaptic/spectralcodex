@@ -6,19 +6,13 @@ import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { hasFeaturedImage } from '#lib/catalog/catalog-utils.ts';
-import {
-	createLocationsByPostsFunction,
-	getLocationsCollection,
-} from '#lib/collections/locations/locations-data.ts';
-import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
+import { createLocationsBySeriesFunction } from '#lib/collections/locations/locations-data.ts';
 import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-data.ts';
 import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
 import { getMapLanguages } from '#lib/i18n/i18n-utils.ts';
-import { getMapData } from '#lib/map/map-data.ts';
-import { getMapDirectoryData } from '#lib/map/map-directory.ts';
-import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
+import { createMapDataFunction } from '#lib/map/map-data.ts';
+import { getLocationsMapRule } from '#lib/map/map-locations.ts';
 
-// Data for a single series entry page: catalog items, map data, and word count
 export async function createQuerySeriesEntryFunction() {
 	const { entries: series } = await getSeriesCollection();
 
@@ -26,7 +20,7 @@ export async function createQuerySeriesEntryFunction() {
 	const getSeriesCatalogItems = await createSeriesCatalogItemsFunction();
 	const getSeriesLocations = await createLocationsBySeriesFunction();
 	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
-	const { chunkKeyById, version } = await getMapDirectoryData();
+	const getMapData = await createMapDataFunction();
 
 	const seriesCatalogItems = catalog.resolve(series);
 
@@ -39,11 +33,8 @@ export async function createQuerySeriesEntryFunction() {
 		const regionPrimary = getFirstRegionByReference(entry.data.regions);
 
 		const mapData = getMapData({
-			chunkKeyById,
-			featureCollection: getLocationsFeatureCollection(seriesLocations),
-			locationCount: seriesLocations.length,
 			mapId: `${entry.collection}/${entry.id}`,
-			version,
+			rule: getLocationsMapRule(seriesLocations),
 			...getMapLanguages(regionPrimary?.data._langCode),
 		});
 
@@ -53,7 +44,6 @@ export async function createQuerySeriesEntryFunction() {
 	};
 }
 
-// Return all series containing a given entry; used to generate post and location catalog item blocks
 export async function createSeriesByIdFunction() {
 	const { entries: series } = await getSeriesCollection();
 
@@ -69,7 +59,6 @@ export async function createSeriesByIdFunction() {
 		catalogItems: Array<CatalogItem>;
 		entry: CollectionEntry<'series'>;
 	}> {
-		// Note: a post or location may be in more than one series!
 		const entries = series.filter((entry: CollectionEntry<'series'>) =>
 			entry.data.seriesItems?.includes(id),
 		);
@@ -82,7 +71,6 @@ export async function createSeriesByIdFunction() {
 		for (const entry of entries) {
 			const catalogItems = getSeriesCatalogItems(entry.data.seriesItems);
 
-			// This avoids returning series for a post or location with an identical ID
 			if (catalogItems?.some((item) => item.id === id && item.collection === collection)) {
 				results.push({ catalogItems, entry });
 			}
@@ -108,42 +96,6 @@ export async function querySeriesIndex() {
 	);
 }
 
-// Generate geodata for series items; combines posts with multiple locations and individual locations
-export async function createLocationsBySeriesFunction() {
-	const { entriesMap: locationsMap } = await getLocationsCollection();
-	const { entriesMap: postsMap } = await getPostsCollection();
-
-	const getLocationsByPosts = await createLocationsByPostsFunction();
-
-	return function getLocationsBySeries(
-		seriesItemIds: Array<string> | undefined,
-	): Array<CollectionEntry<'locations'>> {
-		if (!seriesItemIds || seriesItemIds.length === 0) return [];
-
-		const seriesLocationsMap = new Map<string, CollectionEntry<'locations'>>();
-
-		for (const seriesItemId of seriesItemIds) {
-			const location = locationsMap.get(seriesItemId);
-
-			if (location) {
-				seriesLocationsMap.set(seriesItemId, location);
-				continue;
-			}
-
-			const post = postsMap.get(seriesItemId);
-
-			if (!post) throw new Error(`[Series] Requested item "${seriesItemId}" not found!`);
-
-			for (const seriesPostLocation of getLocationsByPosts(post)) {
-				seriesLocationsMap.set(seriesPostLocation.id, seriesPostLocation);
-			}
-		}
-
-		return [...seriesLocationsMap.values()];
-	};
-}
-
-// Filter the catalog for series items by ID
 async function createSeriesCatalogItemsFunction() {
 	const catalog = await getCatalog();
 

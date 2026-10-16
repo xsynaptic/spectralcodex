@@ -1,13 +1,13 @@
 ---
 import {
+	atlasFlagAttribute,
 	atlasFlagStorageKey,
 	atlasLinkParam,
 	atlasPage,
-	atlasPaneMediaQuery,
+	atlasPageAttribute,
 	atlasPaneSizeProperty,
 	atlasPaneStorageKey,
 	atlasSheetAttribute,
-	atlasSheetHalfMediaQuery,
 	atlasSheetRest,
 	atlasSheetRestStorageKey,
 } from '#lib/atlas/atlas-constants.ts';
@@ -15,33 +15,32 @@ import {
 
 <script
 	define:vars={{
+		flagAttribute: atlasFlagAttribute,
 		flagStorageKey: atlasFlagStorageKey,
 		linkParam: atlasLinkParam,
 		mapPage: atlasPage.map,
-		paneMediaQuery: atlasPaneMediaQuery,
+		pageAttribute: atlasPageAttribute,
 		panePage: atlasPage.pane,
 		paneSizeProperty: atlasPaneSizeProperty,
 		paneStorageKey: atlasPaneStorageKey,
 		sheetAttribute: atlasSheetAttribute,
 		sheetHalf: atlasSheetRest.half,
-		sheetHalfMediaQuery: atlasSheetHalfMediaQuery,
 		sheetRaised: atlasSheetRest.raised,
 		sheetRestStorageKey: atlasSheetRestStorageKey,
 	}}
 	is:inline
 >
-	// Cold load only; atlas-mode.ts stamps every later document before its swap
 	const root = document.documentElement;
 	const url = new URL(location.href);
 	const hasLink = url.searchParams.has(linkParam);
 
-	// Removed before the return path and analytics read the URL, so a reload or Back does not force the mode again
 	if (hasLink) {
 		url.searchParams.delete(linkParam);
 		history.replaceState(history.state, '', url);
 	}
 
-	let isEnabled = root.dataset.atlasPage === mapPage || (hasLink && 'atlasPage' in root.dataset);
+	const page = root.getAttribute(pageAttribute);
+	let isEnabled = page === mapPage || (hasLink && page !== null);
 
 	try {
 		if (isEnabled) sessionStorage.setItem(flagStorageKey, '1');
@@ -50,7 +49,7 @@ import {
 		// sessionStorage unavailable
 	}
 
-	if (isEnabled) root.dataset.atlas = '';
+	if (isEnabled) root.setAttribute(flagAttribute, '');
 
 	let paneSize;
 
@@ -72,19 +71,16 @@ import {
 		// localStorage unavailable
 	}
 
-	if (
-		isEnabled &&
-		sheetRest !== sheetRaised &&
-		root.dataset.atlasPage === panePage &&
-		!matchMedia(paneMediaQuery).matches &&
-		matchMedia(sheetHalfMediaQuery).matches
-	) {
+	// Duplicates `getPreferredSheetRest` because an inline script cannot import it
+	if (isEnabled && sheetRest !== sheetRaised && page === panePage) {
 		root.setAttribute(sheetAttribute, sheetHalf);
 	}
 </script>
 
 <script>
+	import { startAtlasIntents } from '#lib/atlas/atlas-intent.ts';
 	import { startAtlasMode } from '#lib/atlas/atlas-mode.ts';
 
 	startAtlasMode();
+	startAtlasIntents();
 </script>

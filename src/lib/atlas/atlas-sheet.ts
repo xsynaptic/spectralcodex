@@ -9,7 +9,7 @@ import {
 	atlasSheetAttribute,
 	atlasSheetFoldProperty,
 	atlasSheetGrabbingAttribute,
-	atlasSheetHalfMediaQuery,
+	atlasSheetHalfProperty,
 	atlasSheetHandleSelector,
 	atlasSheetRest,
 	atlasSheetRestProperty,
@@ -17,7 +17,6 @@ import {
 	atlasSheetSplitProperty,
 	atlasSheetStartSelector,
 } from '#lib/atlas/atlas-constants.ts';
-import { readAtlasLayout, readSheetRest } from '#lib/atlas/atlas-layout.ts';
 import {
 	getPreferredSheetRest,
 	getSheetDragLine,
@@ -45,8 +44,18 @@ function readLengthPx(property: string) {
 	return Number(length.replace('px', '')) || 0;
 }
 
-function hasHalfRest() {
-	return matchMedia(atlasSheetHalfMediaQuery).matches;
+export function hasHalfRest() {
+	const value = getComputedStyle(document.documentElement).getPropertyValue(atlasSheetHalfProperty);
+
+	return value.trim() === '1';
+}
+
+export function readSheetRest(): AtlasSheetRest {
+	const value = document.documentElement.getAttribute(atlasSheetAttribute);
+
+	if (value === atlasSheetRest.down || value === atlasSheetRest.half) return value;
+
+	return atlasSheetRest.raised;
 }
 
 function readLines(): AtlasSheetLines {
@@ -81,6 +90,7 @@ function readFoldPx() {
 	return Number(fold.replace('px', '')) || 0;
 }
 
+// Written once per grab or slide and kept while lowered; scrolling the window under it breaks the clip
 function writeFoldPx(linePx: number, paneTop: number) {
 	const foldPx = getSheetFold({ linePx, paneTop });
 
@@ -169,9 +179,8 @@ function startSheetArrival(navigationType: string) {
 	if (isAtStart) scrollToSheetStart('instant');
 }
 
-export function prepareSheetArrival(event: TransitionBeforeSwapEvent) {
+export function prepareSheetArrival(event: TransitionBeforeSwapEvent, isSheet: boolean) {
 	const incomingRoot = event.newDocument.documentElement;
-	const isSheet = readAtlasLayout(incomingRoot) === 'sheet';
 
 	writeRest(incomingRoot, isSheet ? readPreferredSheetRest() : atlasSheetRest.raised);
 
@@ -234,6 +243,7 @@ function slidePane(pane: HTMLElement, keyframe: PropertyIndexedKeyframes, rest: 
 	});
 }
 
+// Takes the rest as asked; callers pick one the height gate allows from `atlas-sheet-factory.ts`
 export async function moveSheet(rest: AtlasSheetRest) {
 	const from = readSheetRest();
 
@@ -255,8 +265,10 @@ export async function moveSheet(rest: AtlasSheetRest) {
 		return;
 	}
 
+	// Only the current slide writes the rest; `resetSheet` may have cancelled it or another replaced it
 	if (move !== currentMove || !pane.isConnected) return;
 
+	// The rest lands while the fill still holds the pane, then the slide lets go in the same task
 	setSheet(rest);
 	pane.style.translate = '';
 	move.cancel();

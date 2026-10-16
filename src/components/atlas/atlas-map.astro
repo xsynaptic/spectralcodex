@@ -33,6 +33,7 @@ const zIndex = 10;
 			<ReactMapComponent
 				{...mapComponentProps}
 				client:atlas={JSON.stringify(directiveOptions)}
+				controls={['exit', 'expand']}
 				host={{ fullscreenContainerId: atlasRootId }}
 				messages={{
 					exitAriaLabel: t('atlas.close.label'),

@@ -25,15 +25,13 @@ import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getImageBreakpoints, getImageLayoutSizesProp } from '#lib/image/image-layout.ts';
 import { ImageLayoutEnum, ImageSizeEnum } from '#lib/image/image-types.ts';
-import { getMapData } from '#lib/map/map-data.ts';
-import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
+import { createMapDataFunction } from '#lib/map/map-data.ts';
+import { getLocationsMapRule } from '#lib/map/map-locations.ts';
 import { getDayKey } from '#lib/utils/date.ts';
 import { sanitizeImageAltAttribute } from '#lib/utils/text.ts';
 
-// Every URL on this page points back at the page itself; nothing here should navigate away
 export const sampleUrl = '/inventory/';
 
-// Division outlines are cached SVGs keyed by Region id, and not every Region has one
 export async function getSampleDivisionRegionId() {
 	const { entries } = await getRegionsCollection();
 
@@ -44,8 +42,6 @@ export async function getSampleDivisionRegionId() {
 	return;
 }
 
-// Images resolve their id against the Images collection, so a fixture cannot invent one
-// Falls back to the id order for a media library whose Entries feature nothing
 export async function getSampleImages() {
 	const { entries } = await getImagesCollection();
 
@@ -72,7 +68,6 @@ export async function getSampleLocations() {
 	return entries.filter((entry) => entry.data.regions.length > 0).slice(0, 5);
 }
 
-// Distances come from the build-time neighbour pass, so the sample needs a Location that has one
 export async function getSampleNearbyLocations() {
 	const { entries } = await getLocationsCollection();
 
@@ -85,8 +80,6 @@ export async function getSampleNearbyLocations() {
 	return locations.map((location) => ({ ...location, url: getSampleUrl('locations-nearby-list') }));
 }
 
-// A preview subtitle walks a Region's ancestors and throws on an id the collection does not hold
-// The deepest Region also gives `regions-list` the longest ancestor run to expand
 export async function getSampleRegions() {
 	const { entries } = await getRegionsCollection();
 
@@ -100,7 +93,6 @@ export async function getSampleRegions() {
 	return { deepest, nested: nested.slice(0, 3) };
 }
 
-// `regions-related` renders a column per relation, so the sample needs both filled
 export async function getSampleRelatedRegion() {
 	const { entries } = await getRegionsCollection();
 
@@ -109,7 +101,6 @@ export async function getSampleRelatedRegion() {
 	);
 }
 
-// Themes and Regions promote all their Featured Images to Heroes, so they carry the longest groups
 async function getSampleFeaturedImageIds() {
 	const [themes, regions] = await Promise.all([getThemesCollection(), getRegionsCollection()]);
 
@@ -149,22 +140,16 @@ export function createSampleImageProps(entry: CollectionEntry<'images'>) {
 	};
 }
 
-// Omitting `mapId` takes the MDX inline branch: the map draws without a chunk endpoint existing
 export async function createSampleMapData() {
 	const { entries } = await getLocationsCollection();
+	const getMapData = await createMapDataFunction();
 
-	return getMapData({
-		featureCollection: getLocationsFeatureCollection(entries.slice(0, 40)),
-		version: undefined,
-	});
+	return getMapData({ rule: getLocationsMapRule(entries.slice(0, 40)) });
 }
 
-// All three notices stacked; a Location's own data can only ever trigger two of them at once
-// Built from real entries so the flattened shape cannot drift from the Resource schema
 export async function getSampleResources() {
 	const { entries } = await getResourcesCollection();
 
-	// `showPage` adds the italic link to the Resource's own page beside the outbound one
 	const linked = entries.filter((entry) => !!entry.data.url && entry.data.showPage).slice(0, 2);
 	const cited = entries.filter((entry) => !!entry.data.authors?.length).slice(0, 2);
 
@@ -201,7 +186,6 @@ export function createSampleImageFeaturedGroup(entries: Array<CollectionEntry<'i
 	})) satisfies Array<ImageFeaturedWithCaption>;
 }
 
-// Dates carry a time so the long preset has something to show; the medium preset drops it
 export const sampleDate = new Date('2026-03-14T09:20:00Z');
 export const sampleDateUpdated = new Date('2026-07-02T16:45:00Z');
 export const sampleDateEnd = new Date('2026-03-17T11:05:00Z');
@@ -321,7 +305,6 @@ export function createSamplePage({
 		size: items.length,
 		start: 0,
 		total: items.length * lastPage,
-		// Fragments, not paths: the select navigates on change and those pages do not exist
 		url: {
 			current: getSampleUrl('pagination'),
 			first: getSampleUrl('pagination'),
@@ -354,7 +337,6 @@ function createCatalogItem(item: Partial<CatalogItem> & Pick<CatalogItem, 'id' |
 	} satisfies CatalogItem;
 }
 
-// The other half of each union: a Link and a Source written inline in frontmatter, with no Resource
 export const sampleLinkInline = {
 	title: 'Chiayi County cultural heritage register',
 	url: 'https://example.org/chiayi-heritage',
@@ -397,8 +379,6 @@ export const sampleChronologyYears = ['2019', '2021', '2023', '2024', '2025', '2
 
 export const sampleChronologyMonths = ['02', '05', '09', '11'];
 
-// The OG card is drawn by a batch script (`packages/scripts/src/og-image`), never by Astro
-// A key doubles as the route param, so `inventory-og-image.ts` resolves one back through this list
 interface OpenGraphCard {
 	entry: OpenGraphMetadataItem;
 	imagePath: string;
@@ -408,7 +388,6 @@ interface SampleOpenGraphCard extends OpenGraphCard {
 	key: string;
 }
 
-// Heavy-tailed counts spread over all four intensity bins; a flat ramp renders as a single shade
 export function createSampleActivityValues(year: string) {
 	const values: Record<string, number> = {};
 	const yearNumber = Number(year);
@@ -428,7 +407,6 @@ export function createSampleActivityValues(year: string) {
 	return values;
 }
 
-// Each day's total split three ways, so the activity totals line reads as three distinct counts
 export function createSampleDailyData(values: Record<string, number>) {
 	const dailyData: Record<string, ChronologyDailyCounts> = {};
 
@@ -444,7 +422,6 @@ export function createSampleDailyData(values: Record<string, number>) {
 
 const openGraphLuminanceSampleCount = 24;
 
-// A card is a plain metadata object, and a found one changes subject as content changes
 const openGraphTitleSamples = [
 	{
 		key: 'title-long',
@@ -460,7 +437,7 @@ const openGraphTitleSamples = [
 	{
 		key: 'title-ja',
 		title: 'Monopoly Bureau of the Government-General of Taiwan',
-		// Shinjitai, because Zen Antique has no glyph for the traditional forms in sampleTitleJapanese
+		// Shinjitai, because Zen Antique has no glyphs for the traditional forms
 		titleJa: '台湾総督府専売局',
 	},
 	{
@@ -478,7 +455,6 @@ async function createSampleOpenGraphCards() {
 		getSampleImages(),
 	]);
 
-	// No region parent map, so a fallback resolves by collection or Theme, never by Region
 	const candidates = [...posts.entries, ...locations.entries].flatMap<OpenGraphCard>((entry) => {
 		const item = toOpenGraphEntryItem({ collection: entry.collection, entry });
 		const image = item ? images.entriesMap.get(item.imageFeaturedId) : undefined;
@@ -486,10 +462,8 @@ async function createSampleOpenGraphCards() {
 		return item && image ? [{ entry: item, imagePath: path.resolve(image.data.path) }] : [];
 	});
 
-	// A fallback is blurred, and only a Latin title leaves the ground uncovered
 	const groundCandidates = candidates.filter(({ entry }) => !entry.isFallback && !entry.titleZh);
 
-	// Decoding every candidate would stall the page, and the two ends of a sample are enough
 	const ranked = await Promise.all(
 		groundCandidates.slice(0, openGraphLuminanceSampleCount).map(async (candidate) => ({
 			candidate,
@@ -524,7 +498,6 @@ function toOpenGraphCard(key: string, card: OpenGraphCard | undefined): Array<Sa
 	return card ? [{ key, ...card }] : [];
 }
 
-// The page renders one <img> per card and the route re-enters here for each, so sample once
 let sampleOpenGraphCards: Promise<Array<SampleOpenGraphCard>> | undefined;
 
 export function getSampleOpenGraphCards() {

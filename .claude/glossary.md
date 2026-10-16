@@ -86,23 +86,23 @@ Map Scope, Map Filter, Map Target and Map View keep the prefix everywhere outsid
 
 **Map Features**: The Features a map holds, selected from the Map Directory. The selection is made at build time and does not change in the browser.
 
-**Map Scope**: The set of Features the Atlas map is currently limited to, named after the Entry that set it. A Region, Theme, Series or Post sets the Map Scope when it opens in the Pane; a Location inside it keeps it; a Location outside it clears it. The user can switch it off to see every Feature, then back on, without clearing it. A map has at most one, and while it is on, Features outside it are not displayed. _Avoid_: page features, highlight, selection, filter (a Map Filter is set by the user, a Map Scope by a page).
+**Map Scope**: The set of Features the Atlas map is currently limited to, named after the Entry that set it. A Region, Theme, Series or Post sets the Map Scope when it opens in the Pane; a Location inside it keeps it; a Location outside it clears it. The user can switch it off to see every Feature, then back on, without clearing it. A map has at most one, and while it is on, Features outside it are not displayed. In map search, a Scope row is a result that sets a Map Scope rather than opening a Location. _Avoid_: page features, highlight, selection, filter (a Map Filter is set by the user, a Map Scope by a page).
 
 **Map Filter**: A map control the user sets to limit which Features the map displays, by Status, Rating, or Objective. Only the user sets a Map Filter; a page never does. _Avoid_: scope, facet.
 
-**Source Data**: The minimal per-Feature payload needed to draw a map: identity, geometry, and the few properties that drive styling and filtering. _Avoid_: geojson, features, source.
+**Source Data**: The minimal per-Feature payload needed to draw a map: identity, geometry, the few properties that drive styling, filtering and search ranking, and the address of the Feature's page. _Avoid_: geojson, features, source.
 
 **Popup Data**: The richer per-Feature payload shown only once a reader opens a Feature (title, description, thumbnail, outbound links). _Avoid_: detail, tooltip, card.
 
 **Chunk**: A geographically contiguous bundle of Popup Data, fetched on demand so a map never loads every popup up front. _Avoid_: tile, batch, page, shard.
 
-**Atlas**: The full-screen map of Locations at `/atlas`, and the mode in which that same map stays beside the page being read, or behind it on a narrow screen. _Avoid_: explorer, map mode.
+**Atlas**: The full-screen map of Locations at `/atlas`, and Atlas mode, in which that same map stays beside the page being read, or behind it on a narrow screen. _Avoid_: explorer, map mode, mode on its own (Mode is the colour scheme).
 
 **Split**: The Atlas layout with the map on the left and a page on the right. _Avoid_: two-pane, side-by-side.
 
 **Pane**: The part of the Atlas that holds the page: one side of the Split, or the surface that covers the map in the Sheet. _Avoid_: sidebar, panel, drawer.
 
-**Sheet**: The Atlas layout on a screen too narrow for the Split: the page sits over the map at one of three rests (raised, half, lowered), and the reader moves it between them without losing their place. _Avoid_: drawer, modal, overlay, bottom sheet, detent, snap point (a rest).
+**Sheet**: The Atlas layout on a screen too narrow for the Split: the page sits over the map at one of three rests, and the reader moves it between them without losing their place. Raised, the page covers the map; at half, the page's top sits at the half line with the map above it; lowered, only the handle shows and the map has the screen. _Avoid_: drawer, modal, overlay, bottom sheet, detent, snap point (a rest), down (lowered).
 
 **Map Target**: A Feature a map is asked to open or center on when it loads, typically the Location whose page is being read. _Avoid_: focus, selected, active, objective.
 
@@ -137,6 +137,8 @@ Map Scope, Map Filter, Map Target and Map View keep the prefix everywhere outsid
 **Navigation**: The site's own link structure, in the header and the footer. _Avoid_: menu, menubar, nav bar.
 
 **Notice**: A derived advisory on a Location page, computed from its Safety, Status, and Entry Quality rather than authored (see `noticeKeys` in `locations-section-notices.astro`). Its severity is a separate axis and never a Status. _Avoid_: alert, warning, callout, banner.
+
+**Mode**: The colour scheme the site is read in: light, dark, or auto, which follows the system. The reader's choice is kept across visits. _Avoid_: theme (a Theme groups content), appearance, colour scheme.
 
 ### Development
 

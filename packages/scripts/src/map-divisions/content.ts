@@ -7,6 +7,14 @@ import path from 'node:path';
 import type { RegionMetadata } from '#map-divisions/types.ts';
 import type { ContentEntry } from '#shared/astro-content.ts';
 
+export function getDivisionIds(entry: ContentEntry): Array<string> {
+	const divisionId = GeometryDivisionIdSchema.optional().parse(entry.data.divisionId);
+
+	if (!divisionId) return [];
+
+	return Array.isArray(divisionId) ? divisionId : [divisionId];
+}
+
 export function parseRegionData(entries: Array<ContentEntry>) {
 	const regions: Array<RegionMetadata> = [];
 
@@ -21,16 +29,8 @@ export function parseRegionData(entries: Array<ContentEntry>) {
 			entry.data.divisionClippingBBox,
 		);
 
-		const divisionIdValue = GeometryDivisionIdSchema.optional().parse(entry.data.divisionId);
-
-		const divisionIdValues = Array.isArray(divisionIdValue) ? divisionIdValue : [divisionIdValue];
-
-		const divisionIds = divisionIdValue
-			? divisionIdValues.filter((id): id is string => typeof id === 'string')
-			: [];
-
 		regions.push({
-			divisionIds,
+			divisionIds: getDivisionIds(entry),
 			id,
 			regionPathIds,
 			...(divisionSelectionBBox ? { divisionSelectionBBox } : {}),
@@ -49,7 +49,6 @@ export function parseRegionData(entries: Array<ContentEntry>) {
 	return { allRegions: regions, regionsWithDivisionIds };
 }
 
-// Resolve a bounding box hierarchically by walking up the ancestry chain
 export function resolveBoundingBox(
 	region: RegionMetadata,
 	regionsById: Map<string, RegionMetadata>,
@@ -64,11 +63,6 @@ export function resolveBoundingBox(
 	return undefined;
 }
 
-/**
- * Derive regionPathIds (ancestor chain) from filePath
- * e.g. "packages/content/collections/regions/asia/japan/tokyo.mdx"
- * → ["tokyo", "japan", "asia"] (self + ancestors from immediate parent to root)
- */
 function getRegionPathIds(filePath: string, id: string): Array<string> {
 	const collectionMarker = 'collections/regions/';
 	const index = filePath.indexOf(collectionMarker);
@@ -80,7 +74,6 @@ function getRegionPathIds(filePath: string, id: string): Array<string> {
 	const pathWithoutExt = relativePath.replace(ext, '');
 	const parts = pathWithoutExt.split('/');
 
-	// Start with self then add ancestors from immediate parent to root
 	const regionPathIds: Array<string> = [id];
 
 	for (let i = parts.length - 2; i >= 0; i--) {

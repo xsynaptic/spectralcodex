@@ -1,4 +1,3 @@
-/** MapLibre GL vendor styles (lazy-loaded on map pages only) */
 @import 'maplibre-gl/dist/maplibre-gl.css';
 
 @property --map-inset-bottom {
@@ -13,10 +12,12 @@
 	initial-value: 0;
 }
 
-/*
- * Theme tokens; neutral defaults render standalone, a host overrides the ramp on [data-map-root]
- * Dark mode is a per-element ramp-step choice via light-dark(), so the ramp tokens never flip
- */
+@property --map-page-hidden {
+	syntax: '<integer>';
+	inherits: true;
+	initial-value: 0;
+}
+
 :where([data-map-root]) {
 	--map-color-neutral-50: #fafafa;
 	--map-color-neutral-100: #f5f5f5;
@@ -39,6 +40,7 @@
 	--map-radius-full: 9999px;
 	--map-font-display: ui-sans-serif, system-ui, sans-serif;
 	--map-font-sans: ui-sans-serif, system-ui, sans-serif;
+	--map-popup-surface: light-dark(var(--map-color-neutral-50), var(--map-color-neutral-900));
 }
 
 /* Wire color-scheme from the mode attribute so light-dark() resolves standalone, without a host color-scheme */
@@ -61,7 +63,6 @@
 	outline-offset: -2px;
 }
 
-/** Popup (vendor overrides) */
 .maplibregl-popup {
 	z-index: 5;
 }
@@ -69,7 +70,7 @@
 div.maplibregl-popup-content {
 	padding: 0;
 	overflow: auto;
-	background-color: light-dark(var(--map-color-neutral-50), var(--map-color-neutral-900));
+	background-color: var(--map-popup-surface);
 }
 
 button.maplibregl-popup-close-button {
@@ -87,22 +88,21 @@ button.maplibregl-popup-close-button {
 }
 
 .maplibregl-popup-anchor-left .maplibregl-popup-tip {
-	border-right-color: light-dark(var(--map-color-neutral-50), var(--map-color-neutral-900));
+	border-right-color: var(--map-popup-surface);
 }
 
 .maplibregl-popup-anchor-right .maplibregl-popup-tip {
-	border-left-color: light-dark(var(--map-color-neutral-50), var(--map-color-neutral-900));
+	border-left-color: var(--map-popup-surface);
 }
 
 .maplibregl-popup-anchor-top .maplibregl-popup-tip {
-	border-bottom-color: light-dark(var(--map-color-neutral-50), var(--map-color-neutral-900));
+	border-bottom-color: var(--map-popup-surface);
 }
 
 .maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
-	border-top-color: light-dark(var(--map-color-neutral-50), var(--map-color-neutral-900));
+	border-top-color: var(--map-popup-surface);
 }
 
-/** Popup content */
 .map-popup-frame {
 	position: relative;
 	display: flex;
@@ -282,7 +282,7 @@ button.maplibregl-popup-close-button {
 }
 
 .maplibregl-map {
-	container-type: size;
+	container: map / size;
 }
 
 .map-filter-menu {
@@ -322,31 +322,21 @@ button.maplibregl-popup-close-button {
 }
 
 .map-filter-menu-item {
-	background-color: light-dark(var(--map-color-neutral-50), var(--map-color-neutral-900));
+	background-color: var(--map-popup-surface);
 	border-radius: var(--map-radius-sm);
 	transition: background-color 150ms;
-}
 
-.map-filter-menu-item:focus-visible {
-	background-color: light-dark(var(--map-color-neutral-100), var(--map-color-neutral-800));
+	&[data-active] {
+		background-color: light-dark(var(--map-color-neutral-200), var(--map-color-neutral-800));
+	}
 }
 
 @media (hover: hover) {
 	.map-filter-menu-item:hover {
 		background-color: light-dark(var(--map-color-neutral-100), var(--map-color-neutral-800));
 	}
-}
 
-.map-filter-menu-item-active {
-	background-color: light-dark(var(--map-color-neutral-200), var(--map-color-neutral-800));
-}
-
-.map-filter-menu-item-active:focus-visible {
-	background-color: light-dark(var(--map-color-neutral-300), var(--map-color-neutral-700));
-}
-
-@media (hover: hover) {
-	.map-filter-menu-item-active:hover {
+	.map-filter-menu-item[data-active]:hover {
 		background-color: light-dark(var(--map-color-neutral-300), var(--map-color-neutral-700));
 	}
 }
@@ -375,6 +365,10 @@ button.maplibregl-popup-close-button {
 	border-color: var(--map-color-neutral-500);
 }
 
+.map-filter-menu-item[data-active] .map-filter-swatch {
+	opacity: 0.6;
+}
+
 .map-filter-label {
 	display: flex;
 	flex-wrap: nowrap;
@@ -385,20 +379,20 @@ button.maplibregl-popup-close-button {
 	font-family: var(--map-font-display);
 	font-size: 0.75rem;
 	color: light-dark(var(--map-color-neutral-700), var(--map-color-neutral-300));
-}
 
-.map-filter-label-active {
-	color: light-dark(var(--map-color-neutral-500), var(--map-color-neutral-400));
+	.map-filter-menu-item[data-active] & {
+		color: light-dark(var(--map-color-neutral-500), var(--map-color-neutral-400));
+	}
 }
 
 .map-filter-label-zh {
 	font-family: var(--map-font-sans);
 	font-weight: 500;
 	color: light-dark(var(--map-color-neutral-600), var(--map-color-neutral-400));
-}
 
-.map-filter-label-zh-active {
-	color: light-dark(var(--map-color-neutral-400), var(--map-color-neutral-500));
+	.map-filter-menu-item[data-active] & {
+		color: light-dark(var(--map-color-neutral-400), var(--map-color-neutral-500));
+	}
 }
 
 .map-filter-rating {
@@ -413,43 +407,30 @@ button.maplibregl-popup-close-button {
 	user-select: none;
 }
 
-.map-filter-star-empty {
+.map-filter-star {
 	width: 16px;
 	color: light-dark(var(--map-color-neutral-300), var(--map-color-neutral-600));
 	cursor: pointer;
 	transition: color 200ms;
+
+	&[data-active] {
+		color: var(--map-color-highlight-500);
+	}
+
+	&:focus-visible {
+		color: var(--map-color-highlight-300);
+	}
+}
+
+@media (hover: hover) {
+	.map-filter-star:hover {
+		color: var(--map-color-highlight-300);
+	}
 }
 
 .map-filter-star-icon {
 	display: block;
 	width: 100%;
-}
-
-.map-filter-star-empty:focus-visible {
-	color: var(--map-color-highlight-300);
-}
-
-@media (hover: hover) {
-	.map-filter-star-empty:hover {
-		color: var(--map-color-highlight-300);
-	}
-}
-
-.map-filter-star-filled {
-	width: 16px;
-	color: var(--map-color-highlight-500);
-	cursor: pointer;
-	transition: color 200ms;
-}
-
-.map-filter-star-filled:focus-visible {
-	color: var(--map-color-highlight-300);
-}
-
-@media (hover: hover) {
-	.map-filter-star-filled:hover {
-		color: var(--map-color-highlight-300);
-	}
 }
 
 .map-filter-objective-button {
@@ -460,11 +441,11 @@ button.maplibregl-popup-close-button {
 	background-color: var(--map-color-neutral-200);
 	border: 1px solid var(--map-color-neutral-300);
 	border-radius: var(--map-radius-full);
-}
 
-.map-filter-objective-button-active {
-	background-color: var(--map-color-neutral-300);
-	border-color: var(--map-color-neutral-400);
+	&[aria-pressed='true'] {
+		background-color: var(--map-color-neutral-300);
+		border-color: var(--map-color-neutral-400);
+	}
 }
 
 .map-filter-objective-row {
@@ -476,7 +457,7 @@ button.maplibregl-popup-close-button {
 	user-select: none;
 }
 
-@media (width >= 640px) {
+@container map (width >= 640px) {
 	.map-filter-button {
 		padding-top: 0.125rem;
 		padding-bottom: 0.125rem;
@@ -491,7 +472,7 @@ button.maplibregl-popup-close-button {
 	}
 }
 
-@media (width >= 768px) {
+@container map (width >= 768px) {
 	.map-popup-warning-icon {
 		height: 16px;
 	}
@@ -505,7 +486,6 @@ button.maplibregl-popup-close-button {
 	}
 }
 
-/** Target marker */
 @keyframes target-pulse-ring {
 	0% {
 		opacity: 0.7;
@@ -541,7 +521,7 @@ button.maplibregl-popup-close-button {
 	}
 }
 
-/** Scope bar; positioned by hand, as MapLibre has no top-center control slot, and white in dark mode like MapLibre's own controls */
+/* MapLibre has no top-center control slot, so this is positioned by hand */
 .map-scope-bar {
 	position: absolute;
 	inset-inline: 3rem;
@@ -549,8 +529,6 @@ button.maplibregl-popup-close-button {
 	z-index: 2;
 	display: flex;
 	width: fit-content;
-
-	/* A long name is one unbreakable line, so the insets alone do not keep it clear of the controls on the right */
 	max-width: calc(100% - 6rem);
 	margin-inline: auto;
 	font-family: var(--map-font-display);
@@ -559,16 +537,37 @@ button.maplibregl-popup-close-button {
 	background-color: #fff;
 	border-radius: var(--map-radius-sm);
 	box-shadow: 0 0 0 2px rgb(0 0 0 / 10%);
+
+	&[data-open] {
+		z-index: 3;
+		flex-direction: column;
+		width: 20rem;
+		max-height: min(
+			24rem,
+			calc(100% - 20px - max(var(--map-inset-bottom), var(--map-cover-bottom)))
+		);
+	}
 }
 
-.map-scope-name,
-.map-scope-toggle {
+.map-scope-button {
 	height: 29px;
+	padding: 0;
 	color: inherit;
 	cursor: pointer;
 	user-select: none;
 	background-color: transparent;
+	border: 0;
 	border-radius: inherit;
+
+	&:focus-visible {
+		background-color: rgb(0 0 0 / 5%);
+	}
+}
+
+@media (hover: hover) {
+	.map-scope-button:hover {
+		background-color: rgb(0 0 0 / 5%);
+	}
 }
 
 .map-scope-name {
@@ -582,38 +581,204 @@ button.maplibregl-popup-close-button {
 	border-start-end-radius: 0;
 	border-end-end-radius: 0;
 	transition: color 150ms ease-out;
-
-	:where(.map-scope-bar:not([data-active])) & {
-		color: var(--map-color-neutral-400);
-	}
 }
 
-.map-scope-toggle {
+.map-scope-bar:not([data-active]) .map-scope-name {
+	color: var(--map-color-neutral-400);
+}
+
+.map-scope-toggle,
+.map-scope-search,
+.map-search-close {
 	display: flex;
 	flex-shrink: 0;
 	align-items: center;
 	justify-content: center;
 	width: 29px;
-	padding: 0;
-	border: 0;
 	border-inline-start: 1px solid var(--map-color-neutral-300);
+}
+
+.map-scope-toggle {
+	border-radius: 0;
+}
+
+.map-scope-search,
+.map-search-close {
 	border-start-start-radius: 0;
 	border-end-start-radius: 0;
 }
 
-.map-scope-name:focus-visible,
-.map-scope-toggle:focus-visible {
-	background-color: rgb(0 0 0 / 5%);
+/* Matches the prompt's inset so the icon holds still as the bar opens */
+.map-search-icon {
+	display: flex;
+	flex-shrink: 0;
+	align-items: center;
+	padding-inline: 4.5px 0.25rem;
 }
 
-@media (hover: hover) {
-	.map-scope-name:hover,
-	.map-scope-toggle:hover {
+.map-scope-prompt {
+	display: flex;
+	gap: 0.25rem;
+	align-items: center;
+	min-width: 0;
+	padding-inline: 4.5px 0.625rem;
+}
+
+.map-scope-prompt-text {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	color: var(--map-color-neutral-500);
+	white-space: nowrap;
+}
+
+.map-search {
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+	max-height: var(--map-search-room, none);
+}
+
+.map-search-field {
+	display: flex;
+	flex-shrink: 0;
+	align-items: center;
+}
+
+.map-search-input {
+	flex-grow: 1;
+	min-width: 0;
+	height: 29px;
+	padding: 0 0.5rem 0 0;
+	font-family: inherit;
+	font-size: inherit;
+	color: inherit;
+	background-color: transparent;
+	border: 0;
+
+	&::placeholder {
+		color: var(--map-color-neutral-500);
+		opacity: 1;
+	}
+
+	/* iOS zooms the page into any input set under 16px; `-webkit-touch-callout` matches WebKit on iOS alone */
+	@supports (-webkit-touch-callout: none) {
+		font-size: 16px;
+	}
+}
+
+[data-map-root] .map-search-input:focus-visible {
+	outline-color: transparent;
+}
+
+.map-search-list {
+	min-height: 0;
+	padding: 0.25rem 0;
+	margin: 0;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	list-style: none;
+	border-top: 1px solid var(--map-color-neutral-200);
+	transition: opacity 150ms ease-out;
+
+	@starting-style {
+		opacity: 0;
+	}
+}
+
+.map-search-option {
+	display: flex;
+	flex-direction: column;
+	gap: 0.125rem;
+	padding: 0.375rem 0.625rem;
+	cursor: pointer;
+	user-select: none;
+
+	&[aria-selected='true'] {
 		background-color: rgb(0 0 0 / 5%);
 	}
 }
 
-/* Rounded end buttons stand in for clipping the group, which would cut off the focus ring */
+.map-search-line {
+	display: flex;
+	gap: 0.5rem;
+	align-items: baseline;
+}
+
+.map-search-title,
+.map-search-meta {
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.map-search-title {
+	flex-grow: 1;
+	font-size: 0.8125rem;
+	color: var(--map-color-neutral-800);
+}
+
+.map-search-title-multilingual,
+.map-search-count,
+.map-search-meta {
+	color: var(--map-color-neutral-500);
+}
+
+.map-search-match {
+	font-weight: 600;
+	color: inherit;
+	background-color: transparent;
+}
+
+.map-search-count {
+	flex-shrink: 0;
+	font-variant-numeric: tabular-nums;
+}
+
+.map-search-meta {
+	font-size: 0.6875rem;
+}
+
+.map-search-kind {
+	color: color-mix(in oklab, var(--map-color-accent-600) 65%, var(--map-color-neutral-500));
+}
+
+.map-search-empty {
+	padding: 0.5rem 0.625rem;
+	margin: 0;
+	color: var(--map-color-neutral-500);
+	border-top: 1px solid var(--map-color-neutral-200);
+}
+
+/* Forced colours drop every `box-shadow`, MapLibre's `ButtonText` edge included, and a tint alone vanishes */
+@media (forced-colors: active) {
+	.map-scope-bar {
+		outline: 2px solid ButtonText;
+	}
+
+	.map-search-match {
+		color: CanvasText;
+		forced-color-adjust: none;
+	}
+
+	.map-scope-toggle,
+	.map-scope-search,
+	.map-search-list,
+	.map-search-empty {
+		border-color: ButtonText;
+	}
+
+	.map-search-option[aria-selected='true'] {
+		color: HighlightText;
+		forced-color-adjust: none;
+		background-color: Highlight;
+
+		* {
+			color: inherit;
+		}
+	}
+}
+
 .maplibregl-ctrl-group button:first-child {
 	border-start-start-radius: inherit;
 	border-start-end-radius: inherit;
@@ -677,28 +842,6 @@ button.maplibregl-popup-close-button {
 	height: 20px;
 }
 
-.map-search {
-	display: flex;
-	gap: 0.25rem;
-	align-items: center;
-	width: 300px;
-}
-
-.map-search-input {
-	flex-grow: 1;
-	padding: 0.25rem;
-	font-size: 0.875rem;
-	outline: 0;
-	border-start-end-radius: var(--map-radius-sm);
-	border-end-end-radius: var(--map-radius-sm);
-}
-
-.map-search-button {
-	border-start-start-radius: var(--map-radius-sm);
-	border-end-start-radius: var(--map-radius-sm);
-}
-
-/** Scale and metrics controls */
 .maplibregl-ctrl-bottom-left {
 	display: flex;
 	font-size: 10px;
@@ -737,7 +880,6 @@ button.maplibregl-popup-close-button {
 	border-bottom-left-radius: var(--map-radius-xs);
 }
 
-/** Visually-hidden accessible label */
 .map-sr-only {
 	position: absolute;
 	width: 1px;
@@ -750,7 +892,7 @@ button.maplibregl-popup-close-button {
 	clip-path: inset(50%);
 }
 
-/** Loading indicator; adapted from Daisy UI; mask supplied by the host via --map-loading-mask */
+/* Adapted from Daisy UI; mask supplied by the host via --map-loading-mask */
 .map-loading-animation {
 	display: inline-block;
 	aspect-ratio: 1/1;

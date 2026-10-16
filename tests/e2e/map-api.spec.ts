@@ -1,13 +1,13 @@
 import { expect, test } from '@playwright/test';
-import { MapDataKeysCompressed } from '@spectralcodex/map-codec';
+import { MapSourceItemSchema, mapSourceKeys } from '@spectralcodex/map-codec';
 
-const id = MapDataKeysCompressed.Id;
-const chunkKey = MapDataKeysCompressed.ChunkKey;
+const id = mapSourceKeys.id;
+const chunkKey = mapSourceKeys.chunkKey;
 
 type MapApiItem = Record<string, unknown>;
 
 test.describe('map data API', { tag: '@smoke' }, () => {
-	test('global directory is built and every row carries a chunk key', async ({ request }) => {
+	test('global directory decodes and every row carries a chunk key', async ({ request }) => {
 		const response = await request.get('/api/map/map-directory.json');
 
 		expect(response.ok()).toBe(true);
@@ -16,6 +16,7 @@ test.describe('map data API', { tag: '@smoke' }, () => {
 
 		expect(directory.length).toBeGreaterThan(1000);
 		expect(directory.every((row) => typeof row[chunkKey] === 'string')).toBe(true);
+		expect(() => MapSourceItemSchema.array().parse(directory)).not.toThrow();
 	});
 
 	test('sampled popup chunks resolve and contain their features', async ({ request }) => {

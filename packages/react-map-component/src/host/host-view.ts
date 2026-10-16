@@ -1,10 +1,49 @@
-import { mapSyncEventName, mapViewAttribute } from '#constants.ts';
-import { useDocumentAttribute, useDocumentEventValue } from '#lib/document-attribute.ts';
+import { MapViewSchema } from '@spectralcodex/map-codec';
+import { useEffect } from 'react';
 
-export function useHostViewKey() {
-	return useDocumentAttribute(mapViewAttribute, mapSyncEventName);
+import type { MapView } from '#types.ts';
+
+import { mapSyncEventName } from '#constants.ts';
+import { useEnsureMapRows } from '#data/data-query.ts';
+import { useMapConfig } from '#lib/config.tsx';
+import { useMapStore } from '#store/store.tsx';
+
+export function parseMapView(value: string | undefined, isDev = false): MapView {
+	if (!value) return {};
+
+	try {
+		return MapViewSchema.parse(JSON.parse(value));
+	} catch (error) {
+		if (isDev) console.warn('[Map] Malformed host view:', error);
+
+		return {};
+	}
 }
 
-export function useHostSyncValue<Value>(getSnapshot: () => Value, serverValue: Value) {
-	return useDocumentEventValue(mapSyncEventName, getSnapshot, serverValue);
+export function useHostViewSync() {
+	const { host } = useMapConfig();
+	const { syncView } = useMapStore((state) => state.actions);
+	const ensureRows = useEnsureMapRows();
+
+	useEffect(() => {
+		async function sync() {
+			const page = host.readView();
+
+			try {
+				syncView(page, await ensureRows());
+			} catch {
+				syncView(page, undefined);
+			}
+		}
+
+		function handleSync() {
+			void sync();
+		}
+
+		document.addEventListener(mapSyncEventName, handleSync);
+
+		return () => {
+			document.removeEventListener(mapSyncEventName, handleSync);
+		};
+	}, [ensureRows, host, syncView]);
 }

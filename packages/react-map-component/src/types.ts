@@ -1,101 +1,85 @@
 import type { Flavor } from '@protomaps/basemaps';
-import type {
-	MapPopupItemCompressed,
-	MapSourceItem,
-	MapSourceItemCompressed,
-} from '@spectralcodex/map-codec';
-import type { Feature, FeatureCollection, LineString, Point, Polygon } from 'geojson';
+import type { MapFeaturesRule, MapScope, MapView } from '@spectralcodex/map-codec';
+import type { Feature, Point } from 'geojson';
 import type { MapOptions } from 'maplibre-gl';
 import type { CSSProperties } from 'react';
 import type { MapProps } from 'react-map-gl/maplibre';
 
-import type { MapDarkModeOptions } from '#lib/dark-mode.tsx';
-import type { MapMessages } from '#lib/messages.tsx';
+import type { defaultMapMessages } from '#constants.ts';
 
 export interface MapComponentProps extends Partial<
-	Pick<MapOptions, 'bounds' | 'hash' | 'interactive' | 'maxBounds' | 'zoom'>
+	Pick<MapOptions, 'hash' | 'interactive' | 'zoom'>
 > {
-	// Base URL for demand-fetched popup chunks (e.g. `/api/map/`); paired with version
-	apiChunkBaseUrl?: string | undefined;
 	apiDivisionUrl?: string | undefined;
-	apiPopupUrl?: string | undefined;
-	apiSourceUrl?: string | undefined;
+	apiSourceUrl: string;
 	baseMapTheme?: Flavor | undefined;
+	bounds?: MapScope['bounds'] | undefined;
 	center?: [number, number];
-	// Adapter for a host dark-mode convention; defaults to data-mode="dark" + a mode-changed event
-	darkMode?: MapDarkModeOptions | undefined;
-	hasEnterControl?: boolean | undefined;
+	controls?: ReadonlyArray<MapHostControlName> | undefined;
 	host?: MapHostOptions | undefined;
 	imageServerUrl?: string | undefined;
 	isDev?: boolean | undefined;
 	isObjectiveFilterEnabled?: boolean | undefined;
 	languages?: Array<string> | undefined;
-	mapFeaturesRule?: MapFeaturesRule | undefined;
+	mapFeaturesRule: MapFeaturesRule;
 	mapId?: string | undefined;
-	// Host-overridable UI strings; merged over English defaults
+	maxBounds?: MapScope['bounds'] | undefined;
 	messages?: Partial<MapMessages> | undefined;
-	popupData?: Array<MapPopupItemCompressed> | undefined;
-	popupDataKey?: string | undefined;
 	protomapsApiKey?: string | undefined;
-	sourceData?: Array<MapSourceItemCompressed> | undefined;
-	// Per-map content hashes that cache-key inline source/popup datasets
-	sourceDataKey?: string | undefined;
 	style?: CSSProperties | undefined;
 	targetIds?: Array<string> | undefined;
-	version?: string | undefined;
 }
 
-export type MapGeometry = LineString | Point | Polygon;
+export type MapClickOutcome =
+	| { center: [number, number]; clusterId: number | string; kind: 'expand-cluster' }
+	| { isEased: boolean; kind: 'popup'; pointId: string }
+	| { isScopeRestored: boolean; kind: 'open'; url: string }
+	| { kind: 'clear' }
+	| { kind: 'none' };
 
-export type MapHoverFeature = Feature<Point>;
+export type MapHoverCluster = Feature<Point>;
 
-// Serializable; a persisted island never receives new props and a function cannot cross island serialization
-export interface MapHostOptions {
+export type MapOverlayClose = 'dismiss' | 'keyboard' | 'pointer';
+
+export type MapHostControlName = 'enter' | 'exit' | 'expand';
+
+export interface MapHost {
+	canOpen: boolean;
+	controls: ReadonlyArray<MapHostControlName>;
+	fullscreenContainerId: string | undefined;
+	open: (url: string) => void;
+	readView: () => MapStoreView;
+	send: (name: MapHostControlName) => void;
+}
+
+// Astro serializes island props, so no function crosses here
+interface MapHostOptions {
 	fullscreenContainerId: string;
 }
 
 export type MapInitialViewState = MapProps['initialViewState'];
 
-/**
- * Selects Features from the shared global directory
- * - region: keep points whose region ordinal falls inside the subtree interval
- * - theme: keep points carrying the theme index
- * - ids: keep the explicit, order-preserving feature-id list
- */
-export type MapFeaturesRule =
-	| { ids: Array<string>; type: 'ids' }
-	| { index: number; type: 'theme' }
-	| { interval: [number, number]; type: 'region' };
+export type MapMessages = Record<keyof typeof defaultMapMessages, string>;
 
 export type MapTrackName =
-	| 'map-enter'
 	| 'map-error'
-	| 'map-exit'
-	| 'map-expand'
 	| 'map-filter-open'
 	| 'map-load'
 	| 'map-popup-open'
 	| 'map-popup-visit'
 	| 'map-scope-toggle'
-	| 'map-sheet-toggle';
+	| 'map-search-pick'
+	| `map-${MapHostControlName}`;
 
 export interface MapTrackDetail {
 	data?: Record<string, unknown>;
 	mapId?: string | undefined;
-	name: MapTrackName;
+	name: string;
 }
 
-export interface MapScope extends Pick<MapComponentProps, 'apiDivisionUrl' | 'bounds'> {
-	rule: MapFeaturesRule;
-	title: string;
-	url: string;
+export interface MapStoreView {
+	view: MapView;
+	viewKey: string | undefined;
 }
 
-export interface MapView extends Pick<MapComponentProps, 'targetIds'> {
-	scope?: MapScope | undefined;
-}
-
-export type MapSourceFeatureCollection = FeatureCollection<
-	MapGeometry,
-	MapSourceItem['properties']
->;
+export type { MapFeaturesRule, MapScope, MapView } from '@spectralcodex/map-codec';

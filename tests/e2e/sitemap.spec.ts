@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
 
-import { prodUrl } from '#e2e/constants.ts';
+import { isDev, prodUrl } from '#e2e/constants.ts';
+
+test.skip(isDev, 'the sitemap is a build artefact');
 
 test.describe('sitemap', { tag: '@smoke' }, () => {
 	test('index references the url sitemap', async ({ request }) => {

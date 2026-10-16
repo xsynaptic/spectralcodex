@@ -3,7 +3,7 @@ import type { Page } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 
 import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
-import type { MapComponentData } from '#lib/map/map-types.ts';
+import type { MapComponentData } from '#lib/map/map-data.ts';
 
 import ContentEntryDetail from '#components/content/content-entry-detail.astro';
 import ContentProse from '#components/content/content-prose.astro';
@@ -47,7 +47,7 @@ const themeIds = entry.data.themes?.map(({ id }) => id);
 const t = getTranslations();
 ---
 
-<ContentEntryDetail entry={entry} prefetchUrls={mapData.prefetchUrls}>
+<ContentEntryDetail entry={entry}>
 	<Fragment slot="header-subtitle">
 		{entry.data.url ? (
 			<DividedItem>

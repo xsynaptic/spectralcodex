@@ -1,6 +1,39 @@
+import type { MapSourceItem } from '@spectralcodex/map-codec';
+
+import { GeometryTypeEnum } from '@spectralcodex/shared/map';
 import { describe, expect, test } from 'vitest';
 
-import { findTargetClusters, getClusterCandidates } from '#targets/targets-markers-factory.ts';
+import {
+	findTargetClusters,
+	getClusterCandidates,
+	getTargetPoints,
+} from '#targets/targets-markers-factory.ts';
+
+function makeItem(id: string, coordinates: [number, number]) {
+	return {
+		geometry: { coordinates, type: GeometryTypeEnum.Point },
+		properties: { id },
+	} as MapSourceItem;
+}
+
+describe('getTargetPoints', () => {
+	const items = [
+		makeItem('theater', [121.8, 24.6]),
+		makeItem('railway', [121, 24]),
+		makeItem('temple', [120.2, 23]),
+	];
+
+	test('yields the Targets only, in Target order', () => {
+		expect(getTargetPoints(items, ['railway', 'theater'])).toEqual([
+			{ coordinates: [121, 24], id: 'railway' },
+			{ coordinates: [121.8, 24.6], id: 'theater' },
+		]);
+	});
+
+	test('an unknown Target yields nothing', () => {
+		expect(getTargetPoints(items, ['missing'])).toEqual([]);
+	});
+});
 
 describe('getClusterCandidates', () => {
 	const clusters = [
@@ -57,12 +90,10 @@ describe('findTargetClusters', () => {
 	test('a Target in its closest cluster is found without asking the next one', async () => {
 		const { asked, getLeafIds } = createLookup();
 
-		const clusters = await findTargetClusters({
+		const clusters = await findTargetClusters(
+			[{ candidates: [north, south], id: 'shrine' }],
 			getLeafIds,
-			isCurrent: () => true,
-			leafIds: new Map(),
-			pending: [{ candidates: [north, south], id: 'shrine' }],
-		});
+		);
 
 		expect(clusters).toEqual([north]);
 		expect(asked).toEqual([north.id]);
@@ -71,12 +102,10 @@ describe('findTargetClusters', () => {
 	test('a Target missing from its closest cluster is looked for in the next closest', async () => {
 		const { asked, getLeafIds } = createLookup();
 
-		const clusters = await findTargetClusters({
+		const clusters = await findTargetClusters(
+			[{ candidates: [east, north, south], id: 'theater' }],
 			getLeafIds,
-			isCurrent: () => true,
-			leafIds: new Map(),
-			pending: [{ candidates: [east, north, south], id: 'theater' }],
-		});
+		);
 
 		expect(clusters).toEqual([south]);
 		expect(asked).toEqual([east.id, north.id, south.id]);
@@ -85,33 +114,13 @@ describe('findTargetClusters', () => {
 	test('Targets sharing a cluster ask it once and yield it once', async () => {
 		const { asked, getLeafIds } = createLookup();
 
-		const clusters = await findTargetClusters({
-			getLeafIds,
-			isCurrent: () => true,
-			leafIds: new Map(),
-			pending: [
+		const clusters = await findTargetClusters(
+			[
 				{ candidates: [south], id: 'theater' },
 				{ candidates: [south], id: 'mine' },
 			],
-		});
-
-		expect(clusters).toEqual([south]);
-		expect(asked).toEqual([south.id]);
-	});
-
-	test('a cluster asked by an earlier call is not asked again', async () => {
-		const { asked, getLeafIds } = createLookup();
-		const leafIds = new Map<number, Set<unknown>>();
-		const pending = [{ candidates: [south], id: 'theater' }];
-
-		await findTargetClusters({ getLeafIds, isCurrent: () => true, leafIds, pending });
-
-		const clusters = await findTargetClusters({
 			getLeafIds,
-			isCurrent: () => true,
-			leafIds,
-			pending,
-		});
+		);
 
 		expect(clusters).toEqual([south]);
 		expect(asked).toEqual([south.id]);
@@ -120,50 +129,27 @@ describe('findTargetClusters', () => {
 	test('a Target in none of its candidates, or with none, yields nothing', async () => {
 		const { getLeafIds } = createLookup();
 
-		const clusters = await findTargetClusters({
-			getLeafIds,
-			isCurrent: () => true,
-			leafIds: new Map(),
-			pending: [
+		const clusters = await findTargetClusters(
+			[
 				{ candidates: [east, north], id: 'theater' },
 				{ candidates: [], id: 'mine' },
 			],
-		});
-
-		expect(clusters).toEqual([]);
-	});
-
-	test('a search that is no longer current stops asking', async () => {
-		const { asked, getLeafIds } = createLookup();
-		let rounds = 0;
-
-		const clusters = await findTargetClusters({
 			getLeafIds,
-			isCurrent: () => {
-				rounds += 1;
-
-				return rounds === 1;
-			},
-			leafIds: new Map(),
-			pending: [{ candidates: [east, south], id: 'theater' }],
-		});
+		);
 
 		expect(clusters).toEqual([]);
-		expect(asked).toEqual([east.id]);
 	});
 
 	test('a failed lookup ends the search and keeps what was already found', async () => {
 		const { getLeafIds } = createLookup({ failingId: east.id });
 
-		const clusters = await findTargetClusters({
-			getLeafIds,
-			isCurrent: () => true,
-			leafIds: new Map(),
-			pending: [
+		const clusters = await findTargetClusters(
+			[
 				{ candidates: [north], id: 'shrine' },
 				{ candidates: [south, east], id: 'temple' },
 			],
-		});
+			getLeafIds,
+		);
 
 		expect(clusters).toEqual([north]);
 	});
@@ -172,12 +158,7 @@ describe('findTargetClusters', () => {
 		const { getLeafIds } = createLookup();
 		const candidates = [east, south];
 
-		await findTargetClusters({
-			getLeafIds,
-			isCurrent: () => true,
-			leafIds: new Map(),
-			pending: [{ candidates, id: 'theater' }],
-		});
+		await findTargetClusters([{ candidates, id: 'theater' }], getLeafIds);
 
 		expect(candidates).toEqual([east, south]);
 	});

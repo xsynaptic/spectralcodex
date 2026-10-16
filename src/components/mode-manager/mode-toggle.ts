@@ -1,4 +1,5 @@
-// Type-only import keeps this script import-free so Astro inlines it
+import { modeAttribute, modeChangedEventName } from '@spectralcodex/shared/constants';
+
 import type { ModeChangedEvent, ModeSystemType } from '#components/mode-manager/mode-types.ts';
 
 class ModeToggle extends HTMLElement {
@@ -6,15 +7,15 @@ class ModeToggle extends HTMLElement {
 
 	connectedCallback() {
 		this.addEventListener('click', this.#handleClick);
-		document.addEventListener('mode-changed', this.#handleModeChanged);
+		document.addEventListener(modeChangedEventName, this.#handleModeChanged);
 
-		// The manager may have announced its mode before this listener existed
-		this.#updateLabel(document.documentElement.dataset.mode);
+		// The manager may have announced its mode before this listener was added
+		this.#updateLabel(document.documentElement.getAttribute(modeAttribute));
 	}
 
 	disconnectedCallback() {
 		this.removeEventListener('click', this.#handleClick);
-		document.removeEventListener('mode-changed', this.#handleModeChanged);
+		document.removeEventListener(modeChangedEventName, this.#handleModeChanged);
 	}
 
 	#handleClick = () => {
@@ -24,17 +25,16 @@ class ModeToggle extends HTMLElement {
 
 		this.#lastClickTime = now;
 
-		// Auto flips away from whatever the system currently shows, so every press changes the page
 		document
 			.querySelector('mode-manager')
-			?.setMode(getOppositeMode(document.documentElement.dataset.mode));
+			?.setMode(getOppositeMode(document.documentElement.getAttribute(modeAttribute)));
 	};
 
 	#handleModeChanged = (event: Event) => {
 		this.#updateLabel((event as ModeChangedEvent).detail.resolvedMode);
 	};
 
-	#updateLabel(resolvedMode: string | undefined) {
+	#updateLabel(resolvedMode: null | string) {
 		const nextMode = getOppositeMode(resolvedMode);
 		const label = nextMode === 'dark' ? this.dataset.labelDark : this.dataset.labelLight;
 
@@ -50,7 +50,7 @@ class ModeToggle extends HTMLElement {
 	}
 }
 
-function getOppositeMode(resolvedMode: string | undefined): ModeSystemType {
+function getOppositeMode(resolvedMode: null | string): ModeSystemType {
 	return resolvedMode === 'dark' ? 'light' : 'dark';
 }
 

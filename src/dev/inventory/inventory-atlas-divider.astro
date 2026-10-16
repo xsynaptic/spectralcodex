@@ -18,7 +18,10 @@ const dividerClass = 'absolute inset-y-0 left-1/2 block w-3 -translate-x-1/2';
 			<div class={mapClass}></div>
 			<AtlasDivider class={dividerClass} />
 		</div>
-		<div class:list={[frameClass, '[--atlas-drag-offset:5rem]']} data-divider-demo-drag>
+		<div
+			class:list={[frameClass, '[--atlas-pane-current:-4.625rem] [--atlas-pane-width:0.375rem]']}
+			data-divider-demo-drag
+		>
 			<div class={mapClass}></div>
 			<AtlasDivider class={dividerClass} />
 		</div>
@@ -28,7 +31,7 @@ const dividerClass = 'absolute inset-y-0 left-1/2 block w-3 -translate-x-1/2';
 <script>
 	const demo = document.querySelector('[data-divider-demo]');
 
-	// Capture keeps the element's own listeners from resizing the pane or leaving atlas mode
+	// Listening in the capture phase keeps the divider's own handlers from resizing the pane or leaving atlas mode
 	for (const type of ['pointerdown', 'keydown', 'click']) {
 		demo?.addEventListener(
 			type,

@@ -25,23 +25,15 @@ interface InitialViewStateOptions {
 
 type SavedViewport = Pick<z.infer<typeof SavedViewportSchema>, 'latitude' | 'longitude' | 'zoom'>;
 
-// `sessionStorage` is read inside each `try`; touching the global throws where storage is blocked
-interface ViewportStore {
-	now?: (() => number) | undefined;
-	storage?: undefined | ViewportStorage;
-}
-
-interface ViewportStorage {
-	getItem: (key: string) => ReturnType<Storage['getItem']> | undefined;
-	setItem: Storage['setItem'];
-}
-
-export function getInitialViewState(
-	{ bounds, center, mapId, maxBounds, zoom }: InitialViewStateOptions,
-	store?: ViewportStore,
-): NonNullable<MapInitialViewState> {
+export function getInitialViewState({
+	bounds,
+	center,
+	mapId,
+	maxBounds,
+	zoom,
+}: InitialViewStateOptions): NonNullable<MapInitialViewState> {
 	const maxBoundsOption = maxBounds ? { maxBounds } : {};
-	const saved = readSavedViewport(mapId, store);
+	const saved = readSavedViewport(mapId);
 
 	if (saved) return { ...maxBoundsOption, ...saved };
 
@@ -54,18 +46,14 @@ export function getInitialViewState(
 	return { ...viewState, latitude, longitude };
 }
 
-export function writeSavedViewport(
-	mapId: string,
-	viewport: SavedViewport,
-	{ now = Date.now, storage }: ViewportStore = {},
-) {
+export function writeSavedViewport(mapId: string, viewport: SavedViewport) {
 	try {
-		(storage ?? sessionStorage).setItem(
+		sessionStorage.setItem(
 			getViewportStorageKey(mapId),
-			JSON.stringify({ ...viewport, timestamp: now() }),
+			JSON.stringify({ ...viewport, timestamp: Date.now() }),
 		);
 	} catch {
-		// Ignore quota errors
+		// Storage can be full or blocked
 	}
 }
 
@@ -73,20 +61,16 @@ function getViewportStorageKey(mapId: string) {
 	return `${mapViewportStorageKeyPrefix}${mapId}`;
 }
 
-export function readSavedViewport(
-	mapId: string | undefined,
-	{ now = Date.now, storage }: ViewportStore = {},
-): SavedViewport | undefined {
+function readSavedViewport(mapId: string | undefined): SavedViewport | undefined {
 	if (!mapId) return;
 
 	try {
-		const raw = (storage ?? sessionStorage).getItem(getViewportStorageKey(mapId));
+		const raw = sessionStorage.getItem(getViewportStorageKey(mapId));
 
-		return raw ? parseSavedViewport(raw, now()) : undefined;
+		return raw ? parseSavedViewport(raw, Date.now()) : undefined;
 	} catch {
-		// Ignore parse errors or missing sessionStorage
+		return undefined;
 	}
-	return undefined;
 }
 
 function parseSavedViewport(raw: string, nowMs: number): SavedViewport | undefined {

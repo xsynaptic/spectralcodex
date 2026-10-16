@@ -33,7 +33,7 @@ const { positionals, values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
 		'divisions-path': {
-			default: './public/divisions',
+			default: './.cache/divisions',
 			type: 'string',
 		},
 		'media-path': {
@@ -72,11 +72,8 @@ const bodyContentEntries = entriesFrom('locations', 'posts');
 const resourceEntries = entriesFrom('resources');
 const locationEntries = entriesFrom('locations');
 
-// Names are the CLI subcommands
-// Note: there is no need for a help command
 const validations = [
 	{ name: 'entry-ids', run: () => validateEntryIds(allEntries) },
-	// Images load separately; the images check resolves them against the media directory
 	{
 		name: 'references',
 		run: () => validateReferences(allEntries, { skipCollections: ['images'] }),
@@ -122,7 +119,11 @@ const validations = [
 	{
 		name: 'location-coordinates',
 		run: () =>
-			validateLocationsCoordinates(locationEntries, path.join(rootPath, values['divisions-path'])),
+			validateLocationsCoordinates(
+				locationEntries,
+				entriesFrom('regions'),
+				path.join(rootPath, values['divisions-path']),
+			),
 	},
 ] satisfies Array<{ name: string; run: () => Promise<ValidationResult> | ValidationResult }>;
 

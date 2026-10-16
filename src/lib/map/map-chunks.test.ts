@@ -15,8 +15,7 @@ function makeItem(id: string, [lng, lat]: [number, number], popupBytes = 10): Ch
 	return { id, lat, lng, popupBytes };
 }
 
-// Spread-out point set whose ids are permuted by seed, so different seeds feed the same
-// items in a different input order
+// Spread-out point set whose ids are permuted by seed, so different seeds feed the same items in a different input order
 function makeSeededItems(seed: number): Array<ChunkInputItem> {
 	return Array.from({ length: 30 }, (_, index) => {
 		const id = `q${String((index * 7 + seed) % 30)}`;
@@ -110,9 +109,6 @@ describe('assignChunks', () => {
 	});
 
 	test('keeps geographically distant clusters spatially coherent', () => {
-		// Two tight clusters on opposite sides of the world; next-fit may straddle at most one
-		// boundary bin, but must not scatter either cluster or interleave the two
-		// Ids interleave the clusters, so only spatial ordering can satisfy this
 		const east = Array.from({ length: 5 }, (_, index) =>
 			makeItem(`p${String(index * 2)}`, [121 + index * 0.01, 25 + index * 0.01], 40),
 		);
@@ -128,7 +124,6 @@ describe('assignChunks', () => {
 	});
 
 	test('bins walk the world one grid cell at a time', () => {
-		// The curve is self-similar, so an order-16 walk takes a coarse 4x4 grid in order-2 Hilbert order
 		const items = gridCellItems();
 		const { chunkIds } = assignChunks(items.toReversed(), { capBytes: 100 });
 
@@ -148,7 +143,6 @@ describe('assignChunks', () => {
 
 describe('assignChunks byte cap', () => {
 	test('the byte cap counts the brackets and the comma between items', () => {
-		// Two 90-byte items cost 2 brackets + 90 + 1 comma + 90 = 183
 		const items = [makeItem('a', [121, 25], 90), makeItem('b', [121.001, 25.001], 90)];
 
 		expect([...assignChunks(items, { capBytes: 183 }).chunkIds.keys()]).toEqual(['0']);
@@ -156,7 +150,6 @@ describe('assignChunks byte cap', () => {
 	});
 
 	test('the running total keeps counting separators as the bin fills', () => {
-		// A third 90-byte item adds another comma: 2 + 90 + 1 + 90 + 1 + 90 = 274
 		const items = [
 			makeItem('a', [121, 25], 90),
 			makeItem('b', [121.001, 25.001], 90),
@@ -175,7 +168,6 @@ describe('assignChunks byte cap', () => {
 	});
 
 	test('omitting options falls back to the default cap', () => {
-		// 50 x 1000 bytes plus separators is far under the 150 KiB default
 		const items = Array.from({ length: 50 }, (_, index) =>
 			makeItem(`d${String(index)}`, [-120 + index * 5, index], 1000),
 		);

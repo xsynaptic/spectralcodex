@@ -1,28 +1,37 @@
-import type { MapPopupItem, MapSourceItem } from '@spectralcodex/map-codec';
-import type { MapGeometry } from '@spectralcodex/react-map-component';
+import type {
+	MapFeatureProperties,
+	MapFeaturesRule,
+	MapPopupItem,
+	MapSourceItem,
+} from '@spectralcodex/map-codec';
 import type { CollectionEntry } from 'astro:content';
-import type { Feature, FeatureCollection, Position } from 'geojson';
+import type { Feature, Position } from 'geojson';
 
-import { mapCodecTables, MapPopupOwnField } from '@spectralcodex/map-codec';
+import {
+	MapPopupOwnField,
+	pickMapPopupProperties,
+	pickMapSourceProperties,
+} from '@spectralcodex/map-codec';
 import { GeometryTypeEnum } from '@spectralcodex/shared/map';
 import { stripDiacritics } from '@spectralcodex/shared/text';
-import { featureCollection } from '@turf/helpers';
-import { hash } from 'ohash';
 
 import type { MultilingualContent } from '#lib/i18n/i18n-types.ts';
-import type { MapFeatureCollection, MapFeatureProperties } from '#lib/map/map-types.ts';
 
-import { hashShortLength } from '#constants.ts';
+import { mapDisplayRegionIds } from '#constants.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
-import { contentPolicy } from '#lib/utils/content-policy.ts';
+import { getTruncatedLngLat } from '#lib/map/map-utils.ts';
+import { isLocationHidden } from '#lib/utils/content-policy.ts';
 
 type LocationGeometry = Exclude<CollectionEntry<'locations'>['data']['geometry'], Array<unknown>>;
 
-interface LocationsFeatureCollectionOptions {
-	hideSensitiveLocations?: boolean | undefined;
+export type MapLocationFeature = Feature<MapSourceItem['geometry'], MapFeatureProperties> & {
+	id: string;
+};
+
+interface LocationFeaturesOptions {
+	includeHidden?: boolean | undefined;
 }
 
-// Multi-point locations expand to one `uuid-N` per point
 export function getLocationFeatureIds(entry: CollectionEntry<'locations'>): Array<string> {
 	const uuid = entry.data._uuid ?? entry.id;
 	const geometryArray = Array.isArray(entry.data.geometry)
@@ -34,51 +43,14 @@ export function getLocationFeatureIds(entry: CollectionEntry<'locations'>): Arra
 		: [uuid];
 }
 
-function getMapGeometryCoordinatesOptimized(
-	coordinates: Position,
-	featureId: string,
-): [number, number] {
+function getMapPosition(coordinates: Position, featureId: string): [number, number] {
 	const [lng, lat] = coordinates;
 
-	// A malformed position must fail the build rather than ship a marker at null island
 	if (typeof lng !== 'number' || typeof lat !== 'number') {
 		throw new TypeError(`Malformed coordinates for map feature "${featureId}"`);
 	}
 
-	return [Number(lng.toFixed(6)), Number(lat.toFixed(6))];
-}
-
-function getMapGeometryOptimized(geometry: MapGeometry, featureId: string) {
-	const geometryType = geometry.type;
-
-	switch (geometryType) {
-		case GeometryTypeEnum.LineString: {
-			return {
-				coordinates: geometry.coordinates.map((position) =>
-					getMapGeometryCoordinatesOptimized(position, featureId),
-				),
-				type: geometryType,
-			};
-		}
-		case GeometryTypeEnum.Point: {
-			return {
-				coordinates: getMapGeometryCoordinatesOptimized(geometry.coordinates, featureId),
-				type: geometryType,
-			};
-		}
-		case GeometryTypeEnum.Polygon: {
-			return {
-				coordinates: geometry.coordinates.map((ring) =>
-					ring.map((position) => getMapGeometryCoordinatesOptimized(position, featureId)),
-				),
-				type: geometryType,
-			};
-		}
-		default: {
-			geometryType satisfies never;
-			return;
-		}
-	}
+	return getTruncatedLngLat([lng, lat]);
 }
 
 function getRelativePath(url: string | undefined): string | undefined {
@@ -90,43 +62,78 @@ function getRelativePath(url: string | undefined): string | undefined {
 // Shared across every region and theme map; safe only because output depends on nothing but the entry
 const locationFeaturesCache = new WeakMap<
 	CollectionEntry<'locations'>,
-	Array<Feature<MapGeometry, MapFeatureProperties>>
+	Array<MapLocationFeature>
 >();
 
-const googleMapsHostPrefix = 'maps.app.goo.gl/';
+export function getLocationFeatures(
+	locations: Array<CollectionEntry<'locations'>>,
+	options?: LocationFeaturesOptions,
+): Array<MapLocationFeature> {
+	const shown = options?.includeHidden ? locations : filterHiddenLocations(locations);
 
-export function getLocationsFeatureCollection(
-	locations: Array<CollectionEntry<'locations'>> | undefined,
-	options?: LocationsFeatureCollectionOptions,
-): FeatureCollection<MapGeometry, MapFeatureProperties> | undefined {
-	if (!locations || locations.length === 0) return;
+	return shown
+		.flatMap((entry) => buildLocationFeatures(entry))
+		.toSorted((a, b) => a.id.localeCompare(b.id));
+}
 
-	const shouldHideSensitiveLocations =
-		options?.hideSensitiveLocations ?? contentPolicy.hideSensitiveLocations;
+export function getLocationsMapRule(locations: Array<CollectionEntry<'locations'>>) {
+	return {
+		ids: filterHiddenLocations(locations).flatMap((entry) => getLocationFeatureIds(entry)),
+		type: 'ids',
+	} satisfies MapFeaturesRule;
+}
 
-	const locationsFiltered = shouldHideSensitiveLocations
-		? locations.filter((entry) => !entry.data.hideLocation)
-		: locations;
+export function hasEntryMap(entry: CollectionEntry<'regions' | 'series' | 'themes'>) {
+	switch (entry.collection) {
+		case 'regions': {
+			return (
+				mapDisplayRegionIds.has(entry.id) ||
+				(entry.data._ancestors?.some((ancestor) => mapDisplayRegionIds.has(ancestor)) ?? false)
+			);
+		}
+		case 'series': {
+			return true;
+		}
+		case 'themes': {
+			return !entry.data.hideMap;
+		}
+	}
+}
 
-	return featureCollection<MapGeometry, MapFeatureProperties>(
-		locationsFiltered.flatMap((entry) => buildLocationFeatures(entry)),
-	) satisfies MapFeatureCollection;
+export function getRegionMapRule(
+	intervalById: ReadonlyMap<string, [number, number]>,
+	id: string,
+): MapFeaturesRule {
+	const interval = intervalById.get(id);
+
+	if (!interval) throw new Error(`No region interval for "${id}"`);
+
+	return { interval, type: 'region' };
+}
+
+export function getThemeMapRule(
+	themeIndexById: ReadonlyMap<string, number>,
+	id: string,
+): MapFeaturesRule {
+	const index = themeIndexById.get(id);
+
+	if (index === undefined) throw new Error(`No theme index for "${id}"`);
+
+	return { index, type: 'theme' };
+}
+
+function filterHiddenLocations(locations: Array<CollectionEntry<'locations'>>) {
+	return locations.filter((entry) => !isLocationHidden(entry));
 }
 
 export function getLocationsMapPopupData(
-	featureCollection: MapFeatureCollection | undefined,
-): Array<MapPopupItem> | undefined {
-	return mapFeaturesById(featureCollection, (feature, featureId) => {
+	features: ReadonlyArray<MapLocationFeature>,
+): Array<MapPopupItem> {
+	return features.map((feature) => {
 		return {
-			description: feature.properties.description,
-			googleMapsUrl: feature.properties.googleMapsUrl,
-			id: featureId,
-			own: feature.properties.own,
+			...pickMapPopupProperties(feature.properties),
+			id: feature.id,
 			title: stripDiacritics(feature.properties.title),
-			titleMultilingualLang: feature.properties.titleMultilingualLang,
-			titleMultilingualValue: feature.properties.titleMultilingualValue,
-			url: feature.properties.url,
-			wikipediaUrl: feature.properties.wikipediaUrl,
 			...(feature.properties.image === undefined
 				? {}
 				: { image: { srcSet: feature.properties.image.srcSet } }),
@@ -134,51 +141,35 @@ export function getLocationsMapPopupData(
 	});
 }
 
-// Encoded to the compressed form at serialization edges
 export function getLocationsMapSourceData(
-	featureCollection: MapFeatureCollection | undefined,
-): Array<MapSourceItem> | undefined {
-	return mapFeaturesById(featureCollection, (feature, featureId) => {
-		const title = feature.properties.titleMultilingualValue
-			? `${feature.properties.title} (${feature.properties.titleMultilingualValue})`
-			: feature.properties.title;
+	features: ReadonlyArray<MapLocationFeature>,
+): Array<MapSourceItem> {
+	return features.map((feature) => {
+		const { titleMultilingualValue } = feature.properties;
 
 		return {
-			geometry: getMapGeometryOptimized(feature.geometry, featureId)!,
+			geometry: {
+				coordinates: getMapPosition(feature.geometry.coordinates, feature.id),
+				type: GeometryTypeEnum.Point,
+			},
 			properties: {
-				category: feature.properties.category,
-				id: featureId,
-				precision: feature.properties.precision,
-				rating: feature.properties.rating,
-				status: feature.properties.status,
-				title: stripDiacritics(title),
-				...(feature.properties.objective === undefined
+				...pickMapSourceProperties(feature.properties),
+				hasImage: feature.properties.image !== undefined,
+				id: feature.id,
+				title: stripDiacritics(feature.properties.title),
+				...(titleMultilingualValue === undefined
 					? {}
-					: { objective: feature.properties.objective }),
-				...(feature.properties.outlier === undefined
-					? {}
-					: { outlier: feature.properties.outlier }),
+					: { titleMultilingual: stripDiacritics(titleMultilingualValue) }),
 				...(feature.properties.pointTitle === undefined
 					? {}
 					: { pointTitle: stripDiacritics(feature.properties.pointTitle) }),
-				hasImage: feature.properties.image !== undefined,
 			},
+			type: 'Feature',
 		} satisfies MapSourceItem;
 	});
 }
 
-export function hashMapPopupData(popupData: Array<MapPopupItem> | undefined) {
-	return hash([mapCodecTables, popupData]).slice(0, hashShortLength);
-}
-
-// Endpoint URLs and inline cache keys derive from these hashes
-export function hashMapSourceData(sourceData: Array<MapSourceItem> | undefined) {
-	return hash([mapCodecTables, sourceData]).slice(0, hashShortLength);
-}
-
-function buildLocationFeatures(
-	entry: CollectionEntry<'locations'>,
-): Array<Feature<MapGeometry, MapFeatureProperties>> {
+function buildLocationFeatures(entry: CollectionEntry<'locations'>): Array<MapLocationFeature> {
 	const cached = locationFeaturesCache.get(entry);
 
 	if (cached) return cached;
@@ -219,16 +210,12 @@ function buildLocationFeatures(
 
 function getEntryFeatureProperties(entry: CollectionEntry<'locations'>) {
 	return {
+		entryQuality: entry.data.entryQuality,
 		objective: entry.data.objective,
 		outlier: entry.data.outlier,
 		rating: entry.data.rating,
 		url: getRelativePath(entry.data._url),
 	};
-}
-
-// Popup and source data join on this id, so both must derive it the same way
-function getFeatureId(feature: Pick<Feature, 'id'>, index: number) {
-	return typeof feature.id === 'string' ? feature.id : `feature-${String(index)}`;
 }
 
 function getFeatureTitleProperties({
@@ -269,7 +256,6 @@ function getGeometryFeatureProperties(
 	geometry: LocationGeometry,
 	isMultiPoint: boolean,
 ) {
-	// Image thumbnails can be nulled by individual points
 	const image = (geometry._imageThumbnail === undefined ? entry.data : geometry)._imageThumbnail;
 
 	return {
@@ -288,14 +274,13 @@ function getGeometryLinkProperties(
 	geometry: LocationGeometry,
 	isMultiPoint: boolean,
 ) {
-	// The Location's Google Maps link points at one place; with several Points each uses its own link or its coordinates
 	const googleMapsUrl = isMultiPoint
 		? geometry.googleMapsUrl
 		: (geometry.googleMapsUrl ?? entry.data._googleMapsUrl);
 
 	return {
-		googleMapsUrl: getShortenedUrl(googleMapsUrl, googleMapsHostPrefix),
-		wikipediaUrl: getShortenedUrl(geometry.wikipediaUrl ?? entry.data._wikipediaUrl),
+		googleMapsUrl,
+		wikipediaUrl: geometry.wikipediaUrl ?? entry.data._wikipediaUrl,
 	};
 }
 
@@ -321,26 +306,4 @@ function getOwnProperties(geometry: LocationGeometry) {
 		(geometry.precision === undefined ? 0 : MapPopupOwnField.Precision);
 
 	return own === 0 ? {} : { own };
-}
-
-function getShortenedUrl(url: string | undefined, hostPrefix?: string): string | undefined {
-	if (!url) return undefined;
-
-	const withoutScheme = url.replace('https://', '');
-
-	return hostPrefix && withoutScheme.startsWith(hostPrefix)
-		? withoutScheme.slice(hostPrefix.length)
-		: withoutScheme;
-}
-
-function mapFeaturesById<T>(
-	featureCollection: MapFeatureCollection | undefined,
-	transform: (feature: MapFeatureCollection['features'][number], featureId: string) => T,
-): Array<T> | undefined {
-	if (!featureCollection || featureCollection.features.length === 0) return;
-
-	return featureCollection.features
-		.map((feature, index) => ({ feature, featureId: getFeatureId(feature, index) }))
-		.toSorted((a, b) => a.featureId.localeCompare(b.featureId))
-		.map(({ feature, featureId }) => transform(feature, featureId));
 }

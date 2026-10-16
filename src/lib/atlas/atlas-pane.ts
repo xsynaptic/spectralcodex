@@ -1,77 +1,72 @@
-import type { AtlasPaneLimits } from '#lib/atlas/atlas-pane-factory.ts';
-
 import {
-	atlasPaneMediaQuery,
+	atlasMapMinProperty,
+	atlasPaneDefaultProperty,
+	atlasPaneMinProperty,
 	atlasPaneSelector,
 	atlasPaneSizeProperty,
 	atlasPaneStorageKey,
 } from '#lib/atlas/atlas-constants.ts';
-import { readAtlasLayout } from '#lib/atlas/atlas-layout.ts';
-import { getPaneImageSizes } from '#lib/atlas/atlas-pane-factory.ts';
+import { clampPaneWidth } from '#lib/atlas/atlas-pane-factory.ts';
 
 const heroSelector = 'img[data-hero-image]';
 
-function readPaneTokens() {
-	const style = getComputedStyle(document.documentElement);
-
+function readPaneTokenRems(style: CSSStyleDeclaration) {
 	function readRem(name: string) {
 		return Number(style.getPropertyValue(name).replace('rem', ''));
 	}
 
 	return {
-		mapMinRem: readRem('--atlas-map-min'),
-		paneDefaultRem: readRem('--atlas-pane-default'),
-		paneMinRem: readRem('--atlas-pane-min'),
+		mapMin: readRem(atlasMapMinProperty),
+		paneDefault: readRem(atlasPaneDefaultProperty),
+		paneMin: readRem(atlasPaneMinProperty),
 	};
 }
 
-let paneTokens: ReturnType<typeof readPaneTokens> | undefined;
+let paneTokenRems: ReturnType<typeof readPaneTokenRems> | undefined;
 
-// Declared in parts/theme.css, in rem; constants of the stylesheet, so one read serves the session
-function getPaneTokens() {
-	if (paneTokens) return paneTokens;
+function readPaneTokens() {
+	const style = getComputedStyle(document.documentElement);
+	const rootFontSize = Number(style.fontSize.replace('px', ''));
 
-	paneTokens = readPaneTokens();
+	if (!paneTokenRems) paneTokenRems = readPaneTokenRems(style);
 
-	return paneTokens;
+	return {
+		mapMin: paneTokenRems.mapMin * rootFontSize,
+		paneDefault: paneTokenRems.paneDefault * rootFontSize,
+		paneMin: paneTokenRems.paneMin * rootFontSize,
+		rootFontSize,
+	};
 }
 
 export function getPaneWidth() {
 	return document.querySelector(atlasPaneSelector)?.getBoundingClientRect().width ?? 0;
 }
 
-export function getPaneLimits(): AtlasPaneLimits {
-	const root = document.documentElement;
-	const rootFontSize = Number(getComputedStyle(root).fontSize.replace('px', ''));
-	const { mapMinRem, paneMinRem } = getPaneTokens();
-
-	return {
-		mapMin: mapMinRem * rootFontSize,
-		paneMin: paneMinRem * rootFontSize,
-		rootFontSize,
-		// Excludes the scrollbar, as the pane's right edge does
-		viewportWidth: root.clientWidth,
-	};
+export function getPaneLimits() {
+	return { ...readPaneTokens(), viewportWidth: document.documentElement.clientWidth };
 }
 
 function getSplitHeroSizes(root: HTMLElement) {
-	if (readAtlasLayout(root) !== 'split') return;
+	const limits = getPaneLimits();
+	const paneSize = Number(root.style.getPropertyValue(atlasPaneSizeProperty).replace('px', ''));
 
-	const { mapMinRem, paneDefaultRem, paneMinRem } = getPaneTokens();
-	const paneSize =
-		root.style.getPropertyValue(atlasPaneSizeProperty) || `${String(paneDefaultRem)}rem`;
-
-	return getPaneImageSizes({ mapMinRem, mediaQuery: atlasPaneMediaQuery, paneMinRem, paneSize });
+	return `${String(Math.round(clampPaneWidth(paneSize || limits.paneDefault, limits)))}px`;
 }
 
-export function updateHeroSizes(target: Document = document) {
-	const sizes = getSplitHeroSizes(target.documentElement);
+export function updateHeroSizes(isSplit: boolean, target: Document = document) {
+	const sizes = isSplit ? getSplitHeroSizes(target.documentElement) : undefined;
 
 	for (const heroImage of target.querySelectorAll<HTMLImageElement>(heroSelector)) {
 		if (heroImage.dataset.sizes === undefined) heroImage.dataset.sizes = heroImage.sizes;
 
 		heroImage.sizes = sizes ?? heroImage.dataset.sizes;
 	}
+}
+
+export function stampPaneSize(incomingRoot: HTMLElement) {
+	const paneSize = document.documentElement.style.getPropertyValue(atlasPaneSizeProperty);
+
+	if (paneSize) incomingRoot.style.setProperty(atlasPaneSizeProperty, paneSize);
 }
 
 export function requestPaneWidth(width: number) {
@@ -83,5 +78,5 @@ export function requestPaneWidth(width: number) {
 		// localStorage unavailable
 	}
 
-	updateHeroSizes();
+	updateHeroSizes(true);
 }

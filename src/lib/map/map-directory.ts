@@ -1,40 +1,69 @@
-import type { MapPopupItem, MapSourceItem } from '@spectralcodex/map-codec';
+import type { MapFeaturesRule, MapSourceItem } from '@spectralcodex/map-codec';
 import type { CollectionEntry } from 'astro:content';
-import type { Position } from 'geojson';
 
-import { encodeMapPopupData, MapDataKeysCompressed } from '@spectralcodex/map-codec';
+import {
+	encodeMapPopupData,
+	encodeMapSourceData,
+	MapDivisionMaskSchema,
+	mapPopupKeys,
+	selectMapRows,
+} from '@spectralcodex/map-codec';
+import { mapScopesFileName } from '@spectralcodex/react-map-component/constants';
+import { CUSTOM_CACHE_PATH } from 'astro:env/server';
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
 import pMemoize from 'p-memoize';
 import * as R from 'remeda';
 
-import type { MapFeatureCollection } from '#lib/map/map-types.ts';
-
+import { atlasRegionId } from '#constants.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
+import { getObjectiveLocations } from '#lib/collections/locations/locations-queries.ts';
 import {
 	getRegionsCollection,
 	resolveLocationRegions,
 } from '#lib/collections/regions/regions-data.ts';
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { assignChunks } from '#lib/map/map-chunks.ts';
-import { hashMapDirectoryData } from '#lib/map/map-directory-hash.ts';
+import { hashMapPayloads } from '#lib/map/map-directory-hash.ts';
 import {
 	getLocationFeatureIds,
-	getLocationsFeatureCollection,
+	getLocationFeatures,
 	getLocationsMapPopupData,
 	getLocationsMapSourceData,
+	getRegionMapRule,
 } from '#lib/map/map-locations.ts';
+import { buildAtlasScopeList } from '#lib/map/map-scopes.ts';
+import { getBasePath } from '#lib/utils/routing.ts';
 
-interface MapDirectoryData {
-	// Every feature id → its popup chunk key; small inline maps stamp this onto their points
-	chunkKeyById: Map<string, string>;
-	// Popup entries grouped by chunk key, each array sorted by id
-	chunks: Map<string, Array<MapPopupItem>>;
-	// One row per non-hidden feature: standard source shape plus region ordinals, theme indices, chunk key
+export type MapDatasetName = 'objectives' | 'shared';
+
+interface MapDataset {
 	directory: Array<MapSourceItem>;
-	// Cache key for the directory and chunk endpoints, which Caddy serves as immutable
+	directoryUrl: string;
+	payloads: Map<string, string>;
+	prefix: string;
 	version: string;
 }
 
-// Memoized theme → index map; theme maps read their own index to build a rule
+interface MapDatasetContext {
+	includeHidden?: boolean | undefined;
+	ordinalById: ReadonlyMap<string, number>;
+	prefix: string;
+	themeIndexById: ReadonlyMap<string, number>;
+}
+
+interface MapDirectoryData {
+	atlasRows: Array<MapSourceItem>;
+	atlasRule: MapFeaturesRule;
+	datasets: Record<MapDatasetName, MapDataset>;
+	divisionUrlById: Map<string, string>;
+	payloads: Map<string, string>;
+}
+
+export function getMapPayloadUrl(id: string, version: string) {
+	return getBasePath('api/map', `${id}.json?v=${version}`);
+}
+
 export const getMapThemeIndexById = pMemoize(async () => {
 	const { entries: themes } = await getThemesCollection();
 	const themeIndexById = new Map<string, number>();
@@ -45,37 +74,6 @@ export const getMapThemeIndexById = pMemoize(async () => {
 	}
 	return themeIndexById;
 });
-
-function buildChunks(
-	chunkIds: Map<string, Array<string>>,
-	popupById: ReadonlyMap<string, MapPopupItem>,
-): Map<string, Array<MapPopupItem>> {
-	const chunks = new Map<string, Array<MapPopupItem>>();
-
-	for (const [chunkKey, ids] of chunkIds) {
-		chunks.set(
-			chunkKey,
-			ids.map((id) => popupById.get(id)).filter((popupItem) => popupItem !== undefined),
-		);
-	}
-
-	return chunks;
-}
-
-function buildCoordinatesById(
-	featureCollection: MapFeatureCollection | undefined,
-): Map<string, Position> {
-	const coordinatesById = new Map<string, Position>();
-	const features = featureCollection?.features ?? [];
-
-	for (const feature of features) {
-		if (typeof feature.id === 'string') {
-			coordinatesById.set(feature.id, feature.geometry.coordinates as Position);
-		}
-	}
-
-	return coordinatesById;
-}
 
 // No hidden-location filtering needed: only ids present in the (already filtered) source data are looked up
 function buildLocationByFeatureId(
@@ -92,33 +90,6 @@ function buildLocationByFeatureId(
 	return locationByFeatureId;
 }
 
-function buildPopupBytesById(popupData: Array<MapPopupItem>): Map<string, number> {
-	const popupBytesById = new Map<string, number>();
-
-	for (const compressedItem of encodeMapPopupData(popupData)) {
-		popupBytesById.set(
-			compressedItem[MapDataKeysCompressed.Id],
-			Buffer.byteLength(JSON.stringify(compressedItem)),
-		);
-	}
-
-	return popupBytesById;
-}
-
-// Drill into a coordinate position to the first [lng, lat] pair
-function getFirstLngLat(coordinates: unknown, featureId: string): [number, number] {
-	let current: unknown = coordinates;
-	while (Array.isArray(current) && Array.isArray(current[0])) {
-		current = current[0];
-	}
-	if (Array.isArray(current) && typeof current[0] === 'number' && typeof current[1] === 'number') {
-		return [current[0], current[1]];
-	}
-	// A feature without a numeric pair must fail the build rather than bin a chunk at null island
-	throw new Error(`No numeric coordinate pair found for map feature "${featureId}"`);
-}
-
-// Unique, ascending membership indices for a set of content references
 function getMembershipIndices(
 	references: ReadonlyArray<{ id: string }>,
 	indexById: ReadonlyMap<string, number>,
@@ -132,39 +103,36 @@ function getMembershipIndices(
 	);
 }
 
-// Memoized so a single build computes the shared artifacts once
-export const getMapDirectoryData = pMemoize(async (): Promise<MapDirectoryData> => {
-	const { entries: locations } = await getLocationsCollection();
-	const { regionsTree } = await getRegionsCollection();
-	const themeIndexById = await getMapThemeIndexById();
-
-	const featureCollection = getLocationsFeatureCollection(locations);
-	const sourceData = getLocationsMapSourceData(featureCollection) ?? [];
-	const popupData = getLocationsMapPopupData(featureCollection) ?? [];
+function buildMapDataset(
+	locations: Array<CollectionEntry<'locations'>>,
+	{ includeHidden, ordinalById, prefix, themeIndexById }: MapDatasetContext,
+) {
+	const features = getLocationFeatures(locations, { includeHidden });
+	const sourceData = getLocationsMapSourceData(features);
+	const popupData = getLocationsMapPopupData(features);
 
 	const locationByFeatureId = buildLocationByFeatureId(locations);
-	const coordinatesById = buildCoordinatesById(featureCollection);
-	const popupById = new Map(popupData.map((popupItem) => [popupItem.id, popupItem]));
-	const popupBytesById = buildPopupBytesById(popupData);
+	const popupById = new Map(
+		encodeMapPopupData(popupData).map((popupItem) => [popupItem[mapPopupKeys.id], popupItem]),
+	);
 
-	// Assign chunk keys by binning every feature, weighted by its serialized popup size
 	const chunkInputs = sourceData.map((sourceItem) => {
 		const id = sourceItem.properties.id;
-		const [lng, lat] = getFirstLngLat(coordinatesById.get(id), id);
-		const popupBytes = popupBytesById.get(id) ?? 0;
+		const [lng, lat] = sourceItem.geometry.coordinates;
+		const popupItem = popupById.get(id);
+		const popupBytes = popupItem ? Buffer.byteLength(JSON.stringify(popupItem)) : 0;
 
 		return { id, lat, lng, popupBytes };
 	});
 
 	const { chunkIds, chunkKeyById } = assignChunks(chunkInputs);
 
-	// Attach membership columns; omit empty arrays to save bytes
 	const directory = sourceData.map((sourceItem) => {
 		const id = sourceItem.properties.id;
 		const location = locationByFeatureId.get(id);
 
 		const regionOrdinals = location
-			? getMembershipIndices(resolveLocationRegions(location), regionsTree.ordinalById)
+			? getMembershipIndices(resolveLocationRegions(location), ordinalById)
 			: [];
 		const themeIndices = location
 			? getMembershipIndices(location.data.themes ?? [], themeIndexById)
@@ -181,7 +149,104 @@ export const getMapDirectoryData = pMemoize(async (): Promise<MapDirectoryData> 
 		} satisfies MapSourceItem;
 	});
 
-	const chunks = buildChunks(chunkIds, popupById);
+	const payloads = new Map([
+		[getDirectoryPayloadId(prefix), JSON.stringify(encodeMapSourceData(directory))],
+	]);
 
-	return { chunkKeyById, chunks, directory, version: hashMapDirectoryData(directory, chunks) };
+	for (const [chunkKey, ids] of chunkIds) {
+		const popupItems = ids
+			.map((id) => popupById.get(id))
+			.filter((popupItem) => popupItem !== undefined);
+
+		payloads.set(`${prefix}${chunkKey}`, JSON.stringify(popupItems));
+	}
+
+	return { directory, payloads, prefix };
+}
+
+async function readDivisionMask(regionId: string, divisionsPath: string) {
+	const filePath = path.join(divisionsPath, `${regionId}.json`);
+
+	try {
+		return await readFile(filePath, 'utf8');
+	} catch (error) {
+		throw new Error(
+			`Region "${regionId}" names a Division but ${filePath} is missing; run \`pnpm map-divisions\``,
+			{ cause: error },
+		);
+	}
+}
+
+async function readDivisionMasks(regions: Array<CollectionEntry<'regions'>>) {
+	const divisionsPath = path.join(process.cwd(), CUSTOM_CACHE_PATH, 'divisions');
+	const shownRegions = regions.filter((entry) => entry.data.divisionId && !entry.data.hideDivision);
+
+	const bodies = await Promise.all(
+		shownRegions.map(async (entry) => {
+			const body = await readDivisionMask(entry.id, divisionsPath);
+
+			MapDivisionMaskSchema.parse(JSON.parse(body));
+
+			return [entry.id, body] as const;
+		}),
+	);
+
+	return new Map(bodies);
+}
+
+function getDirectoryPayloadId(prefix: string) {
+	return `${prefix}map-directory`;
+}
+
+function getDivisionPayloadId(regionId: string) {
+	return `divisions/${regionId}`;
+}
+
+function withVersion(dataset: Omit<MapDataset, 'directoryUrl' | 'version'>): MapDataset {
+	const version = hashMapPayloads(dataset.payloads);
+
+	return {
+		...dataset,
+		directoryUrl: getMapPayloadUrl(getDirectoryPayloadId(dataset.prefix), version),
+		version,
+	};
+}
+
+export const getMapDirectoryData = pMemoize(async (): Promise<MapDirectoryData> => {
+	const { entries: locations } = await getLocationsCollection();
+	const { entries: regions, regionsTree } = await getRegionsCollection();
+	const themeIndexById = await getMapThemeIndexById();
+	const objectiveLocations = await getObjectiveLocations();
+
+	const context = { ordinalById: regionsTree.ordinalById, themeIndexById };
+
+	const objectives = buildMapDataset(objectiveLocations, {
+		...context,
+		includeHidden: true,
+		prefix: 'objectives/',
+	});
+	const shared = buildMapDataset(locations, { ...context, prefix: '' });
+	const atlasRule = getRegionMapRule(regionsTree.intervalById, atlasRegionId);
+	const atlasRows = selectMapRows(shared.directory, atlasRule);
+	const scopes = await buildAtlasScopeList(atlasRows, themeIndexById);
+	const divisionMaskById = await readDivisionMasks(regions);
+
+	for (const [id, body] of divisionMaskById) {
+		shared.payloads.set(getDivisionPayloadId(id), body);
+	}
+	shared.payloads.set(mapScopesFileName, JSON.stringify(scopes));
+
+	const datasets = {
+		objectives: withVersion(objectives),
+		shared: withVersion(shared),
+	};
+	const divisionUrlById = new Map(
+		[...divisionMaskById.keys()].map((id) => [
+			id,
+			getMapPayloadUrl(getDivisionPayloadId(id), datasets.shared.version),
+		]),
+	);
+	const payloads = new Map([...datasets.objectives.payloads, ...datasets.shared.payloads]);
+
+	return { atlasRows, atlasRule, datasets, divisionUrlById, payloads };
 });

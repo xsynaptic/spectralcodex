@@ -1,22 +1,20 @@
 import type { StyleSpecification } from 'maplibre-gl';
 
 import { layers, namedFlavor } from '@protomaps/basemaps';
-import { addProtocol, removeProtocol } from 'maplibre-gl';
-import { Protocol } from 'pmtiles';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 
 import type { MapComponentProps } from '#types.ts';
 
-import { useIsDarkMode } from '#lib/dark-mode.tsx';
-import { useMapLanguages } from '#store/store.ts';
+import { useIsDarkMode } from '#lib/dark-mode.ts';
 
 export function useProtomaps({
 	baseMapTheme,
+	languages,
 	protomapsApiKey,
-}: Pick<MapComponentProps, 'baseMapTheme' | 'protomapsApiKey'>) {
+}: Pick<MapComponentProps, 'baseMapTheme' | 'protomapsApiKey'> & {
+	languages: ReadonlyArray<string>;
+}) {
 	const isDarkMode = useIsDarkMode();
-
-	const languages = useMapLanguages();
 
 	const flavor = useMemo(() => {
 		return baseMapTheme ?? namedFlavor(isDarkMode ? 'dark' : 'light');
@@ -50,26 +48,6 @@ export function useProtomaps({
 					},
 		[flavor, isDarkMode, protomapsApiKey, languages],
 	) satisfies StyleSpecification;
-
-	useEffect(function loadProtomapsProtocol() {
-		const protocol = new Protocol();
-
-		addProtocol('pmtiles', (request) => {
-			return new Promise((resolve, reject) => {
-				protocol.tile(request, (err: unknown, data: unknown) => {
-					if (err || typeof data !== 'object' || data === null) {
-						reject(new Error('PMTiles not loaded!'));
-						return;
-					}
-					resolve({ data });
-				});
-			});
-		});
-
-		return () => {
-			removeProtocol('pmtiles');
-		};
-	}, []);
 
 	return protomapsStyleSpec;
 }

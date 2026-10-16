@@ -4,11 +4,11 @@ import type { SymbolLayerSpecification } from 'react-map-gl/maplibre';
 import { memo, useMemo } from 'react';
 import { Layer } from 'react-map-gl/maplibre';
 
-import { useIsDarkMode } from '#lib/dark-mode.tsx';
+import { useIsDarkMode } from '#lib/dark-mode.ts';
 import { MapLayerIdEnum, MapSourceIdEnum } from '#source/source-config.ts';
 import { getPointsLabelPaint } from '#source/source-hover.tsx';
-import { useMapHoveredId } from '#store/store.ts';
-import { useMapTargetIds } from '#view/view.tsx';
+import { selectTargetIds } from '#store/store-factory.ts';
+import { useMapStore } from '#store/store.tsx';
 
 function getTargetsLabelLayerStyle({
 	hoveredId,
@@ -44,8 +44,8 @@ function getTargetsLabelLayerStyle({
 
 export const MapSourceLabels: FC = memo(function MapSourceLabels() {
 	const isDarkMode = useIsDarkMode();
-	const hoveredId = useMapHoveredId();
-	const targetIds = useMapTargetIds();
+	const hoveredId = useMapStore((state) => state.hoveredId);
+	const targetIds = useMapStore(selectTargetIds);
 
 	const targetsLabelLayerStyle = useMemo(
 		() => getTargetsLabelLayerStyle({ hoveredId, isDarkMode, targetIds }),

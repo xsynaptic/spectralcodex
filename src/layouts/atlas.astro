@@ -9,7 +9,7 @@ import { formatTitleMultilingual } from '#lib/i18n/i18n-utils.ts';
 import { getSitePath } from '#lib/utils/routing.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
 
-const { prefetchUrls } = await getAtlasMapData();
+const { props: atlasMapProps } = await getAtlasMapData();
 
 const t = getTranslations();
 
@@ -23,7 +23,7 @@ const titleMultilingual = { lang: langCodeZh, value: t('atlas.title', langCodeZh
 	meta={{
 		description: t('atlas.description'),
 		image: getSeoImageProps({ alt: t('atlas.title'), id: 'index-atlas' }),
-		preloadUrls: prefetchUrls,
+		preloadUrls: atlasMapProps ? [atlasMapProps.apiSourceUrl] : undefined,
 		title: formatTitleMultilingual(t('atlas.title'), titleMultilingual),
 	}}
 >

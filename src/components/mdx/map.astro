@@ -1,44 +1,26 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
-import * as R from 'remeda';
-
 import MapComponent from '#components/map/map-component.astro';
 import { createLocationsByIdsFunction } from '#lib/collections/locations/locations-data.ts';
-import { getMapData } from '#lib/map/map-data.ts';
-import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
+import { createMapDataFunction } from '#lib/map/map-data.ts';
+import { getLocationsMapRule } from '#lib/map/map-locations.ts';
 
 interface Props extends HTMLAttributes<'div'> {
-	languages?: Array<string> | undefined; // For controlling interface language
+	languages?: Array<string> | undefined;
 	locations: Array<string>;
-	showHidden?: boolean;
 }
 
-const {
-	class: className,
-	languages,
-	locations: locationIds,
-	showHidden = false,
-	...props
-} = Astro.props;
+const { class: className, languages, locations: locationIds, ...props } = Astro.props;
 
-// No map components in feed allowed
 const { isFeed } = Astro.locals;
 
 const getLocationsByReference = await createLocationsByIdsFunction();
+const getMapData = await createMapDataFunction();
 
-// API endpoint is undefined because geodata *must* be inlined with this method
-// We can't know in advance what locations are requested by content without a big performance hit
 const { hasGeodata, props: mapComponentProps } = getMapData({
-	featureCollection: R.pipe(locationIds, getLocationsByReference, (locations) =>
-		getLocationsFeatureCollection(locations, {
-			...(showHidden ? { hideSensitiveLocations: false } : {}),
-		}),
-	),
 	languages,
-	mapId: undefined,
-	// Inline maps ship their popups in the props and never fetch a chunk
-	version: undefined,
+	rule: getLocationsMapRule(getLocationsByReference(locationIds)),
 });
 ---
 

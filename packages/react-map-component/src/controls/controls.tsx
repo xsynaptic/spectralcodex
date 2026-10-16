@@ -8,32 +8,23 @@ import {
 	ScaleControl,
 } from 'react-map-gl/maplibre';
 
-import type { MapComponentProps } from '#types.ts';
-
 import { FilterControl } from '#controls/controls-filter.tsx';
+import { HostControl } from '#controls/controls-host.tsx';
 import { MetricsControl } from '#controls/controls-metrics.tsx';
-import { SearchControl } from '#controls/controls-search.tsx';
-import { useMapHost } from '#host/host-context.tsx';
-import { EnterControl, ExitControl, ExpandControl } from '#host/host-controls.tsx';
-import { useIsMapCanvasInteractive } from '#store/store.ts';
+import { useMapConfig } from '#lib/config.tsx';
 
-const isFeatureSearchControl = false as boolean;
-
-export const MapControls: FC<Pick<MapComponentProps, 'hasEnterControl'>> = function MapControls({
-	hasEnterControl,
-}) {
-	const host = useMapHost();
-	const isCanvasInteractive = useIsMapCanvasInteractive();
+export const MapControls: FC = function MapControls() {
+	const { host, isInteractive } = useMapConfig();
 
 	return (
 		<>
 			<ScaleControl maxWidth={120} position="bottom-left" />
 			<AttributionControl compact={true} position="bottom-right" />
-			{isCanvasInteractive ? (
+			{isInteractive ? (
 				<>
 					<FullscreenControl
 						position="top-left"
-						{...(host ? { containerId: host.fullscreenContainerId } : {})}
+						{...(host.fullscreenContainerId ? { containerId: host.fullscreenContainerId } : {})}
 					/>
 					<GeolocateControl
 						position="top-left"
@@ -42,10 +33,9 @@ export const MapControls: FC<Pick<MapComponentProps, 'hasEnterControl'>> = funct
 					/>
 					<NavigationControl position="top-left" showCompass={true} />
 					<FilterControl position="top-left" />
-					{host ? <ExitControl position="top-right" /> : undefined}
-					{host ? <ExpandControl position="top-right" /> : undefined}
-					{hasEnterControl ? <EnterControl position="top-right" /> : undefined}
-					{isFeatureSearchControl ? <SearchControl position="top-right" /> : undefined}
+					{host.controls.map((name) => (
+						<HostControl key={name} name={name} position="top-right" />
+					))}
 					<MetricsControl position="bottom-left" />
 				</>
 			) : undefined}
