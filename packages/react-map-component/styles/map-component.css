@@ -19,8 +19,6 @@
 }
 
 :where([data-map-root]) {
-	--map-color-neutral-50: #fafafa;
-	--map-color-neutral-100: #f5f5f5;
 	--map-color-neutral-200: #e5e5e5;
 	--map-color-neutral-300: #d4d4d4;
 	--map-color-neutral-400: #a3a3a3;
@@ -28,23 +26,39 @@
 	--map-color-neutral-600: #525252;
 	--map-color-neutral-700: #404040;
 	--map-color-neutral-800: #262626;
-	--map-color-neutral-900: #171717;
 	--map-color-accent-400: #60a5fa;
 	--map-color-accent-500: #3b82f6;
 	--map-color-accent-600: #2563eb;
 	--map-color-highlight-300: #fcd34d;
 	--map-color-highlight-400: #fbbf24;
 	--map-color-highlight-500: #f59e0b;
+	--map-color-highlight-600: #d97706;
+	--map-color-highlight-700: #b45309;
 	--map-radius-xs: 0.125rem;
 	--map-radius-sm: 0.25rem;
 	--map-radius-full: 9999px;
 	--map-font-display: ui-sans-serif, system-ui, sans-serif;
 	--map-font-sans: ui-sans-serif, system-ui, sans-serif;
-	--map-popup-surface: light-dark(var(--map-color-neutral-50), var(--map-color-neutral-900));
+	--map-surface: light-dark(#fff, var(--map-color-neutral-800));
+	--map-surface-hover: light-dark(rgb(0 0 0 / 5%), rgb(255 255 255 / 6%));
+	--map-surface-active: light-dark(rgb(0 0 0 / 10%), rgb(255 255 255 / 8%));
+	--map-edge: light-dark(rgb(0 0 0 / 10%), rgb(255 255 255 / 14%));
+	--map-lift: light-dark(transparent, rgb(0 0 0 / 40%));
+	--map-elevation: 0 0 0 2px var(--map-edge), 0 1px 3px var(--map-lift);
+	--map-divider: light-dark(var(--map-color-neutral-300), var(--map-color-neutral-700));
+	--map-text: light-dark(var(--map-color-neutral-800), var(--map-color-neutral-200));
+	--map-text-muted: light-dark(var(--map-color-neutral-600), var(--map-color-neutral-400));
+	--map-text-faint: light-dark(var(--map-color-neutral-400), var(--map-color-neutral-500));
+	--map-icon: light-dark(#333, #ccc);
+	--map-accent: light-dark(var(--map-color-accent-500), var(--map-color-accent-400));
+	--map-highlight: light-dark(var(--map-color-highlight-500), var(--map-color-highlight-400));
+	--map-highlight-hover: light-dark(var(--map-color-highlight-600), var(--map-color-highlight-300));
+	--map-warning-text: light-dark(var(--map-color-highlight-700), var(--map-color-highlight-400));
 }
 
 /* Wire color-scheme from the mode attribute so light-dark() resolves standalone, without a host color-scheme */
 [data-map-root] {
+	font-family: var(--map-font-sans);
 	color-scheme: light;
 }
 
@@ -54,7 +68,7 @@
 
 /* Mirrors the host's global focus ring so the map stands alone */
 [data-map-root] :focus-visible {
-	outline: 2px solid light-dark(var(--map-color-accent-500), var(--map-color-accent-400));
+	outline: 2px solid var(--map-accent);
 	outline-offset: 2px;
 }
 
@@ -70,7 +84,10 @@
 div.maplibregl-popup-content {
 	padding: 0;
 	overflow: auto;
-	background-color: var(--map-popup-surface);
+	color: var(--map-text);
+	background-color: var(--map-surface);
+	border-radius: var(--map-radius-sm);
+	box-shadow: var(--map-elevation);
 }
 
 button.maplibregl-popup-close-button {
@@ -88,19 +105,19 @@ button.maplibregl-popup-close-button {
 }
 
 .maplibregl-popup-anchor-left .maplibregl-popup-tip {
-	border-right-color: var(--map-popup-surface);
+	border-right-color: var(--map-surface);
 }
 
 .maplibregl-popup-anchor-right .maplibregl-popup-tip {
-	border-left-color: var(--map-popup-surface);
+	border-left-color: var(--map-surface);
 }
 
 .maplibregl-popup-anchor-top .maplibregl-popup-tip {
-	border-bottom-color: var(--map-popup-surface);
+	border-bottom-color: var(--map-surface);
 }
 
 .maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
-	border-top-color: var(--map-popup-surface);
+	border-top-color: var(--map-surface);
 }
 
 .map-popup-frame {
@@ -126,7 +143,7 @@ button.maplibregl-popup-close-button {
 	aspect-ratio: 3/2;
 	user-select: none;
 	object-fit: cover;
-	background-color: light-dark(var(--map-color-neutral-200), var(--map-color-neutral-700));
+	background-color: var(--map-surface-active);
 	background-image: var(--map-image-fallback);
 	background-repeat: repeat;
 }
@@ -161,8 +178,8 @@ button.maplibregl-popup-close-button {
 	font-size: 1rem;
 	font-weight: 600;
 	line-height: 1.375;
-	color: light-dark(var(--map-color-neutral-800), var(--map-color-neutral-300));
-	border-bottom: 1px solid light-dark(var(--map-color-neutral-300), var(--map-color-neutral-700));
+	color: var(--map-text);
+	border-bottom: 1px solid var(--map-divider);
 
 	/* stylelint-disable-next-line no-descending-specificity -- unrelated popup-link rules; reordering would scatter the vendor-override grouping */
 	& a {
@@ -182,12 +199,12 @@ button.maplibregl-popup-close-button {
 
 .map-popup-warning-icon {
 	height: 20px;
-	color: var(--map-color-highlight-500);
+	color: var(--map-highlight);
 }
 
 .map-popup-warning-text {
 	font-style: italic;
-	color: var(--map-color-highlight-400);
+	color: var(--map-warning-text);
 }
 
 .map-popup-description {
@@ -197,8 +214,7 @@ button.maplibregl-popup-close-button {
 	overflow-x: auto;
 	font-size: 0.875rem;
 	line-height: 1.25rem;
-	scrollbar-color: light-dark(var(--map-color-neutral-300), var(--map-color-neutral-600))
-		transparent;
+	scrollbar-color: var(--map-divider) transparent;
 	scrollbar-width: thin;
 }
 
@@ -208,7 +224,7 @@ button.maplibregl-popup-close-button {
 	margin: 0;
 	font-size: 0.75rem;
 	line-height: 1rem;
-	color: light-dark(var(--map-color-neutral-700), var(--map-color-neutral-600));
+	color: var(--map-text-muted);
 	user-select: none;
 }
 
@@ -220,33 +236,33 @@ button.maplibregl-popup-close-button {
 }
 
 .map-popup-coord-text {
-	color: light-dark(var(--map-color-neutral-400), var(--map-color-neutral-500));
+	color: var(--map-text-muted);
 	transition: color 300ms;
 }
 
 .map-popup-coord:focus-visible .map-popup-coord-text {
-	color: var(--map-color-highlight-300);
+	color: var(--map-highlight-hover);
 }
 
 @media (hover: hover) {
 	.map-popup-coord:hover .map-popup-coord-text {
-		color: var(--map-color-highlight-300);
+		color: var(--map-highlight-hover);
 	}
 }
 
 .map-popup-copy-icon {
 	height: 14px;
-	color: light-dark(var(--map-color-neutral-500), var(--map-color-neutral-400));
+	color: var(--map-text-muted);
 	transition: color 300ms;
 }
 
 .map-popup-coord:focus-visible .map-popup-copy-icon {
-	color: var(--map-color-highlight-400);
+	color: var(--map-highlight-hover);
 }
 
 @media (hover: hover) {
 	.map-popup-coord:hover .map-popup-copy-icon {
-		color: var(--map-color-highlight-400);
+		color: var(--map-highlight-hover);
 	}
 }
 
@@ -261,7 +277,7 @@ button.maplibregl-popup-close-button {
 }
 
 .map-popup-link-icon-wiki {
-	color: light-dark(var(--map-color-neutral-700), var(--map-color-neutral-400));
+	color: var(--map-text-muted);
 }
 
 .maplibregl-map {
@@ -294,7 +310,6 @@ button.maplibregl-popup-close-button {
 	overflow-y: auto;
 	overscroll-behavior: contain;
 	scrollbar-width: none;
-	box-shadow: 0 0 0 2px rgb(0 0 0 / 10%);
 }
 
 .map-filter-menu-list {
@@ -305,22 +320,19 @@ button.maplibregl-popup-close-button {
 }
 
 .map-filter-menu-item {
-	background-color: var(--map-popup-surface);
+	background-color: transparent;
 	border-radius: var(--map-radius-sm);
 	transition: background-color 150ms;
 
 	&[data-active] {
-		background-color: light-dark(var(--map-color-neutral-200), var(--map-color-neutral-800));
+		background-color: var(--map-surface-active);
 	}
 }
 
 @media (hover: hover) {
 	.map-filter-menu-item:hover {
-		background-color: light-dark(var(--map-color-neutral-100), var(--map-color-neutral-800));
-	}
-
-	.map-filter-menu-item[data-active]:hover {
-		background-color: light-dark(var(--map-color-neutral-300), var(--map-color-neutral-700));
+		background-image: linear-gradient(var(--map-surface-hover) 0 0);
+		background-repeat: no-repeat;
 	}
 }
 
@@ -344,8 +356,8 @@ button.maplibregl-popup-close-button {
 }
 
 .map-filter-swatch-showhide {
-	background-color: var(--map-color-neutral-200);
-	border-color: var(--map-color-neutral-500);
+	background-color: var(--map-surface-active);
+	border-color: var(--map-text-faint);
 }
 
 .map-filter-menu-item[data-active] .map-filter-swatch {
@@ -361,21 +373,17 @@ button.maplibregl-popup-close-button {
 	width: 100%;
 	font-family: var(--map-font-display);
 	font-size: 0.75rem;
-	color: light-dark(var(--map-color-neutral-700), var(--map-color-neutral-300));
+	color: var(--map-text);
 
 	.map-filter-menu-item[data-active] & {
-		color: light-dark(var(--map-color-neutral-500), var(--map-color-neutral-400));
+		color: var(--map-text-muted);
 	}
 }
 
 .map-filter-label-zh {
 	font-family: var(--map-font-sans);
 	font-weight: 500;
-	color: light-dark(var(--map-color-neutral-600), var(--map-color-neutral-400));
-
-	.map-filter-menu-item[data-active] & {
-		color: light-dark(var(--map-color-neutral-400), var(--map-color-neutral-500));
-	}
+	color: var(--map-text-muted);
 }
 
 .map-filter-rating {
@@ -392,22 +400,22 @@ button.maplibregl-popup-close-button {
 
 .map-filter-star {
 	width: 16px;
-	color: light-dark(var(--map-color-neutral-300), var(--map-color-neutral-600));
+	color: var(--map-text-faint);
 	cursor: pointer;
 	transition: color 200ms;
 
 	&[data-active] {
-		color: var(--map-color-highlight-500);
+		color: var(--map-highlight);
 	}
 
 	&:focus-visible {
-		color: var(--map-color-highlight-300);
+		color: var(--map-highlight-hover);
 	}
 }
 
 @media (hover: hover) {
 	.map-filter-star:hover {
-		color: var(--map-color-highlight-300);
+		color: var(--map-highlight-hover);
 	}
 }
 
@@ -420,14 +428,13 @@ button.maplibregl-popup-close-button {
 	flex: 1 1 0%;
 	font-family: var(--map-font-display);
 	font-size: 0.75rem;
-	color: var(--map-color-neutral-700);
-	background-color: var(--map-color-neutral-200);
-	border: 1px solid var(--map-color-neutral-300);
+	color: var(--map-text);
+	background-color: transparent;
+	border: 1px solid var(--map-divider);
 	border-radius: var(--map-radius-full);
 
 	&[aria-pressed='true'] {
-		background-color: var(--map-color-neutral-300);
-		border-color: var(--map-color-neutral-400);
+		background-color: var(--map-surface-active);
 	}
 }
 
@@ -516,10 +523,10 @@ button.maplibregl-popup-close-button {
 	margin-inline: auto;
 	font-family: var(--map-font-display);
 	font-size: 0.75rem;
-	color: var(--map-color-neutral-700);
-	background-color: #fff;
+	color: var(--map-text);
+	background-color: var(--map-surface);
 	border-radius: var(--map-radius-sm);
-	box-shadow: 0 0 0 2px rgb(0 0 0 / 10%);
+	box-shadow: var(--map-elevation);
 
 	&[data-open] {
 		z-index: 3;
@@ -543,13 +550,13 @@ button.maplibregl-popup-close-button {
 	border-radius: inherit;
 
 	&:focus-visible {
-		background-color: rgb(0 0 0 / 5%);
+		background-color: var(--map-surface-hover);
 	}
 }
 
 @media (hover: hover) {
 	.map-scope-button:hover {
-		background-color: rgb(0 0 0 / 5%);
+		background-color: var(--map-surface-hover);
 	}
 }
 
@@ -567,7 +574,7 @@ button.maplibregl-popup-close-button {
 }
 
 .map-scope-bar:not([data-active]) .map-scope-name {
-	color: var(--map-color-neutral-400);
+	color: var(--map-text-faint);
 }
 
 .map-scope-toggle,
@@ -578,7 +585,7 @@ button.maplibregl-popup-close-button {
 	align-items: center;
 	justify-content: center;
 	width: 29px;
-	border-inline-start: 1px solid var(--map-color-neutral-300);
+	border-inline-start: 1px solid var(--map-divider);
 }
 
 .map-scope-toggle {
@@ -610,7 +617,7 @@ button.maplibregl-popup-close-button {
 .map-scope-prompt-text {
 	overflow: hidden;
 	text-overflow: ellipsis;
-	color: var(--map-color-neutral-500);
+	color: var(--map-text-muted);
 	white-space: nowrap;
 }
 
@@ -639,7 +646,7 @@ button.maplibregl-popup-close-button {
 	border: 0;
 
 	&::placeholder {
-		color: var(--map-color-neutral-500);
+		color: var(--map-text-muted);
 		opacity: 1;
 	}
 
@@ -660,7 +667,7 @@ button.maplibregl-popup-close-button {
 	overflow-y: auto;
 	overscroll-behavior: contain;
 	list-style: none;
-	border-top: 1px solid var(--map-color-neutral-200);
+	border-top: 1px solid var(--map-divider);
 	transition: opacity 150ms ease-out;
 
 	@starting-style {
@@ -677,7 +684,7 @@ button.maplibregl-popup-close-button {
 	user-select: none;
 
 	&[aria-selected='true'] {
-		background-color: rgb(0 0 0 / 5%);
+		background-color: var(--map-surface-hover);
 	}
 }
 
@@ -698,13 +705,13 @@ button.maplibregl-popup-close-button {
 .map-search-title {
 	flex-grow: 1;
 	font-size: 0.8125rem;
-	color: var(--map-color-neutral-800);
+	color: var(--map-text);
 }
 
 .map-search-title-multilingual,
 .map-search-count,
 .map-search-meta {
-	color: var(--map-color-neutral-500);
+	color: var(--map-text-muted);
 }
 
 .map-search-match {
@@ -724,19 +731,22 @@ button.maplibregl-popup-close-button {
 }
 
 .map-search-kind {
-	color: color-mix(in oklab, var(--map-color-accent-600) 65%, var(--map-color-neutral-500));
+	color: color-mix(in oklab, var(--map-accent) 65%, var(--map-text-muted));
 }
 
 .map-search-empty {
 	padding: 0.5rem 0.625rem;
 	margin: 0;
-	color: var(--map-color-neutral-500);
-	border-top: 1px solid var(--map-color-neutral-200);
+	color: var(--map-text-muted);
+	border-top: 1px solid var(--map-divider);
 }
 
 /* Forced colours drop every `box-shadow`, MapLibre's `ButtonText` edge included, and a tint alone vanishes */
 @media (forced-colors: active) {
-	.map-scope-bar {
+	.map-scope-bar,
+	.maplibregl-ctrl-group:not(:empty),
+	.maplibregl-ctrl-attrib.maplibregl-compact,
+	.maplibregl-popup-content {
 		outline: 2px solid ButtonText;
 	}
 
@@ -773,10 +783,65 @@ button.maplibregl-popup-close-button {
 	border-end-end-radius: inherit;
 }
 
+[data-map-root] .maplibregl-ctrl-group {
+	background-color: var(--map-surface);
+	border-radius: var(--map-radius-sm);
+
+	&:not(:empty) {
+		box-shadow: var(--map-elevation);
+	}
+
+	& button + button {
+		border-top-color: var(--map-divider);
+	}
+}
+
+@media (hover: hover) {
+	[data-map-root] .maplibregl-ctrl button:not(:disabled):hover {
+		background-color: var(--map-surface-hover);
+	}
+}
+
+[data-map-root] .maplibregl-ctrl button:not(:disabled):active {
+	background-color: var(--map-surface-hover);
+}
+
+[data-map-root] .maplibregl-ctrl-attrib.maplibregl-compact {
+	color: var(--map-text);
+	background-color: var(--map-surface);
+	border-radius: var(--map-radius-sm);
+	box-shadow: var(--map-elevation);
+
+	& a {
+		color: inherit;
+	}
+}
+
+[data-map-root] .maplibregl-ctrl-attrib-button {
+	background-color: transparent;
+	border-radius: var(--map-radius-sm);
+}
+
 /* MapLibre's blue focus glow would stack with the ring; compound class outranks its `:focus:focus-visible` */
 [data-map-root] .maplibregl-ctrl.maplibregl-ctrl-group button:focus,
 [data-map-root] .maplibregl-ctrl-attrib-button:focus {
 	box-shadow: none;
+}
+
+[data-map-root] .maplibregl-ctrl-attrib.maplibregl-compact-show .maplibregl-ctrl-attrib-button {
+	background-color: var(--map-surface-hover);
+}
+
+@media not (forced-colors: active) {
+	[data-map-mode='dark'] .maplibregl-ctrl-icon,
+	[data-map-mode='dark'] .maplibregl-ctrl-attrib-button {
+		filter: invert(1) hue-rotate(180deg);
+	}
+
+	/* The filter inverts the button's own fill too, so it resolves roles as light */
+	[data-map-mode='dark'] .maplibregl-ctrl-attrib-button {
+		color-scheme: light;
+	}
 }
 
 /* MapLibre forces the open attribution visible, which shows through a host hiding the map with `visibility` */
@@ -801,7 +866,7 @@ button.maplibregl-popup-close-button {
 	width: 7px;
 	height: 7px;
 	pointer-events: none;
-	background-color: light-dark(var(--map-color-accent-500), var(--map-color-accent-400));
+	background-color: var(--map-accent);
 	border-radius: 50%;
 	opacity: 0;
 	scale: 0.4;
@@ -824,6 +889,7 @@ button.maplibregl-popup-close-button {
 .map-ctrl-icon {
 	width: 20px;
 	height: 20px;
+	color: var(--map-icon);
 }
 
 .maplibregl-ctrl-bottom-left {
@@ -848,18 +914,17 @@ button.maplibregl-popup-close-button {
 	gap: 2px;
 	align-items: center;
 	height: 100%;
-	font-family: var(--map-font-sans);
-	color: light-dark(var(--map-color-neutral-600), var(--map-color-neutral-300));
+	color: var(--map-text-muted);
 }
 
 .maplibregl-ctrl-metrics-divider {
-	color: light-dark(var(--map-color-neutral-400), var(--map-color-neutral-500));
+	color: var(--map-text-faint);
 }
 
 .maplibregl-ctrl-scale {
-	color: light-dark(var(--map-color-neutral-600), var(--map-color-neutral-300));
+	color: var(--map-text-muted);
 	background-color: transparent;
-	border-color: light-dark(var(--map-color-neutral-400), var(--map-color-neutral-500));
+	border-color: var(--map-text-faint);
 	border-width: 0 1px 1px;
 	border-bottom-right-radius: var(--map-radius-xs);
 	border-bottom-left-radius: var(--map-radius-xs);
