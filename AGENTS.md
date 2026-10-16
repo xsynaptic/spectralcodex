@@ -39,6 +39,10 @@ Scripts live in `package.json`. Only the ones with a catch are worth stating her
 - Stacking order is `--z-index-*` applied as `z-*` utilities or `var()`.
 - Every `hover:` on a focusable element has its `focus-visible:` twin where relevant. A stylesheet `:hover` sits under `@media (hover: hover)`, as Tailwind's `hover:` does; its `:focus-visible` partner stays outside it.
 
+## Map package
+
+Read `packages/react-map-component/AGENTS.md` before editing the map package or `src/lib/atlas`.
+
 ## Content subrepo
 
 `packages/content` is a separate repository with its own always-on rules covering MDX formatting, frontmatter schemas, and prose style. Read `packages/content/AGENTS.md` before writing or editing anything under that directory. For sustained content work, open `packages/content` as its own project so those rules load automatically.
