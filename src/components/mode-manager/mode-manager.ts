@@ -1,3 +1,5 @@
+import { modeAttribute, modeChangedEventName } from '@spectralcodex/shared/constants';
+
 import type {
 	ModeChangedEvent,
 	ModeGeneralType,
@@ -53,21 +55,21 @@ class ModeManager extends HTMLElement {
 		try {
 			localStorage.setItem(modeStorageKey, mode);
 		} catch {
-			// The mode still applies when the write fails
+			// The mode still applies when saving it fails
 		}
 	}
 
 	#applyMode(mode: ModeGeneralType) {
 		const resolvedMode = mode === ModeTypeEnum.Auto ? this.#systemMode : mode;
 
-		document.documentElement.dataset.mode = resolvedMode;
+		document.documentElement.setAttribute(modeAttribute, resolvedMode);
 		document.documentElement.style.colorScheme = resolvedMode;
 
 		this.#applyThemeColor();
 
 		queueMicrotask(() => {
 			document.dispatchEvent(
-				new CustomEvent('mode-changed', {
+				new CustomEvent(modeChangedEventName, {
 					detail: {
 						mode,
 						resolvedMode,

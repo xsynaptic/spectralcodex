@@ -1,127 +1,102 @@
-import { LocationStatusEnum } from '@spectralcodex/shared/map';
+import type { MapSourceItem } from '@spectralcodex/map-codec';
+
+import {
+	GeometryTypeEnum,
+	LocationCategoryEnum,
+	LocationStatusEnum,
+} from '@spectralcodex/shared/map';
 import { describe, expect, test } from 'vitest';
 
-import { createMapStore, hasActiveFilter } from '#store/store-factory.ts';
+import type { MapScope } from '#types.ts';
+
+import { createMapStore, hasActiveFilter, selectScope } from '#store/store-factory.ts';
+
+function popupOf(pointId: string) {
+	return { isEased: false, kind: 'popup', pointId } as const;
+}
 
 describe('createMapStore', () => {
-	test('toggleStatusFilter adds an absent status and removes a present one', () => {
+	test('a filter change drops the popup, whose Point may be filtered out', () => {
 		const store = createMapStore();
-		const { toggleStatusFilter } = store.getState().actions;
+		const { applyClick, setFilter } = store.getState().actions;
 
-		toggleStatusFilter(LocationStatusEnum.Abandoned);
-		expect(store.getState().statusFilter).toEqual([LocationStatusEnum.Abandoned]);
-
-		toggleStatusFilter(LocationStatusEnum.Abandoned);
-		expect(store.getState().statusFilter).toEqual([]);
-	});
-
-	test('show/hide all set the exclude-list to empty / every status', () => {
-		const store = createMapStore();
-
-		store.getState().actions.hideAllStatusFilter();
-		expect(new Set(store.getState().statusFilter)).toEqual(
-			new Set(Object.values(LocationStatusEnum)),
-		);
-
-		store.getState().actions.showAllStatusFilter();
-		expect(store.getState().statusFilter).toEqual([]);
-	});
-
-	test('filter changes clear the active selection', () => {
-		const store = createMapStore();
-		const { setFilterOpen, setRatingFilter, setSelectedId, toggleStatusFilter } =
-			store.getState().actions;
-
-		setSelectedId('location-1');
-		toggleStatusFilter(LocationStatusEnum.Abandoned);
+		applyClick(popupOf('location-1'));
+		setFilter({ status: [LocationStatusEnum.Abandoned] });
 		expect(store.getState().selectedId).toBeUndefined();
 
-		setSelectedId('location-2');
-		setRatingFilter(3);
+		applyClick(popupOf('location-2'));
+		setFilter({ rating: 3 });
 		expect(store.getState().selectedId).toBeUndefined();
-
-		setSelectedId('location-3');
-		setFilterOpen(true);
-		expect(store.getState().selectedId).toBeUndefined();
-	});
-
-	test('toggling one status leaves the others in the exclude-list', () => {
-		const store = createMapStore();
-		const { toggleStatusFilter } = store.getState().actions;
-
-		toggleStatusFilter(LocationStatusEnum.Abandoned);
-		toggleStatusFilter(LocationStatusEnum.Vanished);
-		toggleStatusFilter(LocationStatusEnum.Abandoned);
-
-		expect(store.getState().statusFilter).toEqual([LocationStatusEnum.Vanished]);
-	});
-
-	test('a filter setter stores its value, not only the cleared selection', () => {
-		const store = createMapStore();
-		const { setFilterOpen, setObjectiveFilter, setRatingFilter } = store.getState().actions;
-
-		setObjectiveFilter(4);
-		setRatingFilter(5);
-		setFilterOpen(true);
-
-		expect(store.getState()).toMatchObject({
-			isFilterOpen: true,
-			objectiveFilter: 4,
-			ratingFilter: 5,
+		expect(store.getState().filter).toEqual({
+			objective: 1,
+			rating: 3,
+			status: [LocationStatusEnum.Abandoned],
 		});
 	});
 
-	test('selecting closes the filter panel and leaves popup visibility alone', () => {
+	test('one overlay at a time: the popup, the filter menu and search each close the others', () => {
 		const store = createMapStore();
-		const { setFilterOpen, setPopupVisible, setSelectedId } = store.getState().actions;
+		const { applyClick, setOverlay } = store.getState().actions;
+		const overlays = () => {
+			const { overlay, selectedId } = store.getState();
 
-		setFilterOpen(true);
+			return { overlay, selectedId };
+		};
+
+		applyClick(popupOf('location-1'));
+		setOverlay('search', true);
+		expect(overlays()).toEqual({ overlay: 'search', selectedId: undefined });
+
+		setOverlay('filter', true);
+		expect(overlays()).toEqual({ overlay: 'filter', selectedId: undefined });
+
+		applyClick(popupOf('location-2'));
+		expect(overlays()).toEqual({ overlay: undefined, selectedId: 'location-2' });
+	});
+
+	test('closing one overlay leaves another that has since opened', () => {
+		const store = createMapStore();
+		const { setOverlay } = store.getState().actions;
+
+		setOverlay('search', true);
+		setOverlay('filter', false);
+		expect(store.getState().overlay).toBe('search');
+	});
+
+	test('any click dismisses the open overlay before its outcome applies', () => {
+		const store = createMapStore();
+		const { applyClick, setOverlay } = store.getState().actions;
+
+		setOverlay('filter', true);
+		applyClick({ kind: 'clear' });
+		expect(store.getState().overlay).toBeUndefined();
+
+		setOverlay('search', true);
+		applyClick({ center: [0, 0], clusterId: 1, kind: 'expand-cluster' });
+		expect(store.getState().overlay).toBeUndefined();
+	});
+
+	test('opening the held Scope page turns the Scope back on', () => {
+		const store = createMapStore();
+		const { applyClick, setScopeEnabled } = store.getState().actions;
+
+		setScopeEnabled(false);
+		applyClick({ isScopeRestored: false, kind: 'open', url: '/other/' });
+		expect(store.getState().isScopeEnabled).toBe(false);
+
+		applyClick({ isScopeRestored: true, kind: 'open', url: '/regions/tainan/' });
+		expect(store.getState().isScopeEnabled).toBe(true);
+	});
+
+	test('closing the popup restores its visibility', () => {
+		const store = createMapStore();
+		const { applyClick, clearSelection, setPopupVisible } = store.getState().actions;
+
+		applyClick(popupOf('location-1'));
 		setPopupVisible(false);
-		expect(store.getState().isPopupVisible).toBe(false);
 
-		setSelectedId('location-1');
-
-		expect(store.getState()).toMatchObject({
-			isFilterOpen: false,
-			isPopupVisible: false,
-			selectedId: 'location-1',
-		});
-	});
-
-	test('clearing the selection leaves the filter panel open', () => {
-		const store = createMapStore();
-		const { setFilterOpen, setSelectedId } = store.getState().actions;
-
-		setFilterOpen(true);
-		setSelectedId(undefined);
-
-		expect(store.getState().isFilterOpen).toBe(true);
-	});
-
-	test('a click does not outlive the selection it made', () => {
-		const store = createMapStore();
-		const { setClickedId, setRatingFilter, setSelectedId } = store.getState().actions;
-
-		setSelectedId('location-1');
-		setClickedId('location-1');
-		setSelectedId(undefined);
-		expect(store.getState().clickedId).toBeUndefined();
-
-		setSelectedId('location-2');
-		setClickedId('location-2');
-		setRatingFilter(3);
-		expect(store.getState().clickedId).toBeUndefined();
-	});
-
-	test('clearing the selection restores popup visibility', () => {
-		const store = createMapStore();
-		const { setPopupVisible, setSelectedId } = store.getState().actions;
-
-		setSelectedId('location-1');
-		setPopupVisible(false);
-
-		setSelectedId(undefined);
-		expect(store.getState().isPopupVisible).toBe(true);
+		clearSelection();
+		expect(store.getState()).toMatchObject({ isPopupVisible: true, selectedId: undefined });
 	});
 });
 
@@ -130,35 +105,83 @@ describe('hasActiveFilter', () => {
 		expect(hasActiveFilter(createMapStore().getState())).toBe(false);
 	});
 
-	test('one hidden status is an active filter, and showing all clears it', () => {
-		const store = createMapStore();
-		const { showAllStatusFilter, toggleStatusFilter } = store.getState().actions;
+	test('a hidden status, a minimum rating or an objective above 1 is each an active filter', () => {
+		for (const filter of [
+			{ status: [LocationStatusEnum.Abandoned] },
+			{ rating: 2 },
+			{ objective: 3 },
+		]) {
+			const store = createMapStore();
 
-		toggleStatusFilter(LocationStatusEnum.Abandoned);
-		expect(hasActiveFilter(store.getState())).toBe(true);
+			store.getState().actions.setFilter(filter);
+			expect(hasActiveFilter(store.getState())).toBe(true);
+		}
+	});
+});
 
-		showAllStatusFilter();
-		expect(hasActiveFilter(store.getState())).toBe(false);
+describe('syncView', () => {
+	const region: MapScope = {
+		rule: { interval: [10, 19], type: 'region' },
+		title: 'Tainan',
+		url: '/regions/tainan/',
+	};
+	const items: Array<MapSourceItem> = [
+		{
+			geometry: { coordinates: [0, 0], type: GeometryTypeEnum.Point },
+			properties: {
+				category: LocationCategoryEnum.Unknown,
+				entryQuality: 1,
+				hasImage: false,
+				id: 'mine',
+				precision: 3,
+				rating: 3,
+				regionOrdinals: [40],
+				status: LocationStatusEnum.Abandoned,
+				title: 'Mine',
+			},
+			type: 'Feature',
+		},
+	];
+	const regionPage = { view: { scope: region }, viewKey: 'region' };
+	const minePage = { view: { targetIds: ['mine'] }, viewKey: 'mine' };
+
+	test('a new view clears the selection and closes the filter panel', () => {
+		const store = createMapStore(regionPage);
+		const { applyClick, setOverlay, syncView } = store.getState().actions;
+
+		applyClick(popupOf('location-1'));
+		syncView(minePage, items);
+		expect(store.getState()).toMatchObject({ selectedId: undefined, view: minePage.view });
+
+		setOverlay('filter', true);
+		syncView(regionPage, items);
+		expect(store.getState().overlay).toBeUndefined();
 	});
 
-	test('a minimum rating above 1 is an active filter that showing all leaves in place', () => {
-		const store = createMapStore();
-		const { setRatingFilter, showAllStatusFilter } = store.getState().actions;
+	test('the same view again leaves the selection, the filter panel and a Scope turned off alone', () => {
+		const store = createMapStore(regionPage);
+		const { applyClick, setOverlay, setScopeEnabled, syncView } = store.getState().actions;
+		const { view } = store.getState();
 
-		setRatingFilter(2);
-		showAllStatusFilter();
+		setScopeEnabled(false);
+		applyClick(popupOf('location-1'));
+		syncView({ ...regionPage, view: { scope: region } }, items);
+		expect(store.getState()).toMatchObject({ isScopeEnabled: false, selectedId: 'location-1' });
+		expect(store.getState().view).toBe(view);
 
-		expect(hasActiveFilter(store.getState())).toBe(true);
+		setOverlay('filter', true);
+		syncView(regionPage, items);
+		expect(store.getState().overlay).toBe('filter');
 	});
 
-	test('an objective above 1 counts only where the objective filter is enabled', () => {
-		const disabledStore = createMapStore();
-		const enabledStore = createMapStore({ isObjectiveFilterEnabled: true });
+	test('a Location outside the Scope clears it, unless its rows failed to load', () => {
+		const failed = createMapStore(regionPage);
+		const loaded = createMapStore(regionPage);
 
-		disabledStore.getState().actions.setObjectiveFilter(3);
-		enabledStore.getState().actions.setObjectiveFilter(3);
+		failed.getState().actions.syncView(minePage, undefined);
+		expect(selectScope(failed.getState())).toBe(region);
 
-		expect(hasActiveFilter(disabledStore.getState())).toBe(false);
-		expect(hasActiveFilter(enabledStore.getState())).toBe(true);
+		loaded.getState().actions.syncView(minePage, items);
+		expect(selectScope(loaded.getState())).toBeUndefined();
 	});
 });

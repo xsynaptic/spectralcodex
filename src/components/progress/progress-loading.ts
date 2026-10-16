@@ -2,10 +2,12 @@ import { setProgressBarOpacity, setProgressBarValue } from '#components/progress
 
 const animationDuration = 300;
 
+const startProgress = 0.2;
+
 class ProgressLoading extends HTMLElement {
 	#fadeTimeout: number | undefined;
 	#isLoading = false;
-	#progress = 0.2;
+	#progress = startProgress;
 	#resetTimeout: number | undefined;
 	#thresholdTimeout: number | undefined;
 	#trickleInterval: number | undefined;
@@ -39,8 +41,8 @@ class ProgressLoading extends HTMLElement {
 		this.#resetTimeout = undefined;
 
 		this.#isLoading = true;
-		this.#progress = 0;
-		setProgressBarValue(this, 0);
+		this.#progress = startProgress;
+		setProgressBarValue(this, startProgress);
 		this.#thresholdTimeout = window.setTimeout(() => {
 			this.#thresholdTimeout = undefined;
 			setProgressBarOpacity(this, 1);
@@ -67,8 +69,8 @@ class ProgressLoading extends HTMLElement {
 
 		this.#resetTimeout = window.setTimeout(() => {
 			this.#resetTimeout = undefined;
-			this.#progress = 0.2;
-			setProgressBarValue(this, 0.2);
+			this.#progress = startProgress;
+			setProgressBarValue(this, startProgress);
 		}, animationDuration * 2);
 	};
 }

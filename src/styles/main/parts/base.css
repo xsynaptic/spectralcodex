@@ -2,6 +2,7 @@ html {
 	scrollbar-gutter: stable;
 }
 
+/* Astro ships its own rule beside a page's first island; a swap can take it away with the persisted shell */
 astro-island,
 astro-slot,
 astro-static-slot {

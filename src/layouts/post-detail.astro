@@ -5,7 +5,7 @@ import type { CollectionEntry } from 'astro:content';
 import { render } from 'astro:content';
 
 import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
-import type { MapComponentData } from '#lib/map/map-types.ts';
+import type { MapComponentData } from '#lib/map/map-data.ts';
 
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
 import ContentEntryArticle from '#components/content/content-entry-article.astro';
@@ -57,7 +57,6 @@ const atlas = await getAtlasPage(entry, mapData);
 			dateCreated: entry.data.dateCreated,
 			dateUpdated: entry.data.dateUpdated,
 		}),
-		prefetchUrls: mapData.prefetchUrls,
 	}}
 	schemas={getPostSchema(entry, { imageUrl: seoImage.url, url: Astro.url.toString() })}
 	titleMultilingual={titleMultilingual}

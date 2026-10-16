@@ -2,21 +2,11 @@ import type { MapPopupItem } from '@spectralcodex/map-codec';
 
 import { MapPopupOwnField } from '@spectralcodex/map-codec';
 
-const popupNarrowContainerPx = 640;
-const popupContainerShare = 0.8;
+import { isClusterHoverId } from '#lib/cluster-hover.ts';
 
-export function getPopupLayout(containerWidth: number) {
-	const isNarrow = containerWidth <= popupNarrowContainerPx;
-
-	return {
-		isNarrow,
-		maxWidthPx: Math.min(isNarrow ? 300 : 350, Math.floor(containerWidth * popupContainerShare)),
-	};
-}
-
-export function getTargetPopupItem<Item extends MapPopupItem & { precision: number | undefined }>(
-	item: Item,
-): Item {
+export function getTargetPopupItem<
+	Item extends MapPopupItem & { precision: number | undefined; url?: string | undefined },
+>(item: Item): Item {
 	const own = item.own ?? 0;
 
 	return {
@@ -49,8 +39,7 @@ export function findPopupImageSrcSet(
 	popupSource: Array<MapPopupItem> | undefined,
 	id: string,
 ): string | undefined {
-	// Clusters have no popup entry of their own
-	if (id.startsWith('cluster-')) return undefined;
+	if (isClusterHoverId(id)) return undefined;
 
 	return popupSource?.find((item) => item.id === id)?.image?.srcSet;
 }

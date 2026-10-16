@@ -23,6 +23,13 @@ const zIndex = 10;
 ---
 
 <link href={mapCssUrl} rel="stylesheet" />
+<link
+	as="fetch"
+	crossorigin="anonymous"
+	fetchpriority="low"
+	href={mapComponentProps.apiSourceUrl}
+	rel="preload"
+/>
 <div
 	aria-label={
 		entryTitle ? formatStringTemplate(t('section.map.label'), { title: entryTitle }) : undefined

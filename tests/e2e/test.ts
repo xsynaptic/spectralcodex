@@ -4,7 +4,7 @@ import { test as base, expect } from '@playwright/test';
 
 import type { SitePaths } from '#e2e/site-paths.ts';
 
-import { getBaseUrl } from '#e2e/constants.ts';
+import { getBaseUrl, isDev } from '#e2e/constants.ts';
 import { getSitePaths } from '#e2e/site-paths.ts';
 
 export { expect } from '@playwright/test';
@@ -15,15 +15,18 @@ interface ConsoleGuard {
 
 const allowedHost = new URL(getBaseUrl()).host;
 
-// Cloudflare edge-injects a beacon the off-host route answers empty; Chromium fails its SRI check, WebKit its MIME check
+// Cloudflare injects a beacon at the edge, and the empty off-host answer fails Chromium's SRI check and WebKit's MIME check
 const blockedResourcePattern = /static\.cloudflareinsights\.com/;
 
+// Under dev, Vite logs to the console, a dependency re-optimization returns a 504 once, and `/_img` fails while Docker is down
+const devPatterns = isDev ? [/\[vite\]/, /Outdated Optimize Dep/, /\/_img\//] : [];
+
 export const test = base.extend<{ consoleGuard: ConsoleGuard; site: SitePaths }>({
-	// Automatic so no spec can forget it; it costs a page, so request-only specs use the base test
+	// Automatic so no spec can forget it, and since it costs a page, specs that only make requests use the base test
 	consoleGuard: [
 		async ({ page }, use) => {
 			const errors: Array<string> = [];
-			const allowed: Array<RegExp> = [blockedResourcePattern];
+			const allowed: Array<RegExp> = [blockedResourcePattern, ...devPatterns];
 
 			page.on('console', (message) => {
 				if (message.type() === 'error') errors.push(message.text());
@@ -45,12 +48,20 @@ export const test = base.extend<{ consoleGuard: ConsoleGuard; site: SitePaths }>
 		{ auto: true },
 	],
 
-	// Fulfilled empty rather than aborted; an abort logs a console error of its own
+	// Fulfilled empty rather than aborted, because an abort logs a console error of its own
 	page: async ({ page }, use) => {
 		await page.route(
 			(url) => url.host !== allowedHost,
 			(route) => route.fulfill({ body: '', status: 204 }),
 		);
+
+		// The dev toolbar's open shadow root adds headings and buttons that locators would match
+		if (isDev) {
+			await page.route(
+				(url) => url.pathname.includes('/dev-toolbar/'),
+				(route) => route.fulfill({ body: '', contentType: 'text/javascript' }),
+			);
+		}
 
 		await use(page);
 	},

@@ -1,4 +1,21 @@
-import type { FC } from 'react';
+import type { CSSProperties, FC, PropsWithChildren } from 'react';
+
+export const MapControlIcon: FC<PropsWithChildren<{ style?: CSSProperties; viewBox?: string }>> =
+	function MapControlIcon({ children, style, viewBox = '0 0 24 24' }) {
+		return (
+			<span className="map-ctrl-icon-frame">
+				<svg
+					aria-hidden="true"
+					className="map-ctrl-icon"
+					style={style}
+					viewBox={viewBox}
+					xmlns="http://www.w3.org/2000/svg"
+				>
+					{children}
+				</svg>
+			</span>
+		);
+	};
 
 export const MapIconClose: FC = function MapIconClose() {
 	return (
@@ -91,7 +108,7 @@ export const MapIconRating: FC = function MapIconRating() {
 export const MapIconSearch: FC = function MapIconSearch() {
 	return (
 		<path
-			d="M21.71 20.29L18 16.61A9 9 0 1 0 16.61 18l3.68 3.68a1 1 0 0 0 1.42 0a1 1 0 0 0 0-1.39M11 18a7 7 0 1 1 7-7a7 7 0 0 1-7 7"
+			d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5l-1.5 1.5l-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16A6.5 6.5 0 0 1 3 9.5A6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14S14 12 14 9.5S12 5 9.5 5"
 			fill="currentColor"
 		/>
 	);

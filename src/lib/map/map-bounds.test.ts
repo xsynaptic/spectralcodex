@@ -1,6 +1,6 @@
-import { describe, expect, test } from 'vitest';
+import type { MapSourceItem } from '@spectralcodex/map-codec';
 
-import type { MapFeatureCollection } from '#lib/map/map-types.ts';
+import { describe, expect, test } from 'vitest';
 
 import { getMapBounds } from '#lib/map/map-bounds.ts';
 
@@ -15,48 +15,35 @@ function expectWithinBounds(
 	expect(lat).toBeLessThanOrEqual(bounds[3]);
 }
 
-function makeCollection(
-	features: Array<ReturnType<typeof makeFeature> | ReturnType<typeof makeLineFeature>>,
-): MapFeatureCollection {
-	return { features, type: 'FeatureCollection' } as unknown as MapFeatureCollection;
-}
-
-function makeFeature(id: string, coordinates: [number, number], isOutlier?: boolean) {
+function makePoint(id: string, coordinates: [number, number], isOutlier?: boolean): MapSourceItem {
 	return {
-		geometry: { coordinates, type: 'Point' as const },
-		id,
-		properties: { title: id, ...(isOutlier === undefined ? {} : { outlier: isOutlier }) },
-		type: 'Feature' as const,
-	};
-}
-
-function makeLineFeature(id: string, coordinates: Array<[number, number]>) {
-	return {
-		geometry: { coordinates, type: 'LineString' as const },
-		id,
-		properties: { title: id },
-		type: 'Feature' as const,
+		geometry: { coordinates, type: 'Point' },
+		properties: {
+			category: 'unknown',
+			entryQuality: 1,
+			hasImage: false,
+			id,
+			precision: 5,
+			rating: 1,
+			status: 'unknown',
+			title: id,
+			...(isOutlier === undefined ? {} : { outlier: isOutlier }),
+		},
+		type: 'Feature',
 	};
 }
 
 describe('getMapBounds', () => {
 	test('returns undefined for missing, empty, or all-outlier input', () => {
-		expect(getMapBounds({ featureCollection: undefined })).toBeUndefined();
-		expect(getMapBounds({ featureCollection: makeCollection([]) })).toBeUndefined();
-		expect(
-			getMapBounds({ featureCollection: makeCollection([makeFeature('far', [150, 50], true)]) }),
-		).toBeUndefined();
+		expect(getMapBounds([])).toBeUndefined();
+		expect(getMapBounds([makePoint('far', [150, 50], true)])).toBeUndefined();
 	});
 
 	test('an outlier that is the target still frames its own map', () => {
-		const result = getMapBounds({
-			featureCollection: makeCollection([makeFeature('far', [150, 50], true)]),
-			limitsFeatureCollection: makeCollection([
-				makeFeature('far', [150, 50], true),
-				makeFeature('other', [10, 10], true),
-			]),
-			targetId: 'far',
-		});
+		const result = getMapBounds(
+			[makePoint('far', [150, 50], true), makePoint('other', [10, 10], true)],
+			{ targetId: 'far' },
+		);
 
 		expect(result).toBeDefined();
 		expect(result!.center).toEqual([150, 50]);
@@ -64,43 +51,17 @@ describe('getMapBounds', () => {
 		expect(result!.maxBounds[0]).toBeGreaterThan(10);
 	});
 
-	test('a line contributes every vertex, not just its ends', () => {
-		const result = getMapBounds({
-			featureCollection: makeCollection([
-				makeLineFeature('route', [
-					[121.5, 25],
-					[121.9, 25.4],
-					[121.6, 25.1],
-				]),
-			]),
-		});
-
-		expect(result).toBeDefined();
-
-		for (const [lng, lat] of [
-			[121.5, 25],
-			[121.9, 25.4],
-			[121.6, 25.1],
-		]) {
-			expectWithinBounds(result!.bounds, lng!, lat!);
-		}
-	});
-
 	test('single point: bounds pad by the 1km minimum, limits by the 10km minimum', () => {
-		const result = getMapBounds({
-			featureCollection: makeCollection([makeFeature('temple', [121.5, 25])]),
-		});
+		const result = getMapBounds([makePoint('temple', [121.5, 25])]);
 
 		expect(result).toBeDefined();
 		expect(result!.center).toEqual([121.5, 25]);
 
-		// 1km at lat 25: lat pad lengthToDegrees(1), lng pad widened by 1/cos(25 deg)
 		expect(result!.bounds[0]).toBeCloseTo(121.490077, 5);
 		expect(result!.bounds[1]).toBeCloseTo(24.991007, 5);
 		expect(result!.bounds[2]).toBeCloseTo(121.509923, 5);
 		expect(result!.bounds[3]).toBeCloseTo(25.008993, 5);
 
-		// 10km pan limit
 		expect(result!.maxBounds[0]).toBeCloseTo(121.400771, 5);
 		expect(result!.maxBounds[1]).toBeCloseTo(24.910068, 5);
 		expect(result!.maxBounds[2]).toBeCloseTo(121.599229, 5);
@@ -113,11 +74,7 @@ describe('getMapBounds', () => {
 			['b', 122, 25],
 			['c', 121.4, 24.7],
 		];
-		const result = getMapBounds({
-			featureCollection: makeCollection(
-				points.map(([id, lng, lat]) => makeFeature(id, [lng, lat])),
-			),
-		});
+		const result = getMapBounds(points.map(([id, lng, lat]) => makePoint(id, [lng, lat])));
 
 		expect(result).toBeDefined();
 
@@ -126,24 +83,20 @@ describe('getMapBounds', () => {
 			expectWithinBounds(result!.maxBounds, lng, lat);
 		}
 
-		// Default 10% frame vs 100% pan limit
 		expect(result!.maxBounds[0]).toBeLessThan(result!.bounds[0]);
 		expect(result!.maxBounds[1]).toBeLessThan(result!.bounds[1]);
 		expect(result!.maxBounds[2]).toBeGreaterThan(result!.bounds[2]);
 		expect(result!.maxBounds[3]).toBeGreaterThan(result!.bounds[3]);
 
-		// Center of extent
 		expect(result!.center).toEqual([121.5, 24.5]);
 	});
 
 	test('outliers are excluded from center, bounds, and limits', () => {
-		const result = getMapBounds({
-			featureCollection: makeCollection([
-				makeFeature('a', [121, 24]),
-				makeFeature('b', [121.1, 24.1]),
-				makeFeature('far', [150, 50], true),
-			]),
-		});
+		const result = getMapBounds([
+			makePoint('a', [121, 24]),
+			makePoint('b', [121.1, 24.1]),
+			makePoint('far', [150, 50], true),
+		]);
 
 		expect(result).toBeDefined();
 		expectWithinBounds(result!.bounds, 121, 24);
@@ -154,25 +107,34 @@ describe('getMapBounds', () => {
 		expect(result!.maxBounds[3]).toBeLessThan(50);
 	});
 
-	test('targetId centers on the target while bounds still span the collection', () => {
-		const result = getMapBounds({
-			featureCollection: makeCollection([makeFeature('a', [121, 24]), makeFeature('b', [122, 25])]),
+	test('the Target is framed and centered while the pan limit spans every row', () => {
+		const result = getMapBounds([makePoint('a', [121, 24]), makePoint('b', [122, 25])], {
 			targetId: 'b',
 		});
 
 		expect(result).toBeDefined();
 		expect(result!.center).toEqual([122, 25]);
-		expectWithinBounds(result!.bounds, 121, 24);
 		expectWithinBounds(result!.bounds, 122, 25);
+		expect(result!.bounds[0]).toBeGreaterThan(121);
+		expectWithinBounds(result!.maxBounds, 121, 24);
+	});
+
+	test('every Point of a multi-point Target is framed', () => {
+		const result = getMapBounds(
+			[makePoint('a', [120, 23]), makePoint('b-0', [121, 24]), makePoint('b-1', [121.2, 24.2])],
+			{ targetId: 'b' },
+		);
+
+		expect(result).toBeDefined();
+		expectWithinBounds(result!.bounds, 121, 24);
+		expectWithinBounds(result!.bounds, 121.2, 24.2);
+		expect(result!.bounds[0]).toBeGreaterThan(120);
+		expect(result!.center).toEqual([121.1, 24.1]);
 	});
 
 	test('explicit buffers override the computed radius', () => {
-		const result = getMapBounds({
-			boundsBuffer: 100,
-			featureCollection: makeCollection([makeFeature('temple', [121.5, 25])]),
-		});
+		const result = getMapBounds([makePoint('temple', [121.5, 25])], { boundsBuffer: 100 });
 
-		// 100km at lat 25: lat pad lengthToDegrees(100)
 		expect(result!.bounds[1]).toBeCloseTo(24.10068, 5);
 		expect(result!.bounds[3]).toBeCloseTo(25.89932, 5);
 	});
@@ -180,12 +142,7 @@ describe('getMapBounds', () => {
 
 describe('getMapBounds at world scale', () => {
 	test('a set crossing the antimeridian frames across the Pacific, not around the world', () => {
-		const result = getMapBounds({
-			featureCollection: makeCollection([
-				makeFeature('fiji', [175, -15]),
-				makeFeature('samoa', [-165, -10]),
-			]),
-		});
+		const result = getMapBounds([makePoint('fiji', [175, -15]), makePoint('samoa', [-165, -10])]);
 
 		expect(result).toBeDefined();
 		expect(result!.bounds[0]).toBeLessThan(175);
@@ -195,44 +152,14 @@ describe('getMapBounds at world scale', () => {
 	});
 
 	test('a pan limit padded past a full world clamps to one world', () => {
-		const result = getMapBounds({
-			featureCollection: makeCollection([
-				makeFeature('a', [-150, 0]),
-				makeFeature('b', [-30, 0]),
-				makeFeature('c', [90, 0]),
-			]),
-		});
+		const result = getMapBounds([
+			makePoint('a', [-150, 0]),
+			makePoint('b', [-30, 0]),
+			makePoint('c', [90, 0]),
+		]);
 
 		expect(result).toBeDefined();
 		expect(result!.maxBounds[0]).toBe(-180);
 		expect(result!.maxBounds[2]).toBe(180);
-	});
-
-	test('polygons bound by their vertices regardless of winding', () => {
-		const ring = [
-			[121, 24],
-			[122, 24],
-			[122, 25],
-			[121, 25],
-			[121, 24],
-		];
-		const result = getMapBounds({
-			featureCollection: {
-				features: [
-					{
-						geometry: { coordinates: [ring], type: 'Polygon' },
-						id: 'area',
-						properties: { title: 'area' },
-						type: 'Feature',
-					},
-				],
-				type: 'FeatureCollection',
-			} as unknown as MapFeatureCollection,
-		});
-
-		expect(result).toBeDefined();
-		expect(result!.bounds[0]).toBeGreaterThan(120);
-		expect(result!.bounds[2]).toBeLessThan(123);
-		expect(result!.center).toEqual([121.5, 24.5]);
 	});
 });

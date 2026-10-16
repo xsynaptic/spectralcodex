@@ -3,6 +3,7 @@ declare global {
 	// https://github.com/mdx-js/mdx-analyzer
 	interface MDXProvidedComponents {
 		// Remark transformers inject the component imports, so these are typed by hand
+		BuildStats: (props: { children?: never }) => React.JSX.Element;
 		Email: (props: { children: React.ReactNode }) => React.JSX.Element;
 		Hide: (props: { char?: string; children: React.ReactNode }) => React.JSX.Element;
 		Img: (props: {
@@ -20,10 +21,7 @@ declare global {
 		}) => React.JSX.Element;
 		Link: (props: { children: React.JSX.Element | string; id: string }) => React.JSX.Element;
 		LocationsTable: (props: { tableId: string }) => React.JSX.Element;
-		Map: (props: {
-			locations: Array<string>;
-			showHidden?: boolean | undefined;
-		}) => React.JSX.Element;
+		Map: (props: { locations: Array<string> }) => React.JSX.Element;
 		More: (props: { children?: never }) => React.JSX.Element;
 		Resource: (props: { children: React.JSX.Element | string; id: string }) => React.JSX.Element;
 	}

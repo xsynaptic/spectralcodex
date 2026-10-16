@@ -1,7 +1,11 @@
 import type { GeometryBoundingBox } from '@spectralcodex/shared/map';
 import type { Feature } from 'geojson';
 
-import { bboxClip, coordAll, featureCollection, rewind, simplify } from '@turf/turf';
+import { bboxClip } from '@turf/bbox-clip';
+import { featureCollection } from '@turf/helpers';
+import { coordAll } from '@turf/meta';
+import { rewind } from '@turf/rewind';
+import { simplify } from '@turf/simplify';
 import chalk from 'chalk';
 import { geoAzimuthalEqualArea, geoCentroid, geoPath } from 'd3-geo';
 import fs from 'node:fs/promises';
@@ -13,19 +17,13 @@ import type { DivisionFeatureCollection, DivisionGeometry } from '#map-divisions
 import { safelyCreateDirectory } from '#shared/utils.ts';
 
 interface SvgOptions {
-	// Optional bounding box to clip geometry
 	divisionClippingBBox?: GeometryBoundingBox;
-	// Height of the SVG viewport
 	height?: number;
-	// Whether to use high-quality simplification (slower but better results)
 	highQuality?: boolean;
-	// Tolerance for geometry simplification (lower = more detail)
 	tolerance?: number;
-	// Width of the SVG viewport
 	width?: number;
 }
 
-// Saves a GeoJSON FeatureCollection as an optimized SVG file
 export async function saveSvg({
 	geojsonData,
 	id,
@@ -77,10 +75,6 @@ export async function saveSvg({
 	}
 }
 
-/**
- * Generates an SVG string from a GeoJSON FeatureCollection using d3-geo
- * This approach references: https://css-irl.info/creating-static-svgs-from-geojson/
- */
 function generateSvg(
 	geojsonData: DivisionFeatureCollection,
 	options: SvgOptions = {},
@@ -97,7 +91,6 @@ function generateSvg(
 		width = 800,
 	} = options;
 
-	// Clip to bounding box if provided
 	let clippedFeatureCollection = geojsonData;
 
 	if (divisionClippingBBox) {
@@ -111,7 +104,6 @@ function generateSvg(
 				]),
 			)
 			.map((feature) => {
-				// Clean up MultiPolygons by removing empty polygon parts (clipped out)
 				if (feature.geometry.type === 'MultiPolygon') {
 					const validPolygons = feature.geometry.coordinates.filter(
 						(polygon) => polygon.length > 0 && (polygon[0]?.length ?? 0) > 0,
@@ -129,11 +121,9 @@ function generateSvg(
 			.filter(({ geometry }) => {
 				if (!['MultiPolygon', 'Polygon'].includes(geometry.type)) return false;
 
-				// Filter out empty geometries
 				if (geometry.type === 'Polygon') {
 					return geometry.coordinates.length > 0 && (geometry.coordinates[0]?.length ?? 0) > 0;
 				}
-				// After cleanup, MultiPolygons just need at least one polygon
 				return geometry.coordinates.length > 0;
 			});
 
@@ -142,8 +132,6 @@ function generateSvg(
 		);
 	}
 
-	// Scale simplification tolerance based on geometry complexity
-	// Complex boundaries get progressively more aggressive simplification (up to 5x)
 	const pointThreshold = 5000;
 	const maxToleranceMultiplier = 5;
 
@@ -158,38 +146,31 @@ function generateSvg(
 		tolerance: adaptiveTolerance,
 	});
 
-	// d3 spherical projections expect clockwise exterior rings, the reverse of RFC 7946
-	// Rewind after simplifying, which can collapse islets into slivers with flipped winding
+	// d3's spherical projections expect clockwise outer rings, the reverse of GeoJSON, and simplifying can flip a ring's winding
 	const corrected = rewind(simplified, {
 		reverse: true,
 	}) as DivisionFeatureCollection;
 
-	// Azimuthal equal-area centred on the region keeps shapes true at any latitude
 	const [centroidLng, centroidLat] = geoCentroid(corrected);
 	const projection = geoAzimuthalEqualArea()
 		.rotate([-centroidLng, -centroidLat])
 		.fitSize([width, height], corrected);
 
-	// Create a path generator
 	const pathGenerator = geoPath(projection);
 
-	// Calculate actual bounds of the geometry with buffer for strokes
 	const bounds = pathGenerator.bounds(corrected);
 	const [[x0, y0], [x1, y1]] = bounds;
-	const buffer = 10; // 10px buffer to prevent stroke clipping
+	const buffer = 10;
 	const viewBoxX = x0 - buffer;
 	const viewBoxY = y0 - buffer;
 	const viewBoxWidth = x1 - x0 + buffer * 2;
 	const viewBoxHeight = y1 - y0 + buffer * 2;
 
-	// Generate path data for all features
 	const pathData = corrected.features
 		.map((feature) => pathGenerator(feature))
 		.filter((path): path is string => path !== null)
 		.join(' ');
 
-	// Generate SVG with dynamic viewBox matching actual geometry bounds
-	// Includes buffer to prevent stroke clipping at edges
 	const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${String(viewBoxX)} ${String(viewBoxY)} ${String(viewBoxWidth)} ${String(viewBoxHeight)}" preserveAspectRatio="xMidYMid meet">
   <path d="${pathData}" fill="currentColor" stroke="var(--division-stroke-color, none)" stroke-width="var(--division-stroke-width, 0)" stroke-linecap="round" stroke-linejoin="round" />
 </svg>`;

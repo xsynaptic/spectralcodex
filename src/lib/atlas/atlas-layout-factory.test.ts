@@ -1,28 +1,19 @@
 import { describe, expect, test } from 'vitest';
 
-import { getAtlasLayout } from '#lib/atlas/atlas-layout-factory.ts';
+import { getAtlasOpenAction } from '#lib/atlas/atlas-layout-factory.ts';
 
-describe('getAtlasLayout', () => {
-	test('every page is regular before the mode is enabled', () => {
-		expect(getAtlasLayout({ hasFlag: false, isPaneMatch: true, page: 'map' })).toBe('regular');
-		expect(getAtlasLayout({ hasFlag: false, isPaneMatch: true, page: 'pane' })).toBe('regular');
+const pathname = '/some-location/';
+
+describe('getAtlasOpenAction', () => {
+	test('the page already open scrolls a half Sheet to where it starts', () => {
+		expect(
+			getAtlasOpenAction({ pathname, screen: { layout: 'sheet', rest: 'half' }, url: pathname }),
+		).toEqual({ type: 'start' });
 	});
 
-	test('the full-screen map shows at every width', () => {
-		expect(getAtlasLayout({ hasFlag: true, isPaneMatch: false, page: 'map' })).toBe('map');
-		expect(getAtlasLayout({ hasFlag: true, isPaneMatch: true, page: 'map' })).toBe('map');
-	});
-
-	test('a pane page too narrow for the split covers the map as a sheet', () => {
-		expect(getAtlasLayout({ hasFlag: true, isPaneMatch: false, page: 'pane' })).toBe('sheet');
-	});
-
-	test('a pane page splits once the split fits', () => {
-		expect(getAtlasLayout({ hasFlag: true, isPaneMatch: true, page: 'pane' })).toBe('split');
-	});
-
-	test('a page that is not an atlas page stays regular at any width', () => {
-		expect(getAtlasLayout({ hasFlag: true, isPaneMatch: false, page: undefined })).toBe('regular');
-		expect(getAtlasLayout({ hasFlag: true, isPaneMatch: true, page: undefined })).toBe('regular');
+	test('the page already open scrolls to its top with the Pane in view', () => {
+		for (const screen of [{ layout: 'split' }, { layout: 'sheet', rest: 'raised' }] as const) {
+			expect(getAtlasOpenAction({ pathname, screen, url: pathname })).toEqual({ type: 'top' });
+		}
 	});
 });

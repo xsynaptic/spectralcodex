@@ -1,81 +1,68 @@
 # Spectral Codex Scripts
 
-Internal tooling for [Spectral Codex](https://spectralcodex.com) content processing, deployment, and asset generation. Built for Astro-based content collections with geographic and semantic analysis capabilities.
+Internal tooling for [Spectral Codex](https://spectralcodex.com): content checks, generated data, OpenGraph images, the local dev stack and deployment. Each script is a `package.json` entry run with `pnpm -F @spectralcodex/scripts <name>`, or through a root alias.
 
-## Content Processing
+## Content
 
 ### `similar-content`
 
-Generates semantic similarity scores between content entries using transformer-based embeddings.
-
-Processes MDX content into embeddings via [Transformers.js](https://huggingface.co/docs/transformers.js), combining cosine similarity with metadata-based scoring boosts (shared themes/regions). Embeddings are cached in SQLite and validated against each entry's content digest, so unchanged files skip regeneration.
-
-Output: JSON mapping of content IDs to ranked similar items.
+Scores how similar each entry is to every other. Entry text is embedded with [Transformers.js](https://huggingface.co/docs/transformers.js), compared by cosine similarity, and boosted for shared Themes and Regions. Embeddings are cached in SQLite and keyed by each entry's content digest, so unchanged entries are not embedded again. The output is a JSON map from each entry ID to its ranked similar entries.
 
 ### `validate-content`
 
-Runs validation checks against content:
-
-- `location-regions` - region references valid
-- `location-coordinates` - coordinates inside assigned regions
-- `location-overlap` - locations not too close together
-- `location-duplicates` - no duplicate titles/addresses
-- `divisions` - division IDs exist in Overture
-- `quality` - quality scores and completeness
-- `mdx` - MDX component syntax valid
-- `images` - image references exist
-
-Run with no arguments to execute all checks (used in CI/deploy).
+Runs every content check: IDs and references, MDX components, links, images, Location coordinates, overlaps and duplicates, and Region parents. Pass a check's name to run just that one; the names are in `src/validate-content/index.ts`. Only a full run exits with an error, so only a full run can stop a deploy.
 
 ### `content-schemas`
 
-Copies generated Astro content collection schemas from `.astro/collections` to the content package.
+Copies the content collection schemas Astro generates in `.astro/collections` into the content package.
 
-## OpenGraph Images
+## OpenGraph images
 
 ### `og-image`
 
-Advanced OG image generator using [Takumi](https://takumi.kane.tw) for text overlay on images. Renders title + subtitle (CJK support via Noto Serif TC) with gradient background effects. Sharp decodes each source photo once per batch and hands Takumi raw pixels; output freshness is tracked per entry in a JSON manifest.
+Renders an OpenGraph image for each entry with [Takumi](https://takumi.kane.tw): the title and subtitle over the entry's photo, with Noto Serif TC for CJK text. Sharp decodes each photo once per batch, and a JSON manifest records which images are already up to date.
 
-## Map Data
+## Map data
 
 ### `map-divisions`
 
-Fetches administrative boundary polygons from [Overture Maps](https://overturemaps.org/) via [DuckDB](https://duckdb.org/) and generates [FlatGeobuf](https://flatgeobuf.org/) files for client-side map rendering with [MapLibre GL JS](https://maplibre.org/).
+Builds each Region's Division from [Overture Maps](https://overturemaps.org/) boundaries, queried with [DuckDB](https://duckdb.org/) and merged with [Turf.js](https://turfjs.org/) when a Region spans several divisions. Each Division's raw boundary is cached in `.cache/divisions/` as `<divisionId>.geojson`, which `validate-content` uses to check Location coordinates. Two files per Region land beside it:
 
-Reads region metadata to extract Overture division IDs, queries Parquet datasets with bounding box optimization, performs geometric unions for multi-division regions via [Turf.js](https://turfjs.org/), and outputs optimized FlatGeobuf files.
+- a simplified mask (the world with the Division cut out) as GeoJSON, which the build serves to the map
+- an SVG outline
+
+Regions that already have their files are skipped; `--regenerate` rebuilds them all from the local Overture cache.
 
 ## Development
 
 ### `dev-server`
 
-Starts a containerized image server alongside the Astro dev server. Loads `.env.development` for dev-specific overrides. Run with `pnpm dev` from the workspace root.
+Starts the Docker image server and then `astro dev`, and stops the containers when the dev server exits. Run it with `pnpm dev` from the workspace root, which also loads `.env.development`.
 
 ## Deployment
 
 ### `deploy-site`
 
-Full deployment pipeline:
+Runs the whole deploy in order:
 
-1. `astro sync` - sync content
-2. `validate-content` - validate content
-3. `generate-redirects` - build redirect pairs
-4. `similar-content` - generate similarity data
-5. `sitemap-lastmod` - stamp sitemap timestamps
-6. `astro build` - build site
-7. `og-image` - generate OG images
-8. `test-e2e-smoke` - smoke tests
-9. `deploy-media` - sync media to remote
-10. `deploy-app` - transfer built app
-11. `deploy-og` - transfer OG images
-12. `deploy-caddy` - sync Caddy config and certs
-13. health check against the live site
-14. cache refresh - detached cache-warmer run on the server
+1. `astro sync`
+2. `validate-content`
+3. `generate-redirects`
+4. `similar-content`
+5. webmentions, when `WEBMENTIONS_SHOW` is on
+6. sitemap `lastmod` dates
+7. `astro build`
+8. `og-image`
+9. the e2e smoke tests
+10. `deploy-media`, `deploy-app` and `deploy-og` over rsync
+11. `deploy-caddy`, for the Caddy config and certificates
+12. a check of the live site's cache headers
+13. a cache refresh, started on the server in the background
 
-### `deploy-app` / `deploy-media`
+### `deploy-app`, `deploy-media`, `deploy-og`, `deploy-caddy`
 
-Individual deployment scripts for app files and media assets via rsync.
+Each runs one deploy step on its own.
 
-## Cache Warming
+## Cache warming
 
-The warmer purges the site hostname, warms pages, assets, and map URLs, then scrapes image URLs from the bodies it already fetched. Image warming is incremental; only URLs not warmed by a previous deploy are requested. Imagor URLs are HMAC signatures of the transform path, so they are stable across builds and survive the host-scoped purge.
+The cache refresh purges the site's hostname, warms its pages, assets and map data, and then warms the image URLs it found in those pages. Image warming is incremental: only URLs no earlier deploy has warmed are requested. Image URLs are signatures of the transform path, so they stay the same across builds, and they live on their own host, which the purge leaves alone.

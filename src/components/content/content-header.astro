@@ -23,6 +23,7 @@ const titleMultilingualMeta = titleMultilingualText
 	: undefined;
 
 const skipLinkTarget = hasHeroImage ? { id: 'main-content', tabindex: -1 } : undefined;
+const sheetStart = hasHeroImage ? undefined : { 'data-atlas-sheet-start': '' };
 
 const titleCaption = hasHeroImage ? caption : undefined;
 const subtitleCaption = hasHeroImage ? undefined : caption;
@@ -49,6 +50,7 @@ const subtitleCaption = hasHeroImage ? undefined : caption;
 			]}
 			washColor={hasHeroImage ? 'accent-featured' : 'accent'}
 			{...titleMultilingualMeta}
+			{...sheetStart}
 			data-pagefind-ignore
 		>
 			<Fragment set:html={titleMultilingual} />
@@ -60,6 +62,7 @@ const subtitleCaption = hasHeroImage ? undefined : caption;
 			titleCaption ? 'flex items-baseline-last justify-between gap-4' : undefined,
 		]}
 		{...skipLinkTarget}
+		{...(titleMultilingual ? undefined : sheetStart)}
 	>
 		<TextWash
 			as="h1"

@@ -1,30 +1,25 @@
 import type { LngLat, Popup as MapLibrePopup } from 'maplibre-gl';
 import type { FC } from 'react';
 
-import { useCallback, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Popup } from 'react-map-gl/maplibre';
 
 import type { MapPopupItemExtended } from '#popup/popup-hooks.ts';
 
+import { mapControlClassName } from '#constants.ts';
+import { useMapLinkClick } from '#host/host-click.ts';
+import { useMapConfig } from '#lib/config.tsx';
 import { MapIconCopy, MapIconGoogle, MapIconWarning, MapIconWikipedia } from '#lib/icons.tsx';
-import { useMapMessages } from '#lib/messages.tsx';
-import { useTrackMap } from '#lib/track-context.tsx';
+import { useTrackMap } from '#lib/track-hook.ts';
 import {
 	getPopupImageSizes,
 	getPopupImageSrc,
 	getPopupImageSrcSet,
 	getTargetPopupItem,
 } from '#popup/popup-factory.ts';
-import { useMapImagePreload, useMapPopupLayout } from '#popup/popup-hooks.ts';
-import { useMapSelection } from '#popup/popup-selection.ts';
-import { useIsMapPopupVisible, useMapStoreActions } from '#store/store.ts';
-
-// Popup data stores `maps.app.goo.gl` links as bare short codes (no slash)
-function getGoogleMapsHref(value: string) {
-	if (value.includes('://')) return value;
-	if (value.includes('/')) return `https://${value}`;
-	return `https://maps.app.goo.gl/${value}`;
-}
+import { useMapCanvasPopup, useMapImagePreload, useMapPopupLayout } from '#popup/popup-hooks.ts';
+import { selectTargetIds } from '#store/store-factory.ts';
+import { useMapStore } from '#store/store.tsx';
 
 function getGoogleMapsUrlFromGeometry(coordinates: LngLat) {
 	const url = new URL('https://www.google.com/maps/search/');
@@ -33,10 +28,6 @@ function getGoogleMapsUrlFromGeometry(coordinates: LngLat) {
 	url.searchParams.set('query', `${String(coordinates.lat)},${String(coordinates.lng)}`);
 
 	return url.href;
-}
-
-function getWikipediaHref(value: string) {
-	return value.includes('https://') ? value : `https://${value}`;
 }
 
 async function copyToClipboard(value: string) {
@@ -54,7 +45,7 @@ const MapPopupFooter: FC<{
 }> = function MapPopupFooter({ googleMapsUrl, popupCoordinates, wikipediaUrl }) {
 	const coordinatesString = `${String(popupCoordinates.lat)}, ${String(popupCoordinates.lng)}`;
 	const mapsUrl = googleMapsUrl ?? getGoogleMapsUrlFromGeometry(popupCoordinates);
-	const messages = useMapMessages();
+	const { messages } = useMapConfig();
 
 	return (
 		<div className="map-popup-footer">
@@ -80,7 +71,7 @@ const MapPopupFooter: FC<{
 				{wikipediaUrl ? (
 					<a
 						aria-label={messages.wikipediaAriaLabel}
-						href={getWikipediaHref(wikipediaUrl)}
+						href={wikipediaUrl}
 						rel="noopener noreferrer"
 						target="_blank"
 					>
@@ -96,7 +87,7 @@ const MapPopupFooter: FC<{
 				) : undefined}
 				<a
 					aria-label={messages.googleMapsAriaLabel}
-					href={getGoogleMapsHref(mapsUrl)}
+					href={mapsUrl}
 					rel="noopener noreferrer"
 					target="_blank"
 				>
@@ -117,7 +108,7 @@ const MapPopupFooter: FC<{
 const MapPopupPrecision: FC<{ precision: number | undefined }> = function MapPopupPrecision({
 	precision,
 }) {
-	const messages = useMapMessages();
+	const { messages } = useMapConfig();
 
 	if (precision === undefined || precision > 2) return;
 
@@ -137,31 +128,36 @@ const MapPopupPrecision: FC<{ precision: number | undefined }> = function MapPop
 	);
 };
 
+const MapPopupTitleLink: FC<{ title: string; url: string }> = function MapPopupTitleLink({
+	title,
+	url,
+}) {
+	const handleLinkClick = useMapLinkClick(url);
+	const trackMap = useTrackMap();
+
+	return (
+		<a
+			href={url}
+			onClick={(event) => {
+				trackMap({ data: { location: url }, name: 'map-popup-visit' });
+				handleLinkClick(event);
+			}}
+		>
+			{title}
+		</a>
+	);
+};
+
 const MapPopupTitleText: FC<{ title: string; url: string | undefined }> =
 	function MapPopupTitleText({ title, url }) {
-		const trackMap = useTrackMap();
-
-		return url ? (
-			<a
-				href={url}
-				onClick={() => {
-					trackMap({ data: { location: url }, name: 'map-popup-visit' });
-				}}
-			>
-				{title}
-			</a>
-		) : (
-			<span>{title}</span>
-		);
+		return url ? <MapPopupTitleLink title={title} url={url} /> : <span>{title}</span>;
 	};
 
-const MapPopupContent: FC<{
-	imageServerUrl: string;
-	isDev: boolean | undefined;
-	popupItem: MapPopupItemExtended;
-}> = function MapPopupContent({ imageServerUrl, isDev, popupItem }) {
+const MapPopupContent: FC<{ popupItem: MapPopupItemExtended }> = function MapPopupContent({
+	popupItem,
+}) {
+	const { imageServerUrl, isDev, messages } = useMapConfig();
 	const { maxWidthPx } = useMapPopupLayout();
-	const messages = useMapMessages();
 
 	const {
 		description,
@@ -196,7 +192,7 @@ const MapPopupContent: FC<{
 						<span lang={titleMultilingualLang}>{titleMultilingualValue}</span>
 					</div>
 				) : undefined}
-				<div className="map-popup-title">
+				<div className={mapControlClassName.popupTitle}>
 					<MapPopupTitleText title={title} url={url} />
 					{isDev && objective ? (
 						<span className="map-popup-objective">{objective}</span>
@@ -234,18 +230,16 @@ function getPopupPlacement(isNarrow: boolean, isTarget: boolean) {
 }
 
 const MapPopupFrame: FC<{
-	imageServerUrl: string;
-	isDev: boolean | undefined;
 	isLoading: boolean;
 	isTarget: boolean;
 	popupItem: MapPopupItemExtended;
-}> = function MapPopupFrame({ imageServerUrl, isDev, isLoading, isTarget, popupItem }) {
-	const isPopupVisible = useIsMapPopupVisible();
+}> = function MapPopupFrame({ isLoading, isTarget, popupItem }) {
+	const isPopupVisible = useMapStore((state) => state.isPopupVisible);
 
 	const { isNarrow, maxWidthPx } = useMapPopupLayout();
 	const popupPlacement = getPopupPlacement(isNarrow, isTarget);
 
-	const { setSelectedId } = useMapStoreActions();
+	const { clearSelection } = useMapStore((state) => state.actions);
 
 	const popupRef = useRef<MapLibrePopup>(null);
 	const frameRef = useRef<HTMLDivElement>(null);
@@ -267,14 +261,6 @@ const MapPopupFrame: FC<{
 		};
 	}, [isTarget]);
 
-	const onClose = useCallback(
-		function onClose() {
-			setSelectedId(undefined);
-		},
-		[setSelectedId],
-	);
-
-	// Note: `closeOnClick` must be false to better control popup display with custom events
 	return (
 		<Popup
 			latitude={popupItem.popupCoordinates.lat}
@@ -283,7 +269,7 @@ const MapPopupFrame: FC<{
 			className={isNarrow ? 'map-popup-narrow' : ''}
 			closeOnClick={false}
 			maxWidth={`${String(maxWidthPx)}px`}
-			onClose={onClose}
+			onClose={clearSelection}
 			ref={popupRef}
 			style={{ visibility: isPopupVisible ? 'visible' : 'hidden' }}
 		>
@@ -294,8 +280,6 @@ const MapPopupFrame: FC<{
 				<div style={{ opacity: isLoading ? 0 : 1 }}>
 					{isLoading ? undefined : (
 						<MapPopupContent
-							imageServerUrl={imageServerUrl}
-							isDev={isDev}
 							key={popupItem.id}
 							popupItem={isTarget ? getTargetPopupItem(popupItem) : popupItem}
 						/>
@@ -306,29 +290,22 @@ const MapPopupFrame: FC<{
 	);
 };
 
-export const MapImagePreload: FC<{
-	imageServerUrl?: string | undefined;
-	isEnabled: boolean;
-}> = function MapImagePreload({ imageServerUrl = '', isEnabled }) {
-	useMapImagePreload({ imageServerUrl, isEnabled });
+export const MapImagePreload: FC = function MapImagePreload() {
+	useMapImagePreload();
 
 	return;
 };
 
-export const MapPopup: FC<{
-	imageServerUrl?: string | undefined;
-	isDev?: boolean | undefined;
-}> = function MapPopup({ imageServerUrl = '', isDev }) {
-	const { isLoading, isTarget, popupItem } = useMapSelection();
+export const MapPopup: FC = function MapPopup() {
+	const { isLoading, popupItem } = useMapCanvasPopup();
+	const targetIds = useMapStore(selectTargetIds);
 
 	if (!popupItem) return;
 
 	return (
 		<MapPopupFrame
-			imageServerUrl={imageServerUrl}
-			isDev={isDev}
 			isLoading={isLoading}
-			isTarget={isTarget}
+			isTarget={targetIds.includes(popupItem.id)}
 			popupItem={popupItem}
 		/>
 	);

@@ -70,16 +70,42 @@
 	// On-demand semantic pass; the 0.80 default is mostly shared idiom, not shared logic
 	"similarCode": { "threshold": 0.9 },
 	"boundaries": {
+		// First match wins, so the map package's zones sit before `packages`
 		"zones": [
+			{
+				"name": "map-ui",
+				"patterns": [
+					"packages/react-map-component/src/index.ts",
+					"packages/react-map-component/src/react-map-component.tsx",
+					"packages/react-map-component/src/canvas/**",
+					"packages/react-map-component/src/controls/**",
+					"packages/react-map-component/src/popup/**",
+					"packages/react-map-component/src/search/**",
+					"packages/react-map-component/src/source/**",
+					"packages/react-map-component/src/targets/**",
+				],
+			},
+			{
+				"name": "map-state",
+				"patterns": [
+					"packages/react-map-component/src/data/**",
+					"packages/react-map-component/src/host/**",
+					"packages/react-map-component/src/store/**",
+				],
+			},
+			{ "name": "map-base", "patterns": ["packages/react-map-component/src/**"] },
 			{ "name": "packages", "patterns": ["packages/**"] },
 			{ "name": "lib", "patterns": ["src/lib/**"] },
 			{ "name": "components", "patterns": ["src/components/**", "src/layouts/**", "src/pages/**"] },
 		],
 		"rules": [
+			{ "from": "map-ui", "allow": ["map-state", "map-base", "packages"] },
+			{ "from": "map-state", "allow": ["map-base", "packages"] },
+			{ "from": "map-base", "allow": ["packages"] },
 			// Vite/Rolldown build breaks when packages import the app
 			{ "from": "packages", "allow": ["packages"] },
-			{ "from": "lib", "allow": ["lib", "packages"] },
-			{ "from": "components", "allow": ["components", "lib", "packages"] },
+			{ "from": "lib", "allow": ["lib", "packages", "map-ui", "map-base"] },
+			{ "from": "components", "allow": ["components", "lib", "packages", "map-ui", "map-base"] },
 		],
 	},
 }

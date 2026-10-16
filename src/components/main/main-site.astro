@@ -19,6 +19,8 @@ interface Props {
 }
 
 const { atlas, hasHeroImage = false, isHomepage = false, meta, schemas } = Astro.props;
+
+// Avoid using `position: fixed` anywhere in the sheet; the pane must be the containing block for Atlas
 ---
 
 <Document atlas={atlas} meta={meta} schemas={schemas}>

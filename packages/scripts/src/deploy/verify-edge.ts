@@ -9,7 +9,7 @@ interface EdgeExpectation {
 	status: number;
 }
 
-// Node's fetch has no default timeout, so a hung connection would stall the deploy indefinitely
+// Node's fetch never times out on its own, so a hung connection would stall the deploy
 const requestTimeoutMs = 10_000;
 
 export async function verifyEdge(): Promise<void> {
@@ -17,7 +17,6 @@ export async function verifyEdge(): Promise<void> {
 
 	const baseUrl = config.siteUrl.replace(/\/$/, '');
 
-	// Unique query busts the Cloudflare cache key so every assertion reaches Caddy at the origin
 	const token = Date.now().toString();
 	const cacheBust = `edge-check=${token}`;
 
@@ -59,7 +58,6 @@ export async function verifyEdge(): Promise<void> {
 
 	const expectations = getExpectations(token);
 
-	// Hashed asset names change every build, so take one from the document we already fetched
 	if (documentResponse.status === 200) {
 		const html = await documentResponse.text();
 		const hashedAsset = /["'](\/_x\/[^"']+\.(?:css|js|woff2))["']/.exec(html)?.[1];
@@ -106,7 +104,6 @@ export async function verifyEdge(): Promise<void> {
 }
 
 function fetchWithTimeout(url: string, method: 'GET' | 'HEAD') {
-	// Manual redirect so a broken trailing-slash rule fails loudly instead of being followed
 	return fetch(url, {
 		method,
 		redirect: 'manual',
@@ -143,7 +140,7 @@ function getExpectations(token: string): Array<EdgeExpectation> {
 		{
 			cacheControl: 'private, no-store',
 			label: 'objectives data gate',
-			path: '/api/map/objectives/s.json',
+			path: '/api/map/objectives/map-directory.json',
 			status: 401,
 		},
 		{

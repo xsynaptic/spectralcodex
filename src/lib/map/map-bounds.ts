@@ -1,23 +1,18 @@
-import type { Position } from 'geojson';
+import type { MapSourceItem } from '@spectralcodex/map-codec';
 
-import { center as turfCenter } from '@turf/center';
+import { getMapRowById } from '@spectralcodex/map-codec';
 import { distance } from '@turf/distance';
 import { degreesToRadians, lengthToDegrees } from '@turf/helpers';
-import { truncate } from '@turf/truncate';
 import { geoBounds } from 'd3-geo';
-
-import type { MapFeatureCollection } from '#lib/map/map-types.ts';
 
 import { getTruncatedLngLat } from '#lib/map/map-utils.ts';
 
-export interface MapDataBoundsProps {
+export interface MapBoundsOptions {
 	boundsBuffer?: number | undefined;
 	boundsBufferPercentage?: number | undefined;
-	featureCollection: MapFeatureCollection | undefined;
 	limitsBuffer?: number | undefined;
 	limitsBufferPercentage?: number | undefined;
-	limitsFeatureCollection?: MapFeatureCollection | undefined; // Optional: used by individual location maps
-	targetId?: string | undefined; // Optional: use for centering on a specific point
+	targetId?: string | undefined;
 }
 
 const mapBoundsBufferMin = 1;
@@ -29,42 +24,34 @@ interface BboxBufferOptions {
 	minBuffer: number;
 }
 
-// Calculate map bounds based on geodata and some parameters
-// This should not include outliers; bounds/center frame featureCollection
-// maxBounds spans limitsFeatureCollection (the rendered set)
-// By default there is a 10% buffer on the frame and the pan limit is 100% of the max span
-// But these values can be overridden on a case-by-case basis
-export function getMapBounds({
-	boundsBuffer,
-	boundsBufferPercentage = 10,
-	featureCollection: featureCollectionRaw,
-	limitsBuffer,
-	limitsBufferPercentage = 100,
-	limitsFeatureCollection: limitsFeatureCollectionRaw,
-	targetId,
-}: MapDataBoundsProps):
+export function getMapBounds(
+	rows: ReadonlyArray<MapSourceItem>,
+	{
+		boundsBuffer,
+		boundsBufferPercentage = 10,
+		limitsBuffer,
+		limitsBufferPercentage = 100,
+		targetId,
+	}: MapBoundsOptions = {},
+):
 	| undefined
 	| {
 			bounds: [number, number, number, number];
 			center: [number, number];
 			maxBounds: [number, number, number, number];
 	  } {
-	if (!featureCollectionRaw) return;
+	const shownRows = rows.filter(
+		({ properties }) => properties.outlier !== true || isTargetFeature(properties.id, targetId),
+	);
+	const targetRows = shownRows.filter(({ properties }) => isTargetFeature(properties.id, targetId));
+	const frameRows = targetRows.length > 0 ? targetRows : shownRows;
 
-	const featureCollection = filterMapOutliers(featureCollectionRaw, targetId);
-
-	if (featureCollection.features.length === 0) return;
-
-	const limitsFeatureCollection = limitsFeatureCollectionRaw
-		? filterMapOutliers(limitsFeatureCollectionRaw, targetId)
-		: featureCollection;
-
-	const bounds = getBufferedBbox(featureCollection, {
+	const bounds = getBufferedBbox(frameRows, {
 		bufferPercentage: boundsBufferPercentage,
 		explicitBuffer: boundsBuffer,
 		minBuffer: mapBoundsBufferMin,
 	});
-	const maxBounds = getBufferedBbox(limitsFeatureCollection, {
+	const maxBounds = getBufferedBbox(shownRows, {
 		bufferPercentage: limitsBufferPercentage,
 		explicitBuffer: limitsBuffer,
 		minBuffer: mapLimitsBufferMin,
@@ -72,11 +59,7 @@ export function getMapBounds({
 
 	if (!bounds || !maxBounds) return;
 
-	return {
-		bounds,
-		center: getMapCenter(featureCollection, targetId),
-		maxBounds,
-	};
+	return { bounds, center: getMapCenter(frameRows, targetId), maxBounds };
 }
 
 export function isTargetFeature(id: number | string | undefined, targetId: string | undefined) {
@@ -85,31 +68,18 @@ export function isTargetFeature(id: number | string | undefined, targetId: strin
 	return id === targetId || String(id).startsWith(`${targetId}-`);
 }
 
-// Handle outliers having their own maps
-function filterMapOutliers(
-	featureCollection: MapFeatureCollection,
-	targetId: string | undefined,
-): MapFeatureCollection {
-	return {
-		...featureCollection,
-		features: featureCollection.features.filter(
-			(item) => item.properties.outlier !== true || isTargetFeature(item.id, targetId),
-		),
-	} satisfies MapFeatureCollection;
-}
-
 function getBufferedBbox(
-	featureCollection: MapFeatureCollection,
+	rows: ReadonlyArray<MapSourceItem>,
 	{ bufferPercentage, explicitBuffer, minBuffer }: BboxBufferOptions,
 ): [number, number, number, number] | undefined {
-	if (featureCollection.features.length === 0) return undefined;
+	if (rows.length === 0) return undefined;
 
-	const naturalBounds = getNaturalBounds(featureCollection);
+	const naturalBounds = getNaturalBounds(rows);
 
 	let bufferRadius = explicitBuffer;
 
 	if (bufferRadius === undefined) {
-		if (featureCollection.features.length === 1) {
+		if (rows.length === 1) {
 			bufferRadius = minBuffer;
 		} else {
 			const spanX = distance(
@@ -125,7 +95,6 @@ function getBufferedBbox(
 		}
 	}
 
-	// Longitude degrees shrink by cos(lat), so widen the pad at the bbox mid-latitude
 	const latPad = lengthToDegrees(bufferRadius);
 	const lngPad = latPad / Math.cos(degreesToRadians((naturalBounds[1] + naturalBounds[3]) / 2));
 
@@ -134,49 +103,32 @@ function getBufferedBbox(
 	const east = naturalBounds[2] + lngPad;
 	const north = Math.min(naturalBounds[3] + latPad, 85);
 
-	// MapLibre wraps each pan limit into one world, so a wider range would fold onto itself
+	// MapLibre wraps a pan limit into a single world, so a wider range would fold onto itself
 	if (east - west >= 360) return [-180, south, 180, north];
 
 	return [west, south, east, north];
 }
 
 function getMapCenter(
-	featureCollection: MapFeatureCollection,
+	rows: ReadonlyArray<MapSourceItem>,
 	targetId: string | undefined,
 ): [number, number] {
-	const targetFeature = targetId
-		? featureCollection.features.find(({ id }) => id === targetId)
-		: undefined;
+	const targetRow = targetId ? getMapRowById(rows, targetId) : undefined;
 
-	if (targetFeature) {
-		const center = truncate(turfCenter(targetFeature.geometry));
+	if (targetRow) return getTruncatedLngLat(targetRow.geometry.coordinates);
 
-		return getTruncatedLngLat(center.geometry.coordinates);
-	}
-
-	const [west, south, east, north] = getNaturalBounds(featureCollection);
+	const [west, south, east, north] = getNaturalBounds(rows);
 	const longitude = (((west + east) / 2 + 180) % 360) - 180;
 
 	return getTruncatedLngLat([longitude, (south + north) / 2]);
 }
 
-// Vertices only: d3 reads GeoJSON polygon winding as inverted and bulges edges along great circles
-// East passes 180 when the shortest span crosses the antimeridian; MapLibre accepts this form
-function getNaturalBounds(
-	featureCollection: MapFeatureCollection,
-): [number, number, number, number] {
+// East goes past 180 when the shortest span crosses the antimeridian, which MapLibre accepts
+function getNaturalBounds(rows: ReadonlyArray<MapSourceItem>): [number, number, number, number] {
 	const [[west, south], [east, north]] = geoBounds({
-		coordinates: getVertices(featureCollection),
+		coordinates: rows.map(({ geometry }) => geometry.coordinates),
 		type: 'MultiPoint',
 	});
 
 	return [west, south, west > east ? east + 360 : east, north];
-}
-
-function getVertices(featureCollection: MapFeatureCollection): Array<Position> {
-	return featureCollection.features.flatMap(({ geometry }) => {
-		if (geometry.type === 'Point') return [geometry.coordinates];
-		if (geometry.type === 'LineString') return geometry.coordinates;
-		return geometry.coordinates.flat();
-	});
 }

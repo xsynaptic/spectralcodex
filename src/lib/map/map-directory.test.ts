@@ -1,43 +1,47 @@
-import type { MapPopupItem, MapSourceItem } from '@spectralcodex/map-codec';
+import type { MapSourceItem } from '@spectralcodex/map-codec';
 
+import { encodeMapSourceData, MapSourceItemSchema, mapSourceKeys } from '@spectralcodex/map-codec';
+import { mapScopesFileName } from '@spectralcodex/react-map-component/constants';
 import { describe, expect, test } from 'vitest';
 
-import { hashMapDirectoryData } from '#lib/map/map-directory-hash.ts';
+import { hashMapPayloads } from '#lib/map/map-directory-hash.ts';
 
-function makeChunks(title: string): Map<string, Array<MapPopupItem>> {
-	return new Map([['0', [makePopupItem('alpha', title)]]]);
+const sourceItem = {
+	geometry: { coordinates: [100, 10], type: 'Point' },
+	properties: {
+		category: 'other',
+		entryQuality: 1,
+		hasImage: false,
+		id: 'alpha',
+		precision: 3,
+		rating: 2,
+		status: 'unknown',
+		title: 'Alpha',
+	},
+	type: 'Feature',
+} satisfies MapSourceItem;
+
+function payloadsOf(rows: ReadonlyArray<unknown>) {
+	return new Map([['map-directory', JSON.stringify(rows)]]);
 }
 
-function makePopupItem(id: string, title: string): MapPopupItem {
-	return { id, title };
-}
+describe('hashMapPayloads', () => {
+	test('moves when a converter changes bytes but not decoded rows', () => {
+		const before = encodeMapSourceData([sourceItem]);
+		const after = before.map((row) => ({ ...row, [mapSourceKeys.entryQuality]: 1 }));
 
-function makeSourceItem(id: string): MapSourceItem {
-	return {
-		geometry: { coordinates: [100, 10], type: 'Point' },
-		properties: { category: 'other', chunkKey: '0', id, title: id },
-	} as unknown as MapSourceItem;
-}
-
-describe('hashMapDirectoryData', () => {
-	test('is stable across calls with equal input', () => {
-		const first = hashMapDirectoryData([makeSourceItem('alpha')], makeChunks('Alpha'));
-		const second = hashMapDirectoryData([makeSourceItem('alpha')], makeChunks('Alpha'));
-
-		expect(first).toBe(second);
+		expect(after.map((row) => MapSourceItemSchema.parse(row))).toEqual(
+			before.map((row) => MapSourceItemSchema.parse(row)),
+		);
+		expect(hashMapPayloads(payloadsOf(after))).not.toBe(hashMapPayloads(payloadsOf(before)));
 	});
 
-	test('changes when a directory row changes', () => {
-		const before = hashMapDirectoryData([makeSourceItem('alpha')], makeChunks('Alpha'));
-		const after = hashMapDirectoryData([makeSourceItem('beta')], makeChunks('Alpha'));
+	test('ignores the order payloads were collected in', () => {
+		const payloads = new Map([
+			['map-directory', JSON.stringify(encodeMapSourceData([sourceItem]))],
+			[mapScopesFileName, '[]'],
+		]);
 
-		expect(after).not.toBe(before);
-	});
-
-	test('changes when only a popup chunk changes', () => {
-		const before = hashMapDirectoryData([makeSourceItem('alpha')], makeChunks('Alpha'));
-		const after = hashMapDirectoryData([makeSourceItem('alpha')], makeChunks('Alpha Renamed'));
-
-		expect(after).not.toBe(before);
+		expect(hashMapPayloads(new Map([...payloads].toReversed()))).toBe(hashMapPayloads(payloads));
 	});
 });

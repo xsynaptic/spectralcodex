@@ -6,11 +6,7 @@ import chalk from 'chalk';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 
-import type {
-	DivisionFeatureCollection,
-	DivisionItem,
-	RegionMetadata,
-} from '#map-divisions/types.ts';
+import type { DivisionItem, RegionMetadata } from '#map-divisions/types.ts';
 
 const stacCatalogUrl = 'https://stac.overturemaps.org/catalog.json';
 const s3Base = 's3://overturemaps-us-west-2/release';
@@ -27,8 +23,7 @@ async function resolveLatestRelease(): Promise<string> {
 
 import { parseRegionData, resolveBoundingBox } from '#map-divisions/content.ts';
 import { fetchDivisionData, initializeDuckDB } from '#map-divisions/duckdb.ts';
-import { saveFlatgeobuf } from '#map-divisions/flatgeobuf.ts';
-import { convertToFeatureCollection } from '#map-divisions/geojson.ts';
+import { convertToFeatureCollection, saveDivisionMask } from '#map-divisions/geojson.ts';
 import { saveSvg } from '#map-divisions/svg.ts';
 import { getCollectionEntries, withAstroContent } from '#shared/astro-content.ts';
 import { findWorkspaceRoot, isExistingFile, safelyCreateDirectory } from '#shared/utils.ts';
@@ -43,19 +38,18 @@ const { values } = parseArgs({
 			short: 'c',
 			type: 'string',
 		},
-		'output-path': {
-			default: 'public/divisions',
-			short: 'o',
-			type: 'string',
+		regenerate: {
+			default: false,
+			short: 'r',
+			type: 'boolean',
 		},
 	},
 });
 
 const cachePath = path.join(rootPath, values['cache-path']);
-const outputPath = path.join(rootPath, values['output-path']);
 
 interface RegionProcessingNeeds {
-	needsFgb: boolean;
+	needsGeometry: boolean;
 	needsSvg: boolean;
 	region: RegionMetadata;
 }
@@ -64,18 +58,27 @@ async function collectProcessingNeeds(regions: Array<RegionMetadata>) {
 	const processingNeeds: Array<RegionProcessingNeeds> = [];
 
 	for (const region of regions) {
-		const fgbPath = path.join(outputPath, `${region.id}.fgb`);
-		const svgPath = path.join(cachePath, `${region.id}.svg`);
+		const isNeedsGeometry =
+			values.regenerate ||
+			!(await isExistingFile(path.join(cachePath, `${region.id}.json`))) ||
+			(await isMissingDivisionCache(region.divisionIds));
+		const isNeedsSvg =
+			values.regenerate || !(await isExistingFile(path.join(cachePath, `${region.id}.svg`)));
 
-		const isNeedsFgb = !(await isExistingFile(fgbPath));
-		const isNeedsSvg = !(await isExistingFile(svgPath));
-
-		if (isNeedsFgb || isNeedsSvg) {
-			processingNeeds.push({ needsFgb: isNeedsFgb, needsSvg: isNeedsSvg, region });
+		if (isNeedsGeometry || isNeedsSvg) {
+			processingNeeds.push({ needsGeometry: isNeedsGeometry, needsSvg: isNeedsSvg, region });
 		}
 	}
 
 	return processingNeeds;
+}
+
+async function isMissingDivisionCache(divisionIds: Array<string>) {
+	for (const divisionId of divisionIds) {
+		if (!(await isExistingFile(path.join(cachePath, `${divisionId}.geojson`)))) return true;
+	}
+
+	return false;
 }
 
 async function didProcessRegion({
@@ -87,7 +90,7 @@ async function didProcessRegion({
 	needs: RegionProcessingNeeds;
 	regionsById: Map<string, RegionMetadata>;
 }) {
-	const { needsFgb, needsSvg, region } = needs;
+	const { needsGeometry, needsSvg, region } = needs;
 
 	const divisionItems: Array<DivisionItem> = [];
 
@@ -114,17 +117,17 @@ async function didProcessRegion({
 
 	const divisionFeatureCollection = convertToFeatureCollection(divisionItems);
 
-	if (needsFgb) {
-		await saveFlatgeobuf(divisionFeatureCollection, region.id, outputPath);
+	if (needsGeometry) {
+		await saveDivisionMask(divisionFeatureCollection, region.id, cachePath);
 	} else {
-		console.log(chalk.gray(`  Skipping FGB (already exists): ${chalk.cyan(region.id)}`));
+		console.log(chalk.gray(`  Skipping mask (already exists): ${chalk.cyan(region.id)}`));
 	}
 
 	if (needsSvg) {
 		const divisionClippingBBox = resolveBoundingBox(region, regionsById, 'divisionClippingBBox');
 
 		await saveSvg({
-			geojsonData: divisionFeatureCollection as DivisionFeatureCollection,
+			geojsonData: divisionFeatureCollection,
 			id: region.id,
 			options: divisionClippingBBox ? { divisionClippingBBox } : {},
 			outputDir: cachePath,
@@ -187,16 +190,12 @@ async function mapDivisions() {
 			return;
 		}
 
-		// Build lookup map from ALL regions (including those without divisionIds)
-		// This enables hierarchical bbox resolution from parent regions
 		const regionsById = new Map(allRegions.map((region) => [region.id, region]));
 
-		// Initialize DuckDB connection
 		const connection = await initializeDuckDB();
 
 		const totalCount = regionsWithDivisionIds.length;
 
-		// Process only regions with division IDs
 		const successCount = await processRegions({
 			db: connection,
 			overtureUrl,
@@ -212,7 +211,7 @@ async function mapDivisions() {
 				`Successfully processed: ${chalk.cyan(String(successCount))} / ${chalk.cyan(String(totalCount))} regions`,
 			),
 		);
-		console.log(chalk.blue(`Output directory: ${chalk.cyan(values['output-path'])}`));
+		console.log(chalk.blue(`Output directory: ${chalk.cyan(values['cache-path'])}`));
 
 		if (successCount === totalCount) {
 			console.log(chalk.green('🎉 All regions processed successfully!'));
@@ -254,7 +253,6 @@ async function processBBoxGroup({
 	for (const needs of bboxNeeds) {
 		console.log(chalk.blue(`\nProcessing ${chalk.cyan(needs.region.id)}...`));
 
-		// One bad region should not abort the run
 		try {
 			if (await didProcessRegion({ divisionsById, needs, regionsById })) {
 				successCount++;
@@ -280,7 +278,7 @@ async function processRegions({
 }) {
 	console.log(chalk.magenta(`\n=== Processing ${chalk.cyan(String(regions.length))} regions ===`));
 
-	safelyCreateDirectory(outputPath);
+	safelyCreateDirectory(cachePath);
 
 	const processingNeeds = await collectProcessingNeeds(regions);
 
@@ -325,5 +323,4 @@ async function processRegions({
 	return successCount;
 }
 
-// Run the script
 await mapDivisions();

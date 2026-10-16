@@ -1,6 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 
-import { getBaseUrl, isProd, localPort, localUrl } from '#e2e/constants.ts';
+import { getBaseUrl, isDev, isProd, localPort, localUrl } from '#e2e/constants.ts';
 
 export default defineConfig({
 	fullyParallel: true,
@@ -10,16 +10,19 @@ export default defineConfig({
 			name: 'chromium',
 			use: { ...devices['Desktop Chrome'], launchOptions: { args: ['--enable-gpu'] } },
 		},
-		{ grep: /@firefox/, name: 'firefox', use: { ...devices['Desktop Firefox'] } },
+		{ grep: /@firefox/, name: 'firefox', use: { ...devices['Desktop Firefox'] }, workers: 1 },
+		{ grep: /@webkit/, name: 'webkit', use: { ...devices['Desktop Safari'] }, workers: 1 },
 	],
 	reporter: [['list'], ['html', { open: 'never', outputFolder: './temp/playwright-report' }]],
 	retries: 0,
 	testDir: './tests/e2e',
-	timeout: 15_000,
+	timeout: isDev ? 60_000 : 15_000,
 	use: {
 		baseURL: getBaseUrl(),
 	},
-	...(isProd
+	// The dev server renders each page on request, taking seconds per page once workers contend for it
+	...(isDev ? { expect: { timeout: 12_000 }, workers: 3 } : {}),
+	...(isProd || isDev
 		? {}
 		: {
 				webServer: {

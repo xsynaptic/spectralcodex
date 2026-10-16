@@ -1,6 +1,6 @@
 import type { ExpressionSpecification } from 'maplibre-gl';
 import type { FC } from 'react';
-import type { CircleLayerSpecification, SymbolLayerSpecification } from 'react-map-gl/maplibre';
+import type { CircleLayerSpecification } from 'react-map-gl/maplibre';
 
 import {
 	LocationStatusEnum,
@@ -14,10 +14,11 @@ import {
 import { memo, useMemo } from 'react';
 import { Layer, Source } from 'react-map-gl/maplibre';
 
-import type { MapSourceFeatureCollection } from '#types.ts';
+import type { MapRowCollection } from '#data/data-filter.ts';
 
-import { useIsDarkMode } from '#lib/dark-mode.tsx';
+import { useIsDarkMode } from '#lib/dark-mode.ts';
 import { MapLayerIdEnum, MapSourceIdEnum, pointClusterRadius } from '#source/source-config.ts';
+import { getClustersLabelLayerStyle } from '#source/source-hover.tsx';
 
 // Hover/select visuals read feature-state (set imperatively) so these paint specs never rebuild per interaction
 const hoverStateExpression = [
@@ -60,35 +61,11 @@ const clusterRampDeep = [
 	tailwindColors.sky400,
 ] satisfies ExpressionSpecification;
 
-// Numeric labels for clusters
-function getClustersLabelLayerStyle(isDarkMode: boolean) {
-	return {
-		filter: ['has', 'point_count'],
-		id: MapLayerIdEnum.ClustersLabel,
-		layout: {
-			'text-allow-overlap': true,
-			'text-field': '{point_count_abbreviated}',
-			'text-font': ['Noto Sans Medium'],
-			'text-ignore-placement': true,
-			'text-size': 10,
-		},
-		paint: {
-			'text-color': isDarkMode ? tailwindColors.sky50 : tailwindColors.sky50,
-			'text-halo-color': 'rgba(0, 0, 0, 0.2)',
-			'text-halo-width': 1,
-			'text-opacity': ['case', hoverStateExpression, 0, 1],
-		},
-		source: MapSourceIdEnum.PointCollection,
-		type: 'symbol',
-	} satisfies SymbolLayerSpecification;
-}
-
 function getClustersLayerStyle(isDarkMode: boolean) {
 	return {
 		filter: ['has', 'point_count'],
 		id: MapLayerIdEnum.Clusters,
 		layout: {
-			// Sort clusters by point count, descending
 			'circle-sort-key': ['-', ['get', 'point_count']],
 		},
 		paint: {
@@ -144,7 +121,6 @@ function getPointsImageLayerStyle() {
 	} satisfies CircleLayerSpecification;
 }
 
-// Visual points for unfiltered (zoomed-in) points
 function getPointsLayerStyle(isDarkMode: boolean) {
 	return {
 		filter: ['!', ['has', 'point_count']],
@@ -219,51 +195,29 @@ function getPointsTargetLayerStyle(isDarkMode: boolean) {
 	} satisfies CircleLayerSpecification;
 }
 
-function useMapSourcePointsStyle(): {
-	[MapLayerIdEnum.Clusters]: CircleLayerSpecification;
-	[MapLayerIdEnum.ClustersLabel]: SymbolLayerSpecification;
-	[MapLayerIdEnum.Points]: CircleLayerSpecification;
-	[MapLayerIdEnum.PointsImage]: CircleLayerSpecification;
-	[MapLayerIdEnum.PointsTarget]: CircleLayerSpecification;
-} {
+function useMapSourcePointsStyle() {
 	const isDarkMode = useIsDarkMode();
 
-	const clustersLayerStyle = useMemo(() => getClustersLayerStyle(isDarkMode), [isDarkMode]);
-
-	const clustersLabelLayerStyle = useMemo(
-		() => getClustersLabelLayerStyle(isDarkMode),
+	return useMemo(
+		() => ({
+			clusters: getClustersLayerStyle(isDarkMode),
+			clustersLabel: getClustersLabelLayerStyle(MapSourceIdEnum.PointCollection),
+			points: getPointsLayerStyle(isDarkMode),
+			pointsImage: getPointsImageLayerStyle(),
+			pointsTarget: getPointsTargetLayerStyle(isDarkMode),
+		}),
 		[isDarkMode],
 	);
-
-	const pointsLayerStyle = useMemo(() => getPointsLayerStyle(isDarkMode), [isDarkMode]);
-
-	const pointsTargetLayerStyle = useMemo(() => getPointsTargetLayerStyle(isDarkMode), [isDarkMode]);
-
-	const pointsImageLayerStyle = useMemo(() => getPointsImageLayerStyle(), []);
-
-	return {
-		[MapLayerIdEnum.Clusters]: clustersLayerStyle,
-		[MapLayerIdEnum.ClustersLabel]: clustersLabelLayerStyle,
-		[MapLayerIdEnum.Points]: pointsLayerStyle,
-		[MapLayerIdEnum.PointsImage]: pointsImageLayerStyle,
-		[MapLayerIdEnum.PointsTarget]: pointsTargetLayerStyle,
-	};
 }
 
-/**
- * A note about cluster properties:
- * MapLibre's setClusterOptions API only accepts cluster, clusterRadius, and clusterMaxZoom as options
- * We can't set clusterProperties after initialization of a source; changing them requires a complete teardown
- * Only add cluster properties derived from values that never change
- */
+// `clusterProperties` cannot change after the source is created, so only values fixed for the session belong there
 export const MapSourcePoints: FC<{
-	data: MapSourceFeatureCollection;
+	data: MapRowCollection;
 	interactive: boolean;
 }> = memo(function MapPointLayerContents({ data, interactive }) {
 	const pointsStyle = useMapSourcePointsStyle();
 
 	const clusterConfig = useMemo(() => {
-		// Create cluster properties dynamically for each status
 		const clusterProperties: Record<string, unknown> = Object.fromEntries(
 			Object.values(LocationStatusEnum).map((status) => [
 				status,
@@ -280,7 +234,7 @@ export const MapSourcePoints: FC<{
 		};
 	}, [interactive]);
 
-	// Note: Layer components need to be immediate children of Source components; do not use React.Fragment here
+	// react-map-gl needs each Layer as an immediate child of Source; no Fragment
 	return (
 		<Source
 			data={data}
@@ -289,15 +243,11 @@ export const MapSourcePoints: FC<{
 			type="geojson"
 			{...clusterConfig}
 		>
-			{interactive ? (
-				<Layer key={MapLayerIdEnum.Clusters} {...pointsStyle[MapLayerIdEnum.Clusters]} />
-			) : undefined}
-			{interactive ? (
-				<Layer key={MapLayerIdEnum.ClustersLabel} {...pointsStyle[MapLayerIdEnum.ClustersLabel]} />
-			) : undefined}
-			<Layer key={MapLayerIdEnum.PointsTarget} {...pointsStyle[MapLayerIdEnum.PointsTarget]} />
-			<Layer key={MapLayerIdEnum.Points} {...pointsStyle[MapLayerIdEnum.Points]} />
-			<Layer key={MapLayerIdEnum.PointsImage} {...pointsStyle[MapLayerIdEnum.PointsImage]} />
+			{interactive ? <Layer {...pointsStyle.clusters} /> : undefined}
+			{interactive ? <Layer {...pointsStyle.clustersLabel} /> : undefined}
+			<Layer {...pointsStyle.pointsTarget} />
+			<Layer {...pointsStyle.points} />
+			<Layer {...pointsStyle.pointsImage} />
 		</Source>
 	);
 });

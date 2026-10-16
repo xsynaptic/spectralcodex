@@ -10,7 +10,7 @@ import { describe, expect, test } from 'vitest';
 import type { MapFilterState } from '#data/data-filter.ts';
 import type { MapFeaturesRule } from '#types.ts';
 
-import { getHiddenTargetIds, getMapCanvasData, isLocationVisible } from '#data/data-filter.ts';
+import { getHiddenTargetIds, getMapCanvasData } from '#data/data-filter.ts';
 
 const passAll: MapFilterState = {
 	objective: 1,
@@ -18,19 +18,12 @@ const passAll: MapFilterState = {
 	status: [],
 };
 
-const pointGeometry = {
-	coordinates: [0, 0],
-	type: GeometryTypeEnum.Point,
-} satisfies MapSourceItem['geometry'];
-
-function makeItem(
-	properties: Partial<MapSourceItem['properties']> = {},
-	geometry: MapSourceItem['geometry'] = pointGeometry,
-): MapSourceItem {
+function makeItem(properties: Partial<MapSourceItem['properties']> = {}): MapSourceItem {
 	return {
-		geometry,
+		geometry: { coordinates: [0, 0], type: GeometryTypeEnum.Point },
 		properties: {
 			category: LocationCategoryEnum.Unknown,
+			entryQuality: 1,
 			hasImage: false,
 			id: 'location-id',
 			outlier: false,
@@ -40,91 +33,47 @@ function makeItem(
 			title: 'Location',
 			...properties,
 		},
+		type: 'Feature',
 	};
 }
 
-const lineGeometry = {
-	coordinates: [
-		[0, 0],
-		[1, 1],
-	],
-	type: GeometryTypeEnum.LineString,
-} satisfies MapSourceItem['geometry'];
+function getDrawnIds(result: ReturnType<typeof getMapCanvasData>) {
+	return result.pointCollection.features.map(({ properties }) => properties.id);
+}
 
-const polygonGeometry = {
-	coordinates: [
-		[
-			[0, 0],
-			[1, 1],
-			[2, 0],
-			[0, 0],
-		],
-	],
-	type: GeometryTypeEnum.Polygon,
-} satisfies MapSourceItem['geometry'];
+function isDrawn(item: MapSourceItem, filter: MapFilterState) {
+	return getDrawnIds(getMapCanvasData([item], filter)).includes(item.properties.id);
+}
 
-describe('isLocationVisible', () => {
+describe('getMapCanvasData visibility', () => {
 	test('status is an exclude-list', () => {
-		const properties = makeItem({ status: LocationStatusEnum.Abandoned }).properties;
+		const item = makeItem({ status: LocationStatusEnum.Abandoned });
 
-		expect(
-			isLocationVisible(properties, { ...passAll, status: [LocationStatusEnum.Abandoned] }),
-		).toBe(false);
-		expect(isLocationVisible(properties, { ...passAll, status: [LocationStatusEnum.Active] })).toBe(
-			true,
-		);
+		expect(isDrawn(item, { ...passAll, status: [LocationStatusEnum.Abandoned] })).toBe(false);
+		expect(isDrawn(item, { ...passAll, status: [LocationStatusEnum.Active] })).toBe(true);
 	});
 
 	test('a missing objective is never hidden by the objective threshold', () => {
-		expect(isLocationVisible(makeItem().properties, { ...passAll, objective: 5 })).toBe(true);
+		expect(isDrawn(makeItem(), { ...passAll, objective: 5 })).toBe(true);
 	});
 
 	test('every threshold is an inclusive minimum', () => {
 		const atThreshold: MapFilterState = { objective: 3, rating: 3, status: [] };
 		const onTheLine = { objective: 3, rating: 3 };
 
-		expect(isLocationVisible(makeItem(onTheLine).properties, atThreshold)).toBe(true);
-		expect(isLocationVisible(makeItem({ ...onTheLine, rating: 2 }).properties, atThreshold)).toBe(
-			false,
-		);
-		expect(
-			isLocationVisible(makeItem({ ...onTheLine, objective: 2 }).properties, atThreshold),
-		).toBe(false);
+		expect(isDrawn(makeItem(onTheLine), atThreshold)).toBe(true);
+		expect(isDrawn(makeItem({ ...onTheLine, rating: 2 }), atThreshold)).toBe(false);
+		expect(isDrawn(makeItem({ ...onTheLine, objective: 2 }), atThreshold)).toBe(false);
 	});
 });
 
 describe('getMapCanvasData', () => {
-	test('partitions point and line into their own collections; polygons build nothing', () => {
-		const result = getMapCanvasData(
-			[makeItem(), makeItem({}, lineGeometry), makeItem({}, polygonGeometry)],
-			passAll,
-		);
-
-		expect(result.pointCollection?.features).toHaveLength(1);
-		expect(result.lineStringCollection?.features).toHaveLength(1);
-		expect('polygonCollection' in result).toBe(false);
-	});
-
-	test('filteredCount counts drawn features only; totalCount counts every survivor', () => {
-		const result = getMapCanvasData(
-			[makeItem(), makeItem({}, lineGeometry), makeItem({}, polygonGeometry)],
-			passAll,
-		);
-
-		expect(result.filteredCount).toBe(2);
-		expect(result.totalCount).toBe(3);
-	});
-
-	test('emits frozen feature shape without id', () => {
+	test('draws the decoded rows themselves, which carry no id', () => {
 		const item = makeItem();
 
-		const feature = getMapCanvasData([item], passAll).pointCollection?.features[0];
+		const feature = getMapCanvasData([item], passAll).pointCollection.features[0];
 
-		expect(feature).toEqual({
-			geometry: item.geometry,
-			properties: item.properties,
-			type: 'Feature',
-		});
+		expect(feature).toBe(item);
 		expect(feature && 'id' in feature).toBe(false);
 	});
 
@@ -135,7 +84,7 @@ describe('getMapCanvasData', () => {
 		});
 
 		expect(result.filteredCount).toBe(1);
-		expect(result.totalCount).toBe(2); // totalCount is the map features total, before visibility
+		expect(result.totalCount).toBe(2);
 	});
 
 	test('a pinned item is drawn whatever the filter hides', () => {
@@ -144,26 +93,23 @@ describe('getMapCanvasData', () => {
 			{ ...passAll, pinnedIds: ['target'], rating: 3 },
 		);
 
-		expect(result.pointCollection?.features.map(({ properties }) => properties.id)).toEqual([
-			'target',
-		]);
+		expect(getDrawnIds(result)).toEqual(['target']);
 	});
 
-	test('a pinned item outside the map features stays out', () => {
+	test('a pinned item outside the Scope stays out', () => {
 		const result = getMapCanvasData(
 			[makeItem({ id: 'target', themeIndices: [1] })],
 			{ ...passAll, pinnedIds: ['target'] },
-			{ mapFeaturesRule: { index: 2, type: 'theme' } },
+			{ index: 2, type: 'theme' },
 		);
 
-		expect(result.pointCollection).toBeUndefined();
+		expect(result.pointCollection.features).toEqual([]);
 	});
 
-	test('empty input yields undefined collections and zero counts', () => {
+	test('empty input yields an empty collection and zero counts', () => {
 		const result = getMapCanvasData([], passAll);
 
-		expect(result.pointCollection).toBeUndefined();
-		expect(result.lineStringCollection).toBeUndefined();
+		expect(result.pointCollection.features).toEqual([]);
 		expect(result.filteredCount).toBe(0);
 		expect(result.totalCount).toBe(0);
 	});
@@ -182,133 +128,28 @@ describe('getHiddenTargetIds', () => {
 	});
 });
 
-describe('getMapCanvasData map features', () => {
-	const inside = makeItem({ id: 'inside', regionOrdinals: [5], themeIndices: [2] });
-	const outside = makeItem({ id: 'outside', regionOrdinals: [99], themeIndices: [7] });
-
-	test('theme rule keeps only points carrying the theme index', () => {
-		const result = getMapCanvasData([inside, outside], passAll, {
-			mapFeaturesRule: { index: 2, type: 'theme' },
-		});
-
-		expect(result.totalCount).toBe(1);
-		expect(result.pointCollection?.features[0]?.properties.id).toBe('inside');
-	});
-
-	test('ids rule preserves the list order', () => {
-		const result = getMapCanvasData([inside, outside], passAll, {
-			mapFeaturesRule: { ids: ['outside', 'inside'], type: 'ids' },
-		});
-
-		expect(result.pointCollection?.features.map((feature) => feature.properties.id)).toEqual([
-			'outside',
-			'inside',
-		]);
-	});
-
-	test('region rule is inclusive at both ends of the interval', () => {
-		const items = [
-			makeItem({ id: 'below-left', regionOrdinals: [3] }),
-			makeItem({ id: 'at-left', regionOrdinals: [4] }),
-			makeItem({ id: 'at-right', regionOrdinals: [10] }),
-			makeItem({ id: 'above-right', regionOrdinals: [11] }),
-		];
-
-		const result = getMapCanvasData(items, passAll, {
-			mapFeaturesRule: { interval: [4, 10], type: 'region' },
-		});
-
-		expect(result.pointCollection?.features.map((feature) => feature.properties.id)).toEqual([
-			'at-left',
-			'at-right',
-		]);
-	});
-
-	test('an item in several regions is kept when any one ordinal is inside', () => {
-		const item = makeItem({ id: 'multi', regionOrdinals: [99, 5] });
-
-		const result = getMapCanvasData([item], passAll, {
-			mapFeaturesRule: { interval: [1, 10], type: 'region' },
-		});
-
-		expect(result.totalCount).toBe(1);
-	});
-
-	test('ids rule drops ids missing from the index', () => {
-		const result = getMapCanvasData([inside, outside], passAll, {
-			mapFeaturesRule: { ids: ['inside', 'nope'], type: 'ids' },
-		});
-
-		expect(result.totalCount).toBe(1);
-		expect(result.pointCollection?.features.map((feature) => feature.properties.id)).toEqual([
-			'inside',
-		]);
-	});
-
-	test('points missing the relevant column are excluded by a rule', () => {
-		const bare = makeItem({ id: 'bare' });
-
-		expect(
-			getMapCanvasData([bare], passAll, { mapFeaturesRule: { interval: [1, 10], type: 'region' } })
-				.totalCount,
-		).toBe(0);
-		expect(
-			getMapCanvasData([bare], passAll, { mapFeaturesRule: { index: 2, type: 'theme' } })
-				.totalCount,
-		).toBe(0);
-	});
-
-	test('no rule keeps every point', () => {
-		const result = getMapCanvasData([inside, outside], passAll);
-
-		expect(result.totalCount).toBe(2);
-	});
-});
-
-function getDrawnIds(result: ReturnType<typeof getMapCanvasData>) {
-	return [
-		...(result.pointCollection?.features ?? []),
-		...(result.lineStringCollection?.features ?? []),
-	].map(({ properties }) => properties.id);
-}
-
 describe('getMapCanvasData scope', () => {
 	const inside = makeItem({ id: 'inside', regionOrdinals: [5] });
 	const outside = makeItem({ id: 'outside', regionOrdinals: [99] });
-	const outsideLine = makeItem({ id: 'outside-line', regionOrdinals: [99] }, lineGeometry);
 
-	const mapFeaturesRule: MapFeaturesRule = { interval: [1, 100], type: 'region' };
 	const scopeRule: MapFeaturesRule = { interval: [4, 10], type: 'region' };
 
 	test('items outside the Scope are not drawn, and the total is the Scope size', () => {
-		const result = getMapCanvasData([inside, outside, outsideLine], passAll, {
-			mapFeaturesRule,
-			scopeRule,
-		});
+		const result = getMapCanvasData([inside, outside], passAll, scopeRule);
 
 		expect(getDrawnIds(result)).toEqual(['inside']);
 		expect(result.totalCount).toBe(1);
 		expect(result.filteredCount).toBe(1);
 	});
 
-	test('the Scope narrows the map features, never widens them', () => {
-		const result = getMapCanvasData([inside, outside], passAll, {
-			mapFeaturesRule: { interval: [50, 100], type: 'region' },
-			scopeRule,
-		});
-
-		expect(getDrawnIds(result)).toEqual([]);
-		expect(result.totalCount).toBe(0);
-	});
-
 	test('a filter that empties the Scope leaves a blank map and the Scope size as the total', () => {
 		const result = getMapCanvasData(
 			[inside, outside],
 			{ ...passAll, status: [LocationStatusEnum.Abandoned] },
-			{ mapFeaturesRule, scopeRule },
+			scopeRule,
 		);
 
-		expect(result.pointCollection).toBeUndefined();
+		expect(result.pointCollection.features).toEqual([]);
 		expect(result.filteredCount).toBe(0);
 		expect(result.totalCount).toBe(1);
 	});

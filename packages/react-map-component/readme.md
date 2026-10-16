@@ -1,21 +1,22 @@
 # react-map-component
 
-MapLibre GL JS component for rendering geographic location data with dynamic filtering, clustering, and administrative boundary overlays.
+The map island of Spectral Codex. It draws the site's Locations on a [react-map-gl](https://visgl.github.io/react-map-gl/) map over [Protomaps](https://protomaps.com/) basemap tiles, with clustering, status colours, Division masks and popups.
 
-## Features
+## Data
 
-Built on [react-map-gl](https://visgl.github.io/react-map-gl/) with [Protomaps](https://protomaps.com/) basemap tiles and PMTiles protocol. The component consumes compressed JSON for point/line geometries and streams FlatGeobuf files for administrative divisions, enabling low-bandwidth map initialization with thousands of features.
+Each map fetches its dataset's directory from `/api/map/`, a compressed JSON payload written at build time by `@spectralcodex/map-codec`, and picks out its own rows using the rule the page gives it. Popup details arrive separately, in Chunks fetched when a Point is opened. Every payload URL carries a version hash, so the browser caches it across pages and a new build replaces it.
 
-**Data compression**: Location properties use numeric enums and single-letter keys to reduce payload size. Zod schemas transform compressed data to developer-friendly structures at runtime while maintaining type safety.
+## State
 
-**Streaming boundaries**: Administrative divisions are fetched as FlatGeobuf files and geometrically inverted using Turf.js to create "mask" layers that highlight regions by dimming everything outside their boundaries. FlatGeobuf's column-oriented format enables progressive decoding without loading entire datasets into memory.
+Props are fixed at mount. Everything that changes afterwards (the view, Scope, Targets, selection, hover, filters and overlays) lives in one zustand store, and fetched data lives in react-query.
 
-**State management**: [Zustand](https://zustand-demo.pmnd.rs/) store with [React Query](https://tanstack.com/query/latest) for async data fetching and IndexedDB persistence. Map filters (status, rating, objective) trigger memoized GeoJSON reconstruction rather than mutating layer sources, preserving React's unidirectional data flow.
+## Host contract
 
-**Dynamic styling**: MapLibre layer specifications are generated via hooks that interpolate style properties based on zoom level, selection state, and dark mode. Expressions use feature properties to drive data-driven styling for status colors, cluster sizing, and hover effects.
+A host page drives a persisted map through the document rather than through props. The page's view (its Targets and an optional Scope) sits in a JSON attribute on the root element and is read again on `map:sync`. Layout facts arrive as custom properties on the shell, and the site's mode attribute switches dark mode. The map reports back with DOM events: `map:open` asks the host to open a page, `map:control` reports a press on a host control, and `map:track` carries analytics. All of these names are exported from `./constants`.
 
-**Host bridge**: A host page can drive a persistent map through the document instead of props. The map reads its current view (the targets to frame, and an optional scope limiting which features it shows) from a JSON attribute on the root element, validated with Zod, and re-reads it on a sync event; feature clicks, the controls that enter, expand, and leave the host's map layout, and analytics events are dispatched back as DOM events for the host to handle. This keeps a single map instance alive across Astro view transitions, where a persisted island never receives new props.
+## Exports
 
-**Camera transitions**: When the view changes the camera eases to the new targets, with duration scaled by zoom change and distance travelled. The current zoom is kept when it already frames them, and target markers are drawn once the move settles.
-
-**Clustering**: SuperCluster integration with dynamic radius scaling and multi-tier visual hierarchy. Cluster styling uses interpolated expressions to scale radius and color by point count, with enlarged tap targets for mobile interaction.
+- `.`: `ReactMapComponent` and its prop types
+- `./constants`: event names, attributes, properties and class names shared with the host and the e2e suite
+- `./track`: `trackMap`, for a host that reports its own map events
+- `./styles/map-component.css`

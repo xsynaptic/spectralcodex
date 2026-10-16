@@ -8,7 +8,7 @@ This repository contains the working [Astro](https://astro.build) project used t
 
 - All content authored in MDX using the Content Layer API, with strict Zod schemas and generated JSON schemas for editor tooling
 - Entry quality scoring on a 1-5 scale, used to prioritize content in listings, chronology highlights, and image fallbacks
-- Comprehensive validation: frontmatter checks, cross-collection reference integrity, global ID uniqueness, geospatial boundary checking (Turf.js and FlatGeobuf), proximity-based duplicate detection ([KDBush](https://github.com/mourner/kdbush)), image reference and aspect ratio validation
+- Comprehensive validation: frontmatter checks, cross-collection reference integrity, global ID uniqueness, geospatial boundary checking against Overture Maps divisions (Turf.js), proximity-based duplicate detection ([KDBush](https://github.com/mourner/kdbush)), image reference and aspect ratio validation
 - Build scripts read `astro:content` outside the Astro runtime via a Vite module runner, so validation, redirects, OG images, and sitemap dates see the same parsed collections the site does
 - Automated excerpt generation for previews and listings
 - Backlinks discovered from the internal `<Link>` component, plus entry counts computed across regions, themes, series, and resources
@@ -47,7 +47,7 @@ Astro's built-in image optimization works well for smaller sites, but this proje
 - Map payloads run through a key-compression codec in its own package, shared by the build script that writes them and the client that reads them
 - Popups, clustering, filtering by objectives, and responsive design
 - Custom filter controls for adjusting what points are visible on the map
-- Administrative boundaries sourced from [Overture Maps](https://docs.overturemaps.org/) and converted to FlatGeobuf files for rendering on region maps
+- Administrative boundaries sourced from [Overture Maps](https://docs.overturemaps.org/) and converted to simplified GeoJSON masks for rendering on region maps
 - Persistent storage of map data via IndexedDB, keyed by build version so a deploy invalidates client-cached payloads instead of serving stale points
 - Atlas mode: a full-screen map at `/atlas` that splits on desktop into the map and a reading pane; click a point and its page loads beside the map. On a narrow screen the page becomes a sheet over the map that can be lowered out of the way
 - A single MapLibre instance persisted across view transitions, so map position and filters survive navigation

@@ -21,10 +21,9 @@ interface Props {
 	atlas?: AtlasPageProps | undefined;
 	breadcrumbRegions?: Array<CollectionEntry<'regions'>> | undefined;
 	entry: CollectionEntry<'regions' | 'resources' | 'series' | 'themes'>;
-	prefetchUrls: Array<string> | undefined;
 }
 
-const { atlas, breadcrumbRegions, entry, prefetchUrls } = Astro.props;
+const { atlas, breadcrumbRegions, entry } = Astro.props;
 
 const titleMultilingual = getMultilingualContent({ data: entry.data, prop: 'title' })?.primary;
 
@@ -49,7 +48,6 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 			alt: entry.data.title,
 			id: entry.id,
 		}),
-		prefetchUrls,
 		title: formatTitleMultilingual(entry.data.title, titleMultilingual),
 	}}
 	schemas={[

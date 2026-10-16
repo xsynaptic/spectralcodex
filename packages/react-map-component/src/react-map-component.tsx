@@ -1,23 +1,22 @@
 import type { FC } from 'react';
 
+import { useState } from 'react';
+
 import type { MapComponentProps } from '#types.ts';
 
 import { MapCanvas } from '#canvas/canvas.tsx';
-import { DarkModeProvider } from '#lib/dark-mode.tsx';
-import { MapMessagesProvider } from '#lib/messages.tsx';
+import { createMapHost } from '#host/host-adapter.ts';
+import { createMapConfig, MapConfigProvider } from '#lib/config.tsx';
 import { ReactQueryProvider } from '#lib/react-query.tsx';
-import { MapTrackContext } from '#lib/track-context.tsx';
 
 export const ReactMapComponent: FC<MapComponentProps> = function ReactMapComponent(props) {
+	const [config] = useState(() => createMapConfig(props, createMapHost(props)));
+
 	return (
-		<ReactQueryProvider isDev={props.isDev}>
-			<DarkModeProvider darkMode={props.darkMode}>
-				<MapMessagesProvider messages={props.messages}>
-					<MapTrackContext.Provider value={props.mapId}>
-						<MapCanvas {...props} />
-					</MapTrackContext.Provider>
-				</MapMessagesProvider>
-			</DarkModeProvider>
+		<ReactQueryProvider>
+			<MapConfigProvider config={config}>
+				<MapCanvas />
+			</MapConfigProvider>
 		</ReactQueryProvider>
 	);
 };

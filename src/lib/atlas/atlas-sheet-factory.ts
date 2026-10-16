@@ -1,4 +1,4 @@
-import type { AtlasScreen, AtlasSheetRest } from '#lib/atlas/atlas-layout-factory.ts';
+import type { AtlasSheetRest } from '#lib/atlas/atlas-layout-factory.ts';
 
 import { atlasSheetRest } from '#lib/atlas/atlas-constants.ts';
 
@@ -41,6 +41,7 @@ export function getSheetTranslate({
 	linePx: number;
 	lines: AtlasSheetLines;
 }) {
+	// Less the half margin, so a grab draws the same frame as the half rest it left
 	return linePx - getMarginPx(from, lines);
 }
 
@@ -64,6 +65,7 @@ export function getSheetSlide({
 
 	if (to !== atlasSheetRest.raised) return { clipPx: undefined, translatePx };
 
+	// Leaving half drops the margin, so near a page's end the scroll clamps and raised stops short
 	const clampPx = Math.min(marginPx, Math.max(0, scrollY - (scrollMaxY - marginPx)));
 
 	if (clampPx === 0) return { clipPx: undefined, translatePx };
@@ -170,24 +172,6 @@ export function getPreferredSheetRest({
 
 export function getSheetEnterRest(hasHalf: boolean) {
 	return hasHalf ? atlasSheetRest.half : atlasSheetRest.down;
-}
-
-export function getSheetArrivalRest({
-	from,
-	hasHalf,
-	stored,
-}: {
-	from: AtlasScreen;
-	hasHalf: boolean;
-	stored: string | undefined;
-}) {
-	if (!hasHalf) return atlasSheetRest.raised;
-	if (isOpenRest(stored)) return stored;
-
-	if (from.layout === 'map') return atlasSheetRest.half;
-	if (from.layout !== 'sheet') return atlasSheetRest.raised;
-
-	return from.rest === atlasSheetRest.raised ? atlasSheetRest.raised : atlasSheetRest.half;
 }
 
 export function isSheetArrivalAtStart({

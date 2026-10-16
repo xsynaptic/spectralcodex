@@ -22,7 +22,6 @@ export interface MetaProps {
 	noFollow?: boolean;
 	noIndex?: boolean;
 	ogType?: 'article' | 'website' | undefined;
-	prefetchUrls?: Array<string> | undefined;
 	preloadUrls?: Array<string> | undefined;
 	title?: string | undefined;
 }

@@ -4,7 +4,7 @@ import type { Page } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 
 import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
-import type { MapComponentData } from '#lib/map/map-types.ts';
+import type { MapComponentData } from '#lib/map/map-data.ts';
 
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
 import ContentEntryDetail from '#components/content/content-entry-detail.astro';
@@ -41,7 +41,7 @@ const allThemeIds = [...new Set([...(themeIds ?? []), ...relatedThemeIds])];
 const atlas = await getAtlasPage(entry, mapData);
 ---
 
-<ContentEntryDetail atlas={atlas} entry={entry} prefetchUrls={mapData.prefetchUrls}>
+<ContentEntryDetail atlas={atlas} entry={entry}>
 	<Fragment slot="header-subtitle">
 		<DividedItem>
 			<ContentCollectionLink collection={entry.collection} />
