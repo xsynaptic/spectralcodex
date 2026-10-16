@@ -49,20 +49,20 @@
 		"#*": "./src/*"
 	},
 	"dependencies": {
-		"astro": "^7.3.8",
+		"astro": "^7.4.0",
 		"react": "^19.3.0",
 		"react-dom": "^19.3.0"
 	},
 	"devDependencies": {
 		"@astrojs/check": "^0.9.10",
-		"@astrojs/markdown-satteri": "^0.4.3",
-		"@astrojs/mdx": "^8.0.3",
-		"@astrojs/node": "^11.1.7",
-		"@astrojs/react": "^7.0.1",
+		"@astrojs/markdown-satteri": "^0.4.4",
+		"@astrojs/mdx": "^8.1.0",
+		"@astrojs/node": "^11.1.8",
+		"@astrojs/react": "^7.1.0",
 		"@astrojs/rss": "^4.0.19",
 		"@astrojs/sitemap": "^3.7.4",
 		"@pagefind/component-ui": "^1.5.2",
-		"@playwright/test": "^1.64.0",
+		"@playwright/test": "^1.64.1",
 		"@spectralcodex/map-codec": "workspace:*",
 		"@spectralcodex/react-map-component": "workspace:*",
 		"@spectralcodex/scripts": "workspace:*",
@@ -109,7 +109,7 @@
 		"globals": "^17.13.0",
 		"kdbush": "^4.1.0",
 		"knip": "^6.41.0",
-		"lefthook": "^2.2.1",
+		"lefthook": "^2.2.2",
 		"ohash": "^2.0.12",
 		"p-memoize": "^8.0.0",
 		"prettier": "^3.9.10",
@@ -125,7 +125,7 @@
 		"unpic": "^4.2.2",
 		"vite": "^8.3.4",
 		"vitest": "^4.1.11",
-		"zod": "^4.6.6"
+		"zod": "^4.6.7"
 	},
 	"packageManager": "pnpm@12.3.4"
 }
