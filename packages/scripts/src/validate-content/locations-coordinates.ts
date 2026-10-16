@@ -1,39 +1,37 @@
-import type { Feature, MultiPolygon, Polygon } from 'geojson';
+import { booleanPointInPolygon } from '@turf/boolean-point-in-polygon';
+import { point } from '@turf/helpers';
 
-import { booleanPointInPolygon, point } from '@turf/turf';
-import { deserialize } from 'flatgeobuf/geojson';
-import fs from 'node:fs/promises';
-import path from 'node:path';
-
+import type { DivisionGeometry } from '#map-divisions/types.ts';
 import type { ContentEntry } from '#shared/astro-content.ts';
 import type { ValidationResult } from '#validate-content/validation-result.ts';
 
+import { getDivisionIds } from '#map-divisions/content.ts';
+import { getDivisionDataCache } from '#map-divisions/geojson-cache.ts';
 import { toReferenceIds } from '#shared/entries.ts';
 import { LocationGeometrySchema } from '#shared/geometry.ts';
 
 interface RegionCoverage {
-	features: RegionFeatures;
+	geometries: Array<DivisionGeometry>;
 	validRegions: Array<string>;
 }
 
-type RegionFeatures = Array<Feature<MultiPolygon | Polygon>>;
-
 export async function validateLocationsCoordinates(
 	entries: Array<ContentEntry>,
+	regionEntries: Array<ContentEntry>,
 	divisionsPath: string,
 ) {
 	const {
 		checkedCount,
 		mismatchCount,
 		mismatches,
-		missingFgbCount,
+		missingGeometryCount,
 		missingRegions,
 		unloadableRegions,
-	} = await collectCoordinateFindings(entries, divisionsPath);
+	} = await collectCoordinateFindings(entries, regionEntries, divisionsPath);
 
 	const notes = unloadableRegions.map(
 		(regionId) =>
-			`${regionId}: could not load FGB file, skipping all other locations in this region`,
+			`${regionId}: could not load Division geometry, skipping all other locations in this region`,
 	);
 
 	if (checkedCount === 0) {
@@ -50,7 +48,7 @@ export async function validateLocationsCoordinates(
 			issues: [],
 			notes,
 			status: 'pass',
-			summary: `${checkedCount.toString()} valid location coordinates (${missingFgbCount.toString()} skipped)`,
+			summary: `${checkedCount.toString()} valid location coordinates (${missingGeometryCount.toString()} skipped)`,
 		} satisfies ValidationResult;
 	}
 
@@ -62,39 +60,49 @@ export async function validateLocationsCoordinates(
 		issues: mismatches.map((message) => ({ message })),
 		notes:
 			sortedMissingRegions.length > 0
-				? [...notes, `Missing FGB regions: ${sortedMissingRegions.join(', ')}`]
+				? [...notes, `Regions missing Division geometry: ${sortedMissingRegions.join(', ')}`]
 				: notes,
 		status: 'fail',
 		summary: `Found ${mismatchCount.toString()} coordinate mismatch(es)`,
 	} satisfies ValidationResult;
 }
 
-async function collectCoordinateFindings(entries: Array<ContentEntry>, divisionsPath: string) {
+async function collectCoordinateFindings(
+	entries: Array<ContentEntry>,
+	regionEntries: Array<ContentEntry>,
+	divisionsPath: string,
+) {
 	const mismatches: Array<string> = [];
 
 	let mismatchCount = 0;
-	let missingFgbCount = 0;
+	let missingGeometryCount = 0;
 	let checkedCount = 0;
 
-	const { getRegionFeatures, missingRegions, unloadableRegions } =
-		createRegionGeometryLoader(divisionsPath);
+	const divisionIdsByRegion = new Map(
+		regionEntries.map((region) => [region.id, getDivisionIds(region)]),
+	);
+
+	const { getRegionGeometries, missingRegions, unloadableRegions } = createRegionGeometryLoader(
+		divisionIdsByRegion,
+		divisionsPath,
+	);
 
 	for (const entry of entries) {
 		if (entry.data.skipCoordinateCheck === true) continue;
 
-		const geometries = getEntryGeometries(entry);
+		const locationGeometries = getEntryGeometries(entry);
 
-		if (!geometries) continue;
+		if (!locationGeometries) continue;
 
 		const regions = toReferenceIds(entry.data.regions);
-		const coverage = await collectRegionFeatures(regions, getRegionFeatures);
+		const coverage = await collectRegionGeometries(regions, getRegionGeometries);
 
 		if (coverage.validRegions.length === 0) {
-			missingFgbCount++;
+			missingGeometryCount++;
 			continue;
 		}
 
-		const entryMismatches = collectEntryMismatches(entry, geometries, coverage);
+		const entryMismatches = collectEntryMismatches(entry, locationGeometries, coverage);
 
 		if (entryMismatches.length > 0) {
 			mismatches.push(...entryMismatches);
@@ -108,7 +116,7 @@ async function collectCoordinateFindings(entries: Array<ContentEntry>, divisions
 		checkedCount,
 		mismatchCount,
 		mismatches,
-		missingFgbCount,
+		missingGeometryCount,
 		missingRegions,
 		unloadableRegions,
 	};
@@ -116,13 +124,13 @@ async function collectCoordinateFindings(entries: Array<ContentEntry>, divisions
 
 function collectEntryMismatches(
 	entry: ContentEntry,
-	geometries: Array<{ coordinates: [number, number] }>,
-	{ features, validRegions }: RegionCoverage,
+	locationGeometries: Array<{ coordinates: [number, number] }>,
+	{ geometries, validRegions }: RegionCoverage,
 ): Array<string> {
 	const mismatches: Array<string> = [];
 
-	for (const { coordinates } of geometries) {
-		if (isPointInRegion(coordinates, features)) continue;
+	for (const { coordinates } of locationGeometries) {
+		if (isPointInRegion(coordinates, geometries)) continue;
 
 		mismatches.push(
 			`${entry.id}: [${String(coordinates[0])}, ${String(coordinates[1])}] not in region(s): ${validRegions.join(', ')}`,
@@ -132,58 +140,64 @@ function collectEntryMismatches(
 	return mismatches;
 }
 
-async function collectRegionFeatures(
+async function collectRegionGeometries(
 	regions: Array<string>,
-	getRegionFeatures: (
+	getRegionGeometries: (
 		regionId: string,
 		shouldReportMissing: boolean,
-	) => Promise<RegionFeatures | undefined>,
-) {
+	) => Promise<Array<DivisionGeometry> | undefined>,
+): Promise<RegionCoverage> {
 	const validRegions: Array<string> = [];
-	const features: RegionFeatures = [];
+	const geometries: Array<DivisionGeometry> = [];
 
 	for (const region of regions) {
 		// Only warn when the entry has no other region to check against
-		const regionFeatures = await getRegionFeatures(region, regions.length === 1);
+		const regionGeometries = await getRegionGeometries(region, regions.length === 1);
 
-		if (!regionFeatures) continue;
+		if (!regionGeometries) continue;
 
 		validRegions.push(region);
-		features.push(...regionFeatures);
+		geometries.push(...regionGeometries);
 	}
 
-	return { features, validRegions };
+	return { geometries, validRegions };
 }
 
-// A missing FGB file disqualifies that region for the whole run
-function createRegionGeometryLoader(divisionsPath: string) {
-	const cache = new Map<string, Array<Feature<MultiPolygon | Polygon>>>();
+// A Region missing any of its Division geometry is disqualified for the whole run
+function createRegionGeometryLoader(
+	divisionIdsByRegion: Map<string, Array<string>>,
+	divisionsPath: string,
+) {
+	const cache = new Map<string, Array<DivisionGeometry>>();
 	const missingRegions = new Set<string>();
 	const unloadableRegions: Array<string> = [];
 
-	async function getRegionFeatures(regionId: string, shouldReportMissing: boolean) {
+	async function getRegionGeometries(regionId: string, shouldReportMissing: boolean) {
 		if (missingRegions.has(regionId)) return;
 
 		const cached = cache.get(regionId);
 
 		if (cached) return cached;
 
-		try {
-			const features = await loadRegionGeometry(regionId, divisionsPath);
+		const geometries = await loadRegionGeometries(
+			divisionIdsByRegion.get(regionId) ?? [],
+			divisionsPath,
+		);
 
-			cache.set(regionId, features);
-
-			return features;
-		} catch {
+		if (!geometries) {
 			if (shouldReportMissing) unloadableRegions.push(regionId);
 
 			missingRegions.add(regionId);
 
 			return;
 		}
+
+		cache.set(regionId, geometries);
+
+		return geometries;
 	}
 
-	return { getRegionFeatures, missingRegions, unloadableRegions };
+	return { getRegionGeometries, missingRegions, unloadableRegions };
 }
 
 function getEntryGeometries(entry: ContentEntry) {
@@ -194,43 +208,24 @@ function getEntryGeometries(entry: ContentEntry) {
 	return Array.isArray(result.data) ? result.data : [result.data];
 }
 
-function isPointInRegion(
-	coordinates: [number, number],
-	regionFeatures: Array<Feature<MultiPolygon | Polygon>>,
-): boolean {
+function isPointInRegion(coordinates: [number, number], geometries: Array<DivisionGeometry>) {
 	const testPoint = point(coordinates);
 
-	for (const feature of regionFeatures) {
-		if (booleanPointInPolygon(testPoint, feature)) {
-			return true;
-		}
-	}
-
-	return false;
+	return geometries.some((geometry) => booleanPointInPolygon(testPoint, geometry));
 }
 
-async function loadRegionGeometry(
-	regionId: string,
-	divisionsPath: string,
-): Promise<Array<Feature<MultiPolygon | Polygon>>> {
-	const fgbPath = path.join(divisionsPath, `${regionId}.fgb`);
+async function loadRegionGeometries(divisionIds: Array<string>, divisionsPath: string) {
+	if (divisionIds.length === 0) return;
 
-	try {
-		const buffer = await fs.readFile(fgbPath);
+	const geometries: Array<DivisionGeometry> = [];
 
-		const featuresIterator = deserialize(buffer);
-		const features: Array<Feature<MultiPolygon | Polygon>> = [];
+	for (const divisionId of divisionIds) {
+		const division = await getDivisionDataCache(divisionId, divisionsPath);
 
-		for await (const feature of featuresIterator) {
-			if (['MultiPolygon', 'Polygon'].includes(feature.geometry.type)) {
-				features.push(feature as Feature<MultiPolygon | Polygon>);
-			}
-		}
-		return features;
-	} catch (error) {
-		throw new Error(
-			`Failed to load FGB file for region "${regionId}": ${error instanceof Error ? error.message : String(error)}`,
-			{ cause: error },
-		);
+		if (!division) return;
+
+		geometries.push(division.geometry);
 	}
+
+	return geometries;
 }

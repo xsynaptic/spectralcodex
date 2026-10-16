@@ -26,9 +26,8 @@ Renders an OpenGraph image for each entry with [Takumi](https://takumi.kane.tw):
 
 ### `map-divisions`
 
-Builds each Region's Division from [Overture Maps](https://overturemaps.org/) boundaries, queried with [DuckDB](https://duckdb.org/) and merged with [Turf.js](https://turfjs.org/) when a Region spans several divisions. Three files per Region land in `.cache/divisions/`:
+Builds each Region's Division from [Overture Maps](https://overturemaps.org/) boundaries, queried with [DuckDB](https://duckdb.org/) and merged with [Turf.js](https://turfjs.org/) when a Region spans several divisions. Each Division's raw boundary is cached in `.cache/divisions/` as `<divisionId>.geojson`, which `validate-content` uses to check Location coordinates. Two files per Region land beside it:
 
-- the boundary as [FlatGeobuf](https://flatgeobuf.org/), which `validate-content` uses to check Location coordinates
 - a simplified mask (the world with the Division cut out) as GeoJSON, which the build serves to the map
 - an SVG outline
 

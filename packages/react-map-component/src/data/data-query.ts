@@ -66,6 +66,8 @@ function scopeListQueryOptions(url: string, isEnabled: boolean) {
 		enabled: isEnabled,
 		queryFn: () => fetchMapJson(url, MapScopeRowSchema.array()),
 		queryKey: ['scope-list', url],
+		// An earlier deploy's list returns 404, and search shows nothing until this settles
+		retry: 1,
 		staleTime: 'static',
 	});
 }

@@ -119,7 +119,11 @@ const validations = [
 	{
 		name: 'location-coordinates',
 		run: () =>
-			validateLocationsCoordinates(locationEntries, path.join(rootPath, values['divisions-path'])),
+			validateLocationsCoordinates(
+				locationEntries,
+				entriesFrom('regions'),
+				path.join(rootPath, values['divisions-path']),
+			),
 	},
 ] satisfies Array<{ name: string; run: () => Promise<ValidationResult> | ValidationResult }>;
 

@@ -7,6 +7,14 @@ import path from 'node:path';
 import type { RegionMetadata } from '#map-divisions/types.ts';
 import type { ContentEntry } from '#shared/astro-content.ts';
 
+export function getDivisionIds(entry: ContentEntry): Array<string> {
+	const divisionId = GeometryDivisionIdSchema.optional().parse(entry.data.divisionId);
+
+	if (!divisionId) return [];
+
+	return Array.isArray(divisionId) ? divisionId : [divisionId];
+}
+
 export function parseRegionData(entries: Array<ContentEntry>) {
 	const regions: Array<RegionMetadata> = [];
 
@@ -21,16 +29,8 @@ export function parseRegionData(entries: Array<ContentEntry>) {
 			entry.data.divisionClippingBBox,
 		);
 
-		const divisionIdValue = GeometryDivisionIdSchema.optional().parse(entry.data.divisionId);
-
-		const divisionIdValues = Array.isArray(divisionIdValue) ? divisionIdValue : [divisionIdValue];
-
-		const divisionIds = divisionIdValue
-			? divisionIdValues.filter((id): id is string => typeof id === 'string')
-			: [];
-
 		regions.push({
-			divisionIds,
+			divisionIds: getDivisionIds(entry),
 			id,
 			regionPathIds,
 			...(divisionSelectionBBox ? { divisionSelectionBBox } : {}),

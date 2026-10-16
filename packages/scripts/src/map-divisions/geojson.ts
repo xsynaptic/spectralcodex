@@ -1,7 +1,11 @@
 import type { BBox } from 'geojson';
 
+import { bboxPolygon } from '@turf/bbox-polygon';
+import { difference } from '@turf/difference';
 import { feature, featureCollection } from '@turf/helpers';
-import { bboxPolygon, difference, simplify, truncate, union } from '@turf/turf';
+import { simplify } from '@turf/simplify';
+import { truncate } from '@turf/truncate';
+import { union } from '@turf/union';
 import chalk from 'chalk';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -14,7 +18,7 @@ import type {
 
 import { safelyCreateDirectory } from '#shared/utils.ts';
 
-const maskSimplifyTolerance = 0.0001;
+const maskSimplifyTolerance = 0.00005;
 const maskCoordinatePrecision = 5;
 const worldBounds = [-180, -85, 180, 85] satisfies BBox;
 

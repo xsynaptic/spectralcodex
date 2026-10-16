@@ -1,7 +1,11 @@
 import type { GeometryBoundingBox } from '@spectralcodex/shared/map';
 import type { Feature } from 'geojson';
 
-import { bboxClip, coordAll, featureCollection, rewind, simplify } from '@turf/turf';
+import { bboxClip } from '@turf/bbox-clip';
+import { featureCollection } from '@turf/helpers';
+import { coordAll } from '@turf/meta';
+import { rewind } from '@turf/rewind';
+import { simplify } from '@turf/simplify';
 import chalk from 'chalk';
 import { geoAzimuthalEqualArea, geoCentroid, geoPath } from 'd3-geo';
 import fs from 'node:fs/promises';

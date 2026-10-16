@@ -23,7 +23,6 @@ async function resolveLatestRelease(): Promise<string> {
 
 import { parseRegionData, resolveBoundingBox } from '#map-divisions/content.ts';
 import { fetchDivisionData, initializeDuckDB } from '#map-divisions/duckdb.ts';
-import { saveFlatgeobuf } from '#map-divisions/flatgeobuf.ts';
 import { convertToFeatureCollection, saveDivisionMask } from '#map-divisions/geojson.ts';
 import { saveSvg } from '#map-divisions/svg.ts';
 import { getCollectionEntries, withAstroContent } from '#shared/astro-content.ts';
@@ -61,8 +60,8 @@ async function collectProcessingNeeds(regions: Array<RegionMetadata>) {
 	for (const region of regions) {
 		const isNeedsGeometry =
 			values.regenerate ||
-			!(await isExistingFile(path.join(cachePath, `${region.id}.fgb`))) ||
-			!(await isExistingFile(path.join(cachePath, `${region.id}.json`)));
+			!(await isExistingFile(path.join(cachePath, `${region.id}.json`))) ||
+			(await isMissingDivisionCache(region.divisionIds));
 		const isNeedsSvg =
 			values.regenerate || !(await isExistingFile(path.join(cachePath, `${region.id}.svg`)));
 
@@ -72,6 +71,15 @@ async function collectProcessingNeeds(regions: Array<RegionMetadata>) {
 	}
 
 	return processingNeeds;
+}
+
+// Validation scripts read the raw cache
+async function isMissingDivisionCache(divisionIds: Array<string>) {
+	for (const divisionId of divisionIds) {
+		if (!(await isExistingFile(path.join(cachePath, `${divisionId}.geojson`)))) return true;
+	}
+
+	return false;
 }
 
 async function didProcessRegion({
@@ -111,10 +119,9 @@ async function didProcessRegion({
 	const divisionFeatureCollection = convertToFeatureCollection(divisionItems);
 
 	if (needsGeometry) {
-		await saveFlatgeobuf(divisionFeatureCollection, region.id, cachePath);
 		await saveDivisionMask(divisionFeatureCollection, region.id, cachePath);
 	} else {
-		console.log(chalk.gray(`  Skipping FGB and mask (already exist): ${chalk.cyan(region.id)}`));
+		console.log(chalk.gray(`  Skipping mask (already exists): ${chalk.cyan(region.id)}`));
 	}
 
 	if (needsSvg) {
