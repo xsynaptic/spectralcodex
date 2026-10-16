@@ -6,6 +6,13 @@ import { paths } from '#e2e/constants.ts';
 import { expect, test, visit } from '#e2e/test.ts';
 
 test('the map loads on a Location', { tag: '@smoke' }, async ({ page, site }) => {
+	const directoryRequests: Array<string> = [];
+
+	page.on('request', (request) => {
+		if (request.url().includes('/api/map/map-directory.json'))
+			directoryRequests.push(request.url());
+	});
+
 	await visit(page, site.locationDetail);
 
 	const island = page.locator(
@@ -14,7 +21,8 @@ test('the map loads on a Location', { tag: '@smoke' }, async ({ page, site }) =>
 
 	await island.scrollIntoViewIfNeeded();
 
-	await expect(island.locator('canvas.maplibregl-canvas')).toBeVisible({ timeout: 10_000 });
+	await expect(island.locator('.maplibregl-marker').first()).toBeVisible({ timeout: 10_000 });
+	expect(directoryRequests, 'one directory download').toHaveLength(1);
 });
 
 async function clickOwnPoint(page: Page, path: string) {

@@ -83,13 +83,21 @@ test('sensitive Locations stay out of the build output', { tag: '@smoke' }, asyn
 	}
 
 	const manifestResponse = await request.get(mapManifestPath);
-	const mapPaths = (await manifestResponse.json()) as Array<string>;
+	// Division masks are boundary geometry that names no Location, and most of the download
+	const mapPaths = ((await manifestResponse.json()) as Array<string>).filter(
+		(surface) => !surface.startsWith('/api/map/divisions/'),
+	);
 
 	expect(mapPaths.length, 'public map files').toBeGreaterThan(0);
 
-	for (const surface of mapPaths) {
-		const rootPaths = await readRootPaths(request, surface);
+	const mapSurfaces = await Promise.all(
+		mapPaths.map(async (surface) => ({
+			rootPaths: await readRootPaths(request, surface),
+			surface,
+		})),
+	);
 
+	for (const { rootPaths, surface } of mapSurfaces) {
 		expect
 			.soft(countNamed(anonymizedPaths, rootPaths), `anonymized Locations named in ${surface}`)
 			.toBe(0);
