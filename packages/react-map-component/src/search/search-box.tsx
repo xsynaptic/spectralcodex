@@ -1,5 +1,6 @@
 import type { FC, KeyboardEvent, ReactNode, RefObject } from 'react';
 
+import { getNumberFormat } from '@spectralcodex/shared/i18n';
 import { useEffect, useId, useRef, useState } from 'react';
 
 import type { MapSearchResult, MapSearchText } from '#search/search-factory.ts';
@@ -57,9 +58,6 @@ const MapSearchOption: FC<{
 			className="map-search-option"
 			id={id}
 			onClick={onPick}
-			onMouseDown={(event) => {
-				event.preventDefault();
-			}}
 			onMouseMove={isActive ? undefined : onActivate}
 			role="option"
 		>
@@ -75,7 +73,7 @@ const MapSearchOption: FC<{
 				</span>
 				{result.kind === 'location' ? undefined : (
 					<span className="map-search-count">
-						{result.count}
+						{getNumberFormat('en', undefined).format(result.count)}
 						<span className="map-sr-only">
 							{' '}
 							{result.count === 1 ? messages.point : messages.points}
@@ -289,6 +287,9 @@ export const MapSearchBox: FC<{
 				className="map-search-list"
 				hidden={listedResults.length === 0}
 				id={listboxId}
+				onMouseDown={(event) => {
+					event.preventDefault();
+				}}
 				ref={listRef}
 				role="listbox"
 			>

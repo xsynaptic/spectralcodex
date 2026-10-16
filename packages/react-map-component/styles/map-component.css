@@ -715,7 +715,8 @@ button.maplibregl-popup-close-button {
 
 .map-search-count {
 	flex-shrink: 0;
-	font-variant-numeric: tabular-nums;
+	font-family: var(--map-font-sans);
+	font-size: 0.6875rem;
 }
 
 .map-search-meta {
@@ -847,6 +848,7 @@ button.maplibregl-popup-close-button {
 	gap: 2px;
 	align-items: center;
 	height: 100%;
+	font-family: var(--map-font-sans);
 	color: light-dark(var(--map-color-neutral-600), var(--map-color-neutral-300));
 }
 

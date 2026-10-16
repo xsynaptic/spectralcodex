@@ -1,13 +1,13 @@
 import type { FC } from 'react';
 import type { ControlPosition } from 'react-map-gl/maplibre';
 
+import { getNumberFormat } from '@spectralcodex/shared/i18n';
+
 import { mapControlClassName } from '#constants.ts';
 import { CustomControlPortal } from '#controls/controls-custom.tsx';
 import { useMapCanvasData } from '#data/data-canvas.tsx';
 import { useMapRows } from '#data/data-query.ts';
 import { useMapConfig } from '#lib/config.tsx';
-
-const formatNumber = new Intl.NumberFormat('en');
 
 export const MetricsControl: FC<{
 	position: ControlPosition;
@@ -25,10 +25,11 @@ export const MetricsControl: FC<{
 				</div>
 			) : (
 				<div className={mapControlClassName.metrics} role="status">
-					<span>{formatNumber.format(filteredCount)}</span>
+					<span>{getNumberFormat('en', undefined).format(filteredCount)}</span>
 					<span className="maplibregl-ctrl-metrics-divider">/</span>
 					<span>
-						{formatNumber.format(totalCount)} {totalCount === 1 ? messages.point : messages.points}
+						{getNumberFormat('en', undefined).format(totalCount)}{' '}
+						{totalCount === 1 ? messages.point : messages.points}
 					</span>
 				</div>
 			)}

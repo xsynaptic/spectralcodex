@@ -8,6 +8,7 @@
 		"./collections": "./src/collections.ts",
 		"./constants": "./src/constants.ts",
 		"./entries": "./src/entries.ts",
+		"./i18n": "./src/i18n.ts",
 		"./indexing": "./src/indexing.ts",
 		"./links": "./src/links.ts",
 		"./map": "./src/map/index.ts",
