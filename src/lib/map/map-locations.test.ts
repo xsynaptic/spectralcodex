@@ -5,10 +5,11 @@ import { describe, expect, test, vi } from 'vitest';
 
 import {
 	getLocationFeatureIds,
-	getLocationsFeatureCollection,
+	getLocationFeatures,
 	getLocationsMapSourceData,
 } from '#lib/map/map-locations.ts';
 
+// Minimal fixtures; only the fields the feature builder reads, cast to the collection entry type
 function makeLocation(
 	id: string,
 	data: Record<string, unknown> & { title: string },
@@ -71,14 +72,13 @@ describe('getLocationFeatureIds', () => {
 	});
 });
 
-describe('getLocationsFeatureCollection', () => {
-	test('returns undefined for missing or empty input', () => {
-		expect(getLocationsFeatureCollection(undefined)).toBeUndefined();
-		expect(getLocationsFeatureCollection([])).toBeUndefined();
+describe('getLocationFeatures', () => {
+	test('returns nothing for an empty input', () => {
+		expect(getLocationFeatures([])).toEqual([]);
 	});
 
 	test('builds one feature per single-geometry location', () => {
-		const result = getLocationsFeatureCollection([
+		const result = getLocationFeatures([
 			makeLocation('longshan-temple', {
 				_uuid: 'abc123',
 				geometry: makePoint(121.5, 25),
@@ -86,14 +86,14 @@ describe('getLocationsFeatureCollection', () => {
 			}),
 		]);
 
-		expect(result?.features).toHaveLength(1);
-		expect(result?.features[0]?.id).toBe('abc123');
-		expect(result?.features[0]?.geometry).toEqual({ coordinates: [121.5, 25], type: 'Point' });
-		expect(result?.features[0]?.properties.title).toBe('Longshan Temple');
+		expect(result).toHaveLength(1);
+		expect(result[0]?.id).toBe('abc123');
+		expect(result[0]?.geometry).toEqual({ coordinates: [121.5, 25], type: 'Point' });
+		expect(result[0]?.properties.title).toBe('Longshan Temple');
 	});
 
 	test('builds one feature per point and suffixes point titles', () => {
-		const result = getLocationsFeatureCollection([
+		const result = getLocationFeatures([
 			makeLocation('bopiliao', {
 				_uuid: 'abc123',
 				geometry: [makePoint(121.5, 25, { title: 'North Block' }), makePoint(121.51, 25.01)],
@@ -101,13 +101,13 @@ describe('getLocationsFeatureCollection', () => {
 			}),
 		]);
 
-		expect(result?.features.map((feature) => feature.id)).toEqual(['abc123-0', 'abc123-1']);
-		expect(result?.features[0]?.properties.title).toBe('Bopiliao: North Block');
-		expect(result?.features[1]?.properties.title).toBe('Bopiliao');
+		expect(result.map((feature) => feature.id)).toEqual(['abc123-0', 'abc123-1']);
+		expect(result[0]?.properties.title).toBe('Bopiliao: North Block');
+		expect(result[1]?.properties.title).toBe('Bopiliao');
 	});
 
 	test('joins entry and point multilingual titles', () => {
-		const result = getLocationsFeatureCollection([
+		const result = getLocationFeatures([
 			makeLocation('bopiliao', {
 				geometry: [makePoint(121.5, 25, { title: 'North Block', title_zh: '北街' })],
 				title: 'Bopiliao',
@@ -115,12 +115,12 @@ describe('getLocationsFeatureCollection', () => {
 			}),
 		]);
 
-		expect(result?.features[0]?.properties.titleMultilingualLang).toBe('zh');
-		expect(result?.features[0]?.properties.titleMultilingualValue).toBe('剝皮寮：北街');
+		expect(result[0]?.properties.titleMultilingualLang).toBe('zh');
+		expect(result[0]?.properties.titleMultilingualValue).toBe('剝皮寮：北街');
 	});
 
 	test('each Point of a Location with several carries its own title, its multilingual title in brackets', () => {
-		const result = getLocationsFeatureCollection([
+		const result = getLocationFeatures([
 			makeLocation('bopiliao', {
 				geometry: [
 					makePoint(121.5, 25, { title: 'North Block', title_zh: '北街' }),
@@ -136,7 +136,7 @@ describe('getLocationsFeatureCollection', () => {
 			}),
 		]);
 
-		expect(result?.features.map((feature) => feature.properties.pointTitle)).toEqual([
+		expect(result.map((feature) => feature.properties.pointTitle)).toEqual([
 			'North Block (北街)',
 			'South Block',
 			undefined,
@@ -165,10 +165,9 @@ describe('getLocationsFeatureCollection', () => {
 
 		vi.unstubAllEnvs();
 
-		expect(production.getLocationsFeatureCollection(sensitiveLocations)?.features).toHaveLength(1);
+		expect(production.getLocationFeatures(sensitiveLocations)).toHaveLength(1);
 		expect(
-			production.getLocationsFeatureCollection(sensitiveLocations, { includeHidden: true })
-				?.features,
+			production.getLocationFeatures(sensitiveLocations, { includeHidden: true }),
 		).toHaveLength(2);
 		expect(production.getLocationsMapRule(sensitiveLocations).ids).toEqual(['longshan-temple']);
 	});
@@ -180,16 +179,16 @@ describe('getLocationsFeatureCollection', () => {
 			title: 'Longshan Temple',
 		});
 
-		const first = getLocationsFeatureCollection([entry]);
-		const second = getLocationsFeatureCollection([entry]);
+		const first = getLocationFeatures([entry]);
+		const second = getLocationFeatures([entry]);
 
-		expect(second?.features[0]).toBe(first?.features[0]);
+		expect(second[0]).toBe(first[0]);
 	});
 });
 
-describe('getLocationsFeatureCollection properties', () => {
+describe('getLocationFeatures properties', () => {
 	test('reduces the page url to a path and carries external links whole', () => {
-		const result = getLocationsFeatureCollection([
+		const result = getLocationFeatures([
 			makeLocation('longshan-temple', {
 				_googleMapsUrl: 'https://maps.app.goo.gl/xYz123',
 				_url: 'https://spectralcodex.com/locations/longshan-temple/',
@@ -199,7 +198,7 @@ describe('getLocationsFeatureCollection properties', () => {
 			}),
 		]);
 
-		const properties = result?.features[0]?.properties;
+		const properties = result[0]?.properties;
 
 		expect(properties?.url).toBe('/locations/longshan-temple/');
 		expect(properties?.googleMapsUrl).toBe('https://maps.app.goo.gl/xYz123');
@@ -207,7 +206,7 @@ describe('getLocationsFeatureCollection properties', () => {
 	});
 
 	test('lets a point override entry-level properties', () => {
-		const result = getLocationsFeatureCollection([
+		const result = getLocationFeatures([
 			makeLocation('bopiliao', {
 				_descriptionHtml: '<p>Entry description</p>',
 				geometry: [makePoint(121.5, 25, { description: 'Point description', precision: 2 })],
@@ -215,7 +214,7 @@ describe('getLocationsFeatureCollection properties', () => {
 			}),
 		]);
 
-		const properties = result?.features[0]?.properties;
+		const properties = result[0]?.properties;
 
 		expect(properties?.description).toBe('Point description');
 		expect(properties?.precision).toBe(2);
@@ -225,7 +224,7 @@ describe('getLocationsFeatureCollection properties', () => {
 	test('omits the image when a point nulls the entry thumbnail', () => {
 		const thumbnail = { height: 100, src: 'thumb.avif', srcSet: 'thumb.avif 100w', width: 100 };
 
-		const result = getLocationsFeatureCollection([
+		const result = getLocationFeatures([
 			makeLocation('bopiliao', {
 				_imageThumbnail: thumbnail,
 				geometry: [
@@ -237,14 +236,14 @@ describe('getLocationsFeatureCollection properties', () => {
 			}),
 		]);
 
-		expect(result?.features[0]?.properties.image).toBe(thumbnail);
-		expect(result?.features[1]?.properties).not.toHaveProperty('image');
+		expect(result[0]?.properties.image).toBe(thumbnail);
+		expect(result[1]?.properties).not.toHaveProperty('image');
 	});
 
 	const thumbnail = { height: 100, src: 'thumb.avif', srcSet: 'thumb.avif 100w', width: 100 };
 
 	test('marks what a Point of a multi-Point Location sets itself, and nothing it inherits', () => {
-		const result = getLocationsFeatureCollection([
+		const result = getLocationFeatures([
 			makeLocation('bopiliao', {
 				_descriptionHtml: '<p>Entry description</p>',
 				_imageThumbnail: thumbnail,
@@ -265,7 +264,7 @@ describe('getLocationsFeatureCollection properties', () => {
 			}),
 		]);
 
-		const properties = result?.features.map((feature) => feature.properties) ?? [];
+		const properties = result.map((feature) => feature.properties);
 
 		expect(properties[0]?.description).toBe('<p>Entry description</p>');
 		expect(properties[0]?.image).toBe(thumbnail);
@@ -280,18 +279,18 @@ describe('getLocationsFeatureCollection properties', () => {
 	});
 
 	test('marks nothing on a single-Point Location', () => {
-		const result = getLocationsFeatureCollection([
+		const result = getLocationFeatures([
 			makeLocation('longshan-temple', {
 				geometry: makePoint(121.5, 25, { description: 'Point description', precision: 2 }),
 				title: 'Longshan Temple',
 			}),
 		]);
 
-		expect(result?.features[0]?.properties).not.toHaveProperty('own');
+		expect(result[0]?.properties).not.toHaveProperty('own');
 	});
 
 	test("a Point of a multi-Point Location keeps its own links, and inherits the Location's Wikipedia link but never its Google Maps link", () => {
-		const result = getLocationsFeatureCollection([
+		const result = getLocationFeatures([
 			makeLocation('bopiliao', {
 				_googleMapsUrl: 'https://maps.app.goo.gl/entryPin',
 				_wikipediaUrl: 'https://en.wikipedia.org/wiki/Bopiliao',
@@ -306,7 +305,7 @@ describe('getLocationsFeatureCollection properties', () => {
 			}),
 		]);
 
-		const properties = result?.features.map((feature) => feature.properties) ?? [];
+		const properties = result.map((feature) => feature.properties);
 
 		expect(properties.map((item) => item.googleMapsUrl)).toEqual([
 			undefined,
@@ -321,16 +320,15 @@ describe('getLocationsFeatureCollection properties', () => {
 
 describe('getLocationsMapSourceData', () => {
 	test('carries the Multilingual Title beside the title, both stripped of marks for the map font', () => {
-		const [row] =
-			getLocationsMapSourceData(
-				getLocationsFeatureCollection([
-					makeLocation('hue-citadel', {
-						geometry: makePoint(107.58, 16.47),
-						title: 'Huế Citadel',
-						title_vi: 'Kinh thành Huế',
-					}),
-				]),
-			) ?? [];
+		const [row] = getLocationsMapSourceData(
+			getLocationFeatures([
+				makeLocation('hue-citadel', {
+					geometry: makePoint(107.58, 16.47),
+					title: 'Huế Citadel',
+					title_vi: 'Kinh thành Huế',
+				}),
+			]),
+		);
 
 		expect(row?.properties).toMatchObject({
 			title: 'Hue Citadel',

@@ -27,7 +27,7 @@ import { assignChunks } from '#lib/map/map-chunks.ts';
 import { hashMapPayloads } from '#lib/map/map-directory-hash.ts';
 import {
 	getLocationFeatureIds,
-	getLocationsFeatureCollection,
+	getLocationFeatures,
 	getLocationsMapPopupData,
 	getLocationsMapSourceData,
 	getRegionMapRule,
@@ -75,6 +75,7 @@ export const getMapThemeIndexById = pMemoize(async () => {
 	return themeIndexById;
 });
 
+// No hidden-location filtering needed: only ids present in the (already filtered) source data are looked up
 function buildLocationByFeatureId(
 	locations: Array<CollectionEntry<'locations'>>,
 ): Map<string, CollectionEntry<'locations'>> {
@@ -106,9 +107,9 @@ function buildMapDataset(
 	locations: Array<CollectionEntry<'locations'>>,
 	{ includeHidden, ordinalById, prefix, themeIndexById }: MapDatasetContext,
 ) {
-	const featureCollection = getLocationsFeatureCollection(locations, { includeHidden });
-	const sourceData = getLocationsMapSourceData(featureCollection) ?? [];
-	const popupData = getLocationsMapPopupData(featureCollection) ?? [];
+	const features = getLocationFeatures(locations, { includeHidden });
+	const sourceData = getLocationsMapSourceData(features);
+	const popupData = getLocationsMapPopupData(features);
 
 	const locationByFeatureId = buildLocationByFeatureId(locations);
 	const popupById = new Map(

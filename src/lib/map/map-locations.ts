@@ -5,7 +5,7 @@ import type {
 	MapSourceItem,
 } from '@spectralcodex/map-codec';
 import type { CollectionEntry } from 'astro:content';
-import type { Feature, FeatureCollection, Position } from 'geojson';
+import type { Feature, Position } from 'geojson';
 
 import {
 	MapPopupOwnField,
@@ -14,10 +14,8 @@ import {
 } from '@spectralcodex/map-codec';
 import { GeometryTypeEnum } from '@spectralcodex/shared/map';
 import { stripDiacritics } from '@spectralcodex/shared/text';
-import { featureCollection } from '@turf/helpers';
 
 import type { MultilingualContent } from '#lib/i18n/i18n-types.ts';
-import type { MapFeatureCollection } from '#lib/map/map-types.ts';
 
 import { mapDisplayRegionIds } from '#constants.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
@@ -26,7 +24,11 @@ import { isLocationHidden } from '#lib/utils/content-policy.ts';
 
 type LocationGeometry = Exclude<CollectionEntry<'locations'>['data']['geometry'], Array<unknown>>;
 
-interface LocationsFeatureCollectionOptions {
+export type MapLocationFeature = Feature<MapSourceItem['geometry'], MapFeatureProperties> & {
+	id: string;
+};
+
+interface LocationFeaturesOptions {
 	includeHidden?: boolean | undefined;
 }
 
@@ -57,22 +59,21 @@ function getRelativePath(url: string | undefined): string | undefined {
 	return new URL(url).pathname;
 }
 
+// Shared across every region and theme map; safe only because output depends on nothing but the entry
 const locationFeaturesCache = new WeakMap<
 	CollectionEntry<'locations'>,
-	Array<Feature<MapSourceItem['geometry'], MapFeatureProperties>>
+	Array<MapLocationFeature>
 >();
 
-export function getLocationsFeatureCollection(
-	locations: Array<CollectionEntry<'locations'>> | undefined,
-	options?: LocationsFeatureCollectionOptions,
-): FeatureCollection<MapSourceItem['geometry'], MapFeatureProperties> | undefined {
-	if (!locations || locations.length === 0) return;
+export function getLocationFeatures(
+	locations: Array<CollectionEntry<'locations'>>,
+	options?: LocationFeaturesOptions,
+): Array<MapLocationFeature> {
+	const shown = options?.includeHidden ? locations : filterHiddenLocations(locations);
 
-	return featureCollection<MapSourceItem['geometry'], MapFeatureProperties>(
-		(options?.includeHidden ? locations : filterHiddenLocations(locations)).flatMap((entry) =>
-			buildLocationFeatures(entry),
-		),
-	) satisfies MapFeatureCollection;
+	return shown
+		.flatMap((entry) => buildLocationFeatures(entry))
+		.toSorted((a, b) => a.id.localeCompare(b.id));
 }
 
 export function getLocationsMapRule(locations: Array<CollectionEntry<'locations'>>) {
@@ -126,12 +127,12 @@ function filterHiddenLocations(locations: Array<CollectionEntry<'locations'>>) {
 }
 
 export function getLocationsMapPopupData(
-	featureCollection: MapFeatureCollection | undefined,
-): Array<MapPopupItem> | undefined {
-	return mapFeaturesById(featureCollection, (feature, featureId) => {
+	features: ReadonlyArray<MapLocationFeature>,
+): Array<MapPopupItem> {
+	return features.map((feature) => {
 		return {
 			...pickMapPopupProperties(feature.properties),
-			id: featureId,
+			id: feature.id,
 			title: stripDiacritics(feature.properties.title),
 			...(feature.properties.image === undefined
 				? {}
@@ -141,20 +142,20 @@ export function getLocationsMapPopupData(
 }
 
 export function getLocationsMapSourceData(
-	featureCollection: MapFeatureCollection | undefined,
-): Array<MapSourceItem> | undefined {
-	return mapFeaturesById(featureCollection, (feature, featureId) => {
+	features: ReadonlyArray<MapLocationFeature>,
+): Array<MapSourceItem> {
+	return features.map((feature) => {
 		const { titleMultilingualValue } = feature.properties;
 
 		return {
 			geometry: {
-				coordinates: getMapPosition(feature.geometry.coordinates, featureId),
+				coordinates: getMapPosition(feature.geometry.coordinates, feature.id),
 				type: GeometryTypeEnum.Point,
 			},
 			properties: {
 				...pickMapSourceProperties(feature.properties),
 				hasImage: feature.properties.image !== undefined,
-				id: featureId,
+				id: feature.id,
 				title: stripDiacritics(feature.properties.title),
 				...(titleMultilingualValue === undefined
 					? {}
@@ -168,9 +169,7 @@ export function getLocationsMapSourceData(
 	});
 }
 
-function buildLocationFeatures(
-	entry: CollectionEntry<'locations'>,
-): Array<Feature<MapSourceItem['geometry'], MapFeatureProperties>> {
+function buildLocationFeatures(entry: CollectionEntry<'locations'>): Array<MapLocationFeature> {
 	const cached = locationFeaturesCache.get(entry);
 
 	if (cached) return cached;
@@ -217,10 +216,6 @@ function getEntryFeatureProperties(entry: CollectionEntry<'locations'>) {
 		rating: entry.data.rating,
 		url: getRelativePath(entry.data._url),
 	};
-}
-
-function getFeatureId(feature: Pick<Feature, 'id'>, index: number) {
-	return typeof feature.id === 'string' ? feature.id : `feature-${String(index)}`;
 }
 
 function getFeatureTitleProperties({
@@ -311,16 +306,4 @@ function getOwnProperties(geometry: LocationGeometry) {
 		(geometry.precision === undefined ? 0 : MapPopupOwnField.Precision);
 
 	return own === 0 ? {} : { own };
-}
-
-function mapFeaturesById<T>(
-	featureCollection: MapFeatureCollection | undefined,
-	transform: (feature: MapFeatureCollection['features'][number], featureId: string) => T,
-): Array<T> | undefined {
-	if (!featureCollection || featureCollection.features.length === 0) return;
-
-	return featureCollection.features
-		.map((feature, index) => ({ feature, featureId: getFeatureId(feature, index) }))
-		.toSorted((a, b) => a.featureId.localeCompare(b.featureId))
-		.map(({ feature, featureId }) => transform(feature, featureId));
 }
