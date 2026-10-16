@@ -14,6 +14,7 @@ import { millisecondsPerHour, siteTimezoneOffsetHours } from '#constants.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
 import { formatTitleMultilingual, getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { isFeaturedQuality, isListed } from '#lib/utils/content-policy.ts';
 import { sortByDateReverseChronological } from '#lib/utils/date.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description-data.ts';
 import { getContentPath } from '#lib/utils/routing.ts';
@@ -118,8 +119,8 @@ export async function generateFeedItems({
 	return R.pipe(
 		await R.pipe(
 			[
-				...posts.filter((entry) => entry.data.entryQuality >= 3),
-				...locations.filter((entry) => entry.data.entryQuality >= 3),
+				...posts.filter((entry) => isFeaturedQuality(entry.data)),
+				...locations.filter((entry) => isListed(entry.data) && isFeaturedQuality(entry.data)),
 			],
 			R.sort(sortByDateReverseChronological),
 			R.take(itemCount),

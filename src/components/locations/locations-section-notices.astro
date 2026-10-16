@@ -14,11 +14,11 @@ import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 interface Props extends HTMLAttributes<'div'> {
 	entry: CollectionEntry<'locations'>;
-	hideLocation?: boolean | undefined;
+	hideGeometry?: boolean | undefined;
 	langCode?: Extract<LanguageCode, 'ja' | 'ko' | 'zh' | 'zh-Hans'> | undefined;
 }
 
-const { entry, hideLocation = false, langCode, ...props } = Astro.props;
+const { entry, hideGeometry = false, langCode, ...props } = Astro.props;
 
 const shouldShowDangerNotice = entry.data.safety
 	? entry.data.safety <= 2
@@ -30,7 +30,7 @@ const shouldShowDangerNotice = entry.data.safety
 
 const shouldShowVanishedNotice = entry.data.status === LocationStatusEnum.Vanished;
 
-const precision = hideLocation ? undefined : entry.data.precision;
+const precision = hideGeometry ? undefined : entry.data.precision;
 
 const shouldShowPrecisionNotice = precision !== undefined && precision <= 2;
 

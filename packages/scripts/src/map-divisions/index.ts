@@ -63,7 +63,7 @@ async function collectProcessingNeeds(regions: Array<RegionMetadata>) {
 			!(await isExistingFile(path.join(cachePath, `${region.id}.json`))) ||
 			(await isMissingDivisionCache(region.divisionIds));
 		const isNeedsSvg =
-			values.regenerate || !(await isExistingFile(path.join(cachePath, `${region.id}.svg`)));
+			isNeedsGeometry || !(await isExistingFile(path.join(cachePath, `${region.id}.svg`)));
 
 		if (isNeedsGeometry || isNeedsSvg) {
 			processingNeeds.push({ needsGeometry: isNeedsGeometry, needsSvg: isNeedsSvg, region });

@@ -52,8 +52,8 @@ export const locations = defineCollection({
 			entryQuality: NumericScaleSchema,
 			formerIds: z.string().array().optional(),
 			geometry: z.union([GeometryPointsSchema, GeometryPointsSchema.array()]),
-			hideIndex: z.boolean().optional(), // Exclude from index/listing surfaces; page remains accessible
-			hideLocation: z.boolean().optional(), // Do not show this location on any map
+			hideFromLists: z.boolean().optional(), // Exclude from index/listing surfaces; page remains accessible
+			hideGeometry: z.boolean().optional(), // Do not show this location on any map
 			imageFeatured: ImageFeaturedSchema.optional(),
 			incomplete: z.boolean().optional(), // Only for personal reference
 			objective: NumericScaleSchema.optional(), // Only for personal reference
@@ -64,13 +64,19 @@ export const locations = defineCollection({
 					id: z.string().optional(),
 					title: TitleSchema.optional(),
 					...titleMultilingualSchema,
+					description: z.string().optional(),
 					regions: reference('regions').array().optional(),
 				})
+				.strict()
 				.optional(),
 			precision: NumericScaleSchema,
 			rating: NumericScaleSchema,
 			safety: NumericScaleSchema.optional(),
 			skipCoordinateCheck: z.boolean().optional(), // Bypass region/coordinate validation
 		})
-		.strict(),
+		.strict()
+		.refine((data) => data.override === undefined || data.hideGeometry === true, {
+			message: 'An Override requires `hideGeometry: true`',
+			path: ['override'],
+		}),
 });

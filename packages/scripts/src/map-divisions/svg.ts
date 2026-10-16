@@ -1,4 +1,5 @@
 import type { GeometryBoundingBox } from '@spectralcodex/shared/map';
+import type { GeoPath } from 'd3-geo';
 import type { Feature } from 'geojson';
 
 import { bboxClip } from '@turf/bbox-clip';
@@ -18,11 +19,11 @@ import { safelyCreateDirectory } from '#shared/utils.ts';
 
 interface SvgOptions {
 	divisionClippingBBox?: GeometryBoundingBox;
-	height?: number;
-	highQuality?: boolean;
-	tolerance?: number;
-	width?: number;
 }
+
+const svgSize = 800;
+const simplifyTolerancePixels = 2;
+const minimumIslandAreaPixels = 4;
 
 export async function saveSvg({
 	geojsonData,
@@ -75,6 +76,57 @@ export async function saveSvg({
 	}
 }
 
+function clipToBoundingBox(
+	geojsonData: DivisionFeatureCollection,
+	divisionClippingBBox: GeometryBoundingBox,
+) {
+	const clippedFeatures = geojsonData.features
+		.map((feature) =>
+			bboxClip(feature, [
+				divisionClippingBBox.lngMin,
+				divisionClippingBBox.latMin,
+				divisionClippingBBox.lngMax,
+				divisionClippingBBox.latMax,
+			]),
+		)
+		.map((feature) => {
+			if (feature.geometry.type === 'MultiPolygon') {
+				const validPolygons = feature.geometry.coordinates.filter(
+					(polygon) => polygon.length > 0 && (polygon[0]?.length ?? 0) > 0,
+				);
+				return {
+					...feature,
+					geometry: {
+						...feature.geometry,
+						coordinates: validPolygons,
+					},
+				};
+			}
+			return feature;
+		})
+		.filter(({ geometry }) => {
+			if (!['MultiPolygon', 'Polygon'].includes(geometry.type)) return false;
+
+			if (geometry.type === 'Polygon') {
+				return geometry.coordinates.length > 0 && (geometry.coordinates[0]?.length ?? 0) > 0;
+			}
+			return geometry.coordinates.length > 0;
+		});
+
+	return featureCollection(clippedFeatures as Array<Feature<DivisionGeometry>>);
+}
+
+function dropIslandSpecks(collection: DivisionFeatureCollection, pathGenerator: GeoPath) {
+	for (const feature of collection.features) {
+		if (feature.geometry.type !== 'MultiPolygon') continue;
+
+		feature.geometry.coordinates = feature.geometry.coordinates.filter(
+			(polygon) =>
+				pathGenerator.area({ coordinates: polygon, type: 'Polygon' }) >= minimumIslandAreaPixels,
+		);
+	}
+}
+
 function generateSvg(
 	geojsonData: DivisionFeatureCollection,
 	options: SvgOptions = {},
@@ -83,80 +135,32 @@ function generateSvg(
 	svg: string;
 	tolerance: number;
 } {
-	const {
-		divisionClippingBBox,
-		height = 800,
-		highQuality = true,
-		tolerance = 0.0002,
-		width = 800,
-	} = options;
+	const { divisionClippingBBox } = options;
+	const clippedFeatureCollection = divisionClippingBBox
+		? clipToBoundingBox(geojsonData, divisionClippingBBox)
+		: geojsonData;
 
-	let clippedFeatureCollection = geojsonData;
+	// d3's spherical projections expect clockwise outer rings, the reverse of GeoJSON
+	const rewound = rewind(clippedFeatureCollection, { reverse: true }) as DivisionFeatureCollection;
 
-	if (divisionClippingBBox) {
-		const clippedFeatures = geojsonData.features
-			.map((feature) =>
-				bboxClip(feature, [
-					divisionClippingBBox.lngMin,
-					divisionClippingBBox.latMin,
-					divisionClippingBBox.lngMax,
-					divisionClippingBBox.latMax,
-				]),
-			)
-			.map((feature) => {
-				if (feature.geometry.type === 'MultiPolygon') {
-					const validPolygons = feature.geometry.coordinates.filter(
-						(polygon) => polygon.length > 0 && (polygon[0]?.length ?? 0) > 0,
-					);
-					return {
-						...feature,
-						geometry: {
-							...feature.geometry,
-							coordinates: validPolygons,
-						},
-					};
-				}
-				return feature;
-			})
-			.filter(({ geometry }) => {
-				if (!['MultiPolygon', 'Polygon'].includes(geometry.type)) return false;
-
-				if (geometry.type === 'Polygon') {
-					return geometry.coordinates.length > 0 && (geometry.coordinates[0]?.length ?? 0) > 0;
-				}
-				return geometry.coordinates.length > 0;
-			});
-
-		clippedFeatureCollection = featureCollection(
-			clippedFeatures as Array<Feature<DivisionGeometry>>,
-		);
-	}
-
-	const pointThreshold = 5000;
-	const maxToleranceMultiplier = 5;
-
-	const pointCount = coordAll(clippedFeatureCollection).length;
-	const adaptiveTolerance =
-		pointCount > pointThreshold
-			? tolerance * Math.min(maxToleranceMultiplier, pointCount / pointThreshold)
-			: tolerance;
-
-	const simplified = simplify(clippedFeatureCollection, {
-		highQuality,
-		tolerance: adaptiveTolerance,
-	});
-
-	// d3's spherical projections expect clockwise outer rings, the reverse of GeoJSON, and simplifying can flip a ring's winding
-	const corrected = rewind(simplified, {
-		reverse: true,
-	}) as DivisionFeatureCollection;
-
-	const [centroidLng, centroidLat] = geoCentroid(corrected);
+	const [centroidLng, centroidLat] = geoCentroid(rewound);
 	const projection = geoAzimuthalEqualArea()
 		.rotate([-centroidLng, -centroidLat])
-		.fitSize([width, height], corrected);
-
+		.fitSize([svgSize, svgSize], rewound);
 	const pathGenerator = geoPath(projection);
+
+	dropIslandSpecks(rewound, pathGenerator);
+
+	// Dropped islands can tighten the frame, which the tolerance must follow
+	projection.fitSize([svgSize, svgSize], rewound);
+
+	const tolerance = ((simplifyTolerancePixels / projection.scale()) * 180) / Math.PI;
+
+	const simplified = simplify(rewound, { highQuality: true, tolerance });
+
+	// Simplifying can flip a ring's winding
+	const corrected = rewind(simplified, { reverse: true }) as DivisionFeatureCollection;
+	const pointCount = coordAll(corrected).length;
 
 	const bounds = pathGenerator.bounds(corrected);
 	const [[x0, y0], [x1, y1]] = bounds;
@@ -175,5 +179,5 @@ function generateSvg(
   <path d="${pathData}" fill="currentColor" stroke="var(--division-stroke-color, none)" stroke-width="var(--division-stroke-width, 0)" stroke-linecap="round" stroke-linejoin="round" />
 </svg>`;
 
-	return { pointCount, svg, tolerance: adaptiveTolerance };
+	return { pointCount, svg, tolerance };
 }

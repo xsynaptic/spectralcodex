@@ -4,6 +4,7 @@ import type { ResourceAssociation } from '#lib/collections/resources/resources-a
 
 import { buildResourceAssociation } from '#lib/collections/resources/resources-association.ts';
 import { createCollectionData, getRawCollection } from '#lib/utils/collections.ts';
+import { collectUnlistedLocationIds, populateContentCounts } from '#lib/utils/content-policy.ts';
 
 // Raw reads; this runs during resources provisioning, and the match rule reads frontmatter only
 export const getResourceAssociation = pMemoize(async (): Promise<ResourceAssociation> => {
@@ -21,14 +22,14 @@ export const getResourcesCollection = createCollectionData({
 	label: 'Resources',
 	async mutate(entries) {
 		const { locationIdsByResourceId, postIdsByResourceId } = await getResourceAssociation();
+		const unlistedLocationIds = collectUnlistedLocationIds(await getRawCollection('locations'));
 
 		for (const entry of entries) {
-			const locationCount = locationIdsByResourceId.get(entry.id)?.length ?? 0;
-			const postCount = postIdsByResourceId.get(entry.id)?.length ?? 0;
-
-			entry.data._locationCount = locationCount;
-			entry.data._postCount = postCount;
-			entry.data._entryCount = locationCount + postCount;
+			populateContentCounts(entry.data, {
+				locations: locationIdsByResourceId.get(entry.id) ?? [],
+				posts: postIdsByResourceId.get(entry.id) ?? [],
+				unlistedLocationIds,
+			});
 		}
 	},
 });

@@ -45,6 +45,13 @@ describe('queryHomeData quality filter', () => {
 
 		expect(ids(data.recentCatalogItems)).toStrictEqual(['at-bar']);
 	});
+
+	test('an unlisted Location never reaches the home page', async () => {
+		const data = await queryWith(makeItems('locations', 1, { hideFromLists: true }));
+
+		expect(data.featuredCatalogItems).toStrictEqual([]);
+		expect(data.recentCatalogItems).toStrictEqual([]);
+	});
 });
 
 describe('queryHomeData featured items', () => {

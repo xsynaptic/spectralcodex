@@ -19,6 +19,7 @@ import {
 	hasEntries,
 	sortByEntryCount,
 } from '#lib/utils/collections.ts';
+import { isListed, isListedQuality } from '#lib/utils/content-policy.ts';
 
 export const createThemesByIdsFunction = createCollectionLookupByIds('Themes', getThemesCollection);
 
@@ -36,14 +37,14 @@ export async function createQueryThemesEntryFunction() {
 		const regionPrimary = getFirstRegionByReference(entry.data.regions);
 
 		const locationsFiltered = getLocationsByTheme(entry);
-		const locationsListed = locationsFiltered.filter(({ data }) => !data.hideIndex);
+		const locationsListed = locationsFiltered.filter(({ data }) => isListed(data));
 
 		const postsFiltered = getPostsByTheme(entry);
 
 		const featuredCandidates = catalog.resolve([
 			...R.pipe(
 				locationsListed,
-				R.filter((location) => location.data.entryQuality >= 2),
+				R.filter((location) => isListedQuality(location.data)),
 			),
 			...postsFiltered,
 		]);

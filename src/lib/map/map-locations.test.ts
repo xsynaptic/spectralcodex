@@ -147,7 +147,7 @@ describe('getLocationFeatures', () => {
 	const sensitiveLocations = [
 		makeLocation('sensitive-site', {
 			geometry: makePoint(121.5, 25),
-			hideLocation: true,
+			hideGeometry: true,
 			title: 'Sensitive Site',
 		}),
 		makeLocation('longshan-temple', {

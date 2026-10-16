@@ -1,4 +1,5 @@
 import { createCollectionData, getRawCollection } from '#lib/utils/collections.ts';
+import { populateContentCounts } from '#lib/utils/content-policy.ts';
 
 export const getSeriesCollection = createCollectionData({
 	collection: 'series',
@@ -10,9 +11,11 @@ export const getSeriesCollection = createCollectionData({
 		for (const entry of entries) {
 			const seriesItems = new Set(entry.data.seriesItems);
 
-			entry.data._locationCount = locations.filter(({ id }) => seriesItems.has(id)).length;
-			entry.data._postCount = posts.filter(({ id }) => seriesItems.has(id)).length;
-			entry.data._entryCount = entry.data._locationCount + entry.data._postCount;
+			populateContentCounts(entry.data, {
+				locations: locations.filter(({ id }) => seriesItems.has(id)).map(({ id }) => id),
+				posts: posts.filter(({ id }) => seriesItems.has(id)).map(({ id }) => id),
+				unlistedLocationIds: new Set(),
+			});
 		}
 	},
 });

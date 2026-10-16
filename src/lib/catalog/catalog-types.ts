@@ -21,6 +21,7 @@ export interface CatalogItem<T extends CatalogCollectionKey = CatalogCollectionK
 	dateUpdated: Date | undefined;
 	description: string | undefined;
 	entryQuality: number;
+	hideFromLists: boolean;
 	id: string;
 	imageHeroId: string | undefined;
 	imageId: string | undefined;

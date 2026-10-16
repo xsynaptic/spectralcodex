@@ -56,6 +56,10 @@ async function getRegionPrimaryIdFunction() {
 	};
 }
 
+function isUnlisted(entry: CatalogEntry) {
+	return entry.collection === 'locations' && entry.data.hideFromLists === true;
+}
+
 function getWordCount(entry: CollectionEntry<CollectionKey>) {
 	if (!wordCountFunction) {
 		wordCountFunction = createWordCountFunction({
@@ -152,6 +156,7 @@ function createCatalogItem(
 		dateUpdated: 'dateUpdated' in data ? data.dateUpdated : undefined,
 		description: getDescription(entry),
 		entryQuality: data.entryQuality,
+		hideFromLists: isUnlisted(entry),
 		id: entry.id,
 		imageHeroId: getImageHeroId({ imageFeatured }),
 		imageId: getImageFeaturedId({ imageFeatured }),

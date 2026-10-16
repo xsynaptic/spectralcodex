@@ -79,5 +79,5 @@ const atlas = await getAtlasPage(entry, mapData);
 		<SectionPreviewList count={catalogItemsCount} items={catalogItems} />
 	) : undefined}
 	<SectionStats backlinksCount={backlinksCount} entryCount={entry.data._entryCount ?? 0} />
-	<RegionsDivision entryId={entry.id} />
+	<RegionsDivision entry={entry} />
 </ContentEntryDetail>

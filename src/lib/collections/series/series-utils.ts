@@ -12,6 +12,7 @@ import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
 import { getMapLanguages } from '#lib/i18n/i18n-utils.ts';
 import { createMapDataFunction } from '#lib/map/map-data.ts';
 import { getLocationsMapRule } from '#lib/map/map-locations.ts';
+import { isListedQuality } from '#lib/utils/content-policy.ts';
 
 export async function createQuerySeriesEntryFunction() {
 	const { entries: series } = await getSeriesCollection();
@@ -86,7 +87,7 @@ export async function querySeriesIndex() {
 
 	return R.pipe(
 		series,
-		R.filter((entry) => entry.data.entryQuality >= 2),
+		R.filter((entry) => isListedQuality(entry.data)),
 		R.sort((a, b) =>
 			a.data.seriesItems && b.data.seriesItems
 				? b.data.seriesItems.length - a.data.seriesItems.length

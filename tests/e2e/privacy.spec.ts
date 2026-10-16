@@ -22,7 +22,7 @@ async function readSensitiveLocations() {
 			.filter((entry) => getPublicId(entry) !== entry.id)
 			.map((entry) => `/${entry.id}/`),
 		hiddenPaths: locations
-			.filter((entry) => entry.data.hideLocation)
+			.filter((entry) => entry.data.hideGeometry)
 			.map((entry) => `/${getPublicId(entry)}/`),
 	};
 }

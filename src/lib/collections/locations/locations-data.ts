@@ -22,7 +22,7 @@ import {
 	createCollectionLookupByIds,
 	getRawCollection,
 } from '#lib/utils/collections.ts';
-import { contentPolicy } from '#lib/utils/content-policy.ts';
+import { contentPolicy, isGeometryHidden } from '#lib/utils/content-policy.ts';
 import { getDescriptionRendered } from '#lib/utils/description-data.ts';
 import { getDescription } from '#lib/utils/description.ts';
 import { getContentPath } from '#lib/utils/routing.ts';
@@ -124,7 +124,7 @@ export const getLocationsCollection = createCollectionData({
 		}
 
 		const nearbyCandidates = contentPolicy.hideSensitiveLocations
-			? entries.filter((location) => !location.data.hideLocation)
+			? entries.filter((location) => !isGeometryHidden(location))
 			: entries;
 
 		const posts = await getRawCollection('posts');

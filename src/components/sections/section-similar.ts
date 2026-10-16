@@ -7,7 +7,7 @@ import { z } from 'zod';
 import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
-import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
+import { isListed } from '#lib/utils/content-policy.ts';
 
 // A general file loading function that resolves the file path relative to the project root
 async function loadDataFile(filePath: string) {
@@ -41,7 +41,6 @@ async function createSimilarContentFunction() {
 	const similarContentData = await loadSimilarContentData();
 
 	const catalog = await getCatalog();
-	const { entriesMap: locationsMap } = await getLocationsCollection();
 
 	return function getSimilarContent({
 		hasImageFeatured = true,
@@ -62,9 +61,9 @@ async function createSimilarContentFunction() {
 
 		return similarItem
 			.filter((item) => item.score >= threshold)
-			.filter((item) => !locationsMap.get(item.id)?.data.hideIndex)
 			.map((item) => catalog.getById(item.id))
 			.filter((item) => item !== undefined)
+			.filter(isListed)
 			.filter((item) => (hasImageFeatured ? !!item.imageId : !item.imageId))
 			.slice(0, limit);
 	};

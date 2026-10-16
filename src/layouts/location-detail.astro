@@ -32,7 +32,7 @@ import {
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getImageFeaturedId, getImageHeroId } from '#lib/image/image-featured.ts';
 import { hasEntryContent } from '#lib/utils/astro.ts';
-import { isLocationHidden } from '#lib/utils/content-policy.ts';
+import { isGeometryHidden } from '#lib/utils/content-policy.ts';
 
 interface Props {
 	backlinks: Array<CatalogItem> | undefined;
@@ -59,7 +59,7 @@ const hasContent = hasEntryContent(entry);
 const hasHeroImage = !!getImageHeroId({ imageFeatured: entry.data.imageFeatured });
 const imageFeaturedId = getImageFeaturedId({ imageFeatured: entry.data.imageFeatured });
 
-const hideLocation = isLocationHidden(entry);
+const hideGeometry = isGeometryHidden(entry);
 
 const showChinese = regionLangCode?.startsWith('zh');
 
@@ -98,7 +98,7 @@ const t = getTranslations();
 		entry={entry}
 		{...(hasContent ? { 'data-reading-frame': '' } : {})}
 	/>
-	{hideLocation ? undefined : (
+	{hideGeometry ? undefined : (
 		<SectionMap
 			class="atlas-inline-map"
 			entryTitle={entry.data.title}
@@ -106,25 +106,27 @@ const t = getTranslations();
 			showAtlasOpen={!!atlas}
 		/>
 	)}
-	<SectionNotices entry={entry} hideLocation={hideLocation} langCode={regionLangCode} />
-	{hideLocation ? undefined : <SectionPoints entry={entry} showChinese={showChinese} />}
+	<SectionNotices entry={entry} hideGeometry={hideGeometry} langCode={regionLangCode} />
+	{hideGeometry ? undefined : <SectionPoints entry={entry} showChinese={showChinese} />}
 	<SectionDetails
 		address={addressBase}
 		addressMultilingual={addressMultilingual}
 		entry={entry}
-		hideLocation={hideLocation}
+		hideGeometry={hideGeometry}
 		showChinese={showChinese}
 	/>
-	{hideLocation ? undefined : (
+	{hideGeometry ? undefined : (
 		<SectionDateList dates={entry.data.dateRecorded} sectionTitle={t('section.dateRecorded')} />
 	)}
-	{hideLocation ? undefined : <SectionLinks entry={entry} />}
-	{hideLocation ? undefined : <SectionSources entry={entry} />}
+	{hideGeometry ? undefined : <SectionLinks entry={entry} />}
+	{hideGeometry ? undefined : <SectionSources entry={entry} />}
 	<SectionThemes themeIds={themeIds} />
 	<SectionSeries entry={entry} />
 	<SectionBacklinks backlinks={backlinks} />
 	<SectionWebmentions entry={entry} />
-	<SectionNearbyList class="atlas-inline-nearby" entry={entry} limit={12} />
+	{hideGeometry ? undefined : (
+		<SectionNearbyList class="atlas-inline-nearby" entry={entry} limit={12} />
+	)}
 	<SectionPreviews items={catalogItems} sectionTitle={t('section.content.locations')} />
 	<SectionSimilar entry={entry} limit={12} showPreviews={true} />
 </ContentEntryArticle>

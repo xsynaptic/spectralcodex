@@ -1,39 +1,21 @@
+import type { CollectionEntry } from 'astro:content';
+
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
-import { readdir, readFile } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
-import pMemoize from 'p-memoize';
 
-/**
- * Load all region division SVG files from the cache directory
- * Reads directory once and caches all SVG content for fast lookup
- */
-const loadRegionDivisionsSvgCache = pMemoize(async (): Promise<Map<string, string>> => {
-	const cache = new Map<string, string>();
-	const divisionsPath = path.join(process.cwd(), CUSTOM_CACHE_PATH, 'divisions');
+export async function getRegionsDivisionSvgContent(entry: CollectionEntry<'regions'>) {
+	if (!entry.data.divisionId) return;
+
+	const filePath = path.join(process.cwd(), CUSTOM_CACHE_PATH, 'divisions', `${entry.id}.svg`);
 
 	try {
-		const files = await readdir(divisionsPath);
-		const svgFiles = files.filter((file) => file.endsWith('.svg'));
-
-		await Promise.all(
-			svgFiles.map(async (file) => {
-				const id = file.replace('.svg', '');
-				const content = await readFile(path.join(divisionsPath, file), 'utf8');
-
-				cache.set(id, content);
-			}),
+		return await readFile(filePath, 'utf8');
+	} catch (error) {
+		throw new Error(
+			`Region "${entry.id}" names a Division but ${filePath} is missing; run \`pnpm map-divisions\``,
+			{ cause: error },
 		);
-	} catch {
-		// Directory doesn't exist or can't be read
 	}
-
-	return cache;
-});
-
-// Get SVG content for a region division by ID
-export async function getRegionsDivisionSvgContent(id: string) {
-	const cache = await loadRegionDivisionsSvgCache();
-
-	return cache.get(id);
 }

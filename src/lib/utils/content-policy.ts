@@ -1,5 +1,7 @@
 import type { CollectionEntry } from 'astro:content';
 
+import { entryQualityFloor } from '@spectralcodex/shared/entries';
+
 interface ContentPolicy {
 	applyOverrides: boolean;
 	hideSensitiveLocations: boolean;
@@ -11,37 +13,43 @@ export const contentPolicy = {
 	hideSensitiveLocations: !import.meta.env.DEV,
 } satisfies ContentPolicy;
 
-export function isLocationHidden(entry: CollectionEntry<'locations'>) {
-	return entry.data.hideLocation === true && contentPolicy.hideSensitiveLocations;
+export function isListedQuality({ entryQuality }: { entryQuality: number }) {
+	return entryQuality >= entryQualityFloor.listed;
 }
 
-export function collectHiddenLocationIds(
+export function isFeaturedQuality({ entryQuality }: { entryQuality: number }) {
+	return entryQuality >= entryQualityFloor.featured;
+}
+
+export function isListed({ hideFromLists }: { hideFromLists?: boolean | undefined }) {
+	return hideFromLists !== true;
+}
+
+export function isGeometryHidden(entry: CollectionEntry<'locations'>) {
+	return entry.data.hideGeometry === true && contentPolicy.hideSensitiveLocations;
+}
+
+export function collectUnlistedLocationIds(
 	locations: Array<CollectionEntry<'locations'>>,
 ): Set<string> {
-	if (!contentPolicy.hideSensitiveLocations) return new Set<string>();
-
-	return new Set(locations.filter(({ data }) => data.hideLocation).map(({ id }) => id));
+	return new Set(locations.filter(({ data }) => !isListed(data)).map(({ id }) => id));
 }
 
 interface EntryCountData {
 	_entryCount?: number | undefined;
 	_locationCount?: number | undefined;
-	_locations?: Array<string> | undefined;
 	_postCount?: number | undefined;
-	_posts?: Array<string> | undefined;
 }
 
 export function populateContentCounts(
 	data: EntryCountData,
 	{
-		hiddenLocationIds,
 		locations,
 		posts,
-	}: { hiddenLocationIds: Set<string>; locations: Array<string>; posts: Array<string> },
+		unlistedLocationIds,
+	}: { locations: Array<string>; posts: Array<string>; unlistedLocationIds: Set<string> },
 ) {
-	data._locations = locations;
-	data._locationCount = locations.filter((id) => !hiddenLocationIds.has(id)).length;
-	data._posts = posts;
+	data._locationCount = locations.filter((id) => !unlistedLocationIds.has(id)).length;
 	data._postCount = posts.length;
 	data._entryCount = data._locationCount + data._postCount;
 }

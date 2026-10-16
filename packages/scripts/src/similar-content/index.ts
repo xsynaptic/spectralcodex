@@ -2,6 +2,7 @@
 import { pipeline } from '@huggingface/transformers';
 import { createSqliteCache } from '@spectralcodex/shared/cache';
 import { ContentCollectionsEnum } from '@spectralcodex/shared/collections';
+import { entryQualityFloor } from '@spectralcodex/shared/entries';
 import { sanitizeMdx } from '@xsynaptic/unified-tools';
 import chalk from 'chalk';
 import { readdirSync, rmSync, writeFileSync } from 'node:fs';
@@ -302,7 +303,11 @@ async function getContentEntries(): Promise<Array<EmbeddableEntry>> {
 	for (const entry of collectionEntries) {
 		if (!entry.digest) continue;
 
-		if (typeof entry.data.entryQuality !== 'number' || entry.data.entryQuality < 2) continue;
+		if (
+			typeof entry.data.entryQuality !== 'number' ||
+			entry.data.entryQuality < entryQualityFloor.listed
+		)
+			continue;
 
 		entries.push({ ...entry, digest: String(entry.digest) });
 	}

@@ -16,6 +16,7 @@ import { getMapLanguages } from '#lib/i18n/i18n-utils.ts';
 import { createMapDataFunction } from '#lib/map/map-data.ts';
 import { getLocationsMapRule } from '#lib/map/map-locations.ts';
 import { hasEntries, sortByEntryCount } from '#lib/utils/collections.ts';
+import { isListed, isListedQuality } from '#lib/utils/content-policy.ts';
 
 export type ResourceLink = NonNullable<ReturnType<ResolveResourceLinks>>[number];
 
@@ -43,7 +44,7 @@ export async function createQueryResourcesEntryFunction() {
 			[
 				...R.pipe(
 					locationsFiltered,
-					R.filter((location) => location.data.entryQuality >= 2),
+					R.filter((location) => isListed(location.data) && isListedQuality(location.data)),
 					catalog.resolve,
 				),
 				...R.pipe(postsFiltered, catalog.resolve),

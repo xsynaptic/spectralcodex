@@ -18,7 +18,7 @@ import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getMapLanguages, getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { createMapDataFunction } from '#lib/map/map-data.ts';
 import { getLocationsMapRule } from '#lib/map/map-locations.ts';
-import { contentPolicy } from '#lib/utils/content-policy.ts';
+import { isGeometryHidden, isListed, isListedQuality } from '#lib/utils/content-policy.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description-data.ts';
 import { getContentPath } from '#lib/utils/routing.ts';
 import { buildEntryBreadcrumbSchema, buildPlaceSchema } from '#lib/utils/seo-structured-data.ts';
@@ -27,7 +27,7 @@ export async function getLocationSchemas(
 	entry: CollectionEntry<'locations'>,
 	props: { url: string },
 ): Promise<Array<Thing>> {
-	if (entry.data.override || (entry.data.hideLocation && contentPolicy.hideSensitiveLocations)) {
+	if (entry.data.override || isGeometryHidden(entry)) {
 		return [];
 	}
 
@@ -156,8 +156,8 @@ export async function queryLocationsIndex() {
 
 	return R.pipe(
 		entries,
-		R.filter((item) => !item.data.hideIndex),
-		R.filter((entry) => entry.data.entryQuality >= 2),
+		R.filter((entry) => isListed(entry.data)),
+		R.filter((entry) => isListedQuality(entry.data)),
 		R.filter((item) => !!item.data.imageFeatured),
 		catalog.resolve,
 		R.sort(sortCatalogByDate),

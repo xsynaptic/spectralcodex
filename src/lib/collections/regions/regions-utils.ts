@@ -18,7 +18,7 @@ import { createMapDataFunction } from '#lib/map/map-data.ts';
 import { getMapDirectoryData } from '#lib/map/map-directory.ts';
 import { getRegionMapRule, hasEntryMap } from '#lib/map/map-locations.ts';
 import { hasEntries, sortByEntryCount } from '#lib/utils/collections.ts';
-import { contentPolicy } from '#lib/utils/content-policy.ts';
+import { isListed, isListedQuality } from '#lib/utils/content-policy.ts';
 
 export async function createQueryRegionsEntryFunction() {
 	const getRegionAncestors = await createRegionAncestorsFunction();
@@ -34,22 +34,18 @@ export async function createQueryRegionsEntryFunction() {
 		const divisionUrl = divisionUrlById.get(entry.id);
 
 		const entryLocations = entry.data._locations ? getLocationsByIds(entry.data._locations) : [];
-		const entryLocationsListed = entryLocations.filter(({ data }) => !data.hideIndex);
+		const entryLocationsListed = entryLocations.filter(({ data }) => isListed(data));
 
 		const featuredCandidates = [
 			...R.pipe(
 				entryLocationsListed,
-				R.filter((location) => location.data.entryQuality >= 2),
+				R.filter((location) => isListedQuality(location.data)),
 				catalog.resolve,
 			),
 			...R.pipe(entry.data._posts ?? [], getPostsByIds, catalog.resolve),
 		];
 
-		const restCandidates = R.pipe(
-			entryLocationsListed,
-			R.filter(({ data }) => !(contentPolicy.hideSensitiveLocations && data.hideLocation)),
-			catalog.resolve,
-		);
+		const restCandidates = catalog.resolve(entryLocationsListed);
 
 		const { catalogItems, catalogItemsCount, catalogItemsFiltered } = buildEntryCatalogItems(
 			featuredCandidates,

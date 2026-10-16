@@ -14,7 +14,7 @@ import { getMapLanguages } from '#lib/i18n/i18n-utils.ts';
 import { getMapBounds } from '#lib/map/map-bounds.ts';
 import { createMapDataFunction } from '#lib/map/map-data.ts';
 import { getMapDirectoryData } from '#lib/map/map-directory.ts';
-import { isLocationHidden } from '#lib/utils/content-policy.ts';
+import { isGeometryHidden } from '#lib/utils/content-policy.ts';
 import { getContentPath } from '#lib/utils/routing.ts';
 
 export type AtlasPageProps =
@@ -27,7 +27,7 @@ function getAtlasLocationView(
 	atlasRows: ReadonlyArray<MapSourceItem>,
 	props: MapComponentProps,
 ): MapView | undefined {
-	if (isLocationHidden(entry)) return;
+	if (isGeometryHidden(entry)) return;
 
 	const targetIds = props.targetIds ?? [];
 

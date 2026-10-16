@@ -12,6 +12,7 @@ export function makeCatalogItem(
 		dateUpdated: undefined,
 		description: undefined,
 		entryQuality: 3,
+		hideFromLists: false,
 		imageHeroId: undefined,
 		imageId: undefined,
 		linksExternalCount: undefined,

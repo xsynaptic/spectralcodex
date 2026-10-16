@@ -12,6 +12,7 @@ import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/r
 import { getMapLanguages } from '#lib/i18n/i18n-utils.ts';
 import { createMapDataFunction } from '#lib/map/map-data.ts';
 import { getLocationsMapRule } from '#lib/map/map-locations.ts';
+import { isListedQuality } from '#lib/utils/content-policy.ts';
 import { sortByDateReverseChronological } from '#lib/utils/date.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description-data.ts';
 import {
@@ -70,7 +71,7 @@ export async function queryPostsIndex() {
 
 	return R.pipe(
 		entries,
-		R.filter((entry) => entry.data.entryQuality >= 2),
+		R.filter((entry) => isListedQuality(entry.data)),
 		R.sort(sortByDateReverseChronological),
 	);
 }

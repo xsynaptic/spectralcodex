@@ -20,7 +20,7 @@ import type { MultilingualContent } from '#lib/i18n/i18n-types.ts';
 import { mapDisplayRegionIds } from '#constants.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getTruncatedLngLat } from '#lib/map/map-utils.ts';
-import { isLocationHidden } from '#lib/utils/content-policy.ts';
+import { isGeometryHidden } from '#lib/utils/content-policy.ts';
 
 type LocationGeometry = Exclude<CollectionEntry<'locations'>['data']['geometry'], Array<unknown>>;
 
@@ -123,7 +123,7 @@ export function getThemeMapRule(
 }
 
 function filterHiddenLocations(locations: Array<CollectionEntry<'locations'>>) {
-	return locations.filter((entry) => !isLocationHidden(entry));
+	return locations.filter((entry) => !isGeometryHidden(entry));
 }
 
 export function getLocationsMapPopupData(

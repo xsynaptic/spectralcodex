@@ -70,7 +70,7 @@ import {
 	createSampleImageProps,
 	createSampleMapData,
 	createSamplePage,
-	getSampleDivisionRegionId,
+	getSampleDivisionRegion,
 	getSampleImages,
 	getSampleLocations,
 	getSampleNearbyLocations,
@@ -119,7 +119,7 @@ const sampleImages = await getSampleImages();
 const sampleRegions = await getSampleRegions();
 const sampleRegionId = sampleRegions.deepest?.id;
 const sampleRegionIds = sampleRegions.nested.map((entry) => entry.id);
-const sampleDivisionRegionId = await getSampleDivisionRegionId();
+const sampleDivisionRegion = await getSampleDivisionRegion();
 const sampleLocations = await getSampleLocations();
 const sampleNearbyLocations = await getSampleNearbyLocations();
 const sampleRelatedRegion = await getSampleRelatedRegion();
@@ -1233,10 +1233,10 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 				note="The cached Division outline for a Region; decorative."
 				source="components/regions/regions-division.astro"
 			>
-				{sampleDivisionRegionId ? (
-					<RegionsDivision entryId={sampleDivisionRegionId} />
+				{sampleDivisionRegion ? (
+					<RegionsDivision entry={sampleDivisionRegion} />
 				) : (
-					<p class={captionClass}>No Division SVG in the cache, so there is no outline to draw.</p>
+					<p class={captionClass}>No Region names a Division, so there is no outline to draw.</p>
 				)}
 			</Specimen>
 			<InventoryAtlasDivider />

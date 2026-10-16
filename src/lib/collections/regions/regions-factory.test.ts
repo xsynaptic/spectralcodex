@@ -192,11 +192,15 @@ function makeOverrideLocation(
 	} as unknown as CollectionEntry<'locations'>;
 }
 
-function makeSensitiveLocation(id: string, regionIds: Array<string>) {
+function makeFlaggedLocation(
+	id: string,
+	regionIds: Array<string>,
+	flags: { hideFromLists?: boolean; hideGeometry?: boolean },
+) {
 	return {
 		collection: 'locations',
 		data: {
-			hideLocation: true,
+			...flags,
 			regions: regionIds.map((regionId) => ({ id: regionId })),
 			title: id,
 		},
@@ -215,7 +219,11 @@ async function taipeiCountsFor(isDev: boolean) {
 
 	populateRegionsContent({
 		entries: regions,
-		locations: [makeLocation('temple', ['taipei']), makeSensitiveLocation('bunker', ['taipei'])],
+		locations: [
+			makeLocation('temple', ['taipei']),
+			makeFlaggedLocation('bunker', ['taipei'], { hideGeometry: true }),
+			makeFlaggedLocation('theater', ['taipei'], { hideFromLists: true }),
+		],
 		posts: [],
 		regionsTree: createRegionsTree(regions),
 	});
@@ -223,19 +231,19 @@ async function taipeiCountsFor(isDev: boolean) {
 	return regions.find((entry) => entry.id === 'taipei')!.data;
 }
 
-describe('populateRegionsContent under the production content policy', () => {
-	test('a sensitive location is gathered but not counted', async () => {
+describe('populateRegionsContent counts follow listings', () => {
+	test('an unlisted Location is gathered but not counted; a geometry-hidden one counts', async () => {
 		const taipei = await taipeiCountsFor(false);
 
-		expect(taipei._locations).toEqual(['temple', 'bunker']);
-		expect(taipei._locationCount).toBe(1);
-		expect(taipei._entryCount).toBe(1);
+		expect(taipei._locations).toEqual(['temple', 'bunker', 'theater']);
+		expect(taipei._locationCount).toBe(2);
+		expect(taipei._entryCount).toBe(2);
 	});
 
-	test('in development it counts like any other location', async () => {
+	test('development counts the same, since listings are not gated on the environment', async () => {
 		const taipei = await taipeiCountsFor(true);
 
-		expect(taipei._locations).toEqual(['temple', 'bunker']);
+		expect(taipei._locations).toEqual(['temple', 'bunker', 'theater']);
 		expect(taipei._locationCount).toBe(2);
 	});
 });

@@ -14,7 +14,6 @@ import type { MultilingualContent } from '#lib/i18n/i18n-types.ts';
 import type { ImageComponentProps, ImagePlaceholderProps } from '#lib/image/image-types.ts';
 import type { DateRecordedEntry } from '#lib/utils/date.ts';
 
-import { getRegionsDivisionSvgContent } from '#components/regions/regions-division.ts';
 import { getImagesCollection } from '#lib/collections/images/images-data.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import { getLocationsNearbyList } from '#lib/collections/locations/locations-utils.ts';
@@ -32,14 +31,10 @@ import { sanitizeImageAltAttribute } from '#lib/utils/text.ts';
 
 export const sampleUrl = '/inventory/';
 
-export async function getSampleDivisionRegionId() {
+export async function getSampleDivisionRegion() {
 	const { entries } = await getRegionsCollection();
 
-	for (const entry of entries) {
-		if (await getRegionsDivisionSvgContent(entry.id)) return entry.id;
-	}
-
-	return;
+	return entries.find((entry) => entry.data.divisionId);
 }
 
 export async function getSampleImages() {
@@ -324,6 +319,7 @@ function createCatalogItem(item: Partial<CatalogItem> & Pick<CatalogItem, 'id' |
 		dateUpdated: undefined,
 		description: undefined,
 		entryQuality: 3,
+		hideFromLists: false,
 		imageHeroId: undefined,
 		imageId: undefined,
 		linksExternalCount: 0,

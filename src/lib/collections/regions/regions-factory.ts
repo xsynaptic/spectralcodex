@@ -5,7 +5,7 @@ import type { Hierarchy } from '#lib/utils/hierarchy.ts';
 
 import { RegionLanguageMap } from '#lib/collections/regions/regions-types.ts';
 import {
-	collectHiddenLocationIds,
+	collectUnlistedLocationIds,
 	contentPolicy,
 	populateContentCounts,
 } from '#lib/utils/content-policy.ts';
@@ -46,16 +46,19 @@ export function populateRegionsContent({
 	const locationsByRegionMap = mapEntriesByRegion(locations, resolveLocationRegions);
 	const postsByRegionMap = mapEntriesByRegion(posts, (entry) => entry.data.regions);
 
-	const hiddenLocationIds = collectHiddenLocationIds(locations);
+	const unlistedLocationIds = collectUnlistedLocationIds(locations);
 
 	// Calculate cumulative content counts, rolled up through descendants
 	for (const entry of entries) {
 		const regionIds = [entry.id, ...regionsTree.descendantsOf(entry.id)];
 
+		entry.data._locations = collectByRegion(regionIds, locationsByRegionMap);
+		entry.data._posts = collectByRegion(regionIds, postsByRegionMap);
+
 		populateContentCounts(entry.data, {
-			hiddenLocationIds,
-			locations: collectByRegion(regionIds, locationsByRegionMap),
-			posts: collectByRegion(regionIds, postsByRegionMap),
+			locations: entry.data._locations,
+			posts: entry.data._posts,
+			unlistedLocationIds,
 		});
 	}
 }

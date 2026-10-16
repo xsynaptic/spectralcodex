@@ -46,7 +46,7 @@ interface MapDataset {
 }
 
 interface MapDatasetContext {
-	includeHidden?: boolean | undefined;
+	isPrivate?: boolean | undefined;
 	ordinalById: ReadonlyMap<string, number>;
 	prefix: string;
 	themeIndexById: ReadonlyMap<string, number>;
@@ -105,9 +105,9 @@ function getMembershipIndices(
 
 function buildMapDataset(
 	locations: Array<CollectionEntry<'locations'>>,
-	{ includeHidden, ordinalById, prefix, themeIndexById }: MapDatasetContext,
+	{ isPrivate, ordinalById, prefix, themeIndexById }: MapDatasetContext,
 ) {
-	const features = getLocationFeatures(locations, { includeHidden });
+	const features = getLocationFeatures(locations, { includeHidden: isPrivate });
 	const sourceData = getLocationsMapSourceData(features);
 	const popupData = getLocationsMapPopupData(features);
 
@@ -141,7 +141,7 @@ function buildMapDataset(
 		return {
 			...sourceItem,
 			properties: {
-				...sourceItem.properties,
+				...(isPrivate ? sourceItem.properties : R.omit(sourceItem.properties, ['objective'])),
 				...(regionOrdinals.length > 0 ? { regionOrdinals } : {}),
 				...(themeIndices.length > 0 ? { themeIndices } : {}),
 				chunkKey: chunkKeyById.get(id) ?? '0',
@@ -222,7 +222,7 @@ export const getMapDirectoryData = pMemoize(async (): Promise<MapDirectoryData> 
 
 	const objectives = buildMapDataset(objectiveLocations, {
 		...context,
-		includeHidden: true,
+		isPrivate: true,
 		prefix: 'objectives/',
 	});
 	const shared = buildMapDataset(locations, { ...context, prefix: '' });

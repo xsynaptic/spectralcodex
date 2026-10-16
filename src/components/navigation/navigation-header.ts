@@ -15,6 +15,7 @@ import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { sortByEntryCount } from '#lib/utils/collections.ts';
+import { isListedQuality } from '#lib/utils/content-policy.ts';
 import { getSitePath } from '#lib/utils/routing.ts';
 
 // Increase this to 3 to show subregions in the header navigation
@@ -140,7 +141,7 @@ function getNavigationCollectionMenu({
 	entries: Array<CollectionEntry<'series' | 'themes'>>;
 }) {
 	return entries
-		.filter((entry) => entry.data.entryQuality >= 2)
+		.filter((entry) => isListedQuality(entry.data))
 		.filter(filterNavigationItemEntryCount(1))
 		.toSorted(sortByEntryCount)
 		.slice(0, 12)

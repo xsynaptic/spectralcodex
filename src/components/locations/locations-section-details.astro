@@ -20,7 +20,7 @@ interface Props extends HTMLAttributes<'div'> {
 	address?: string | undefined;
 	addressMultilingual?: MultilingualContent | undefined;
 	entry: CollectionEntry<'locations'>;
-	hideLocation?: boolean | undefined;
+	hideGeometry?: boolean | undefined;
 	showChinese?: boolean | undefined;
 }
 
@@ -28,23 +28,23 @@ const {
 	address,
 	addressMultilingual,
 	entry,
-	hideLocation = false,
+	hideGeometry = false,
 	showChinese,
 	...props
 } = Astro.props;
 
 const details = getLocationDetails(entry);
 
-const status = hideLocation || details.coordinates ? details.status : undefined;
-const coordinates = hideLocation ? undefined : details.coordinates;
+const status = hideGeometry || details.coordinates ? details.status : undefined;
+const coordinates = hideGeometry ? undefined : details.coordinates;
 
 const addressParts: Array<MultilingualContent> = [];
 
-if (!hideLocation && address !== undefined) {
+if (!hideGeometry && address !== undefined) {
 	addressParts.push({ lang: LanguageCodeEnum.English, value: address });
 }
 
-if (!hideLocation && addressMultilingual !== undefined) {
+if (!hideGeometry && addressMultilingual !== undefined) {
 	addressParts.push(addressMultilingual);
 }
 
