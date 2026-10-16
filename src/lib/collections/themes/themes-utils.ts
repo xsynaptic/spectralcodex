@@ -2,7 +2,7 @@ import type { CollectionEntry } from 'astro:content';
 
 import * as R from 'remeda';
 
-import type { MapComponentData } from '#lib/map/map-types.ts';
+import type { MapComponentData } from '#lib/map/map-data.ts';
 
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { buildEntryCatalogItems } from '#lib/catalog/catalog-utils.ts';

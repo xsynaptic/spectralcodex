@@ -5,7 +5,7 @@ import type { CollectionEntry } from 'astro:content';
 import { selectMapRows } from '@spectralcodex/map-codec';
 import pMemoize from 'p-memoize';
 
-import type { MapComponentData } from '#lib/map/map-types.ts';
+import type { MapComponentData } from '#lib/map/map-data.ts';
 
 import { atlasRegionId } from '#constants.ts';
 import { atlasPage } from '#lib/atlas/atlas-constants.ts';

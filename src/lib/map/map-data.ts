@@ -7,10 +7,13 @@ import { IMAGE_SERVER_URL } from 'astro:env/server';
 
 import type { MapBoundsOptions } from '#lib/map/map-bounds.ts';
 import type { MapDatasetName } from '#lib/map/map-directory.ts';
-import type { MapComponentData } from '#lib/map/map-types.ts';
 
 import { getMapBounds, isTargetFeature } from '#lib/map/map-bounds.ts';
 import { getMapDirectoryData } from '#lib/map/map-directory.ts';
+
+export type MapComponentData =
+	| { hasGeodata: false; prefetchUrls?: never; props?: never }
+	| { hasGeodata: true; prefetchUrls: Array<string>; props: MapComponentProps };
 
 type MapDataOptions = MapBoundsOptions &
 	Omit<
