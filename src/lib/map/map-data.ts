@@ -12,8 +12,7 @@ import { getMapBounds, isTargetFeature } from '#lib/map/map-bounds.ts';
 import { getMapDirectoryData } from '#lib/map/map-directory.ts';
 
 export type MapComponentData =
-	| { hasGeodata: false; prefetchUrls?: never; props?: never }
-	| { hasGeodata: true; prefetchUrls: Array<string>; props: MapComponentProps };
+	{ hasGeodata: false; props?: never } | { hasGeodata: true; props: MapComponentProps };
 
 type MapDataOptions = MapBoundsOptions &
 	Omit<
@@ -66,7 +65,7 @@ export async function createMapDataFunction() {
 			targetIds: getTargetIds(rows, targetId),
 		};
 
-		return { hasGeodata: true, prefetchUrls: [apiSourceUrl], props: mapProps };
+		return { hasGeodata: true, props: mapProps };
 	};
 }
 

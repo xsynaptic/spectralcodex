@@ -45,7 +45,6 @@ const atlas = await getAtlasPage(entry, mapData);
 	atlas={atlas}
 	breadcrumbRegions={getRegionAncestors(entry).slice(1).toReversed()}
 	entry={entry}
-	prefetchUrls={mapData.prefetchUrls}
 >
 	<Fragment slot="header-subtitle">
 		<DividedItem>

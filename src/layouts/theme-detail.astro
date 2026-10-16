@@ -41,7 +41,7 @@ const allThemeIds = [...new Set([...(themeIds ?? []), ...relatedThemeIds])];
 const atlas = await getAtlasPage(entry, mapData);
 ---
 
-<ContentEntryDetail atlas={atlas} entry={entry} prefetchUrls={mapData.prefetchUrls}>
+<ContentEntryDetail atlas={atlas} entry={entry}>
 	<Fragment slot="header-subtitle">
 		<DividedItem>
 			<ContentCollectionLink collection={entry.collection} />
