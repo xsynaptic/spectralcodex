@@ -1,34 +1,32 @@
-import type { CSSProperties, FC } from 'react';
+import type { FC } from 'react';
 
 import { LngLatBounds } from 'maplibre-gl';
-import { memo, useState } from 'react';
-import { Map as ReactMapGlMap } from 'react-map-gl/maplibre';
+import { memo, useEffect, useLayoutEffect, useState } from 'react';
+import { Map as ReactMapGlMap, useMap } from 'react-map-gl/maplibre';
 
 import type { MapComponentProps } from '#types.ts';
 
 import '#canvas/canvas-worker.ts';
-import { CanvasDataProvider } from '#canvas/canvas-data.tsx';
 import { useMapCanvasEvents } from '#canvas/canvas-events.ts';
 import { MapSelectionFeatureState } from '#canvas/canvas-feature-state.tsx';
-import { MapCanvasLoading } from '#canvas/canvas-loading.tsx';
-import { MapRootMarker } from '#canvas/canvas-root-marker.tsx';
 import { getInitialViewState } from '#canvas/canvas-viewport.ts';
+import { MapScopeBar } from '#controls/controls-scope.tsx';
 import { MapControls } from '#controls/controls.tsx';
-import { ChunkConfigProvider } from '#data/data-popup-chunks.tsx';
-import { PopupDataContextProvider } from '#data/data-popup.tsx';
-import { SourceDataContextProvider } from '#data/data-source.tsx';
-import { MapHostProvider, useMapHost } from '#host/host-context.tsx';
+import { CanvasDataProvider } from '#data/data-canvas.tsx';
+import { useIsMapLoading } from '#data/data-query.ts';
+import { useHostViewSync } from '#host/host-view.ts';
+import { useMapConfig } from '#lib/config.tsx';
+import { useIsDarkMode } from '#lib/dark-mode.ts';
 import { useProtomaps } from '#lib/protomaps.ts';
 import { MapImagePreload, MapPopup } from '#popup/popup.tsx';
 import { mapInteractiveLayerIds } from '#source/source-config.ts';
 import { MapSource } from '#source/source.tsx';
-import { MapStoreProvider } from '#store/store-provider.tsx';
-import { useIsMapCanvasInteractive } from '#store/store.ts';
+import { MapStoreProvider } from '#store/store.tsx';
 import { MapTargets } from '#targets/targets.tsx';
-import { MapScopeBar } from '#view/view-scope-bar.tsx';
-import { MapViewProvider } from '#view/view.tsx';
 
-// Features past the antimeridian only draw with world copies on
+const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
+
+// Features past the antimeridian only draw when world copies are on
 function isBeyondAntimeridian(bounds: MapComponentProps['bounds']) {
 	if (!bounds) return false;
 
@@ -37,43 +35,54 @@ function isBeyondAntimeridian(bounds: MapComponentProps['bounds']) {
 	return lngLatBounds.getWest() < -180 || lngLatBounds.getEast() > 180;
 }
 
-const MapCanvasContainer: FC<
-	Omit<MapComponentProps, 'apiSourceUrl' | 'isObjectiveFilterEnabled'> & {
-		style?: CSSProperties | undefined;
-	}
-> = function MapCanvasContainer({
-	apiChunkBaseUrl,
-	apiDivisionUrl,
-	apiPopupUrl,
-	baseMapTheme,
-	bounds,
-	center,
-	hasEnterControl,
-	hash,
-	imageServerUrl,
-	isDev,
-	mapId,
-	maxBounds,
-	popupData,
-	popupDataKey,
-	protomapsApiKey,
-	style,
-	version,
-	zoom,
-}) {
-	const protomapsStyleSpec = useProtomaps({
+const MapCanvasLoading: FC = function MapCanvasLoading() {
+	const isLoading = useIsMapLoading();
+
+	return (
+		<div className="map-canvas-loading">
+			<div className="map-loading-animation" style={{ opacity: isLoading ? 1 : 0 }} />
+		</div>
+	);
+};
+
+const MapRootMarker: FC = function MapRootMarker() {
+	const { current: map } = useMap();
+	const isDarkMode = useIsDarkMode();
+
+	useIsomorphicLayoutEffect(() => {
+		if (!map) return;
+
+		const container = map.getMap().getContainer();
+
+		container.dataset.mapRoot = '';
+		container.dataset.mapMode = isDarkMode ? 'dark' : 'light';
+	}, [map, isDarkMode]);
+
+	return;
+};
+
+const MapCanvasContainer: FC = function MapCanvasContainer() {
+	const {
 		baseMapTheme,
+		bounds,
+		center,
+		hash,
+		isInteractive,
+		languages,
+		mapId,
+		maxBounds,
 		protomapsApiKey,
-	});
-
-	const host = useMapHost();
-
-	const canvasEvents = useMapCanvasEvents({ mapId });
-	const isCanvasInteractive = useIsMapCanvasInteractive();
+		style,
+		zoom,
+	} = useMapConfig();
+	const protomapsStyleSpec = useProtomaps({ baseMapTheme, languages, protomapsApiKey });
+	const canvasEvents = useMapCanvasEvents();
 
 	const [initialViewState] = useState(() =>
 		getInitialViewState({ bounds, center, mapId, maxBounds, zoom }),
 	);
+
+	useHostViewSync();
 
 	return (
 		<ReactMapGlMap
@@ -81,9 +90,9 @@ const MapCanvasContainer: FC<
 			fadeDuration={0}
 			hash={hash ?? false}
 			initialViewState={initialViewState}
-			interactive={isCanvasInteractive}
+			interactive={isInteractive}
 			interactiveLayerIds={[...mapInteractiveLayerIds]}
-			mapStyle={protomapsStyleSpec} // Note: this is the MapLibre GL style spec, not CSS!
+			mapStyle={protomapsStyleSpec}
 			maxZoom={19}
 			minZoom={4}
 			renderWorldCopies={isBeyondAntimeridian(bounds) || isBeyondAntimeridian(maxBounds)}
@@ -91,22 +100,12 @@ const MapCanvasContainer: FC<
 			styleDiffing={false}
 			{...canvasEvents}
 		>
-			<ChunkConfigProvider chunkUrlBase={apiChunkBaseUrl} isDev={isDev} version={version}>
-				<PopupDataContextProvider
-					apiUrl={apiPopupUrl}
-					data={popupData}
-					dataKey={popupDataKey}
-					isDev={isDev}
-					version={version}
-				>
-					<MapControls hasEnterControl={hasEnterControl} />
-					<MapPopup imageServerUrl={imageServerUrl} isDev={isDev} />
-					<MapImagePreload imageServerUrl={imageServerUrl} isEnabled={!host} />
-					<MapCanvasLoading />
-				</PopupDataContextProvider>
-			</ChunkConfigProvider>
-			<MapSource apiDivisionUrl={apiDivisionUrl} bounds={bounds} isDev={isDev} />
-			{host ? <MapScopeBar /> : undefined}
+			<MapControls />
+			<MapPopup />
+			<MapImagePreload />
+			<MapCanvasLoading />
+			<MapSource />
+			<MapScopeBar />
 			<MapTargets />
 			<MapSelectionFeatureState />
 			<MapRootMarker />
@@ -114,45 +113,14 @@ const MapCanvasContainer: FC<
 	);
 };
 
-export const MapCanvas: FC<MapComponentProps> = memo(function MapCanvas(props) {
-	const {
-		apiSourceUrl,
-		host,
-		interactive,
-		isDev,
-		isObjectiveFilterEnabled,
-		languages,
-		mapFeaturesRule,
-		sourceData,
-		sourceDataKey,
-		targetIds,
-		version,
-	} = props;
+export const MapCanvas: FC = memo(function MapCanvas() {
+	const { host } = useMapConfig();
 
 	return (
-		<SourceDataContextProvider
-			apiUrl={apiSourceUrl}
-			data={sourceData}
-			dataKey={sourceDataKey}
-			isDev={isDev}
-			version={version}
-		>
-			<MapStoreProvider
-				initialState={{
-					...(isObjectiveFilterEnabled ? { isObjectiveFilterEnabled: true } : {}),
-					...(interactive === false ? { isCanvasInteractive: false } : {}),
-					...(languages ? { languages } : {}),
-					...(mapFeaturesRule ? { mapFeaturesRule } : {}),
-				}}
-			>
-				<MapHostProvider host={host}>
-					<MapViewProvider isDev={isDev} targetIds={targetIds}>
-						<CanvasDataProvider>
-							<MapCanvasContainer {...props} />
-						</CanvasDataProvider>
-					</MapViewProvider>
-				</MapHostProvider>
-			</MapStoreProvider>
-		</SourceDataContextProvider>
+		<MapStoreProvider page={host.readView()}>
+			<CanvasDataProvider>
+				<MapCanvasContainer />
+			</CanvasDataProvider>
+		</MapStoreProvider>
 	);
 });

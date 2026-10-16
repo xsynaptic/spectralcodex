@@ -1,155 +1,126 @@
+import type { MapSourceItem } from '@spectralcodex/map-codec';
 import type { LocationStatus } from '@spectralcodex/shared/map';
 
-import { LocationStatusEnum } from '@spectralcodex/shared/map';
 import { createStore } from 'zustand';
 
-import type { MapFeaturesRule, MapHoverFeature } from '#types.ts';
+import type { MapClickOutcome, MapHoverCluster, MapScope, MapStoreView } from '#types.ts';
 
-export type MapDataConfigurableState = Pick<
-	MapDataState,
-	| 'hoveredId'
-	| 'isCanvasInteractive'
-	| 'isFilterOpen'
-	| 'isObjectiveFilterEnabled'
-	| 'languages'
-	| 'mapFeaturesRule'
-	| 'objectiveFilter'
-	| 'ratingFilter'
-	| 'selectedId'
-	| 'statusFilter'
->;
+import { reduceMapScope } from '#store/store-scope.ts';
 
 export interface MapDataStore extends MapDataState {
 	actions: {
-		hideAllStatusFilter: () => void;
+		applyClick: (outcome: MapClickOutcome) => void;
+		clearSelection: () => void;
 		setCanvasLoading: (isCanvasLoading: boolean) => void;
-		setClickedId: (clickedId: string | undefined) => void;
-		setFilterOpen: (isFilterOpen: boolean) => void;
-		setFilterPosition: (filterPosition: DOMCoordinates) => void;
-		setHoveredId: (hoveredId: string | undefined, hoveredFeature?: MapHoverFeature) => void;
-		setObjectiveFilter: (objectiveFilter: number) => void;
+		setFilter: (filter: Partial<MapFilter>) => void;
+		setHoveredId: (hoveredId: string | undefined, hoveredCluster?: MapHoverCluster) => void;
+		setOverlay: (overlay: MapOverlay, isOpen: boolean) => void;
 		setPopupVisible: (isPopupVisible: boolean) => void;
-		setRatingFilter: (ratingFilter: number) => void;
-		setSelectedId: (selectedId: string | undefined) => void;
-		showAllStatusFilter: () => void;
-		toggleStatusFilter: (status: LocationStatus) => void;
+		setScopeEnabled: (isScopeEnabled: boolean) => void;
+		syncView: (page: MapStoreView, items: ReadonlyArray<MapSourceItem> | undefined) => void;
 	};
 }
 
-type DOMCoordinates = Pick<DOMRect, 'x' | 'y'>;
+export interface MapFilter {
+	objective: number;
+	rating: number;
+	status: ReadonlyArray<LocationStatus>;
+}
 
-interface MapDataState {
-	// Set by a user's click only, so programmatic selections stay out of analytics
-	clickedId: string | undefined;
-	filterPosition: DOMCoordinates | undefined;
-	hoveredFeature: MapHoverFeature | undefined;
+export type MapOverlay = 'filter' | 'search';
+
+interface MapDataState extends MapStoreView {
+	filter: MapFilter;
+	hoveredCluster: MapHoverCluster | undefined;
 	hoveredId: string | undefined;
-	isCanvasInteractive: boolean;
 	isCanvasLoading: boolean;
-	isFilterOpen: boolean;
-	isObjectiveFilterEnabled: boolean;
 	isPopupVisible: boolean;
-	languages: Array<string>;
-	mapFeaturesRule: MapFeaturesRule | undefined;
-	objectiveFilter: number;
-	ratingFilter: number;
+	isScopeEnabled: boolean;
+	overlay: MapOverlay | undefined;
+	scope: MapScope | undefined;
 	selectedId: string | undefined;
-	statusFilter: Array<LocationStatus>;
 }
 
-const defaultMapDataState = {
-	clickedId: undefined,
-	filterPosition: undefined,
-	hoveredFeature: undefined,
-	hoveredId: undefined,
-	isCanvasInteractive: true,
-	isCanvasLoading: true,
-	isFilterOpen: false,
-	isObjectiveFilterEnabled: false,
-	isPopupVisible: true,
-	languages: ['en'],
-	mapFeaturesRule: undefined,
-	objectiveFilter: 1,
-	ratingFilter: 1,
-	selectedId: undefined,
-	statusFilter: [],
-} satisfies MapDataState;
+const defaultMapFilter: MapFilter = { objective: 1, rating: 1, status: [] };
 
-export function hasActiveFilter({
-	isObjectiveFilterEnabled,
-	objectiveFilter,
-	ratingFilter,
-	statusFilter,
-}: Pick<
-	MapDataState,
-	'isObjectiveFilterEnabled' | 'objectiveFilter' | 'ratingFilter' | 'statusFilter'
->) {
-	if (statusFilter.length > 0 || ratingFilter > 1) return true;
+const emptyTargetIds: Array<string> = [];
 
-	return isObjectiveFilterEnabled && objectiveFilter > 1;
+export function selectTargetIds({ view }: MapStoreView) {
+	return view.targetIds ?? emptyTargetIds;
 }
 
-export function createMapStore(initialState?: Partial<MapDataConfigurableState>) {
-	const state: MapDataState = { ...defaultMapDataState, ...initialState };
+export function selectScope({
+	isScopeEnabled,
+	scope,
+}: Pick<MapDataState, 'isScopeEnabled' | 'scope'>) {
+	return isScopeEnabled ? scope : undefined;
+}
 
-	return createStore<MapDataStore>()((set, get) => {
-		// filter interactions clear the active selection so its popup doesn't linger
-		const setAndClearSelection = (partial: Partial<MapDataState>) => {
-			set({ clickedId: undefined, selectedId: undefined, ...partial });
-		};
+export function hasActiveFilter({ filter }: Pick<MapDataState, 'filter'>) {
+	return filter.status.length > 0 || filter.rating > 1 || filter.objective > 1;
+}
 
-		return {
-			...state,
-			actions: {
-				hideAllStatusFilter: () => {
-					setAndClearSelection({ statusFilter: Object.values(LocationStatusEnum) });
-				},
-				setCanvasLoading: (isCanvasLoading) => {
-					set({ isCanvasLoading });
-				},
-				setClickedId: (clickedId) => {
-					set({ clickedId });
-				},
-				setFilterOpen: (isFilterOpen) => {
-					setAndClearSelection({ isFilterOpen });
-				},
-				setFilterPosition: (filterPosition) => {
-					set({ filterPosition });
-				},
-				setHoveredId: (hoveredId, hoveredFeature) => {
-					set({ hoveredFeature, hoveredId });
-				},
-				setObjectiveFilter: (objectiveFilter) => {
-					setAndClearSelection({ objectiveFilter });
-				},
-				setPopupVisible: (isPopupVisible) => {
-					set({ isPopupVisible });
-				},
-				setRatingFilter: (ratingFilter) => {
-					setAndClearSelection({ ratingFilter });
-				},
-				setSelectedId: (selectedId) => {
-					// A selection takes the filter panel's place; clearing one leaves the panel as it is
-					set({
-						selectedId,
-						...(selectedId === undefined
-							? { clickedId: undefined, isPopupVisible: true }
-							: { isFilterOpen: false }),
-					});
-				},
-				showAllStatusFilter: () => {
-					setAndClearSelection({ statusFilter: [] });
-				},
-				toggleStatusFilter: (status) => {
-					const statusFilter = get().statusFilter;
+const noOverlay = { isPopupVisible: true, overlay: undefined, selectedId: undefined } as const;
 
-					setAndClearSelection({
-						statusFilter: statusFilter.includes(status)
-							? statusFilter.filter((statusFiltered) => statusFiltered !== status)
-							: [...statusFilter, status],
-					});
-				},
+const noPage: MapStoreView = { view: {}, viewKey: undefined };
+
+export function createMapStore(page = noPage) {
+	const state: MapDataState = {
+		filter: defaultMapFilter,
+		hoveredCluster: undefined,
+		hoveredId: undefined,
+		isCanvasLoading: true,
+		...noOverlay,
+		...page,
+		...reduceMapScope({ isScopeEnabled: true, scope: undefined }, page, undefined),
+	};
+
+	return createStore<MapDataStore>()((set, get) => ({
+		...state,
+		actions: {
+			applyClick: (outcome) => {
+				set({
+					...noOverlay,
+					...(outcome.kind === 'popup' ? { selectedId: outcome.pointId } : {}),
+					...(outcome.kind === 'expand-cluster' || outcome.kind === 'none'
+						? {}
+						: { hoveredCluster: undefined, hoveredId: undefined }),
+					...(outcome.kind === 'open' && outcome.isScopeRestored ? { isScopeEnabled: true } : {}),
+				});
 			},
-		};
-	});
+			clearSelection: () => {
+				set(noOverlay);
+			},
+			setCanvasLoading: (isCanvasLoading) => {
+				set({ isCanvasLoading });
+			},
+			setFilter: (filter) => {
+				set({ filter: { ...get().filter, ...filter }, selectedId: undefined });
+			},
+			setHoveredId: (hoveredId, hoveredCluster) => {
+				set({ hoveredCluster, hoveredId });
+			},
+			setOverlay: (overlay, isOpen) => {
+				if (isOpen) {
+					set({ ...noOverlay, overlay });
+					return;
+				}
+
+				if (get().overlay === overlay) set({ overlay: undefined });
+			},
+			setPopupVisible: (isPopupVisible) => {
+				set({ isPopupVisible });
+			},
+			setScopeEnabled: (isScopeEnabled) => {
+				set({ isScopeEnabled });
+			},
+			syncView: (page, items) => {
+				const current = get();
+
+				if (page.viewKey === current.viewKey) return;
+
+				set({ ...reduceMapScope(current, page, items), ...noOverlay, ...page });
+			},
+		},
+	}));
 }

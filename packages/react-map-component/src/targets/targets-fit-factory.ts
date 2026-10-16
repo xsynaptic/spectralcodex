@@ -1,43 +1,9 @@
-import type { MapSourceItem } from '@spectralcodex/map-codec';
-
-import { GeometryTypeEnum } from '@spectralcodex/shared/map';
-
 type Position = [longitude: number, latitude: number];
 
-export function getTargetPositions(
-	items: ReadonlyArray<MapSourceItem>,
-	targetIds: ReadonlyArray<string>,
-): Array<Position> {
-	const targetIdSet = new Set(targetIds);
-	const positions: Array<Position> = [];
-
-	for (const { geometry, properties } of items) {
-		if (!targetIdSet.has(properties.id)) continue;
-
-		// The codec types coordinates as a union that the geometry type does not narrow
-		switch (geometry.type) {
-			case GeometryTypeEnum.LineString: {
-				positions.push(...(geometry.coordinates as Array<Position>));
-				break;
-			}
-			case GeometryTypeEnum.Point: {
-				positions.push(geometry.coordinates as Position);
-				break;
-			}
-			// Polygons are not rendered anywhere yet
-			case GeometryTypeEnum.Polygon: {
-				break;
-			}
-		}
-	}
-
-	return positions;
-}
-
-// Past the cluster max zoom, so a Target reached from far out draws as its own point
 const targetZoomDefault = 15;
 const targetZoomMax = 17;
 const targetZoomMin = 12;
+const targetInViewZoomMin = 10;
 
 export function getTargetBounds(
 	positions: ReadonlyArray<Position>,
@@ -62,7 +28,6 @@ export function getTargetBounds(
 	];
 }
 
-// `fitZoom` is the closest zoom that still shows every position
 export function getTargetZoom(zoom: number, fitZoom: number) {
 	const limit = Math.min(fitZoom, targetZoomMax);
 
@@ -70,6 +35,18 @@ export function getTargetZoom(zoom: number, fitZoom: number) {
 	if (zoom < targetZoomMin) return Math.min(limit, targetZoomDefault);
 
 	return zoom;
+}
+
+export function isInView(
+	points: ReadonlyArray<{ x: number; y: number }>,
+	frame: Record<'bottom' | 'left' | 'right' | 'top', number>,
+	zoom: number,
+) {
+	if (points.length === 0 || zoom < targetInViewZoomMin) return false;
+
+	return points.every(
+		({ x, y }) => x >= frame.left && x <= frame.right && y >= frame.top && y <= frame.bottom,
+	);
 }
 
 const fitDurationBase = 450;

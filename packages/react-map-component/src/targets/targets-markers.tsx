@@ -1,18 +1,20 @@
 import type { LocationStatus } from '@spectralcodex/shared/map';
-import type { GeoJSONSource, MapGeoJSONFeature } from 'maplibre-gl';
+import type { GeoJSONSource } from 'maplibre-gl';
 import type { FC } from 'react';
 import type { MapRef } from 'react-map-gl/maplibre';
 
-import { LocationStatusRecords, tailwindColors } from '@spectralcodex/shared/map';
+import { GeometryTypeEnum, LocationStatusRecords, tailwindColors } from '@spectralcodex/shared/map';
 import { useEffect, useMemo, useState } from 'react';
 import { Marker, useMap } from 'react-map-gl/maplibre';
 
 import type { TargetPoint } from '#targets/targets-markers-factory.ts';
 
-import { useSourceDataQuery } from '#data/data-source.tsx';
-import { useIsDarkMode } from '#lib/dark-mode.tsx';
+import { useMapRows } from '#data/data-query.ts';
+import { getClusterHoverId } from '#lib/cluster-hover.ts';
+import { useIsDarkMode } from '#lib/dark-mode.ts';
 import { MapLayerIdEnum, MapSourceIdEnum, pointClusterRadius } from '#source/source-config.ts';
-import { useIsMapPopupVisible, useMapSelectedId } from '#store/store.ts';
+import { selectTargetIds } from '#store/store-factory.ts';
+import { useMapStore } from '#store/store.tsx';
 import {
 	findTargetClusters,
 	getClusterCandidates,
@@ -36,15 +38,6 @@ interface TargetMarker {
 	longitude: number;
 }
 
-function areMarkersEqual(previous: TargetMarker, next: TargetMarker): boolean {
-	return (
-		previous.id === next.id &&
-		previous.longitude === next.longitude &&
-		previous.latitude === next.latitude &&
-		previous.color === next.color
-	);
-}
-
 function getRenderedClusters(map: MapRef): Array<RenderedCluster> {
 	const clusters = new Map<number, RenderedCluster>();
 	const features = map.queryRenderedFeatures(undefined, { layers: [MapLayerIdEnum.Clusters] });
@@ -52,10 +45,12 @@ function getRenderedClusters(map: MapRef): Array<RenderedCluster> {
 	for (const feature of features) {
 		const { cluster_id: id, point_count: pointCount } = feature.properties;
 
-		if (feature.geometry.type !== 'Point') continue;
+		if (feature.geometry.type !== GeometryTypeEnum.Point) continue;
 		if (typeof id !== 'number' || typeof pointCount !== 'number') continue;
 
-		const [longitude, latitude] = feature.geometry.coordinates as [number, number];
+		const [longitude, latitude] = feature.geometry.coordinates;
+
+		if (longitude === undefined || latitude === undefined) continue;
 		const { x, y } = map.project([longitude, latitude]);
 
 		clusters.set(id, { id, latitude, longitude, pointCount, x, y });
@@ -70,288 +65,148 @@ async function getLeafIds(source: GeoJSONSource, { id, pointCount }: RenderedClu
 	return new Set(leaves.map((leaf) => leaf.properties?.id as unknown));
 }
 
-// Cluster properties are fixed when the source is created, but the atlas map's Targets change with every page, so ask each nearby cluster what it contains
-async function collectLeafClusterMarkers({
-	color,
-	isCurrent,
-	leafIds,
-	map,
-	targets,
-}: {
-	color: string;
-	isCurrent: () => boolean;
-	leafIds: Map<number, Set<unknown>>;
-	map: MapRef;
-	targets: Array<TargetPoint>;
-}): Promise<Array<TargetMarker>> {
-	const source = map.getSource<GeoJSONSource>(MapSourceIdEnum.PointCollection);
+function getPointColor(status: LocationStatus | undefined, isDark: boolean) {
+	if (!status) return isDark ? tailwindColors.sky400 : tailwindColors.sky500;
 
-	if (!source || targets.length === 0 || !map.getLayer(MapLayerIdEnum.Clusters)) return [];
+	const record = LocationStatusRecords[status];
 
-	const renderedClusters = getRenderedClusters(map);
-	const searchRadius = getClusterSearchRadius(pointClusterRadius);
-
-	const clusters = await findTargetClusters({
-		getLeafIds: (cluster) => getLeafIds(source, cluster),
-		isCurrent,
-		leafIds,
-		pending: targets.map(({ coordinates, id }) => ({
-			candidates: getClusterCandidates(map.project(coordinates), renderedClusters, searchRadius),
-			id,
-		})),
-	});
-
-	return clusters.map((cluster) => ({
-		color,
-		id: `cluster-${String(cluster.id)}`,
-		latitude: cluster.latitude,
-		longitude: cluster.longitude,
-	}));
+	return isDark ? record.colorDark : record.color;
 }
 
-function collectPointMarkers(
-	map: MapRef,
-	targetIds: Array<string>,
-	isDark: boolean,
-): Array<TargetMarker> {
-	if (!map.getLayer(MapLayerIdEnum.Points)) return [];
+// Keyed by id, since queryRenderedFeatures repeats a feature once per tile it renders in
+function getPointMarkers(map: MapRef, targetIds: Array<string>, isDark: boolean) {
+	const markers = new Map<string, TargetMarker>();
+
+	if (!map.getLayer(MapLayerIdEnum.Points)) return markers;
 
 	const points = map.queryRenderedFeatures(undefined, {
 		filter: ['in', ['get', 'id'], ['literal', targetIds]],
 		layers: [MapLayerIdEnum.Points],
 	});
 
-	const markers: Array<TargetMarker> = [];
+	for (const { geometry, properties } of points) {
+		if (geometry.type !== GeometryTypeEnum.Point || typeof properties.id !== 'string') continue;
 
-	for (const feature of points) {
-		const pointId = typeof feature.properties.id === 'string' ? feature.properties.id : undefined;
+		const [longitude, latitude] = geometry.coordinates;
 
-		if (!pointId) continue;
+		if (longitude === undefined || latitude === undefined) continue;
+		const color = getPointColor(properties.status as LocationStatus | undefined, isDark);
 
-		const marker = toPointMarker(feature, pointId, isDark);
-
-		if (marker) markers.push(marker);
+		markers.set(properties.id, { color, id: properties.id, latitude, longitude });
 	}
 
 	return markers;
 }
 
-function getMarkerColor(feature: MapGeoJSONFeature, isDark: boolean): string {
-	const status = feature.properties.status as LocationStatus | undefined;
+// Cluster properties are fixed when the source is created, but Targets change with every page, so ask each nearby cluster what it holds
+async function getClusterMarkers(map: MapRef, targets: Array<TargetPoint>, isDark: boolean) {
+	const source = map.getSource<GeoJSONSource>(MapSourceIdEnum.PointCollection);
 
-	if (status) {
-		const record = LocationStatusRecords[status];
+	if (!source || targets.length === 0 || !map.getLayer(MapLayerIdEnum.Clusters)) return [];
 
-		return isDark ? record.colorDark : record.color;
-	}
-	return isDark ? tailwindColors.sky400 : tailwindColors.sky500;
+	const renderedClusters = getRenderedClusters(map);
+	const searchRadius = getClusterSearchRadius(pointClusterRadius);
+	const color = isDark ? tailwindColors.sky400 : tailwindColors.sky500;
+
+	const clusters = await findTargetClusters(
+		targets.map(({ coordinates, id }) => ({
+			candidates: getClusterCandidates(map.project(coordinates), renderedClusters, searchRadius),
+			id,
+		})),
+		(cluster) => getLeafIds(source, cluster),
+	);
+
+	return clusters.map(({ id, latitude, longitude }) => ({
+		color,
+		id: getClusterHoverId(id),
+		latitude,
+		longitude,
+	}));
 }
 
-function toPointMarker(
-	feature: MapGeoJSONFeature,
-	id: string,
-	isDark: boolean,
-): TargetMarker | undefined {
-	if (feature.geometry.type !== 'Point') return undefined;
+async function getTargetMarkers(map: MapRef, targets: Array<TargetPoint>, isDark: boolean) {
+	const pointMarkers = getPointMarkers(
+		map,
+		targets.map(({ id }) => id),
+		isDark,
+	);
+	const clusterMarkers = await getClusterMarkers(
+		map,
+		targets.filter(({ id }) => !pointMarkers.has(id)),
+		isDark,
+	);
 
-	const [longitude, latitude] = feature.geometry.coordinates as [number, number];
-
-	return { color: getMarkerColor(feature, isDark), id, latitude, longitude };
+	return [...pointMarkers.values(), ...clusterMarkers];
 }
 
-function useTargetMarkers(targetIds: Array<string>): Array<TargetMarker> {
+function useTargetMarkers() {
 	const { current: map } = useMap();
-	const { data: sourceData } = useSourceDataQuery();
-
+	const { data: sourceData } = useMapRows();
+	const targetIds = useMapStore(selectTargetIds);
 	const isDark = useIsDarkMode();
 
 	const [markers, setMarkers] = useState<Array<TargetMarker>>([]);
-	const [visible, setVisible] = useState(true);
 
-	const targetPoints = useMemo(
+	const targets = useMemo(
 		() => (sourceData ? getTargetPoints(sourceData, targetIds) : []),
 		[sourceData, targetIds],
 	);
 
 	useEffect(() => {
-		if (!map || targetIds.length === 0) return;
-
-		const clusterColor = isDark ? tailwindColors.sky400 : tailwindColors.sky500;
-
-		// Cluster lookups are async, so a refresh checks it is still the latest before it applies its result
-		let refreshCount = 0;
-		// Rings hidden for a zoom come back with the first refresh that finishes after `moveend`
-		let isRevealing = false;
-		let leafIds = new Map<number, Set<unknown>>();
-
-		function hideMarkers() {
-			refreshCount += 1;
-			isRevealing = false;
-			setVisible(false);
-		}
-
-		async function refreshMarkers() {
-			if (!map) return;
-
-			refreshCount += 1;
-
-			const refreshIndex = refreshCount;
-			const pointMarkers = collectPointMarkers(map, targetIds, isDark);
-			const pointIds = new Set(pointMarkers.map((marker) => marker.id));
-
-			const clusterMarkers = await collectLeafClusterMarkers({
-				color: clusterColor,
-				isCurrent: () => refreshIndex === refreshCount,
-				leafIds,
-				map,
-				targets: targetPoints.filter((target) => !pointIds.has(target.id)),
-			});
-
-			if (refreshIndex !== refreshCount) return;
-
-			// Keyed by feature id; queryRenderedFeatures repeats a feature once per tile it renders in
-			const results = new Map<string, TargetMarker>();
-
-			for (const marker of [...pointMarkers, ...clusterMarkers]) {
-				results.set(marker.id, marker);
-			}
-
-			const nextMarkers = [...results.values()];
-
-			setMarkers((previous) => {
-				if (previous.length !== nextMarkers.length) return nextMarkers;
-
-				for (const [index, current] of nextMarkers.entries()) {
-					const before = previous[index];
-
-					if (!before || !areMarkersEqual(before, current)) return nextMarkers;
-				}
-
-				return previous;
-			});
-
-			if (isRevealing) setVisible(true);
-		}
+		if (!map || targets.length === 0) return;
 
 		let isStale = true;
+		let latest: object | undefined;
 
-		function onMoveEnd() {
-			isRevealing = true;
+		function clearMarkers() {
 			isStale = true;
-			void refreshMarkers();
+			latest = undefined;
+			setMarkers([]);
 		}
 
-		function onSourceData(event: { sourceDataType?: string; sourceId: string }) {
-			if (event.sourceId !== MapSourceIdEnum.PointCollection) return;
-			if (event.sourceDataType === 'content') leafIds = new Map();
-
-			isStale = true;
+		function onSourceData({ sourceId }: { sourceId: string }) {
+			if (sourceId === MapSourceIdEnum.PointCollection) isStale = true;
 		}
 
 		function onIdle() {
-			if (!isStale) return;
+			if (!map || !isStale) return;
+
+			const refresh = {};
 
 			isStale = false;
-			void refreshMarkers();
+			latest = refresh;
+
+			void getTargetMarkers(map, targets, isDark).then((next) => {
+				if (latest === refresh) setMarkers(next);
+			});
 		}
 
-		map.on('zoomstart', hideMarkers);
-		map.on('moveend', onMoveEnd);
+		map.on('movestart', clearMarkers);
 		map.on('sourcedata', onSourceData);
 		map.on('idle', onIdle);
 
-		void refreshMarkers();
+		onIdle();
 
 		return () => {
-			refreshCount += 1;
-
-			map.off('zoomstart', hideMarkers);
-			map.off('moveend', onMoveEnd);
+			map.off('movestart', clearMarkers);
 			map.off('sourcedata', onSourceData);
 			map.off('idle', onIdle);
-		};
-	}, [map, targetIds, targetPoints, isDark]);
 
-	if (!visible) return [];
+			clearMarkers();
+		};
+	}, [isDark, map, targets]);
 
 	return markers;
 }
 
-const MapPulseRing: FC<TargetMarker> = function MapPulseRing({ color, latitude, longitude }) {
-	return (
-		<Marker anchor="center" latitude={latitude} longitude={longitude}>
+export const MapTargetMarkers: FC = function MapTargetMarkers() {
+	const markers = useTargetMarkers();
+
+	return markers.map(({ color, id, latitude, longitude }) => (
+		<Marker anchor="center" key={id} latitude={latitude} longitude={longitude}>
 			<div className="map-pulse-ring-frame">
 				<span className="map-pulse-ring" style={{ borderColor: color }} />
 			</div>
 		</Marker>
-	);
+	));
 };
-
-export const MapTargetMarkers: FC<{
-	targetIds: Array<string>;
-}> = function MapTargetMarkers({ targetIds }) {
-	const markers = useTargetMarkers(targetIds);
-
-	if (markers.length === 0) return;
-
-	return markers.map((marker) => <MapPulseRing key={marker.id} {...marker} />);
-};
-
-function findPointMarker(map: MapRef, id: string, isDark: boolean): TargetMarker | undefined {
-	if (!map.getLayer(MapLayerIdEnum.Points)) return undefined;
-
-	const [feature] = map.queryRenderedFeatures(undefined, {
-		filter: ['==', ['get', 'id'], id],
-		layers: [MapLayerIdEnum.Points],
-	});
-
-	return feature ? toPointMarker(feature, id, isDark) : undefined;
-}
-
-function useSelectedMarker(targetIds: Array<string> | undefined): TargetMarker | undefined {
-	const { current: map } = useMap();
-	const isDark = useIsDarkMode();
-	const selectedId = useMapSelectedId();
-	const isPopupVisible = useIsMapPopupVisible();
-
-	const trackedId =
-		isPopupVisible && selectedId && !targetIds?.includes(selectedId) ? selectedId : undefined;
-
-	const [marker, setMarker] = useState<TargetMarker | undefined>();
-
-	useEffect(() => {
-		if (!map || !trackedId) return;
-
-		const updateMarker = () => {
-			const next = findPointMarker(map, trackedId, isDark);
-
-			setMarker((previous) =>
-				previous && next && areMarkersEqual(previous, next) ? previous : next,
-			);
-		};
-
-		map.on('moveend', updateMarker);
-
-		updateMarker();
-
-		return () => {
-			map.off('moveend', updateMarker);
-		};
-	}, [map, trackedId, isDark]);
-
-	return marker?.id === trackedId ? marker : undefined;
-}
-
-export const MapSelectedMarker: FC<{ targetIds?: Array<string> | undefined }> =
-	function MapSelectedMarker({ targetIds }) {
-		const marker = useSelectedMarker(targetIds);
-
-		if (!marker) return;
-
-		return (
-			<MapPulseRing
-				key={`selected-${String(marker.longitude)}-${String(marker.latitude)}`}
-				{...marker}
-			/>
-		);
-	};

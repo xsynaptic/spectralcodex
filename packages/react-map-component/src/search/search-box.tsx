@@ -1,0 +1,316 @@
+import type { FC, KeyboardEvent, RefObject } from 'react';
+
+import { useDeferredValue, useEffect, useId, useMemo, useRef, useState } from 'react';
+
+import type { MapSearchIndex, MapSearchResult, MapSearchText } from '#search/search-factory.ts';
+import type { MapMessages, MapOverlayClose } from '#types.ts';
+
+import { useMapConfig } from '#lib/config.tsx';
+import { MapControlIcon, MapIconArrowBack } from '#lib/icons.tsx';
+import { searchMap } from '#search/search-factory.ts';
+
+const searchGapPx = 10;
+
+const kindMessageKey = {
+	location: 'searchKindLocation',
+	region: 'searchKindRegion',
+	series: 'searchKindSeries',
+	theme: 'searchKindTheme',
+} as const satisfies Record<MapSearchResult['kind'], keyof MapMessages>;
+
+const MapSearchHighlight: FC<{ text: MapSearchText }> = function MapSearchHighlight({
+	text: { match, text },
+}) {
+	if (!match) return text;
+
+	const [start, end] = match;
+
+	return (
+		<>
+			{text.slice(0, start)}
+			<mark className="map-search-match">{text.slice(start, end)}</mark>
+			{text.slice(end)}
+		</>
+	);
+};
+
+const MapSearchOption: FC<{
+	id: string;
+	isActive: boolean;
+	onActivate: () => void;
+	onPick: () => void;
+	result: MapSearchResult;
+}> = function MapSearchOption({ id, isActive, onActivate, onPick, result }) {
+	const { messages } = useMapConfig();
+
+	return (
+		<li
+			aria-selected={isActive}
+			className="map-search-option"
+			id={id}
+			onClick={onPick}
+			onMouseDown={(event) => {
+				event.preventDefault();
+			}}
+			onMouseMove={isActive ? undefined : onActivate}
+			role="option"
+		>
+			<span className="map-search-line">
+				<span className="map-search-title">
+					<MapSearchHighlight text={result.title} />
+					{result.titleMultilingual ? (
+						<span className="map-search-title-multilingual">
+							{' '}
+							<MapSearchHighlight text={result.titleMultilingual} />
+						</span>
+					) : undefined}
+				</span>
+				{result.kind === 'location' ? undefined : (
+					<span className="map-search-count">
+						{result.count}
+						<span className="map-sr-only">
+							{' '}
+							{result.count === 1 ? messages.point : messages.points}
+						</span>
+					</span>
+				)}
+			</span>
+			<span className="map-search-meta">
+				<span className="map-search-kind">{messages[kindMessageKey[result.kind]]}</span>
+				{result.parentTitle ? ` · ${result.parentTitle}` : undefined}
+			</span>
+		</li>
+	);
+};
+
+function getStatus(messages: MapMessages, query: string, count: number) {
+	if (query.trim() === '') return '';
+	if (count === 0) return messages.searchEmpty;
+
+	return `${String(count)} ${count === 1 ? messages.searchResult : messages.searchResults}`;
+}
+
+// The list stops above the on-screen keyboard, which only the visual viewport reports
+function useVisualViewportRoom(boxRef: RefObject<HTMLDivElement | null>) {
+	useEffect(() => {
+		const box = boxRef.current;
+		const viewport = globalThis.visualViewport;
+
+		if (!box || !viewport) return;
+
+		const topPx = box.getBoundingClientRect().top;
+
+		function update() {
+			if (!box || !viewport) return;
+
+			const roomPx = viewport.offsetTop + viewport.height - topPx - searchGapPx;
+
+			box.style.setProperty('--map-search-room', `${String(roomPx)}px`);
+		}
+
+		update();
+		// eslint-disable-next-line unicorn/prefer-observer-apis -- no observer reports the visual viewport
+		viewport.addEventListener('resize', update);
+		// eslint-disable-next-line unicorn/prefer-observer-apis -- no observer reports the visual viewport
+		viewport.addEventListener('scroll', update);
+
+		return () => {
+			viewport.removeEventListener('resize', update);
+			viewport.removeEventListener('scroll', update);
+		};
+	}, [boxRef]);
+}
+
+function useSearchKeys({
+	getOptionId,
+	onEnter,
+	results,
+}: {
+	getOptionId: (result: MapSearchResult) => string;
+	onEnter: (activeResult: MapSearchResult | undefined) => void;
+	results: Array<MapSearchResult>;
+}) {
+	const [active, setActive] = useState({ index: 0, results });
+	const activeIndex = active.results === results ? active.index : 0;
+	const activeResult = results[activeIndex];
+
+	function setActiveIndex(index: number) {
+		setActive({ index, results });
+	}
+
+	function moveActive(step: number) {
+		const next = Math.max(Math.min(activeIndex + step, results.length - 1), 0);
+		const nextResult = results[next];
+
+		setActiveIndex(next);
+
+		if (!nextResult) return;
+
+		document
+			.querySelector(`#${CSS.escape(getOptionId(nextResult))}`)
+			?.scrollIntoView({ block: 'nearest' });
+	}
+
+	const actionByKey: Record<string, () => void> = {
+		ArrowDown: () => {
+			moveActive(1);
+		},
+		ArrowUp: () => {
+			moveActive(-1);
+		},
+		Enter: () => {
+			onEnter(activeResult);
+		},
+	};
+
+	function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+		const action = event.nativeEvent.isComposing ? undefined : actionByKey[event.key];
+
+		if (!action) return;
+
+		event.preventDefault();
+		action();
+	}
+
+	return { activeIndex, activeResult, handleKeyDown, setActiveIndex };
+}
+
+const MapSearchBack: FC<{ onClose: (how: MapOverlayClose) => void }> = function MapSearchBack({
+	onClose,
+}) {
+	const { messages } = useMapConfig();
+
+	return (
+		<button
+			aria-label={messages.searchCloseAriaLabel}
+			className="map-scope-button map-search-back"
+			onClick={(event) => {
+				onClose(event.detail === 0 ? 'keyboard' : 'pointer');
+			}}
+			title={messages.searchCloseAriaLabel}
+			type="button"
+		>
+			<MapControlIcon>
+				<MapIconArrowBack />
+			</MapControlIcon>
+		</button>
+	);
+};
+
+// The live region stays mounted so its first status is announced
+const MapSearchStatus: FC<{ count: number; isLoading: boolean; query: string }> =
+	function MapSearchStatus({ count, isLoading, query }) {
+		const { messages } = useMapConfig();
+		const status = isLoading ? '' : getStatus(messages, query, count);
+
+		return (
+			<>
+				{status === messages.searchEmpty ? (
+					<p aria-hidden="true" className="map-search-empty">
+						{messages.searchEmpty}
+					</p>
+				) : undefined}
+				<div aria-live="polite" className="map-sr-only">
+					{status}
+				</div>
+			</>
+		);
+	};
+
+export const MapSearchBox: FC<{
+	index: MapSearchIndex | undefined;
+	onClose: (how: MapOverlayClose) => void;
+	onPick: (result: MapSearchResult, how: MapOverlayClose) => void;
+	ref: RefObject<HTMLDivElement | null>;
+}> = function MapSearchBox({ index, onClose, onPick, ref }) {
+	const { messages } = useMapConfig();
+	const listboxId = useId();
+	const inputRef = useRef<HTMLInputElement>(null);
+	const listRef = useRef<HTMLUListElement>(null);
+	const [query, setQuery] = useState('');
+	const deferredQuery = useDeferredValue(query);
+	const results = useMemo(
+		() => (index ? searchMap(index, deferredQuery) : []),
+		[deferredQuery, index],
+	);
+
+	function getOptionId(result: MapSearchResult) {
+		return `${listboxId}-${result.key}`;
+	}
+
+	function handleEnter(activeResult: MapSearchResult | undefined) {
+		if (!index) return;
+
+		const result = query === deferredQuery ? activeResult : searchMap(index, query)[0];
+
+		if (result) onPick(result, 'keyboard');
+	}
+
+	const { activeIndex, activeResult, handleKeyDown, setActiveIndex } = useSearchKeys({
+		getOptionId,
+		onEnter: handleEnter,
+		results,
+	});
+
+	useVisualViewportRoom(ref);
+
+	useEffect(() => {
+		inputRef.current?.focus();
+	}, []);
+
+	useEffect(() => {
+		if (listRef.current) listRef.current.scrollTop = 0;
+	}, [results]);
+
+	return (
+		<div className="map-search" ref={ref}>
+			<div className="map-search-field">
+				<MapSearchBack onClose={onClose} />
+				<input
+					aria-activedescendant={activeResult ? getOptionId(activeResult) : undefined}
+					aria-autocomplete="list"
+					aria-controls={listboxId}
+					aria-expanded={results.length > 0}
+					aria-label={messages.searchLabel}
+					autoComplete="off"
+					className="map-search-input"
+					enterKeyHint="go"
+					onChange={(event) => {
+						setQuery(event.target.value);
+					}}
+					onKeyDown={handleKeyDown}
+					placeholder={messages.searchLabel}
+					ref={inputRef}
+					role="combobox"
+					spellCheck={false}
+					type="text"
+					value={query}
+				/>
+			</div>
+			<ul
+				aria-label={messages.searchListAriaLabel}
+				className="map-search-list"
+				hidden={results.length === 0}
+				id={listboxId}
+				ref={listRef}
+				role="listbox"
+			>
+				{results.map((result, resultIndex) => (
+					<MapSearchOption
+						id={getOptionId(result)}
+						isActive={resultIndex === activeIndex}
+						key={result.key}
+						onActivate={() => {
+							setActiveIndex(resultIndex);
+						}}
+						onPick={() => {
+							onPick(result, 'pointer');
+						}}
+						result={result}
+					/>
+				))}
+			</ul>
+			<MapSearchStatus count={results.length} isLoading={!index} query={deferredQuery} />
+		</div>
+	);
+};

@@ -1,12 +1,12 @@
 import { GeometryTypeEnum } from '@spectralcodex/shared/map';
 import { describe, expect, test } from 'vitest';
 
-import type { MapClickInput, MapHoverInput } from '#canvas/canvas-events-factory.ts';
+import type { MapCanvasClickInput, MapHoverInput } from '#canvas/canvas-events-factory.ts';
 
-import { decideClickActions, decideHoverIntent } from '#canvas/canvas-events-factory.ts';
+import { decideHoverIntent, getCanvasClickHit } from '#canvas/canvas-events-factory.ts';
 import { MapLayerIdEnum } from '#source/source-config.ts';
 
-function makeClickInput(input: Partial<MapClickInput> = {}): MapClickInput {
+function makeClickInput(input: Partial<MapCanvasClickInput> = {}): MapCanvasClickInput {
 	return {
 		clusterId: undefined,
 		coordinates: [100, 15],
@@ -29,103 +29,58 @@ function makeHoverInput(input: Partial<MapHoverInput> = {}): MapHoverInput {
 	};
 }
 
-describe('decideClickActions', () => {
-	test('clears the selection when nothing was clicked', () => {
+describe('getCanvasClickHit', () => {
+	const empty = { kind: 'empty' };
+
+	test('nothing clicked, or a feature that is not a Point, is the empty map', () => {
 		expect(
-			decideClickActions({
+			getCanvasClickHit({
 				clusterId: undefined,
 				coordinates: undefined,
 				geometryType: undefined,
 				layerId: undefined,
 				pointId: undefined,
 			}),
-		).toEqual([{ kind: 'clear-selection' }]);
-	});
-
-	test('clears the selection when the clicked feature is not a point', () => {
+		).toEqual(empty);
 		expect(
-			decideClickActions(
-				makeClickInput({
-					geometryType: GeometryTypeEnum.Polygon,
-					layerId: MapLayerIdEnum.Polygon,
-				}),
+			getCanvasClickHit(
+				makeClickInput({ geometryType: 'Polygon', layerId: MapLayerIdEnum.DivisionMask }),
 			),
-		).toEqual([{ kind: 'clear-selection' }]);
+		).toEqual(empty);
 	});
 
-	test('expands a cluster', () => {
+	test.each([42, '42'])('a cluster with id %j is a cluster hit', (clusterId) => {
 		expect(
-			decideClickActions(
-				makeClickInput({
-					clusterId: 42,
-					coordinates: [100, 15],
-					layerId: MapLayerIdEnum.Clusters,
-				}),
-			),
-		).toEqual([
-			{ kind: 'close-filter' },
-			{ center: [100, 15], clusterId: 42, kind: 'expand-cluster' },
-		]);
+			getCanvasClickHit(makeClickInput({ clusterId, layerId: MapLayerIdEnum.Clusters })),
+		).toEqual({ center: [100, 15], clusterId, kind: 'cluster' });
 	});
 
-	test('expands a cluster identified by a string id', () => {
+	test.each([
+		['a zero id', { clusterId: 0 }],
+		['no usable id', { clusterId: {} }],
+		['malformed coordinates', { clusterId: 42, coordinates: [100] }],
+	])('a cluster with %s is the empty map', (_, input) => {
 		expect(
-			decideClickActions(makeClickInput({ clusterId: '42', layerId: MapLayerIdEnum.Clusters })),
-		).toEqual([
-			{ kind: 'close-filter' },
-			{ center: [100, 15], clusterId: '42', kind: 'expand-cluster' },
-		]);
-	});
-
-	test('treats a zero cluster id as absent', () => {
-		expect(
-			decideClickActions(makeClickInput({ clusterId: 0, layerId: MapLayerIdEnum.Clusters })),
-		).toEqual([{ kind: 'close-filter' }]);
-	});
-
-	test('closes the filter only when a cluster has no usable id', () => {
-		expect(
-			decideClickActions(makeClickInput({ clusterId: {}, layerId: MapLayerIdEnum.Clusters })),
-		).toEqual([{ kind: 'close-filter' }]);
-	});
-
-	test('closes the filter only when a cluster has malformed coordinates', () => {
-		expect(
-			decideClickActions(
-				makeClickInput({
-					clusterId: 42,
-					coordinates: [100],
-					layerId: MapLayerIdEnum.Clusters,
-				}),
-			),
-		).toEqual([{ kind: 'close-filter' }]);
+			getCanvasClickHit(makeClickInput({ ...input, layerId: MapLayerIdEnum.Clusters })),
+		).toEqual(empty);
 	});
 
 	test.each([MapLayerIdEnum.Points, MapLayerIdEnum.PointsTarget, MapLayerIdEnum.PointsImage])(
-		'selects a point clicked on the %s layer',
+		'a Point on the %s layer is a Point hit, never a pick',
 		(layerId) => {
-			expect(decideClickActions(makeClickInput({ layerId }))).toEqual([
-				{ kind: 'close-filter' },
-				{ center: [100, 15], kind: 'select-point', pointId: 'location-id' },
-			]);
+			expect(getCanvasClickHit(makeClickInput({ layerId }))).toEqual({
+				isPick: false,
+				kind: 'point',
+				pointId: 'location-id',
+			});
 		},
 	);
 
-	test('selects a point without a center when coordinates are malformed', () => {
-		expect(decideClickActions(makeClickInput({ coordinates: ['100', 15] }))).toEqual([
-			{ kind: 'close-filter' },
-			{ center: undefined, kind: 'select-point', pointId: 'location-id' },
-		]);
-	});
-
-	test('closes the filter only when a point has a non-string id', () => {
-		expect(decideClickActions(makeClickInput({ pointId: 7 }))).toEqual([{ kind: 'close-filter' }]);
-	});
-
-	test('closes the filter only for a point on an unhandled layer', () => {
-		expect(decideClickActions(makeClickInput({ layerId: MapLayerIdEnum.PointsLabel }))).toEqual([
-			{ kind: 'close-filter' },
-		]);
+	test('a Point with a non-string id, or on an unhandled layer, is the empty map', () => {
+		expect(getCanvasClickHit(makeClickInput({ pointId: 7 }))).toEqual(empty);
+		expect(getCanvasClickHit(makeClickInput({ layerId: MapLayerIdEnum.PointsLabel }))).toEqual(
+			empty,
+		);
 	});
 });
 
@@ -241,7 +196,7 @@ describe('decideHoverIntent clearing hover', () => {
 				makeHoverInput({
 					featureId: undefined,
 					hoveredFeatureId: 'location-id',
-					layerId: MapLayerIdEnum.Polygon,
+					layerId: MapLayerIdEnum.DivisionMask,
 					pointId: undefined,
 					storeHoveredId: 'location-id',
 				}),

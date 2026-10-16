@@ -1,44 +1,11 @@
-import type { MapSourceItem } from '@spectralcodex/map-codec';
-
-import { GeometryTypeEnum } from '@spectralcodex/shared/map';
 import { describe, expect, test } from 'vitest';
 
 import {
 	getTargetBounds,
 	getTargetDuration,
-	getTargetPositions,
 	getTargetZoom,
+	isInView,
 } from '#targets/targets-fit-factory.ts';
-
-function makeItem(id: string, geometry: MapSourceItem['geometry']) {
-	return { geometry, properties: { id } } as MapSourceItem;
-}
-
-const items = [
-	makeItem('theater', { coordinates: [121.8, 24.6], type: GeometryTypeEnum.Point }),
-	makeItem('railway', {
-		coordinates: [
-			[121, 24],
-			[122, 25],
-		],
-		type: GeometryTypeEnum.LineString,
-	}),
-	makeItem('temple', { coordinates: [120.2, 23], type: GeometryTypeEnum.Point }),
-];
-
-describe('getTargetPositions', () => {
-	test('collects point and line vertices of Targets only', () => {
-		expect(getTargetPositions(items, ['theater', 'railway'])).toEqual([
-			[121.8, 24.6],
-			[121, 24],
-			[122, 25],
-		]);
-	});
-
-	test('an unknown Target yields nothing', () => {
-		expect(getTargetPositions(items, ['missing'])).toEqual([]);
-	});
-});
 
 describe('getTargetBounds', () => {
 	test('no positions yields no bounds', () => {
@@ -97,5 +64,22 @@ describe('getTargetDuration', () => {
 	test('a long zoom or a long pan is capped', () => {
 		expect(getTargetDuration(8, 0)).toBe(1800);
 		expect(getTargetDuration(0, 40)).toBe(1800);
+	});
+});
+
+describe('isInView', () => {
+	const frame = { bottom: 300, left: 50, right: 750, top: 50 };
+	const corner = { x: 50, y: 50 };
+	const inside = { x: 400, y: 200 };
+	const past = { x: 760, y: 200 };
+
+	test('every point inside the frame, edges included, at a working zoom is in view', () => {
+		expect(isInView([corner, inside], frame, 14)).toBe(true);
+	});
+
+	test('one point past an edge, no point, or too far out is not in view', () => {
+		expect(isInView([inside, past], frame, 14)).toBe(false);
+		expect(isInView([], frame, 14)).toBe(false);
+		expect(isInView([inside], frame, 8)).toBe(false);
 	});
 });

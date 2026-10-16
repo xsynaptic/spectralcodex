@@ -18,12 +18,3 @@ export function useDocumentEventValue<Value>(
 
 	return useSyncExternalStore(subscribe, getSnapshot, () => serverValue);
 }
-
-export function useDocumentAttribute(attributeName: string, eventName: string) {
-	const getSnapshot = useCallback(
-		() => document.documentElement.getAttribute(attributeName) ?? undefined,
-		[attributeName],
-	);
-
-	return useDocumentEventValue(eventName, getSnapshot, undefined);
-}

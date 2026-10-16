@@ -1,11 +1,11 @@
 import { GeometryTypeEnum } from '@spectralcodex/shared/map';
 
+import type { MapClickHit } from '#host/host-click-factory.ts';
+
+import { getClusterHoverId } from '#lib/cluster-hover.ts';
 import { MapLayerIdEnum } from '#source/source-config.ts';
 
-export type MapClickAction =
-	MapClearSelectionAction | MapCloseFilterAction | MapExpandClusterAction | MapSelectPointAction;
-
-export interface MapClickInput {
+export interface MapCanvasClickInput {
 	clusterId: unknown;
 	coordinates: unknown;
 	geometryType: string | undefined;
@@ -26,78 +26,46 @@ export interface MapHoverIntent {
 	cursor: MapCursor;
 	featureStateChanges: Array<MapFeatureStateChange>;
 	hoveredFeatureId: number | string | undefined;
-	// `undefined` means no store write
 	storeHoveredIdUpdate: MapStoreHoveredIdUpdate | undefined;
-}
-
-interface MapClearSelectionAction {
-	kind: 'clear-selection';
-}
-
-interface MapCloseFilterAction {
-	kind: 'close-filter';
 }
 
 type MapCoordinates = [number, number];
 
 type MapCursor = '' | 'pointer' | 'zoom-in';
 
-interface MapExpandClusterAction {
-	center: MapCoordinates;
-	clusterId: number | string;
-	kind: 'expand-cluster';
-}
-
 interface MapFeatureStateChange {
 	featureId: number | string;
 	hover: boolean;
-}
-
-interface MapSelectPointAction {
-	center: MapCoordinates | undefined;
-	kind: 'select-point';
-	pointId: string;
 }
 
 interface MapStoreHoveredIdUpdate {
 	hoveredId: string | undefined;
 }
 
-// Order matters: close-filter clears the selection, so it must precede select-point or the popup never opens
-export function decideClickActions(input: MapClickInput): Array<MapClickAction> {
+export function getCanvasClickHit(input: MapCanvasClickInput): MapClickHit {
 	const { clusterId, coordinates, geometryType, layerId, pointId } = input;
 
-	if (!layerId || geometryType !== GeometryTypeEnum.Point) return [{ kind: 'clear-selection' }];
+	if (geometryType !== GeometryTypeEnum.Point) return { kind: 'empty' };
 
 	switch (layerId) {
 		case MapLayerIdEnum.Clusters: {
 			const expansionClusterId = getClusterId(clusterId);
 
 			if (expansionClusterId === undefined || !isMapCoordinates(coordinates)) {
-				return [{ kind: 'close-filter' }];
+				return { kind: 'empty' };
 			}
 
-			return [
-				{ kind: 'close-filter' },
-				{ center: coordinates, clusterId: expansionClusterId, kind: 'expand-cluster' },
-			];
+			return { center: coordinates, clusterId: expansionClusterId, kind: 'cluster' };
 		}
 		case MapLayerIdEnum.Points:
 		case MapLayerIdEnum.PointsImage:
 		case MapLayerIdEnum.PointsTarget: {
-			if (typeof pointId !== 'string') return [{ kind: 'close-filter' }];
-
-			return [
-				{ kind: 'close-filter' },
-				{
-					center: isMapCoordinates(coordinates) ? coordinates : undefined,
-					kind: 'select-point',
-					pointId,
-				},
-			];
+			return typeof pointId === 'string'
+				? { isPick: false, kind: 'point', pointId }
+				: { kind: 'empty' };
 		}
 		default: {
-			return [{ kind: 'close-filter' }];
+			return { kind: 'empty' };
 		}
 	}
 }
@@ -113,7 +81,7 @@ export function decideHoverIntent(input: MapHoverInput): MapHoverIntent {
 				hoveredFeatureId: featureId,
 				storeHoveredIdUpdate:
 					typeof clusterId === 'number'
-						? getStoreHoveredIdUpdate(storeHoveredId, `cluster-${String(clusterId)}`)
+						? getStoreHoveredIdUpdate(storeHoveredId, getClusterHoverId(clusterId))
 						: undefined,
 			};
 		}

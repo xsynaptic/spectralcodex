@@ -1,10 +1,11 @@
 import type { FC } from 'react';
 import type { ControlPosition } from 'react-map-gl/maplibre';
 
-import { useMapCanvasData } from '#canvas/canvas-data.tsx';
+import { mapControlClassName } from '#constants.ts';
 import { CustomControlPortal } from '#controls/controls-custom.tsx';
-import { useSourceDataQuery } from '#data/data-source.tsx';
-import { useMapMessages } from '#lib/messages.tsx';
+import { useMapCanvasData } from '#data/data-canvas.tsx';
+import { useMapRows } from '#data/data-query.ts';
+import { useMapConfig } from '#lib/config.tsx';
 
 const formatNumber = new Intl.NumberFormat('en');
 
@@ -12,11 +13,10 @@ export const MetricsControl: FC<{
 	position: ControlPosition;
 }> = function MetricsControl({ position }) {
 	const { filteredCount, totalCount } = useMapCanvasData();
-	const messages = useMapMessages();
+	const { messages } = useMapConfig();
 
-	const { isLoading: isSourceDataLoading } = useSourceDataQuery();
+	const { isLoading: isSourceDataLoading } = useMapRows();
 
-	// Note: the class name is specified to remove the white background and border added by default
 	return (
 		<CustomControlPortal className="maplibregl-ctrl" position={position}>
 			{isSourceDataLoading ? (
@@ -24,7 +24,7 @@ export const MetricsControl: FC<{
 					<div className="map-loading-animation" />
 				</div>
 			) : (
-				<div className="maplibregl-ctrl-metrics" role="status">
+				<div className={mapControlClassName.metrics} role="status">
 					<span>{formatNumber.format(filteredCount)}</span>
 					<span className="maplibregl-ctrl-metrics-divider">/</span>
 					<span>

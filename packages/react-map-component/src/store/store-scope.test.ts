@@ -1,17 +1,35 @@
 import type { MapSourceItem } from '@spectralcodex/map-codec';
 
+import {
+	GeometryTypeEnum,
+	LocationCategoryEnum,
+	LocationStatusEnum,
+} from '@spectralcodex/shared/map';
 import { describe, expect, test } from 'vitest';
 
 import type { MapScope, MapView } from '#types.ts';
-import type { MapScopeState } from '#view/view-scope.ts';
 
-import { reduceMapScope } from '#view/view-scope.ts';
+import { createMapStore } from '#store/store-factory.ts';
+import { reduceMapScope } from '#store/store-scope.ts';
 
-function makeItem(properties: Partial<MapSourceItem['properties']>) {
-	return { properties } as MapSourceItem;
+function makeItem(properties: Partial<MapSourceItem['properties']>): MapSourceItem {
+	return {
+		geometry: { coordinates: [0, 0], type: GeometryTypeEnum.Point },
+		properties: {
+			category: LocationCategoryEnum.Unknown,
+			entryQuality: 1,
+			hasImage: false,
+			id: 'location-id',
+			precision: 3,
+			rating: 3,
+			status: LocationStatusEnum.Abandoned,
+			title: 'Location',
+			...properties,
+		},
+		type: 'Feature',
+	};
 }
 
-// The Region covers ordinals 10 to 19; theme 3 has Locations inside and outside it
 const items = [
 	makeItem({ id: 'theater', regionOrdinals: [12], themeIndices: [3] }),
 	makeItem({ id: 'theater-1', regionOrdinals: [12], themeIndices: [3] }),
@@ -27,7 +45,7 @@ const theme: MapScope = {
 };
 
 const region: MapScope = {
-	apiDivisionUrl: '/api/divisions/tainan.fgb',
+	apiDivisionUrl: '/api/map/divisions/tainan.json',
 	rule: { interval: [10, 19], type: 'region' },
 	title: 'Tainan',
 	url: '/regions/tainan/',
@@ -48,25 +66,24 @@ const on = 'on';
 
 // Applies each view twice, as a `map:sync` on the same page does; `off` and `on` stand for the toggle on the Scope bar
 function browseHeld(steps: Array<MapView | typeof off | typeof on>) {
-	let state: MapScopeState = { isScopeEnabled: true, scope: undefined, viewKey: undefined };
+	const store = createMapStore();
+	const { setScopeEnabled, syncView } = store.getState().actions;
 
 	for (const step of steps) {
 		if (step === off || step === on) {
-			state = { ...state, isScopeEnabled: step === on };
+			setScopeEnabled(step === on);
 			continue;
 		}
 
-		const viewKey = getViewKey(step);
+		const page = { view: step, viewKey: getViewKey(step) };
 
-		for (const sync of [1, 2]) {
-			const { isSettled, ...result } = reduceMapScope(state, { view: step, viewKey }, items);
-
-			expect(isSettled, `sync ${String(sync)}`).toBe(true);
-			state = { ...result, viewKey };
-		}
+		syncView(page, items);
+		syncView(page, items);
 	}
 
-	return { isScopeEnabled: state.isScopeEnabled, scope: state.scope };
+	const { isScopeEnabled, scope } = store.getState();
+
+	return { isScopeEnabled, scope };
 }
 
 function browse(steps: Parameters<typeof browseHeld>[0]) {
@@ -103,7 +120,6 @@ describe('reduceMapScope', () => {
 		expect(browse([{ scope: region }, locationView()])).toBeUndefined();
 	});
 
-	// Passing the same view again stands for a `map:sync` on that page, not a new visit
 	test('a Scope turned off stays off on the page that set it and on a member Location', () => {
 		expect(browse([{ scope: theme }, off, { scope: theme }])).toBeUndefined();
 		expect(browse([{ scope: theme }, off, locationView('theater')])).toBeUndefined();
@@ -138,39 +154,31 @@ describe('reduceMapScope', () => {
 		expect(browse([noView])).toBeUndefined();
 	});
 
-	test('a Location view before source data waits, then decides once the data lands', () => {
-		const state = { isScopeEnabled: true, scope: region, viewKey: getViewKey({ scope: region }) };
+	test('a Location view keeps the Scope without rows, and decides with them', () => {
+		const state = { isScopeEnabled: true, scope: region };
 		const view = locationView('mine');
 		const page = { view, viewKey: getViewKey(view) };
 
-		expect(reduceMapScope(state, page, undefined)).toEqual({
-			isScopeEnabled: true,
-			isSettled: false,
-			scope: region,
-		});
-		expect(reduceMapScope(state, page, items)).toEqual({
-			isScopeEnabled: true,
-			isSettled: true,
-			scope: undefined,
-		});
+		expect(reduceMapScope(state, page, undefined)).toEqual({ isScopeEnabled: true, scope: region });
+		expect(reduceMapScope(state, page, items)).toEqual({ isScopeEnabled: true, scope: undefined });
 	});
 
-	test('a view that sets a Scope, or finds none in force, never waits on source data', () => {
+	test('a view that sets a Scope, or finds none in force, needs no rows', () => {
 		const view = locationView('mine');
 
 		expect(
 			reduceMapScope(
-				{ isScopeEnabled: true, scope: theme, viewKey: 'theme' },
+				{ isScopeEnabled: true, scope: theme },
 				{ view: { scope: region }, viewKey: 'region' },
 				undefined,
 			),
-		).toEqual({ isScopeEnabled: true, isSettled: true, scope: region });
+		).toEqual({ isScopeEnabled: true, scope: region });
 		expect(
 			reduceMapScope(
-				{ isScopeEnabled: true, scope: undefined, viewKey: 'theme' },
+				{ isScopeEnabled: true, scope: undefined },
 				{ view, viewKey: getViewKey(view) },
 				undefined,
 			),
-		).toEqual({ isScopeEnabled: true, isSettled: true, scope: undefined });
+		).toEqual({ isScopeEnabled: true, scope: undefined });
 	});
 });

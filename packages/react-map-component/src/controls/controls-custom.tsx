@@ -1,8 +1,9 @@
 import type { ReactElement } from 'react';
 import type { ControlPosition, IControl } from 'react-map-gl/maplibre';
 
+import { useLayoutEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { useControl } from 'react-map-gl/maplibre';
+import { useControl, useMap } from 'react-map-gl/maplibre';
 
 interface CustomControlConfig {
 	className?: string | undefined;
@@ -43,4 +44,24 @@ export function CustomControlPortal({ children, className, position }: CustomCon
 	const customControl = useControl<CustomControl>(() => new CustomControl({ className, position }));
 
 	return createPortal(children, customControl.getElement());
+}
+
+// MapLibre has no top-center control slot
+export function TopCenterControlPortal({ children }: { children: ReactElement }) {
+	const { current: map } = useMap();
+	const [slot] = useState(() => document.createElement('div'));
+
+	useLayoutEffect(() => {
+		const topLeft = map?.getContainer().querySelector('.maplibregl-ctrl-top-left');
+
+		if (!topLeft) return;
+
+		topLeft.after(slot);
+
+		return () => {
+			slot.remove();
+		};
+	}, [map, slot]);
+
+	return createPortal(children, slot);
 }

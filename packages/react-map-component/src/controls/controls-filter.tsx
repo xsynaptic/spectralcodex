@@ -1,52 +1,54 @@
 import type { LocationStatus, LocationStatusMetadata } from '@spectralcodex/shared/map';
-import type { CSSProperties, FC, PropsWithChildren } from 'react';
+import type { FC, PropsWithChildren, RefObject } from 'react';
 import type { ControlPosition } from 'react-map-gl/maplibre';
 
 import { locationStatusOrder, LocationStatusRecords } from '@spectralcodex/shared/map';
-import { memo, useEffect, useId, useRef } from 'react';
-import * as R from 'remeda';
+import { memo, useId, useLayoutEffect } from 'react';
 
-import { controlFilterId } from '#constants.ts';
+import { mapActiveAttribute, mapControlClassName } from '#constants.ts';
 import { CustomControlPortal } from '#controls/controls-custom.tsx';
-import { useSourceDataQuery } from '#data/data-source.tsx';
-import { useIsDarkMode } from '#lib/dark-mode.tsx';
-import { MapIconFilters, MapIconRating } from '#lib/icons.tsx';
-import { useMapMessages } from '#lib/messages.tsx';
-import { useTrackMap } from '#lib/track-context.tsx';
-import {
-	useHasMapActiveFilter,
-	useHasMapChineseLabels,
-	useIsMapCanvasLoading,
-	useIsMapFilterOpen,
-	useIsMapObjectiveFilterEnabled,
-	useMapFilterPosition,
-	useMapObjectiveFilter,
-	useMapRatingFilter,
-	useMapStatusFilter,
-	useMapStoreActions,
-} from '#store/store.ts';
+import { useOverlay } from '#controls/controls-overlay.ts';
+import { useIsMapLoading } from '#data/data-query.ts';
+import { useMapConfig } from '#lib/config.tsx';
+import { useIsDarkMode } from '#lib/dark-mode.ts';
+import { MapControlIcon, MapIconFilters, MapIconRating } from '#lib/icons.tsx';
+import { useTrackMap } from '#lib/track-hook.ts';
+import { hasActiveFilter } from '#store/store-factory.ts';
+import { useMapStore, useMapStoreApi } from '#store/store.tsx';
 
-// Bilingual secondary labels; kept local pending the deferred map-portability work
 const chineseShowHideLabels = {
 	hideAll: '隱藏全部',
 	showAll: '顯示全部',
 } as const;
 
-const MapFilterMenuItem: FC<
-	PropsWithChildren<{
-		isActive?: boolean;
-	}>
-> = function MapFilterMenuItem({ children, isActive }) {
+const filterLevels = [1, 2, 3, 4, 5] as const;
+
+function getActiveAttribute(isActive: boolean) {
+	return { [mapActiveAttribute]: isActive ? '' : undefined };
+}
+
+const MapFilterLabel: FC<{ title: string; titleZh: string }> = function MapFilterLabel({
+	title,
+	titleZh,
+}) {
+	const isShowChinese = useMapConfig().languages.some((language) => language.startsWith('zh'));
+
 	return (
-		<li
-			className={
-				isActive ? 'map-filter-menu-item map-filter-menu-item-active' : 'map-filter-menu-item'
-			}
-		>
-			{children}
-		</li>
+		<span className="map-filter-label">
+			<span>{title}</span>
+			{isShowChinese ? <span className="map-filter-label-zh">{titleZh}</span> : undefined}
+		</span>
 	);
 };
+
+const MapFilterMenuItem: FC<PropsWithChildren<{ isActive?: boolean }>> =
+	function MapFilterMenuItem({ children, isActive = false }) {
+		return (
+			<li className="map-filter-menu-item" {...getActiveAttribute(isActive)}>
+				{children}
+			</li>
+		);
+	};
 
 const MapFilterStatusMenuItem: FC<{
 	data: LocationStatusMetadata;
@@ -54,10 +56,8 @@ const MapFilterStatusMenuItem: FC<{
 	status: LocationStatus;
 }> = memo(function MapFilterStatusMenuItem({ data, isFiltered, status }) {
 	const isDarkMode = useIsDarkMode();
-
-	const isShowChinese = useHasMapChineseLabels();
-
-	const { toggleStatusFilter } = useMapStoreActions();
+	const store = useMapStoreApi();
+	const { setFilter } = useMapStore((state) => state.actions);
 
 	return (
 		<MapFilterMenuItem isActive={isFiltered}>
@@ -65,127 +65,82 @@ const MapFilterStatusMenuItem: FC<{
 				aria-pressed={!isFiltered}
 				className="map-filter-button"
 				onClick={() => {
-					toggleStatusFilter(status);
+					const hidden = store.getState().filter.status;
+
+					setFilter({
+						status: isFiltered
+							? hidden.filter((hiddenStatus) => hiddenStatus !== status)
+							: [...hidden, status],
+					});
 				}}
 				type="button"
 			>
 				<span
 					className="map-filter-swatch"
 					style={{
-						backgroundColor: isDarkMode
-							? LocationStatusRecords[status].colorDark
-							: LocationStatusRecords[status].color,
-						borderColor: isDarkMode
-							? LocationStatusRecords[status].strokeDark
-							: LocationStatusRecords[status].stroke,
-						...(isFiltered ? { opacity: 0.6 } : {}),
+						backgroundColor: isDarkMode ? data.colorDark : data.color,
+						borderColor: isDarkMode ? data.strokeDark : data.stroke,
 					}}
 				></span>
-				<span
-					className={isFiltered ? 'map-filter-label map-filter-label-active' : 'map-filter-label'}
-				>
-					{isShowChinese ? (
-						<>
-							<span>{data.title}</span>
-							<span
-								className={
-									isFiltered
-										? 'map-filter-label-zh map-filter-label-zh-active'
-										: 'map-filter-label-zh'
-								}
-							>
-								{data.title_zh}
-							</span>
-						</>
-					) : (
-						data.title
-					)}
-				</span>
+				<MapFilterLabel title={data.title} titleZh={data.title_zh} />
 			</button>
 		</MapFilterMenuItem>
 	);
 });
 
-const MapFilterStatusShowHideMenuItem: FC<
-	PropsWithChildren<{
-		onClick: () => void;
-	}>
-> = function MapFilterStatusShowHideMenuItem({ children, onClick }) {
-	return (
-		<MapFilterMenuItem>
-			<button className="map-filter-button" onClick={onClick}>
-				<span className="map-filter-swatch-showhide"></span>
-				<span className="map-filter-label">{children}</span>
-			</button>
-		</MapFilterMenuItem>
-	);
-};
-
 const MapFilterStatusShowHideMenu: FC = function MapFilterStatusShowHideMenu() {
-	const isShowChinese = useHasMapChineseLabels();
-	const messages = useMapMessages();
-
-	const { hideAllStatusFilter, showAllStatusFilter } = useMapStoreActions();
+	const { messages } = useMapConfig();
+	const { setFilter } = useMapStore((state) => state.actions);
 
 	return (
 		<>
-			<MapFilterStatusShowHideMenuItem
-				onClick={() => {
-					showAllStatusFilter();
-				}}
-			>
-				{isShowChinese ? (
-					<>
-						<span>{messages.showAll}</span>
-						<span className="map-filter-label-zh">{chineseShowHideLabels.showAll}</span>
-					</>
-				) : (
-					messages.showAll
-				)}
-			</MapFilterStatusShowHideMenuItem>
-			<MapFilterStatusShowHideMenuItem
-				onClick={() => {
-					hideAllStatusFilter();
-				}}
-			>
-				{isShowChinese ? (
-					<>
-						<span>{messages.hideAll}</span>
-						<span className="map-filter-label-zh">{chineseShowHideLabels.hideAll}</span>
-					</>
-				) : (
-					messages.hideAll
-				)}
-			</MapFilterStatusShowHideMenuItem>
+			<MapFilterMenuItem>
+				<button
+					className="map-filter-button"
+					onClick={() => {
+						setFilter({ status: [] });
+					}}
+					type="button"
+				>
+					<span className="map-filter-swatch-showhide"></span>
+					<MapFilterLabel title={messages.showAll} titleZh={chineseShowHideLabels.showAll} />
+				</button>
+			</MapFilterMenuItem>
+			<MapFilterMenuItem>
+				<button
+					className="map-filter-button"
+					onClick={() => {
+						setFilter({ status: locationStatusOrder });
+					}}
+					type="button"
+				>
+					<span className="map-filter-swatch-showhide"></span>
+					<MapFilterLabel title={messages.hideAll} titleZh={chineseShowHideLabels.hideAll} />
+				</button>
+			</MapFilterMenuItem>
 		</>
 	);
 };
 
 const MapFilterRatingMenuItem: FC = function MapFilterRatingMenuItem() {
-	const ratingFilterValue = useMapRatingFilter();
-	const messages = useMapMessages();
-
-	const { setRatingFilter } = useMapStoreActions();
+	const rating = useMapStore((state) => state.filter.rating);
+	const { messages } = useMapConfig();
+	const { setFilter } = useMapStore((state) => state.actions);
 
 	return (
 		<li>
-			<span className="map-filter-rating">
-				{R.range(1, 6).map((value) => (
+			<span className={mapControlClassName.filterRating}>
+				{filterLevels.map((value) => (
 					<button
 						aria-label={`${messages.ratingFilterAriaLabel} ${String(value)}`}
-						aria-pressed={ratingFilterValue === value}
-						className={
-							ratingFilterValue >= value ? 'map-filter-star-filled' : 'map-filter-star-empty'
-						}
-						key={`rating-${String(value)}`}
+						aria-pressed={rating === value}
+						className="map-filter-star"
+						key={value}
 						onClick={() => {
-							if (ratingFilterValue === value) {
-								setRatingFilter(1);
-							} else {
-								setRatingFilter(value);
-							}
+							setFilter({ rating: rating === value ? 1 : value });
 						}}
 						type="button"
+						{...getActiveAttribute(rating >= value)}
 					>
 						<svg
 							aria-hidden="true"
@@ -203,23 +158,19 @@ const MapFilterRatingMenuItem: FC = function MapFilterRatingMenuItem() {
 };
 
 const MapFilterObjectiveMenuItem: FC = function MapFilterObjectiveMenuItem() {
-	const objectiveFilter = useMapObjectiveFilter();
-	const { setObjectiveFilter } = useMapStoreActions();
+	const objective = useMapStore((state) => state.filter.objective);
+	const { setFilter } = useMapStore((state) => state.actions);
 
 	return (
 		<li>
 			<div className="map-filter-objective-row">
-				{[1, 2, 3, 4, 5].map((value) => (
+				{filterLevels.map((value) => (
 					<button
-						aria-pressed={objectiveFilter === value}
-						className={
-							objectiveFilter === value
-								? 'map-filter-objective-button map-filter-objective-button-active'
-								: 'map-filter-objective-button'
-						}
-						key={`objective-${String(value)}`}
+						aria-pressed={objective === value}
+						className="map-filter-objective-button"
+						key={value}
 						onClick={() => {
-							setObjectiveFilter(value);
+							setFilter({ objective: value });
 						}}
 						type="button"
 					>
@@ -231,30 +182,45 @@ const MapFilterObjectiveMenuItem: FC = function MapFilterObjectiveMenuItem() {
 	);
 };
 
-interface FilterMenuStyle extends CSSProperties {
-	'--map-filter-x': string;
-	'--map-filter-y': string;
+const filterMenuOffsetPx = 8;
+
+function useFilterMenuPlacement(
+	menuRef: RefObject<HTMLDivElement | null>,
+	openerRef: RefObject<HTMLButtonElement | null>,
+) {
+	useLayoutEffect(() => {
+		const menu = menuRef.current;
+		const parent = menu?.offsetParent;
+		const opener = openerRef.current;
+
+		if (!menu || !parent || !opener) return;
+
+		const { x: parentX, y: parentY } = parent.getBoundingClientRect();
+		const { height, width, x, y } = opener.getBoundingClientRect();
+
+		menu.style.setProperty(
+			'--map-filter-x',
+			`${String(x - parentX + width + filterMenuOffsetPx)}px`,
+		);
+		menu.style.setProperty('--map-filter-y', `${String(y - parentY + height / 2)}px`);
+	}, [menuRef, openerRef]);
 }
 
 const MapControlsFilterMenu: FC<{
-	filterPopupOffset?: number;
 	id: string;
-}> = function MapControlsFilterMenu({ filterPopupOffset = 8, id }) {
-	const filterPosition = useMapFilterPosition();
-	const isFilterOpen = useIsMapFilterOpen();
-	const statusFilter = useMapStatusFilter();
-	const isObjectiveFilterEnabled = useIsMapObjectiveFilterEnabled();
+	openerRef: RefObject<HTMLButtonElement | null>;
+	ref: RefObject<HTMLDivElement | null>;
+}> = function MapControlsFilterMenu({ id, openerRef, ref }) {
+	const hiddenStatuses = useMapStore((state) => state.filter.status);
+	const isObjectiveFilterEnabled = useMapConfig().isObjectiveFilterEnabled;
 
-	return isFilterOpen && filterPosition ? (
+	useFilterMenuPlacement(ref, openerRef);
+
+	return (
 		<div
 			className="maplibregl-popup maplibregl-popup-anchor-left map-filter-menu"
 			id={id}
-			style={
-				{
-					'--map-filter-x': `${String(filterPosition.x + filterPopupOffset)}px`,
-					'--map-filter-y': `${String(filterPosition.y)}px`,
-				} satisfies FilterMenuStyle
-			}
+			ref={ref}
 		>
 			<div className="maplibregl-popup-tip"></div>
 			<div className="maplibregl-popup-content">
@@ -262,7 +228,7 @@ const MapControlsFilterMenu: FC<{
 					{locationStatusOrder.map((status) => (
 						<MapFilterStatusMenuItem
 							data={LocationStatusRecords[status]}
-							isFiltered={statusFilter.includes(status)}
+							isFiltered={hiddenStatuses.includes(status)}
 							key={status}
 							status={status}
 						/>
@@ -273,91 +239,61 @@ const MapControlsFilterMenu: FC<{
 				</ul>
 			</div>
 		</div>
-	) : undefined;
+	);
 };
 
 export const FilterControl: FC<{ position: ControlPosition }> = function FilterControl({
 	position,
 }) {
-	const isCanvasLoading = useIsMapCanvasLoading();
-	const isFilterOpen = useIsMapFilterOpen();
-	const hasActiveFilter = useHasMapActiveFilter();
-	const messages = useMapMessages();
+	const isFilterActive = useMapStore(hasActiveFilter);
+	const isLoading = useIsMapLoading();
+	const { messages } = useMapConfig();
 	const trackMap = useTrackMap();
-
-	const { setFilterOpen } = useMapStoreActions();
-
-	const { isLoading: isSourceDataLoading } = useSourceDataQuery();
-
-	const isLoading = isSourceDataLoading || isCanvasLoading;
-
 	const panelId = useId();
-	const buttonRef = useRef<HTMLButtonElement>(null);
-
-	useEffect(() => {
-		if (!isFilterOpen) return;
-
-		function onKeyDown(event: KeyboardEvent) {
-			if (event.key !== 'Escape') return;
-
-			// Focus returns only from inside this map; Escape elsewhere on the page leaves focus alone
-			const mapRoot = buttonRef.current?.closest('[data-map-root]');
-			const isFocusInMap = mapRoot?.contains(document.activeElement) ?? false;
-
-			setFilterOpen(false);
-
-			if (isFocusInMap) buttonRef.current?.focus();
-		}
-
-		document.addEventListener('keydown', onKeyDown);
-
-		return () => {
-			document.removeEventListener('keydown', onKeyDown);
-		};
-	}, [isFilterOpen, setFilterOpen]);
+	const { close, isOpen, open, openerRef, overlayRef } = useOverlay('filter');
 
 	return (
 		<>
 			<CustomControlPortal position={position}>
 				<button
 					aria-controls={panelId}
-					aria-expanded={isFilterOpen}
+					aria-expanded={isOpen}
 					aria-label={
-						hasActiveFilter ? messages.filterMenuActiveAriaLabel : messages.filterMenuAriaLabel
+						isFilterActive ? messages.filterMenuActiveAriaLabel : messages.filterMenuAriaLabel
 					}
-					className="maplibregl-ctrl-filter"
+					className={mapControlClassName.filter}
 					disabled={isLoading}
-					id={controlFilterId}
-					onClick={() => {
+					onClick={(event) => {
 						if (isLoading) return;
-						if (!isFilterOpen) trackMap({ name: 'map-filter-open' });
 
-						setFilterOpen(!isFilterOpen);
+						if (isOpen) {
+							close(event.detail === 0 ? 'keyboard' : 'pointer');
+							return;
+						}
+
+						trackMap({ name: 'map-filter-open' });
+						open();
 					}}
-					ref={buttonRef}
+					ref={openerRef}
 					type="button"
 				>
-					<span className="map-ctrl-icon-frame">
-						<svg
-							aria-hidden="true"
-							className="map-ctrl-icon"
-							style={{
-								...(isFilterOpen ? { marginTop: '1px', opacity: '0.6' } : {}),
-								...(isLoading ? { opacity: '0.6' } : {}),
-							}}
-							viewBox="0 0 24 24"
-							xmlns="http://www.w3.org/2000/svg"
-						>
-							<MapIconFilters />
-						</svg>
-					</span>
+					<MapControlIcon
+						style={{
+							...(isOpen ? { marginTop: '1px', opacity: '0.6' } : {}),
+							...(isLoading ? { opacity: '0.6' } : {}),
+						}}
+					>
+						<MapIconFilters />
+					</MapControlIcon>
 					<span
 						className="map-filter-indicator"
-						data-active={hasActiveFilter ? '' : undefined}
+						{...{ [mapActiveAttribute]: isFilterActive ? '' : undefined }}
 					></span>
 				</button>
 			</CustomControlPortal>
-			<MapControlsFilterMenu id={panelId} />
+			{isOpen ? (
+				<MapControlsFilterMenu id={panelId} openerRef={openerRef} ref={overlayRef} />
+			) : undefined}
 		</>
 	);
 };

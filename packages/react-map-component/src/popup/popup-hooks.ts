@@ -1,81 +1,31 @@
 import type { MapPopupItem, MapSourceItem } from '@spectralcodex/map-codec';
+import type { LngLat } from 'maplibre-gl';
 
-import { GeometryTypeEnum } from '@spectralcodex/shared/map';
-import { LngLat } from 'maplibre-gl';
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { useMap } from 'react-map-gl/maplibre';
 
-import { useChunkPopup } from '#data/data-popup-chunks.tsx';
-import { usePopupDataQuery } from '#data/data-popup.tsx';
-import { useSourceDataItem } from '#data/data-source.tsx';
+import { useMapChunk, useMapRow } from '#data/data-query.ts';
+import { useClickResolver } from '#host/host-click.ts';
+import { useMapConfig } from '#lib/config.tsx';
+import { getPopupCoordinates, getPopupLayout } from '#lib/popup-layout-factory.ts';
 import {
 	findPopupImageSrcSet,
 	getPopupImageSizes,
 	getPopupImageSrcSet,
-	getPopupLayout,
 } from '#popup/popup-factory.ts';
-import { useMapHoveredId, useMapSelectedId } from '#store/store.ts';
+import { useMapStore } from '#store/store.tsx';
 
-export type MapPopupItemExtended = MapPopupItem & {
-	objective: number | undefined;
-	popupCoordinates: LngLat;
-	precision: number | undefined;
-};
-
-const defaultPopupItem = {
-	description: undefined,
-	googleMapsUrl: undefined,
-	id: 'default',
-	image: undefined,
-	objective: undefined,
-	own: undefined,
-	popupCoordinates: new LngLat(0, 0),
-	precision: 1,
-	title: 'Untitled',
-	titleMultilingualLang: undefined,
-	titleMultilingualValue: undefined,
-	url: undefined,
-	wikipediaUrl: undefined,
-} satisfies MapPopupItemExtended;
-
-function getPopupCoordinates({ geometry }: MapSourceItem): LngLat {
-	switch (geometry.type) {
-		case GeometryTypeEnum.LineString: {
-			const coordinates = geometry.coordinates as Array<[number, number]>;
-
-			if (!coordinates[0]) return new LngLat(0, 0);
-
-			const [lng, lat] = coordinates[0];
-
-			return new LngLat(lng, lat);
-		}
-
-		case GeometryTypeEnum.Point: {
-			const [lng, lat] = geometry.coordinates as [number, number];
-
-			return new LngLat(lng, lat);
-		}
-
-		case GeometryTypeEnum.Polygon: {
-			const coordinates = geometry.coordinates as Array<Array<[number, number]>>;
-
-			if (!coordinates[0]) return new LngLat(0, 0);
-			if (!coordinates[0][0]) return new LngLat(0, 0);
-
-			const [lng, lat] = coordinates[0][0];
-
-			return new LngLat(lng, lat);
-		}
-
-		default: {
-			console.warn(`[Map] Unsupported geometry type for popup:`, geometry);
-
-			return new LngLat(0, 0);
-		}
-	}
-}
+export type MapPopupItemExtended = MapPopupItem &
+	Pick<MapSourceItem['properties'], 'objective' | 'url'> & {
+		popupCoordinates: LngLat;
+		precision: number | undefined;
+	};
 
 const mapImagePreloadDelayMs = 100;
+
+function getRowTitle({ title, titleMultilingual }: MapSourceItem['properties']) {
+	return titleMultilingual ? `${title} (${titleMultilingual})` : title;
+}
 
 function useDebouncedValue<T>(value: T, delayMs: number): T {
 	const [debouncedValue, setDebouncedValue] = useState(value);
@@ -93,72 +43,55 @@ function useDebouncedValue<T>(value: T, delayMs: number): T {
 	return debouncedValue;
 }
 
-// Source data carries only part of a popup; the rest comes from chunks fetched on demand
 export function useMapCanvasPopup() {
-	const selectedId = useMapSelectedId();
-
-	const inlinePopupQuery = usePopupDataQuery();
-	const inlinePopupData = inlinePopupQuery.data;
-
-	const selectedSourceItem = useSourceDataItem(selectedId);
-
-	// Without a chunk key the popup data is inline (objectives, MDX)
-	const chunkKey = selectedSourceItem?.properties.chunkKey;
-	const chunkQuery = useChunkPopup(chunkKey);
-
-	const isLoading = (chunkKey ? chunkQuery : inlinePopupQuery).isLoading;
+	const selectedId = useMapStore((state) => state.selectedId);
+	const selectedSourceItem = useMapRow(selectedId);
+	const { data: chunkData, isLoading } = useMapChunk(selectedSourceItem?.properties.chunkKey);
 
 	const popupItem = useMemo(() => {
-		if (!selectedId) return;
+		if (!selectedId || !selectedSourceItem) return;
 
-		const popupSource = chunkKey ? chunkQuery.data : inlinePopupData;
+		const { objective, precision, url } = selectedSourceItem.properties;
 
 		return {
-			...defaultPopupItem,
-			// The title comes from source data first, so a failed chunk fetch still shows a title-only popup
-			...(selectedSourceItem ? { title: selectedSourceItem.properties.title } : {}),
-			...popupSource?.find((item) => item.id === selectedId),
-			...(selectedSourceItem
-				? {
-						objective: selectedSourceItem.properties.objective,
-						popupCoordinates: getPopupCoordinates(selectedSourceItem),
-						precision: selectedSourceItem.properties.precision,
-					}
-				: {}),
+			title: getRowTitle(selectedSourceItem.properties),
+			...chunkData?.find((item) => item.id === selectedId),
 			id: selectedId,
+			objective,
+			popupCoordinates: getPopupCoordinates(selectedSourceItem),
+			precision,
+			url,
 		} satisfies MapPopupItemExtended;
-	}, [selectedId, chunkKey, inlinePopupData, chunkQuery.data, selectedSourceItem]);
+	}, [selectedId, chunkData, selectedSourceItem]);
 
 	return { isLoading, popupItem };
 }
 
-export function useMapImagePreload({
-	imageServerUrl,
-	isEnabled,
-}: {
-	imageServerUrl: string;
-	isEnabled: boolean;
-}) {
-	const hoveredId = useMapHoveredId();
-	const { data: inlinePopupData } = usePopupDataQuery();
+export function useMapImagePreload() {
+	const { imageServerUrl } = useMapConfig();
+	const { current: map } = useMap();
+	const hoveredId = useMapStore((state) => state.hoveredId);
+	const resolve = useClickResolver();
 	const { maxWidthPx } = useMapPopupLayout();
 
-	// Debounced so that sweeping across a dense area doesn't request a chunk for every point crossed
 	const debouncedHoveredId = useDebouncedValue(hoveredId, mapImagePreloadDelayMs);
 
-	const hoveredSourceItem = useSourceDataItem(debouncedHoveredId);
-	const hoverChunkKey = hoveredSourceItem?.properties.chunkKey;
-	const { data: hoverChunkData } = useChunkPopup(hoverChunkKey);
+	const hoveredSourceItem = useMapRow(debouncedHoveredId);
+	const { data: hoverChunkData } = useMapChunk(hoveredSourceItem?.properties.chunkKey);
 
 	const preloadedRef = useRef<Set<string>>(new Set());
 
 	useEffect(() => {
-		if (!isEnabled || !debouncedHoveredId || preloadedRef.current.has(debouncedHoveredId)) return;
+		if (!map || !debouncedHoveredId || preloadedRef.current.has(debouncedHoveredId)) return;
 
-		const srcSet = findPopupImageSrcSet(
-			hoverChunkKey ? hoverChunkData : inlinePopupData,
-			debouncedHoveredId,
+		const outcome = resolve(
+			{ isPick: false, kind: 'point', pointId: debouncedHoveredId },
+			map.getMap(),
 		);
+
+		if (outcome.kind !== 'popup') return;
+
+		const srcSet = findPopupImageSrcSet(hoverChunkData, debouncedHoveredId);
 
 		if (!srcSet) return;
 
@@ -169,15 +102,7 @@ export function useMapImagePreload({
 
 		preloadImage.sizes = getPopupImageSizes(maxWidthPx);
 		preloadImage.srcset = getPopupImageSrcSet(srcSet, imageServerUrl);
-	}, [
-		debouncedHoveredId,
-		hoverChunkKey,
-		inlinePopupData,
-		hoverChunkData,
-		imageServerUrl,
-		isEnabled,
-		maxWidthPx,
-	]);
+	}, [debouncedHoveredId, hoverChunkData, imageServerUrl, map, maxWidthPx, resolve]);
 }
 
 export function useMapPopupLayout() {

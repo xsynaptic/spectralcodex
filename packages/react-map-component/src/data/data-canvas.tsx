@@ -5,35 +5,22 @@ import { createContext, useContext, useDeferredValue, useMemo } from 'react';
 import type { MapCanvasData } from '#data/data-filter.ts';
 
 import { getHiddenTargetIds, getMapCanvasData } from '#data/data-filter.ts';
-import { useSourceDataQuery } from '#data/data-source.tsx';
-import {
-	useMapFeaturesRule,
-	useMapObjectiveFilter,
-	useMapRatingFilter,
-	useMapStatusFilter,
-} from '#store/store.ts';
-import { useMapView } from '#view/view.tsx';
+import { useMapRows } from '#data/data-query.ts';
+import { selectScope, selectTargetIds } from '#store/store-factory.ts';
+import { useMapStore } from '#store/store.tsx';
 
 const emptyItems = [] as const;
 
 const CanvasDataContext = createContext<MapCanvasData | undefined>(undefined);
 
-// Computed once and shared via context; multiple consumers would otherwise repeat the full filter pass
 export const CanvasDataProvider: FC<PropsWithChildren> = function CanvasDataProvider({ children }) {
-	const { data: sourceData } = useSourceDataQuery();
+	const { data: sourceData } = useMapRows();
+	const scopeRule = useMapStore(selectScope)?.rule;
+	const targetIds = useMapStore(selectTargetIds);
 
-	const status = useMapStatusFilter();
-	const rating = useMapRatingFilter();
-	const objective = useMapObjectiveFilter();
-	const mapFeaturesRule = useMapFeaturesRule();
-	const { scope, targetIds } = useMapView();
-	const scopeRule = scope?.rule;
+	const filter = useDeferredValue(useMapStore((state) => state.filter));
 
-	const filter = useDeferredValue(
-		useMemo(() => ({ objective, rating, status }), [objective, rating, status]),
-	);
-
-	// A string, so a new Target the filter does not hide leaves the collections and their clusters untouched
+	// Joined into a string so that a new Target the filter doesn't hide keeps the same clusters
 	const pinnedKey = useMemo(
 		() => getHiddenTargetIds(sourceData ?? emptyItems, targetIds, filter).join(' '),
 		[sourceData, targetIds, filter],
@@ -44,9 +31,9 @@ export const CanvasDataProvider: FC<PropsWithChildren> = function CanvasDataProv
 			getMapCanvasData(
 				sourceData ?? emptyItems,
 				pinnedKey ? { ...filter, pinnedIds: pinnedKey.split(' ') } : filter,
-				{ mapFeaturesRule, scopeRule },
+				scopeRule,
 			),
-		[sourceData, filter, scopeRule, mapFeaturesRule, pinnedKey],
+		[sourceData, filter, scopeRule, pinnedKey],
 	);
 
 	return <CanvasDataContext.Provider value={canvasData}>{children}</CanvasDataContext.Provider>;

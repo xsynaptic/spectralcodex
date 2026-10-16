@@ -1,6 +1,6 @@
 import type { MapSourceItem } from '@spectralcodex/map-codec';
 
-import { GeometryTypeEnum } from '@spectralcodex/shared/map';
+import { selectMapRows } from '@spectralcodex/map-codec';
 
 export interface TargetPoint {
 	coordinates: [number, number];
@@ -12,12 +12,10 @@ interface ScreenPoint {
 	y: number;
 }
 
-// A Point can sit up to four cluster radii from its cluster's centre, and the map draws at up to twice the clustered scale
 export function getClusterSearchRadius(clusterRadius: number) {
 	return clusterRadius * 4 * 2;
 }
 
-// Closest first, since the closest cluster is usually the one the Point is in
 export function getClusterCandidates<Cluster extends ScreenPoint>(
 	point: ScreenPoint,
 	clusters: ReadonlyArray<Cluster>,
@@ -37,60 +35,48 @@ export function getTargetPoints(
 	items: ReadonlyArray<MapSourceItem>,
 	targetIds: ReadonlyArray<string>,
 ): Array<TargetPoint> {
-	const targetIdSet = new Set(targetIds);
-	const points: Array<TargetPoint> = [];
-
-	for (const { geometry, properties } of items) {
-		if (geometry.type !== GeometryTypeEnum.Point || !targetIdSet.has(properties.id)) continue;
-
-		points.push({ coordinates: geometry.coordinates as [number, number], id: properties.id });
-	}
-
-	return points;
+	return selectMapRows(items, { ids: [...targetIds], type: 'ids' }).map(
+		({ geometry, properties }) => ({
+			coordinates: geometry.coordinates,
+			id: properties.id,
+		}),
+	);
 }
 
-export async function findTargetClusters<Cluster extends { id: number }>({
-	getLeafIds,
-	isCurrent,
-	leafIds,
-	pending,
-}: {
-	getLeafIds: (cluster: Cluster) => Promise<Set<unknown>>;
-	isCurrent: () => boolean;
-	leafIds: Map<number, Set<unknown>>;
-	pending: ReadonlyArray<{ candidates: ReadonlyArray<Cluster>; id: string }>;
-}): Promise<Array<Cluster>> {
+export async function findTargetClusters<Cluster extends { id: number }>(
+	pending: ReadonlyArray<{ candidates: ReadonlyArray<Cluster>; id: string }>,
+	getLeafIds: (cluster: Cluster) => Promise<Set<unknown>>,
+): Promise<Array<Cluster>> {
+	const leaves = new Map<number, Promise<Set<unknown>>>();
+
+	function getLeaves(cluster: Cluster) {
+		const known = leaves.get(cluster.id);
+
+		if (known) return known;
+
+		const asked = getLeafIds(cluster);
+
+		leaves.set(cluster.id, asked);
+
+		return asked;
+	}
+
+	const results = await Promise.allSettled(
+		pending.map(async ({ candidates, id }) => {
+			for (const cluster of candidates) {
+				const leafIds = await getLeaves(cluster);
+
+				if (leafIds.has(id)) return cluster;
+			}
+
+			return;
+		}),
+	);
+
 	const found = new Map<number, Cluster>();
-	let remaining = pending.map(({ candidates, id }) => ({ candidates: [...candidates], id }));
 
-	try {
-		while (remaining.length > 0 && isCurrent()) {
-			const round = new Map(
-				remaining
-					.flatMap(({ candidates }) => candidates.slice(0, 1))
-					.filter((cluster) => !leafIds.has(cluster.id))
-					.map((cluster) => [cluster.id, cluster]),
-			);
-
-			await Promise.all(
-				[...round.values()].map(async (cluster) => {
-					leafIds.set(cluster.id, await getLeafIds(cluster));
-				}),
-			);
-
-			remaining = remaining.filter(({ candidates, id }) => {
-				const cluster = candidates.shift();
-
-				if (!cluster) return false;
-				if (!leafIds.get(cluster.id)?.has(id)) return true;
-
-				found.set(cluster.id, cluster);
-
-				return false;
-			});
-		}
-	} catch {
-		// The clusters changed while we were asking; the caller's next refresh will try again
+	for (const result of results) {
+		if (result.status === 'fulfilled' && result.value) found.set(result.value.id, result.value);
 	}
 
 	return [...found.values()];

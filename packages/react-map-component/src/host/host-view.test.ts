@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { parseMapView } from '#view/view-factory.ts';
+import { parseMapView } from '#host/host-view.ts';
 
 describe('parseMapView', () => {
 	test('a page with no view yields an empty one', () => {
@@ -17,7 +17,7 @@ describe('parseMapView', () => {
 	test('a Region view carries a Scope with its rule, bounds and Division', () => {
 		const view = {
 			scope: {
-				apiDivisionUrl: '/api/divisions/tainan.fgb',
+				apiDivisionUrl: '/api/map/divisions/tainan.json',
 				bounds: [120, 22.8, 120.7, 23.5],
 				rule: { interval: [12, 48], type: 'region' },
 				title: 'Tainan',

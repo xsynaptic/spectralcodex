@@ -1,109 +1,108 @@
-import { describe, expect, test } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
-import {
-	getInitialViewState,
-	readSavedViewport,
-	writeSavedViewport,
-} from '#canvas/canvas-viewport.ts';
+import { getInitialViewState, writeSavedViewport } from '#canvas/canvas-viewport.ts';
 
 const minuteMs = 60 * 1000;
 const savedAt = 1_000_000;
 const viewport = { latitude: 23.5, longitude: 121, zoom: 9 };
+const bounds: [number, number, number, number] = [120, 22, 122, 25];
+const maxBounds: [number, number, number, number] = [118, 20, 124, 27];
 
-function createStorage(entries: Record<string, string> = {}) {
+function stubStorage(entries: Record<string, string> = {}) {
 	const items = new Map(Object.entries(entries));
 
-	return {
+	vi.stubGlobal('sessionStorage', {
 		getItem: (key: string) => items.get(key),
-		items,
 		setItem: (key: string, value: string) => {
 			items.set(key, value);
 		},
-	};
-}
-
-function createSavedStorage() {
-	const storage = createStorage();
-
-	writeSavedViewport('atlas', viewport, { now: () => savedAt, storage });
-
-	return storage;
-}
-
-const blockedStorage = {
-	getItem: () => {
-		throw new Error('blocked');
-	},
-	setItem: () => {
-		throw new Error('blocked');
-	},
-};
-
-describe('readSavedViewport', () => {
-	test('returns a viewport saved under the same map id', () => {
-		const storage = createSavedStorage();
-
-		expect(readSavedViewport('atlas', { now: () => savedAt + minuteMs, storage })).toEqual(
-			viewport,
-		);
-		expect(readSavedViewport('objectives', { now: () => savedAt, storage })).toBeUndefined();
 	});
 
-	test('keeps a viewport for two hours and no longer', () => {
-		const storage = createSavedStorage();
+	return items;
+}
 
-		expect(readSavedViewport('atlas', { now: () => savedAt + 120 * minuteMs, storage })).toEqual(
-			viewport,
-		);
-		expect(
-			readSavedViewport('atlas', { now: () => savedAt + 120 * minuteMs + 1, storage }),
-		).toBeUndefined();
+function stubBlockedStorage() {
+	vi.stubGlobal('sessionStorage', {
+		getItem: () => {
+			throw new Error('blocked');
+		},
+		setItem: () => {
+			throw new Error('blocked');
+		},
+	});
+}
+
+beforeEach(() => {
+	vi.useFakeTimers();
+	vi.setSystemTime(savedAt);
+});
+
+afterEach(() => {
+	vi.useRealTimers();
+	vi.unstubAllGlobals();
+});
+
+describe('getInitialViewState', () => {
+	test('prefers a viewport saved under the same map id, and keeps the limits', () => {
+		stubStorage();
+		writeSavedViewport('atlas', viewport);
+		vi.setSystemTime(savedAt + minuteMs);
+
+		expect(getInitialViewState({ bounds, mapId: 'atlas', maxBounds })).toEqual({
+			...viewport,
+			maxBounds,
+		});
+		expect(getInitialViewState({ bounds, mapId: 'objectives' })).toMatchObject({ bounds });
+	});
+
+	test('keeps a saved viewport for two hours and no longer', () => {
+		stubStorage();
+		writeSavedViewport('atlas', viewport);
+
+		vi.setSystemTime(savedAt + 120 * minuteMs);
+		expect(getInitialViewState({ bounds, mapId: 'atlas' })).toMatchObject(viewport);
+
+		vi.setSystemTime(savedAt + 120 * minuteMs + 1);
+		expect(getInitialViewState({ bounds, mapId: 'atlas' })).toMatchObject({ bounds });
 	});
 
 	test('drops an entry that is not a saved viewport', () => {
-		const [key] = createSavedStorage().items.keys();
+		const items = stubStorage();
 
-		if (!key) throw new Error('Nothing was saved');
+		writeSavedViewport('atlas', viewport);
+
+		const [key = ''] = items.keys();
 
 		for (const value of ['{', '"text"', JSON.stringify({ ...viewport, timestamp: 'now' })]) {
-			const storage = createStorage({ [key]: value });
+			stubStorage({ [key]: value });
 
-			expect(readSavedViewport('atlas', { now: () => savedAt, storage })).toBeUndefined();
+			expect(getInitialViewState({ bounds, mapId: 'atlas' })).toMatchObject({ bounds });
 		}
 	});
 
+	test('falls back to bounds, then to the center, when storage throws', () => {
+		stubBlockedStorage();
+
+		expect(getInitialViewState({ bounds, mapId: 'atlas' })).toMatchObject({ bounds });
+		expect(getInitialViewState({ center: [121, 23.5], mapId: 'atlas' })).toMatchObject({
+			latitude: 23.5,
+			longitude: 121,
+		});
+	});
+
 	test('reads nothing without a map id', () => {
-		expect(readSavedViewport(undefined, { storage: blockedStorage })).toBeUndefined();
+		stubBlockedStorage();
+
+		expect(getInitialViewState({ bounds })).toMatchObject({ bounds });
 	});
 });
 
 describe('writeSavedViewport', () => {
 	test('ignores storage that throws', () => {
+		stubBlockedStorage();
+
 		expect(() => {
-			writeSavedViewport('atlas', viewport, { storage: blockedStorage });
+			writeSavedViewport('atlas', viewport);
 		}).not.toThrow();
-	});
-});
-
-describe('getInitialViewState', () => {
-	const bounds: [number, number, number, number] = [120, 22, 122, 25];
-	const maxBounds: [number, number, number, number] = [118, 20, 124, 27];
-
-	test('prefers a saved viewport over bounds, and keeps the limits', () => {
-		const storage = createSavedStorage();
-
-		expect(
-			getInitialViewState({ bounds, mapId: 'atlas', maxBounds }, { now: () => savedAt, storage }),
-		).toEqual({ ...viewport, maxBounds });
-	});
-
-	test('falls back to bounds, then to the centre, when storage throws', () => {
-		const store = { storage: blockedStorage };
-
-		expect(getInitialViewState({ bounds, mapId: 'atlas' }, store)).toMatchObject({ bounds });
-		expect(getInitialViewState({ center: [121, 23.5], mapId: 'atlas' }, store)).toMatchObject({
-			latitude: 23.5,
-			longitude: 121,
-		});
 	});
 });
