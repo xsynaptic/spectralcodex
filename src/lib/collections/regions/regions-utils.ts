@@ -90,6 +90,7 @@ export async function createQueryRegionsRelatedFunction() {
 	};
 }
 
+// References are not the complete entry; they still need to be fetched from the collection
 export async function createRegionAncestorsByIdFunction() {
 	const { entriesMap } = await getRegionsCollection();
 	const getRegionAncestors = await createRegionAncestorsFunction();

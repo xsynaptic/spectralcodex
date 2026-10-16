@@ -1,5 +1,6 @@
 const keyStepRem = 2;
 
+// The same lengths atlas.css clamps `--atlas-pane-width` between, which covers restore and viewport resizes
 export interface AtlasPaneLimits {
 	mapMin: number;
 	paneMin: number;
@@ -17,6 +18,7 @@ export function clampPaneWidth(width: number, limits: AtlasPaneLimits) {
 	return Math.min(Math.max(width, min), max);
 }
 
+// The divider is the pane's left edge, so moving it left widens the pane
 export function getPaneWidthForKey(key: string, width: number, limits: AtlasPaneLimits) {
 	const { max, min } = getPaneWidthRange(limits);
 	const step = keyStepRem * limits.rootFontSize;

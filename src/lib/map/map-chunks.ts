@@ -1,5 +1,6 @@
 const chunkBytesLimitKb = 150 * 1024;
 
+// Hilbert grid side is 2**ORDER; order 16 resolves the globe to ~600m at the equator, ample for packing
 const hilbertOrder = 16;
 const hilbertSide = 2 ** hilbertOrder;
 
@@ -71,6 +72,7 @@ function clampCell(value: number, min: number, span: number): number {
 	return raw;
 }
 
+// Standard xy2d: fold grid coords into a distance along the Hilbert curve
 function hilbertIndex(gridX: number, gridY: number): number {
 	let x = gridX;
 	let y = gridY;

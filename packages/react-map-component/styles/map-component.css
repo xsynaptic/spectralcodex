@@ -43,6 +43,7 @@
 	--map-popup-surface: light-dark(var(--map-color-neutral-50), var(--map-color-neutral-900));
 }
 
+/* Wire color-scheme from the mode attribute so light-dark() resolves standalone, without a host color-scheme */
 [data-map-root] {
 	color-scheme: light;
 }
@@ -51,11 +52,13 @@
 	color-scheme: dark;
 }
 
+/* Mirrors the host's global focus ring so the map stands alone */
 [data-map-root] :focus-visible {
 	outline: 2px solid light-dark(var(--map-color-accent-500), var(--map-color-accent-400));
 	outline-offset: 2px;
 }
 
+/* The canvas fills a clipped frame, so an outset ring would be cut off */
 [data-map-root] .maplibregl-canvas:focus-visible {
 	outline-offset: -2px;
 }
@@ -889,7 +892,7 @@ button.maplibregl-popup-close-button {
 	clip-path: inset(50%);
 }
 
-/* Adapted from Daisy UI */
+/* Adapted from Daisy UI; mask supplied by the host via --map-loading-mask */
 .map-loading-animation {
 	display: inline-block;
 	aspect-ratio: 1/1;

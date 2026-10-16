@@ -20,6 +20,7 @@ import { useIsDarkMode } from '#lib/dark-mode.ts';
 import { MapLayerIdEnum, MapSourceIdEnum, pointClusterRadius } from '#source/source-config.ts';
 import { getClustersLabelLayerStyle } from '#source/source-hover.tsx';
 
+// Hover/select visuals read feature-state (set imperatively) so these paint specs never rebuild per interaction
 const hoverStateExpression = [
 	'boolean',
 	['feature-state', 'hover'],
@@ -88,6 +89,7 @@ function getClustersLayerStyle(isDarkMode: boolean) {
 	} satisfies CircleLayerSpecification;
 }
 
+// Inner dot marking points with a featured image; every radius is 3/8 of its Points layer counterpart
 function getPointsImageLayerStyle() {
 	return {
 		filter: [
@@ -158,6 +160,8 @@ function getPointsLayerStyle(isDarkMode: boolean) {
 	} satisfies CircleLayerSpecification;
 }
 
+// Visually obscured tap targets for all visible points; this makes the mobile experience better
+// Note: this has to be instantiated first to be underneath the main point
 function getPointsTargetLayerStyle(isDarkMode: boolean) {
 	return {
 		filter: ['!', ['has', 'point_count']],

@@ -3,6 +3,7 @@
 	--spacing-content: 60.25rem;
 }
 
+/* Image shadow and caption sizes; caption min heights spread the gradient behind the text */
 @theme {
 	--spacing-image-shadow-sm: 15vh;
 	--spacing-image-shadow-md: 20vh;
@@ -76,6 +77,7 @@
 	--color-alternate-950: #172e05;
 }
 
+/* Stacking order; image chrome sits under the header so the site chrome overlaps a hero */
 @theme {
 	--z-index-image: 10;
 	--z-index-image-shadow: 11;

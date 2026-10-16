@@ -76,6 +76,7 @@ function getPreviewLink(page: Page) {
 	return page.locator(`${atlasPaneSelector} main .card-preview a[href]`).first();
 }
 
+// A rebuilt map would get a new canvas without this flag
 async function keepCanvas(canvas: Locator) {
 	await canvas.evaluate((element) => {
 		Object.assign(element, { isKept: true });

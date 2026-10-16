@@ -135,6 +135,7 @@ async function didProcessRegion({
 	return true;
 }
 
+// A single Overture query serves every region sharing a selection bbox
 function groupNeedsBySelectionBBox(
 	processingNeeds: Array<RegionProcessingNeeds>,
 	regionsById: Map<string, RegionMetadata>,

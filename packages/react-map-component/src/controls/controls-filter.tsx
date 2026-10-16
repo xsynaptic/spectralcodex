@@ -16,6 +16,7 @@ import { useTrackMap } from '#lib/track-hook.ts';
 import { hasActiveFilter } from '#store/store-factory.ts';
 import { useMapStore, useMapStoreApi } from '#store/store.tsx';
 
+// Bilingual secondary labels; kept local pending the deferred map-portability work
 const chineseShowHideLabels = {
 	hideAll: '隱藏全部',
 	showAll: '顯示全部',

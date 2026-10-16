@@ -22,6 +22,7 @@ export const atlasFromAttribute = 'data-atlas-from';
 
 export const atlasPage = { map: 'map', pane: 'pane' } as const;
 
+// Requested pane width in pixels; atlas.css clamps it into `--atlas-pane-width`
 export const atlasPaneSizeProperty = '--atlas-pane-size';
 
 export const atlasPaneMinProperty = '--atlas-pane-min';

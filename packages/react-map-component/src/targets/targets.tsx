@@ -31,6 +31,7 @@ interface MapFitView {
 	targetIds: Array<string>;
 }
 
+// Pan distance to a position, in map widths at the current zoom
 function getScreensTo(map: MapRef, center: LngLatLike) {
 	const from = map.project(map.getCenter());
 	const to = map.project(center);

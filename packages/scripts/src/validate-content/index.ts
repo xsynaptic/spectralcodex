@@ -142,4 +142,5 @@ for (const validation of selected) {
 	if (result.status === 'fail') hasFailure = true;
 }
 
+// Subcommands are for inspection; only a full run gates deployment
 if (!command && hasFailure) process.exit(1);

@@ -164,6 +164,7 @@ export async function queryLocationsIndex() {
 	);
 }
 
+// Some entries in Taiwan also have Japanese titles; we'd like to display this as well
 function getLangCodeAdditional(regionPrimary: CollectionEntry<'regions'> | undefined) {
 	const isTaiwan =
 		regionPrimary?.id === 'taiwan' || regionPrimary?.data._ancestors?.includes('taiwan');
@@ -171,6 +172,7 @@ function getLangCodeAdditional(regionPrimary: CollectionEntry<'regions'> | undef
 	return isTaiwan ? { langCodeAdditional: LanguageCodeEnum.Japanese } : {};
 }
 
+// Dense areas keep the minimum radius, remote ones widen toward the maximum
 function getLocationNearbyRadius(nearby: Array<LocationsNearbyItem> | undefined): number {
 	if (!nearby || nearby.length === 0) return locationNearbyRadiusKmMin;
 

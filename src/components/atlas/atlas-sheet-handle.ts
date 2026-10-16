@@ -99,6 +99,7 @@ class AtlasSheetHandle extends HTMLElement {
 		if (isKeyboard) this.#moveTo(getTapRest());
 	};
 
+	// Chromium hit-tests a moving press again and drags the link now under it, which cancels the pointer
 	#handleDragStart = (event: DragEvent) => {
 		if (this.#pointerId !== undefined) event.preventDefault();
 	};

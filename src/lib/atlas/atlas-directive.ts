@@ -5,6 +5,7 @@ import { trackMap } from '@spectralcodex/react-map-component/track';
 import { atlasFlagAttribute, atlasPageAttribute } from '#lib/atlas/atlas-constants.ts';
 import { isAtlasMapShown, readAtlasFlags } from '#lib/atlas/atlas-layout-factory.ts';
 
+// Serialized into the `client:atlas` value; a directive takes one string
 export interface AtlasDirectiveOptions {
 	css: string;
 }
@@ -12,6 +13,7 @@ export interface AtlasDirectiveOptions {
 // Astro reruns a directive whenever a persisted island reconnects, which happens on every swap
 const startedIslands = new WeakSet<HTMLElement>();
 
+// Keeps MapLibre from loading before the mode is on, or under a hidden shell
 const atlasDirective: ClientDirective = (load, options, element) => {
 	if (startedIslands.has(element)) return;
 

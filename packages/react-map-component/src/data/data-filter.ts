@@ -42,6 +42,7 @@ function isLocationVisible(
 	return properties.objective === undefined || properties.objective >= filter.objective;
 }
 
+// A Target is the subject of its page, so a filter never hides it; these are the ones to pin
 export function getHiddenTargetIds(
 	items: ReadonlyArray<MapSourceItem>,
 	targetIds: ReadonlyArray<string>,

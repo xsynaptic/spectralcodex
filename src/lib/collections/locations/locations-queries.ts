@@ -6,6 +6,7 @@ import { getLocationsCollection } from '#lib/collections/locations/locations-dat
 import { sortLocationsByLatitude } from '#lib/collections/locations/locations-geometry.ts';
 import { createRegionsByIdsFunction } from '#lib/collections/regions/regions-data.ts';
 
+// TODO: these should eventually be handled via user authentication and/or a database
 export async function getObjectiveLocations() {
 	const { entries } = await getLocationsCollection();
 

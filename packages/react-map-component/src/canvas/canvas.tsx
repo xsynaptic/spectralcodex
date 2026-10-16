@@ -61,6 +61,7 @@ const MapRootMarker: FC = function MapRootMarker() {
 	return;
 };
 
+// Style diffing stays off; the diff throws away our sources anyway and loses the selection
 const MapCanvasContainer: FC = function MapCanvasContainer() {
 	const {
 		baseMapTheme,

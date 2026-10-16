@@ -3,6 +3,7 @@
 	@apply mx-auto max-w-content px-4 md:px-8;
 }
 
+/* Drops the base padding so content reaches the viewport edge on mobile */
 @utility content-column-fill {
 	@apply mx-auto max-w-content sm:px-4 md:px-8;
 }

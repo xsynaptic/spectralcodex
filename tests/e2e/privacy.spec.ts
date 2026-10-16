@@ -8,6 +8,7 @@ import { contentManifestPath, isDev } from '#e2e/constants.ts';
 
 test.skip(isDev, 'content policy is off in dev');
 
+// Failure messages carry counts, never paths; a real ID in a report is itself a leak
 const mapManifestPath = '/api/map/map-manifest.json';
 const feedPaths = ['/sitemap-0.xml', contentManifestPath, '/rss.xml'];
 
@@ -26,6 +27,7 @@ async function readSensitiveLocations() {
 	};
 }
 
+// Root-level paths only, so a Region or Theme sharing a slug is not mistaken for the Location
 function getRootPaths(body: string) {
 	const pattern = /(?:["'>\s]|https?:\/\/[^/"'<>\s]+)(\/[^/"'<>\s\\?#]+\/)(?=["'<\s\\?#])/g;
 

@@ -6,6 +6,7 @@ import { useMap } from 'react-map-gl/maplibre';
 import { MapSourceIdEnum } from '#source/source-config.ts';
 import { useMapStore } from '#store/store.tsx';
 
+// Mirror selectedId into feature-state so the paint layers read ['feature-state', 'select']
 export const MapSelectionFeatureState: FC = function MapSelectionFeatureState() {
 	const { current: map } = useMap();
 	const selectedId = useMapStore((state) => state.selectedId);

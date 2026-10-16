@@ -15,6 +15,7 @@ function makeItem(id: string, [lng, lat]: [number, number], popupBytes = 10): Ch
 	return { id, lat, lng, popupBytes };
 }
 
+// Spread-out point set whose ids are permuted by seed, so different seeds feed the same items in a different input order
 function makeSeededItems(seed: number): Array<ChunkInputItem> {
 	return Array.from({ length: 30 }, (_, index) => {
 		const id = `q${String((index * 7 + seed) % 30)}`;
@@ -22,6 +23,7 @@ function makeSeededItems(seed: number): Array<ChunkInputItem> {
 	});
 }
 
+// Mirror of the packer's byte accounting: brackets + items + comma separators
 function payloadBytes(items: Array<ChunkInputItem>): number {
 	const sum = items.reduce((total, item) => total + item.popupBytes, 0);
 	return 2 + sum + Math.max(0, items.length - 1);

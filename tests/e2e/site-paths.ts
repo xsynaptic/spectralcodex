@@ -23,6 +23,7 @@ interface ProbeOptions {
 
 const probeLimit = 8;
 
+// A hero carousel alone carries several images, so a lone hero never clears this
 const entryImageMinimum = 3;
 
 let discovered: Promise<SitePaths> | undefined;
@@ -59,6 +60,7 @@ async function discover(request: APIRequestContext): Promise<SitePaths> {
 	};
 }
 
+// Both collections' detail routes sit at the root, so the JSON-LD type is what tells them apart
 function isLocation(html: string): boolean {
 	return html.includes('"@type":"Place"') && html.includes('component-export="ReactMapComponent"');
 }

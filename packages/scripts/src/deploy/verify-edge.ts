@@ -164,6 +164,7 @@ function getExpectations(token: string): Array<EdgeExpectation> {
 	];
 }
 
+// The image host is another origin with its own cache policy, so this checks only that a signed URL still resolves
 async function getLiveImageFailures(html: string, siteUrl: string) {
 	const srcset = /<img\b[^>]*\bfetchpriority="high"[^>]*\bsrcset="([^"]+)"/.exec(html)?.[1];
 	const candidate = srcset?.trim().split(/\s+/, 1)[0];

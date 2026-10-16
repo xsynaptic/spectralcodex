@@ -27,6 +27,7 @@ import { getDescriptionRendered } from '#lib/utils/description-data.ts';
 import { getDescription } from '#lib/utils/description.ts';
 import { getContentPath } from '#lib/utils/routing.ts';
 
+// Popup thumbnails are stored as signed paths; the popup prepends the image server URL at render time
 const getSignedImagePath = createSignedImagePathFunction({
 	imageFormat: imageLowQualityFormat,
 	imageQuality: imageLowQualityValue,

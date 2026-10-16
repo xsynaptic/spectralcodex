@@ -36,6 +36,7 @@
 	display: none;
 }
 
+/* Width is the gap between the current pane edge and the dragged one, whichever way the drag went */
 .atlas-divider-preview {
 	--atlas-preview-ink: light-dark(
 		color-mix(in srgb, var(--color-primary-900) 20%, transparent),

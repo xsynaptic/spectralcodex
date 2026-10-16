@@ -8,6 +8,7 @@ import path from 'node:path';
 
 import { safelyCreateDirectory } from '#shared/utils.ts';
 
+// RFC 7946 recommends six decimal places, about 11 cm
 const coordinatePrecision = 6;
 
 export async function saveFlatgeobuf(

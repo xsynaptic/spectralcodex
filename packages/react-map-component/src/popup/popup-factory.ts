@@ -23,6 +23,7 @@ export function getPopupImageSizes(maxWidthPx: number): string {
 	return `${String(maxWidthPx)}px`;
 }
 
+// The first srcSet candidate is the smallest one
 export function getPopupImageSrc(srcSet: string, imageServerUrl: string): string {
 	return `${imageServerUrl}${srcSet.split(', ', 1)[0]?.split(' ', 1)[0] ?? srcSet}`;
 }

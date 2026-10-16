@@ -4,6 +4,7 @@ import { describe, expect, test } from 'vitest';
 import { validateLocationsCoordinates } from '#validate-content/locations-coordinates.ts';
 import { makeEntry, makeRegionRefs } from '#validate-content/validate-test-utils.ts';
 
+// Real Taipei boundary, copied from the map-divisions output
 const divisionsPath = path.join(import.meta.dirname, 'fixtures');
 
 const taipeiCoordinates: [number, number] = [121.5654, 25.033];

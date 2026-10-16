@@ -12,6 +12,7 @@ interface ScreenPoint {
 	y: number;
 }
 
+// A Point can sit up to four cluster radii from its cluster's centre, and the map draws at up to twice the clustered scale
 export function getClusterSearchRadius(clusterRadius: number) {
 	return clusterRadius * 4 * 2;
 }
