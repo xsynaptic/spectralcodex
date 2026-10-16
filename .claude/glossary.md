@@ -10,7 +10,7 @@ This file is a glossary of terms commonly used in this project.
 
 **Collection**: A named set of Entries sharing one schema (e.g. Locations, Posts, Pages, etc.). _Avoid_: content type, model.
 
-**Location**: A specific real-world place with coordinates, a category, and a condition. The central noun of the project; almost everything else exists to describe, group, or connect Locations. _Avoid_: place, site, POI, marker, pin.
+**Location**: A specific real-world place with coordinates and a category. The central noun of the project; almost everything else exists to describe, group, or connect Locations. _Avoid_: place, site, POI, marker, pin.
 
 **Post**: An article about one or more Locations, a journey, or a subject. Length and ambition vary freely, from a short observation to a full photo essay; there is no separate short-form collection. _Avoid_: article, blog post, story, note.
 
@@ -82,7 +82,7 @@ Map Scope, Map Filter, Map Target and Map View keep the prefix everywhere outsid
 
 **Feature**: One mappable unit as it appears on a map, carrying its Geometry and a trimmed set of display properties. A Feature is derived from a Point, not from a Location: a Location with several Points yields one Feature per Point. _Avoid_: marker, pin, item.
 
-**Map Directory**: The single global dataset of every mappable Feature, shared by every map on the site. _Avoid_: index (index means a numeric position or a listing route), catalog (Catalog is content-side), dataset, registry.
+**Map Directory**: The dataset a map selects its Features from. _Avoid_: index (index means a numeric position or a listing route), catalog (Catalog is content-side), registry.
 
 **Map Features**: The Features a map holds, selected from the Map Directory. The selection is made at build time and does not change in the browser.
 
@@ -126,9 +126,11 @@ Map Scope, Map Filter, Map Target and Map View keep the prefix everywhere outsid
 
 **Former ID**: A previous identifier for an Entry, retained so old URLs keep resolving after a rename. _Avoid_: alias, slug history, redirect.
 
-**Override**: An alternative title, identifier, or Region set published in place of the real ones for a sensitive Location, so it can be written about without being findable. _Avoid_: alias, mask, pseudonym.
+**Override**: An alternative title, identifier, description, or Region set published in place of the real ones for a Location whose Geometry is hidden, so it can be written about without being findable. _Avoid_: alias, mask, pseudonym.
 
-**Content Policy**: The rule that sensitive Locations are obfuscated in published output: Overrides stand in for the real title, identifier, and Regions, and hidden Locations are dropped from maps, catalogs, and structured data. _Avoid_: privacy mode, redaction, censorship, feature flag.
+**Content Policy**: The rules deciding what published output reveals of a Location. An Unlisted Location stays out of listings; a Location whose Geometry is hidden (`hideGeometry`) stays off maps, loses its coordinates and structured data, and may publish under Overrides. _Avoid_: privacy mode, redaction, censorship, feature flag.
+
+**Unlisted Location**: A Location kept out of listings (`hideFromLists`) while its page, map Feature and search result remain. _Avoid_: hidden Location (hidden means its Geometry), private, draft.
 
 ### Interface
 

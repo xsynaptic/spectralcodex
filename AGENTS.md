@@ -17,7 +17,7 @@ Scripts live in `package.json`. Only the ones with a catch are worth stating her
 
 ## Project conventions
 
-- **Images are referenced by URL, never imported** (Vite/Rolldown runs out of memory on the large library). They are URL-signed at build time and transformed on-demand by imagor behind nginx (stack in `deploy/docker-compose.yml`, also runs under `pnpm dev`). App-side wrapper: `src/lib/image/image-server.ts`. OG images use Sharp directly, not other image libraries.
+- **Images are referenced by URL, never imported** (Vite/Rolldown runs out of memory on the large library); they are signed at build time and transformed on demand by imagor.
 - **Build-time validation is load-bearing**: internal IDs (locations, regions, themes, series), geospatial placement, and Zod schemas are checked during the build, so a bad reference fails loudly rather than shipping.
 - **Collections have two read paths** (`src/lib/utils/collections.ts`): enriched wrappers from `createCollectionData` (stamp computed `_` fields onto `entry.data`), and `getRawCollection` for cross-collection assembly that must dodge circular init. Raw reads see pristine frontmatter only, never computed `_` fields. A lint rule forbids bare `getCollection` under `src/lib/collections/**`.
 - Dynamic route files must be lowercase: `[...id].astro`, not `[...ID].astro`.
