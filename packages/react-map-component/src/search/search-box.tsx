@@ -1,4 +1,4 @@
-import type { FC, KeyboardEvent, RefObject } from 'react';
+import type { FC, KeyboardEvent, ReactNode, RefObject } from 'react';
 
 import { useEffect, useId, useRef, useState } from 'react';
 
@@ -6,7 +6,7 @@ import type { MapSearchResult, MapSearchText } from '#search/search-factory.ts';
 import type { MapMessages, MapOverlayClose } from '#types.ts';
 
 import { useMapConfig } from '#lib/config.tsx';
-import { MapControlIcon, MapIconArrowBack } from '#lib/icons.tsx';
+import { MapControlIcon, MapIconClose, MapIconSearch } from '#lib/icons.tsx';
 import { useMapSearch } from '#search/search-hooks.ts';
 
 const searchGapPx = 10;
@@ -20,26 +20,27 @@ const kindMessageKey = {
 	theme: 'searchKindTheme',
 } as const satisfies Record<MapSearchResult['kind'], keyof MapMessages>;
 
-const MapSearchHighlight: FC<{ text: MapSearchText }> = function MapSearchHighlight({
-	text: { ranges = [], text },
-}) {
-	const parts = [];
-	let cursor = 0;
+const MapSearchHighlight: FC<{ parenthesis?: boolean; text: MapSearchText }> =
+	function MapSearchHighlight({ parenthesis = false, text: { ranges = [], text } }) {
+		const parts: Array<ReactNode> = parenthesis ? ['('] : [];
+		let cursor = 0;
 
-	for (const [start, end] of ranges) {
-		parts.push(
-			text.slice(cursor, start),
-			<mark className="map-search-match" key={start}>
-				{text.slice(start, end)}
-			</mark>,
-		);
-		cursor = end;
-	}
+		for (const [start, end] of ranges) {
+			parts.push(
+				text.slice(cursor, start),
+				<mark className="map-search-match" key={start}>
+					{text.slice(start, end)}
+				</mark>,
+			);
+			cursor = end;
+		}
 
-	parts.push(text.slice(cursor));
+		parts.push(text.slice(cursor));
 
-	return parts;
-};
+		if (parenthesis) parts.push(')');
+
+		return parts;
+	};
 
 const MapSearchOption: FC<{
 	id: string;
@@ -68,7 +69,7 @@ const MapSearchOption: FC<{
 					{result.titleMultilingual ? (
 						<span className="map-search-title-multilingual">
 							{' '}
-							<MapSearchHighlight text={result.titleMultilingual} />
+							<MapSearchHighlight parenthesis={true} text={result.titleMultilingual} />
 						</span>
 					) : undefined}
 				</span>
@@ -181,7 +182,7 @@ function useSearchKeys({
 	return { activeIndex, activeResult, handleKeyDown, setActiveIndex };
 }
 
-const MapSearchBack: FC<{ onClose: (how: MapOverlayClose) => void }> = function MapSearchBack({
+const MapSearchClose: FC<{ onClose: (how: MapOverlayClose) => void }> = function MapSearchClose({
 	onClose,
 }) {
 	const { messages } = useMapConfig();
@@ -189,7 +190,7 @@ const MapSearchBack: FC<{ onClose: (how: MapOverlayClose) => void }> = function 
 	return (
 		<button
 			aria-label={messages.searchCloseAriaLabel}
-			className="map-scope-button map-search-back"
+			className="map-scope-button map-search-close"
 			onClick={(event) => {
 				onClose(event.detail === 0 ? 'keyboard' : 'pointer');
 			}}
@@ -197,7 +198,7 @@ const MapSearchBack: FC<{ onClose: (how: MapOverlayClose) => void }> = function 
 			type="button"
 		>
 			<MapControlIcon>
-				<MapIconArrowBack />
+				<MapIconClose />
 			</MapControlIcon>
 		</button>
 	);
@@ -256,7 +257,11 @@ export const MapSearchBox: FC<{
 	return (
 		<div className="map-search" ref={ref}>
 			<div className="map-search-field">
-				<MapSearchBack onClose={onClose} />
+				<span className="map-search-icon">
+					<MapControlIcon>
+						<MapIconSearch />
+					</MapControlIcon>
+				</span>
 				<input
 					aria-activedescendant={activeResult ? getOptionId(activeResult) : undefined}
 					aria-autocomplete="list"
@@ -277,6 +282,7 @@ export const MapSearchBox: FC<{
 					type="text"
 					value={query}
 				/>
+				<MapSearchClose onClose={onClose} />
 			</div>
 			<ul
 				aria-label={messages.searchListAriaLabel}

@@ -589,16 +589,12 @@ button.maplibregl-popup-close-button {
 
 .map-scope-toggle,
 .map-scope-search,
-.map-search-back {
+.map-search-close {
 	display: flex;
 	flex-shrink: 0;
 	align-items: center;
 	justify-content: center;
 	width: 29px;
-}
-
-.map-scope-toggle,
-.map-scope-search {
 	border-inline-start: 1px solid var(--map-color-neutral-300);
 }
 
@@ -606,14 +602,18 @@ button.maplibregl-popup-close-button {
 	border-radius: 0;
 }
 
-.map-scope-search {
+.map-scope-search,
+.map-search-close {
 	border-start-start-radius: 0;
 	border-end-start-radius: 0;
 }
 
-.map-search-back {
-	border-start-end-radius: 0;
-	border-end-end-radius: 0;
+/* Matches the prompt's inset so the icon holds still as the bar opens */
+.map-search-icon {
+	display: flex;
+	flex-shrink: 0;
+	align-items: center;
+	padding-inline: 4.5px 0.25rem;
 }
 
 .map-scope-prompt {
@@ -660,8 +660,8 @@ button.maplibregl-popup-close-button {
 		opacity: 1;
 	}
 
-	/* iOS zooms the page into any input set under 16px */
-	@media (pointer: coarse) {
+	/* iOS zooms the page into any input set under 16px; `-webkit-touch-callout` matches WebKit on iOS alone */
+	@supports (-webkit-touch-callout: none) {
 		font-size: 16px;
 	}
 }
