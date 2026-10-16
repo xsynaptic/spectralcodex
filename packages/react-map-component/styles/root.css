@@ -1,0 +1,24 @@
+/* Wire color-scheme from the mode attribute so light-dark() resolves standalone, without a host color-scheme */
+[data-map-root] {
+	font-family: var(--map-font-sans);
+	color-scheme: light;
+}
+
+[data-map-root][data-map-mode='dark'] {
+	color-scheme: dark;
+}
+
+/* Mirrors the host's global focus ring so the map stands alone */
+[data-map-root] :focus-visible {
+	outline: 2px solid var(--map-accent);
+	outline-offset: 2px;
+}
+
+/* The canvas fills a clipped frame, so an outset ring would be cut off */
+[data-map-root] .maplibregl-canvas:focus-visible {
+	outline-offset: -2px;
+}
+
+.maplibregl-map {
+	container: map / size;
+}

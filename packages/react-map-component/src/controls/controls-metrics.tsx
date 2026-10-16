@@ -20,13 +20,13 @@ export const MetricsControl: FC<{
 	return (
 		<CustomControlPortal className="maplibregl-ctrl" position={position}>
 			{isSourceDataLoading ? (
-				<div className="maplibregl-ctrl-metrics-loading">
+				<div className="map-ctrl-metrics-loading">
 					<div className="map-loading-animation" />
 				</div>
 			) : (
 				<div className={mapControlClassName.metrics} role="status">
 					<span>{getNumberFormat('en', undefined).format(filteredCount)}</span>
-					<span className="maplibregl-ctrl-metrics-divider">/</span>
+					<span className="map-ctrl-metrics-divider">/</span>
 					<span>
 						{getNumberFormat('en', undefined).format(totalCount)}{' '}
 						{totalCount === 1 ? messages.point : messages.points}

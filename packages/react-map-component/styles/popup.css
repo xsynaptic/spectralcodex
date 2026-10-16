@@ -1,0 +1,233 @@
+.maplibregl-popup {
+	z-index: var(--map-z-popup);
+}
+
+.maplibregl-popup-content {
+	padding: 0;
+	overflow: auto;
+	color: var(--map-text);
+	background-color: var(--map-surface);
+	border-radius: var(--map-radius-sm);
+	box-shadow: var(--map-elevation);
+}
+
+.maplibregl-popup-close-button {
+	width: 20px;
+	font-size: 16px;
+	color: #fff;
+	border-bottom-left-radius: 3px;
+	mix-blend-mode: difference;
+
+	.map-popup-narrow & {
+		width: 25px;
+		height: 25px;
+		font-size: 18px;
+	}
+}
+
+.maplibregl-popup-anchor-left .maplibregl-popup-tip {
+	border-right-color: var(--map-surface);
+}
+
+.maplibregl-popup-anchor-right .maplibregl-popup-tip {
+	border-left-color: var(--map-surface);
+}
+
+.maplibregl-popup-anchor-top .maplibregl-popup-tip {
+	border-bottom-color: var(--map-surface);
+}
+
+.maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
+	border-top-color: var(--map-surface);
+}
+
+.maplibregl-popup-anchor-top-left .maplibregl-popup-content {
+	border-top-left-radius: 0;
+}
+
+.maplibregl-popup-anchor-top-right .maplibregl-popup-content {
+	border-top-right-radius: 0;
+}
+
+.maplibregl-popup-anchor-bottom-left .maplibregl-popup-content {
+	border-bottom-left-radius: 0;
+}
+
+.maplibregl-popup-anchor-bottom-right .maplibregl-popup-content {
+	border-bottom-right-radius: 0;
+}
+
+.map-popup-frame {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	min-width: 200px;
+	min-height: 80px;
+}
+
+.map-popup-loading {
+	position: absolute;
+	display: flex;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+	padding: 1rem;
+	pointer-events: none;
+}
+
+.map-popup-image {
+	width: 100%;
+	aspect-ratio: 3/2;
+	user-select: none;
+	object-fit: cover;
+	background-color: var(--map-surface-active);
+	background-image: var(--map-image-fallback);
+	background-repeat: repeat;
+}
+
+[data-map-mode='dark'] .map-popup-image {
+	background-image: var(--map-image-fallback-dark);
+	background-repeat: repeat;
+}
+
+.map-popup-body {
+	display: flex;
+	flex-direction: column;
+	padding: 0.25rem 0.5rem 0.5rem;
+}
+
+.map-popup-title-alt {
+	font-size: 0.875rem;
+	font-weight: 500;
+	line-height: 1.375;
+	color: transparent;
+	background-image: linear-gradient(
+		to bottom,
+		light-dark(var(--map-color-accent-500), var(--map-color-accent-400)),
+		light-dark(var(--map-color-accent-600), var(--map-color-accent-500))
+	);
+	background-repeat: no-repeat;
+	background-clip: text;
+}
+
+.map-popup-title {
+	padding-bottom: 0.25rem;
+	font-size: 1rem;
+	font-weight: 600;
+	line-height: 1.375;
+	color: var(--map-text);
+	border-bottom: 1px solid var(--map-divider);
+
+	& a {
+		color: inherit;
+	}
+}
+
+.map-popup-precision {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.25rem;
+	align-items: center;
+	margin-top: 0.25rem;
+	font-size: 0.75rem;
+	line-height: 1rem;
+}
+
+.map-popup-warning-icon {
+	height: 20px;
+	color: var(--map-highlight);
+}
+
+.map-popup-warning-text {
+	font-style: italic;
+	color: var(--map-warning-text);
+}
+
+.map-popup-description {
+	max-height: 119px;
+	margin-top: 0.25rem;
+	margin-bottom: 0.5rem;
+	overflow-x: auto;
+	font-size: 0.875rem;
+	line-height: 1.25rem;
+	scrollbar-color: var(--map-divider) transparent;
+	scrollbar-width: thin;
+}
+
+.map-popup-footer {
+	display: flex;
+	justify-content: space-between;
+	margin: 0;
+	font-size: 0.75rem;
+	line-height: 1rem;
+	color: var(--map-text-muted);
+	user-select: none;
+}
+
+.map-popup-coord {
+	display: flex;
+	gap: 0.25rem;
+	align-items: center;
+	cursor: pointer;
+}
+
+.map-popup-coord-text {
+	color: var(--map-text-muted);
+	transition: color 300ms;
+}
+
+.map-popup-coord:focus-visible .map-popup-coord-text {
+	color: var(--map-highlight-hover);
+}
+
+@media (hover: hover) {
+	.map-popup-coord:hover .map-popup-coord-text {
+		color: var(--map-highlight-hover);
+	}
+}
+
+.map-popup-copy-icon {
+	height: 14px;
+	color: var(--map-text-muted);
+	transition: color 300ms;
+}
+
+.map-popup-coord:focus-visible .map-popup-copy-icon {
+	color: var(--map-highlight-hover);
+}
+
+@media (hover: hover) {
+	.map-popup-coord:hover .map-popup-copy-icon {
+		color: var(--map-highlight-hover);
+	}
+}
+
+.map-popup-links {
+	display: flex;
+	gap: 0.5rem;
+	user-select: none;
+}
+
+.map-popup-link-icon {
+	height: 20px;
+}
+
+.map-popup-link-icon-wiki {
+	color: var(--map-text-muted);
+}
+
+@container map (width >= 768px) {
+	.map-popup-warning-icon {
+		height: 16px;
+	}
+
+	.map-popup-link-icon {
+		height: 16px;
+	}
+}
+
+@media (forced-colors: active) {
+	.maplibregl-popup-content {
+		outline: 2px solid ButtonText;
+	}
+}

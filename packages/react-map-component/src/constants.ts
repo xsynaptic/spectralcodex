@@ -13,13 +13,13 @@ export const mapPageHiddenProperty = '--map-page-hidden';
 export const mapScopesFileName = 'map-scopes';
 
 export function getHostControlClassName(name: MapHostControlName) {
-	return `maplibregl-ctrl-${name}`;
+	return `map-ctrl-${name}`;
 }
 
 export const mapControlClassName = {
-	filter: 'maplibregl-ctrl-filter',
+	filter: 'map-ctrl-filter',
 	filterRating: 'map-filter-rating',
-	metrics: 'maplibregl-ctrl-metrics',
+	metrics: 'map-ctrl-metrics',
 	popupTitle: 'map-popup-title',
 	scopeBar: 'map-scope-bar',
 	scopeName: 'map-scope-name',

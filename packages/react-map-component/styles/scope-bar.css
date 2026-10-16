@@ -1,0 +1,257 @@
+/* MapLibre has no top-center control slot, so this is positioned by hand */
+.map-scope-bar {
+	position: absolute;
+	inset-inline: 3rem;
+	top: 10px;
+	z-index: var(--map-z-scope-bar);
+	display: flex;
+	width: fit-content;
+	max-width: calc(100% - 6rem);
+	margin-inline: auto;
+	font-family: var(--map-font-display);
+	font-size: 0.75rem;
+	color: var(--map-text);
+	background-color: var(--map-surface);
+	border-radius: var(--map-radius-sm);
+	box-shadow: var(--map-elevation);
+
+	&[data-open] {
+		z-index: var(--map-z-scope-bar-open);
+		flex-direction: column;
+		width: 20rem;
+		max-height: min(
+			24rem,
+			calc(100% - 20px - max(var(--map-inset-bottom), var(--map-cover-bottom)))
+		);
+	}
+}
+
+.map-scope-button {
+	height: 29px;
+	padding: 0;
+	color: inherit;
+	cursor: pointer;
+	user-select: none;
+	background-color: transparent;
+	border: 0;
+	border-radius: inherit;
+
+	&:focus-visible {
+		background-color: var(--map-surface-hover);
+	}
+}
+
+@media (hover: hover) {
+	.map-scope-button:hover {
+		background-color: var(--map-surface-hover);
+	}
+}
+
+.map-scope-name {
+	min-width: 0;
+	padding-inline: 0.5rem;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	line-height: 29px;
+	white-space: nowrap;
+	text-decoration: none;
+	border-start-end-radius: 0;
+	border-end-end-radius: 0;
+	transition: color 150ms ease-out;
+}
+
+.map-scope-bar:not([data-active]) .map-scope-name {
+	color: var(--map-text-faint);
+}
+
+.map-scope-toggle,
+.map-scope-search,
+.map-search-close {
+	display: flex;
+	flex-shrink: 0;
+	align-items: center;
+	justify-content: center;
+	width: 29px;
+	border-inline-start: 1px solid var(--map-divider);
+}
+
+.map-scope-toggle {
+	border-radius: 0;
+}
+
+.map-scope-search,
+.map-search-close {
+	border-start-start-radius: 0;
+	border-end-start-radius: 0;
+}
+
+/* Matches the prompt's inset so the icon holds still as the bar opens */
+.map-search-icon {
+	display: flex;
+	flex-shrink: 0;
+	align-items: center;
+	padding-inline: 4.5px 0.25rem;
+}
+
+.map-scope-prompt {
+	display: flex;
+	gap: 0.25rem;
+	align-items: center;
+	min-width: 0;
+	padding-inline: 4.5px 0.625rem;
+}
+
+.map-scope-prompt-text {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	color: var(--map-text-muted);
+	white-space: nowrap;
+}
+
+.map-search {
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+	max-height: var(--map-search-room, none);
+}
+
+.map-search-field {
+	display: flex;
+	flex-shrink: 0;
+	align-items: center;
+}
+
+.map-search-input {
+	flex-grow: 1;
+	min-width: 0;
+	height: 29px;
+	padding: 0 0.5rem 0 0;
+	font-family: inherit;
+	font-size: inherit;
+	color: inherit;
+	background-color: transparent;
+	border: 0;
+
+	&::placeholder {
+		color: var(--map-text-muted);
+		opacity: 1;
+	}
+
+	/* iOS zooms the page into any input set under 16px; `-webkit-touch-callout` matches WebKit on iOS alone */
+	@supports (-webkit-touch-callout: none) {
+		font-size: 16px;
+	}
+}
+
+[data-map-root] .map-search-input:focus-visible {
+	outline-color: transparent;
+}
+
+.map-search-list {
+	min-height: 0;
+	padding: 0.25rem 0;
+	margin: 0;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	list-style: none;
+	border-top: 1px solid var(--map-divider);
+	transition: opacity 150ms ease-out;
+
+	@starting-style {
+		opacity: 0;
+	}
+}
+
+.map-search-option {
+	display: flex;
+	flex-direction: column;
+	gap: 0.125rem;
+	padding: 0.375rem 0.625rem;
+	cursor: pointer;
+	user-select: none;
+
+	&[aria-selected='true'] {
+		background-color: var(--map-surface-hover);
+	}
+}
+
+.map-search-line {
+	display: flex;
+	gap: 0.5rem;
+	align-items: baseline;
+}
+
+.map-search-title,
+.map-search-meta {
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.map-search-title {
+	flex-grow: 1;
+	font-size: 0.8125rem;
+	color: var(--map-text);
+}
+
+.map-search-title-multilingual,
+.map-search-count,
+.map-search-meta {
+	color: var(--map-text-muted);
+}
+
+.map-search-match {
+	font-weight: 600;
+	color: inherit;
+	background-color: transparent;
+}
+
+.map-search-count {
+	flex-shrink: 0;
+	font-family: var(--map-font-sans);
+	font-size: 0.6875rem;
+}
+
+.map-search-meta {
+	font-size: 0.6875rem;
+}
+
+.map-search-kind {
+	color: color-mix(in oklab, var(--map-accent) 65%, var(--map-text-muted));
+}
+
+.map-search-empty {
+	padding: 0.5rem 0.625rem;
+	margin: 0;
+	color: var(--map-text-muted);
+	border-top: 1px solid var(--map-divider);
+}
+
+@media (forced-colors: active) {
+	.map-scope-bar {
+		outline: 2px solid ButtonText;
+	}
+
+	.map-search-match {
+		color: CanvasText;
+		forced-color-adjust: none;
+	}
+
+	.map-scope-toggle,
+	.map-scope-search,
+	.map-search-list,
+	.map-search-empty {
+		border-color: ButtonText;
+	}
+
+	.map-search-option[aria-selected='true'] {
+		color: HighlightText;
+		forced-color-adjust: none;
+		background-color: Highlight;
+
+		* {
+			color: inherit;
+		}
+	}
+}

@@ -1,0 +1,173 @@
+.maplibregl-ctrl-group {
+	background-color: var(--map-surface);
+	border-radius: var(--map-radius-sm);
+
+	&:not(:empty) {
+		box-shadow: var(--map-elevation);
+	}
+
+	& button + button {
+		border-top-color: var(--map-divider);
+	}
+
+	& button:first-child {
+		border-start-start-radius: inherit;
+		border-start-end-radius: inherit;
+	}
+
+	& button:last-child {
+		border-end-start-radius: inherit;
+		border-end-end-radius: inherit;
+	}
+}
+
+.maplibregl-ctrl-attrib.maplibregl-compact {
+	color: var(--map-text);
+	background-color: var(--map-surface);
+	box-shadow: var(--map-elevation);
+
+	& a {
+		color: inherit;
+	}
+}
+
+/* MapLibre forces the open attribution visible, which shows through a host hiding the map with `visibility` */
+.maplibregl-ctrl-attrib.maplibregl-compact-show {
+	visibility: inherit;
+}
+
+.maplibregl-ctrl-attrib-button {
+	background-color: transparent;
+
+	.maplibregl-compact-show & {
+		background-color: var(--map-surface-hover);
+	}
+}
+
+/* MapLibre's blue focus glow would stack with the ring */
+.maplibregl-ctrl-group button:focus,
+.maplibregl-ctrl-attrib-button:focus {
+	box-shadow: none;
+}
+
+@media (hover: hover) {
+	.maplibregl-ctrl button:not(:disabled):hover {
+		background-color: var(--map-surface-hover);
+	}
+}
+
+.maplibregl-ctrl button:not(:disabled):active {
+	background-color: var(--map-surface-hover);
+}
+
+@media not (forced-colors: active) {
+	[data-map-mode='dark'] .maplibregl-ctrl-icon,
+	[data-map-mode='dark'] .maplibregl-ctrl-attrib-button {
+		filter: invert(1) hue-rotate(180deg);
+	}
+
+	/* The filter inverts the button's own fill too, so it resolves roles as light */
+	[data-map-mode='dark'] .maplibregl-ctrl-attrib-button {
+		color-scheme: light;
+	}
+}
+
+.maplibregl-ctrl-attrib,
+.maplibregl-ctrl-scale,
+.map-ctrl-metrics {
+	user-select: none;
+}
+
+.map-ctrl-filter {
+	position: relative;
+}
+
+.map-filter-indicator {
+	position: absolute;
+	top: 2px;
+	right: 2px;
+	width: 7px;
+	height: 7px;
+	pointer-events: none;
+	background-color: var(--map-accent);
+	border-radius: 50%;
+	opacity: 0;
+	scale: 0.4;
+	transition:
+		opacity 150ms ease-out,
+		scale 150ms ease-out;
+
+	&[data-active] {
+		opacity: 1;
+		scale: 1;
+	}
+}
+
+.map-ctrl-icon-frame {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.map-ctrl-icon {
+	width: 20px;
+	height: 20px;
+	color: var(--map-icon);
+}
+
+.maplibregl-ctrl-bottom-left {
+	display: flex;
+	font-size: 10px;
+}
+
+.maplibregl-ctrl-bottom-left,
+.maplibregl-ctrl-bottom-right {
+	bottom: var(--map-cover-bottom);
+}
+
+.map-ctrl-metrics-loading {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+}
+
+.map-ctrl-metrics {
+	display: flex;
+	flex-wrap: nowrap;
+	gap: 2px;
+	align-items: center;
+	height: 100%;
+	color: var(--map-text-muted);
+}
+
+.map-ctrl-metrics-divider {
+	color: var(--map-text-faint);
+}
+
+.maplibregl-ctrl-scale {
+	color: var(--map-text-muted);
+	background-color: transparent;
+	border-color: var(--map-text-faint);
+	border-width: 0 1px 1px;
+	border-bottom-right-radius: var(--map-radius-xs);
+	border-bottom-left-radius: var(--map-radius-xs);
+}
+
+/* MapLibre's forced-colours attribution icon targets a `::after` its markup no longer draws */
+@media (forced-colors: active) and (prefers-color-scheme: dark) {
+	.maplibregl-ctrl-attrib-button {
+		filter: invert(1);
+	}
+}
+
+/* Forced colours drop every `box-shadow`, MapLibre's `ButtonText` edge included, and a tint alone vanishes */
+@media (forced-colors: active) {
+	.maplibregl-ctrl-group:not(:empty),
+	.maplibregl-ctrl-attrib.maplibregl-compact {
+		outline: 2px solid ButtonText;
+	}
+
+	.maplibregl-ctrl-group button + button {
+		border-color: ButtonText;
+	}
+}

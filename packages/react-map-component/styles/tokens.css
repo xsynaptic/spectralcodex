@@ -1,0 +1,59 @@
+@property --map-inset-bottom {
+	syntax: '<length>';
+	inherits: true;
+	initial-value: 0;
+}
+
+@property --map-cover-bottom {
+	syntax: '<length>';
+	inherits: true;
+	initial-value: 0;
+}
+
+@property --map-page-hidden {
+	syntax: '<integer>';
+	inherits: true;
+	initial-value: 0;
+}
+
+:where([data-map-root]) {
+	--map-color-neutral-200: #e5e5e5;
+	--map-color-neutral-300: #d4d4d4;
+	--map-color-neutral-400: #a3a3a3;
+	--map-color-neutral-500: #737373;
+	--map-color-neutral-600: #525252;
+	--map-color-neutral-700: #404040;
+	--map-color-neutral-800: #262626;
+	--map-color-accent-400: #60a5fa;
+	--map-color-accent-500: #3b82f6;
+	--map-color-accent-600: #2563eb;
+	--map-color-highlight-300: #fcd34d;
+	--map-color-highlight-400: #fbbf24;
+	--map-color-highlight-500: #f59e0b;
+	--map-color-highlight-600: #d97706;
+	--map-color-highlight-700: #b45309;
+	--map-radius-xs: 0.125rem;
+	--map-radius-sm: 0.25rem;
+	--map-radius-full: 9999px;
+	--map-z-scope-bar: 2;
+	--map-z-scope-bar-open: 3;
+	--map-z-popup: 5;
+	--map-z-filter-menu: 10;
+	--map-font-display: ui-sans-serif, system-ui, sans-serif;
+	--map-font-sans: ui-sans-serif, system-ui, sans-serif;
+	--map-surface: light-dark(#fff, var(--map-color-neutral-800));
+	--map-surface-hover: light-dark(rgb(0 0 0 / 5%), rgb(255 255 255 / 6%));
+	--map-surface-active: light-dark(rgb(0 0 0 / 10%), rgb(255 255 255 / 8%));
+	--map-edge: light-dark(rgb(0 0 0 / 10%), rgb(255 255 255 / 14%));
+	--map-lift: light-dark(transparent, rgb(0 0 0 / 40%));
+	--map-elevation: 0 0 0 2px var(--map-edge), 0 1px 3px var(--map-lift);
+	--map-divider: light-dark(var(--map-color-neutral-300), var(--map-color-neutral-700));
+	--map-text: light-dark(var(--map-color-neutral-800), var(--map-color-neutral-200));
+	--map-text-muted: light-dark(var(--map-color-neutral-600), var(--map-color-neutral-400));
+	--map-text-faint: light-dark(var(--map-color-neutral-400), var(--map-color-neutral-500));
+	--map-icon: light-dark(#333, #ccc);
+	--map-accent: light-dark(var(--map-color-accent-500), var(--map-color-accent-400));
+	--map-highlight: light-dark(var(--map-color-highlight-500), var(--map-color-highlight-400));
+	--map-highlight-hover: light-dark(var(--map-color-highlight-600), var(--map-color-highlight-300));
+	--map-warning-text: light-dark(var(--map-color-highlight-700), var(--map-color-highlight-400));
+}
