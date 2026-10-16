@@ -1,6 +1,5 @@
 /* Wire color-scheme from the mode attribute so light-dark() resolves standalone, without a host color-scheme */
 [data-map-root] {
-	font-family: var(--map-font-sans);
 	color-scheme: light;
 }
 

@@ -24,7 +24,6 @@
 .maplibregl-ctrl-attrib.maplibregl-compact {
 	color: var(--map-text);
 	background-color: var(--map-surface);
-	box-shadow: var(--map-elevation);
 
 	& a {
 		color: inherit;
@@ -137,6 +136,7 @@
 	gap: 2px;
 	align-items: center;
 	height: 100%;
+	font-family: var(--map-font-sans);
 	color: var(--map-text-muted);
 }
 

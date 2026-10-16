@@ -8,7 +8,6 @@
 	color: var(--map-text);
 	background-color: var(--map-surface);
 	border-radius: var(--map-radius-sm);
-	box-shadow: var(--map-elevation);
 }
 
 .maplibregl-popup-close-button {
@@ -150,6 +149,7 @@
 	overflow-x: auto;
 	font-size: 0.875rem;
 	line-height: 1.25rem;
+	color: light-dark(var(--map-color-neutral-800), var(--map-color-neutral-300));
 	scrollbar-color: var(--map-divider) transparent;
 	scrollbar-width: thin;
 }
@@ -172,7 +172,7 @@
 }
 
 .map-popup-coord-text {
-	color: var(--map-text-muted);
+	color: var(--map-text-faint);
 	transition: color 300ms;
 }
 
