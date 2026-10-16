@@ -240,13 +240,7 @@ export default defineConfig({
 			'import.meta.env.BUILD_VERSION': JSON.stringify(Date.now().toString()),
 		},
 		optimizeDeps: {
-			include: [
-				'@turf/center',
-				'@turf/centroid',
-				'@turf/distance',
-				'@turf/helpers',
-				'@turf/truncate',
-			],
+			include: ['@turf/centroid', '@turf/distance', '@turf/helpers'],
 		},
 		plugins: [tailwindcss()],
 		server: {

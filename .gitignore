@@ -38,8 +38,7 @@ deploy/caddy/spectralcodex-redirects-generated.conf
 # certificates
 deploy/certs/
 
-# public generated files; no trailing slash where a worktree symlink must match too
-/public/divisions
+# public generated files
 public/icons/
 
 # content and media
