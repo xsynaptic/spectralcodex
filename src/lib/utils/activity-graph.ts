@@ -1,4 +1,5 @@
 import { millisecondsPerDay } from '#constants.ts';
+import { getDateTimeFormat } from '#lib/i18n/i18n-formatters.ts';
 import { getDayKey } from '#lib/utils/date.ts';
 
 export interface ActivityGraphData {
@@ -74,10 +75,7 @@ export function buildActivityGraph({
 		const dayIndex = Math.round((firstOfMonth - yearStart) / millisecondsPerDay);
 
 		return {
-			name: new Date(firstOfMonth).toLocaleDateString('en', {
-				month: 'short',
-				timeZone: 'UTC',
-			}),
+			name: getDateTimeFormat('en', { month: 'short', timeZone: 'UTC' }).format(firstOfMonth),
 			week: Math.floor((padCount + dayIndex) / 7) + 1,
 		};
 	});

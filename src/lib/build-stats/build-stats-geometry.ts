@@ -13,6 +13,7 @@ import {
 	getRollingMedian,
 	getUtcDayStart,
 } from '#lib/build-stats/build-stats-utils.ts';
+import { getDateTimeFormat } from '#lib/i18n/i18n-formatters.ts';
 import { getDateDisplay } from '#lib/utils/date.ts';
 import { formatNumber } from '#lib/utils/text.ts';
 
@@ -184,7 +185,7 @@ export function getBuildStatsGeometry(
 
 	return {
 		axisTicks: utcMonth.range(new Date(domainStart), new Date(lastTime)).map((month, index) => ({
-			label: month.toLocaleDateString('en', { month: 'short', timeZone: 'UTC' }),
+			label: getDateTimeFormat('en', { month: 'short', timeZone: 'UTC' }).format(month),
 			x: round(getX(month.getTime())),
 			// Anywhere but the opening tick and each January, the year is noise
 			yearLabel:

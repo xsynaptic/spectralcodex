@@ -6,6 +6,7 @@ import Anchor from '#components/parts/anchor.astro';
 import DividedItem from '#components/parts/divided-item.astro';
 import PaginationSelect from '#components/parts/pagination-select.astro';
 import { getChronologyYearPagination } from '#lib/collections/chronology/chronology-utils.ts';
+import { getDateTimeFormat } from '#lib/i18n/i18n-formatters.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getSitePath } from '#lib/utils/routing.ts';
 
@@ -32,7 +33,7 @@ const yearPagination = getChronologyYearPagination(chronologyYears, currentYear,
 const months = chronologyMonths?.toSorted((monthA, monthB) => monthA.localeCompare(monthB)) ?? [];
 
 function getMonthName(month: string) {
-	return new Date(0, Number(month) - 1).toLocaleDateString('en', { month: 'long' });
+	return getDateTimeFormat('en', { month: 'long' }).format(new Date(0, Number(month) - 1));
 }
 ---
 

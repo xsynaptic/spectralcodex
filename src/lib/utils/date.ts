@@ -1,3 +1,5 @@
+import { getDateTimeFormat } from '#lib/i18n/i18n-formatters.ts';
+
 export const DatePresetEnum = {
 	Long: 'long',
 	Medium: 'medium',
@@ -61,7 +63,7 @@ export function getDateDisplay(
 	if (!dateEnd) return formatDateOrdinal(date, options);
 
 	if (!isMonthNameFormat(options)) {
-		return new Intl.DateTimeFormat('en', options).formatRange(date, dateEnd);
+		return getDateTimeFormat('en', options).formatRange(date, dateEnd);
 	}
 
 	const startOptions: Intl.DateTimeFormatOptions = { ...options };
@@ -85,7 +87,7 @@ export function sortByDateReverseChronological(
 }
 
 function formatDateOrdinal(date: Date, options: Intl.DateTimeFormatOptions): string {
-	const formatter = new Intl.DateTimeFormat('en', options);
+	const formatter = getDateTimeFormat('en', options);
 
 	if (!isMonthNameFormat(options)) return formatter.format(date);
 
@@ -100,7 +102,7 @@ function getOrdinalDay(day: number): string {
 }
 
 function getYearPart(date: Date, options: Intl.DateTimeFormatOptions): string | undefined {
-	return new Intl.DateTimeFormat('en', options)
+	return getDateTimeFormat('en', options)
 		.formatToParts(date)
 		.find((part) => part.type === 'year')?.value;
 }

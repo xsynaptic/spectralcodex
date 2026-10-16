@@ -3,6 +3,8 @@ import { wrapCjk } from '@xsynaptic/satteri-wrap-cjk';
 import { stripTags } from '@xsynaptic/unified-tools';
 import { markdownToHtml } from 'satteri';
 
+import { getNumberFormat } from '#lib/i18n/i18n-formatters.ts';
+
 // Locale-independent word segmentation; split(' ') counts space-free scripts (CJK, Thai) as one word
 const wordSegmenter = new Intl.Segmenter(undefined, { granularity: 'word' });
 
@@ -11,11 +13,11 @@ export function formatNumber({
 	number,
 	options,
 }: {
-	locales?: Intl.LocalesArgument | undefined;
+	locales?: string | undefined;
 	number: number | string;
 	options?: Intl.NumberFormatOptions | undefined;
 }) {
-	return new Intl.NumberFormat(locales ?? 'en', options).format(Number(number));
+	return getNumberFormat(locales ?? 'en', options).format(Number(number));
 }
 
 // Interpolate named placeholders in a string *e.g.* "Chronology: {month} {year}"

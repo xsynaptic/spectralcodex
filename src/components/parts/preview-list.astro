@@ -5,7 +5,7 @@ import Anchor from '#components/parts/anchor.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
 import TextSeparated from '#components/parts/text-separated.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { formatStringTemplate } from '#lib/utils/text.ts';
+import { formatNumber, formatStringTemplate } from '#lib/utils/text.ts';
 
 interface Props {
 	count?: number | undefined;
@@ -18,15 +18,16 @@ const { count, countThreshold = 10, items, url, ...props } = Astro.props;
 
 const shouldShowCount = count ? Math.abs(items.length - count) > countThreshold : false;
 
-const numberFormatter = new Intl.NumberFormat('en', { maximumFractionDigits: 0 });
-
 const t = getTranslations();
 
 function getCountText() {
 	if (shouldShowCount && count) {
 		return {
 			title: formatStringTemplate(t('parts.textSeparatedList.more'), {
-				count: numberFormatter.format(count - items.length),
+				count: formatNumber({
+					number: count - items.length,
+					options: { maximumFractionDigits: 0 },
+				}),
 			}),
 			titleMultilingual: undefined,
 			url,

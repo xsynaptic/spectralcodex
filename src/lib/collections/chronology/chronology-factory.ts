@@ -11,6 +11,7 @@ import type {
 } from '#lib/collections/chronology/chronology-types.ts';
 
 import { millisecondsPerDay } from '#constants.ts';
+import { getDateTimeFormat } from '#lib/i18n/i18n-formatters.ts';
 import { getDateRanges, getDayKey } from '#lib/utils/date.ts';
 
 interface ChronologyData {
@@ -98,7 +99,7 @@ export function getDateData(date: Date): ChronologyDateData {
 }
 
 export function getMonthName(date: Date): string {
-	return date.toLocaleDateString('en', { month: 'long', timeZone: 'UTC' });
+	return getDateTimeFormat('en', { month: 'long', timeZone: 'UTC' }).format(date);
 }
 
 // Every UTC day covered by a recorded range, start to end inclusive
