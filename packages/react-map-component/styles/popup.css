@@ -149,7 +149,7 @@
 	overflow-x: auto;
 	font-size: 0.875rem;
 	line-height: 1.25rem;
-	color: light-dark(var(--map-color-neutral-800), var(--map-color-neutral-300));
+	color: var(--map-text-body);
 	scrollbar-color: var(--map-divider) transparent;
 	scrollbar-width: thin;
 }

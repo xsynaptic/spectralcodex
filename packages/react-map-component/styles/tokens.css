@@ -49,6 +49,7 @@
 	--map-elevation: 0 0 0 2px var(--map-edge), 0 1px 3px var(--map-lift);
 	--map-divider: light-dark(var(--map-color-neutral-300), var(--map-color-neutral-700));
 	--map-text: light-dark(var(--map-color-neutral-800), var(--map-color-neutral-200));
+	--map-text-body: light-dark(var(--map-color-neutral-800), var(--map-color-neutral-300));
 	--map-text-muted: light-dark(var(--map-color-neutral-600), var(--map-color-neutral-400));
 	--map-text-faint: light-dark(var(--map-color-neutral-400), var(--map-color-neutral-500));
 	--map-icon: light-dark(#333, #ccc);
