@@ -174,9 +174,6 @@ importers:
       '@tanstack/eslint-plugin-query':
         specifier: ^5.104.2
         version: 5.104.2(eslint@10.12.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)
-      '@turf/center':
-        specifier: ^7.4.0
-        version: 7.4.0
       '@turf/centroid':
         specifier: ^7.4.0
         version: 7.4.0
@@ -184,9 +181,6 @@ importers:
         specifier: ^7.4.0
         version: 7.4.0
       '@turf/helpers':
-        specifier: ^7.4.0
-        version: 7.4.0
-      '@turf/truncate':
         specifier: ^7.4.0
         version: 7.4.0
       '@types/d3-geo':
@@ -390,33 +384,12 @@ importers:
       '@spectralcodex/shared':
         specifier: workspace:*
         version: link:../shared
-      '@tanstack/query-persist-client-core':
-        specifier: ^5.104.2
-        version: 5.104.2
       '@tanstack/react-query':
         specifier: ^5.104.2
         version: 5.104.2(react@19.3.0)
-      '@turf/bbox-polygon':
-        specifier: ^7.4.0
-        version: 7.4.0
-      '@turf/difference':
-        specifier: ^7.4.0
-        version: 7.4.0
-      '@turf/helpers':
-        specifier: ^7.4.0
-        version: 7.4.0
-      flatgeobuf:
-        specifier: ^4.6.0
-        version: 4.6.0
-      idb-keyval:
-        specifier: ^6.3.0
-        version: 6.3.0
       maplibre-gl:
         specifier: ^6.14.0
         version: 6.14.0
-      pmtiles:
-        specifier: ^4.5.0
-        version: 4.5.0
       react:
         specifier: ^19.3.0
         version: 19.3.0
@@ -2818,9 +2791,6 @@ packages:
 
   '@tanstack/query-core@5.104.2':
     resolution: {integrity: sha512-/qbsxJK5c3Ve1aFIULWYNcT2jeRUAiD4HME6Eu2ZdpofHoVgAjpkQhLg5xHuOoBkTPQUJLfP7zOxy0qsBcqROA==}
-
-  '@tanstack/query-persist-client-core@5.104.2':
-    resolution: {integrity: sha512-rFbWzV0NmdPU9b6xbJBEH6dtaWbbSX1vmXoi+s5o63ETKJhcKoh3gGq0NMqITtGEGEG8kogvJ56US7DJjwkPKA==}
 
   '@tanstack/react-query@5.104.2':
     resolution: {integrity: sha512-xKmzWGhadbE5wGS/ZmXShRITnI9oItox5GO14KvFZco3+vhTAyXS1erYzJWdiY280zapAGJXFUL9nHgwP6SV/g==}
@@ -6063,9 +6033,6 @@ packages:
   pluralize@8.0.0:
     resolution: {integrity: sha512-Nc3IT5yHzflTfbjgqWcCPpo7DaKy4FnpB0l/zCAW0Tc7jxAiuqSxHasntB3D7887LSrA93kDJ9IXovxJYxyLCA==}
     engines: {node: '>=4'}
-
-  pmtiles@4.5.0:
-    resolution: {integrity: sha512-CBeD4SoUluFziGdy/8k7FOjQxQy486n+929W/tWophauvMICpkZ26vGBWhDt/6b1FZQWNaf4jFdT/5+q0Wii5w==}
 
   pngjs@7.0.0:
     resolution: {integrity: sha512-LKWqWJRhstyYo9pGvgor/ivk2w94eSjE3RGVuzLGlr3NmD8bf7RcYGze1mNdEHRP6TRP6rMuDHk5t44hnTRyow==}
@@ -9713,10 +9680,6 @@ snapshots:
 
   '@tanstack/query-core@5.104.2': {}
 
-  '@tanstack/query-persist-client-core@5.104.2':
-    dependencies:
-      '@tanstack/query-core': 5.104.2
-
   '@tanstack/react-query@5.104.2(react@19.3.0)':
     dependencies:
       '@tanstack/query-core': 5.104.2
@@ -12569,7 +12532,8 @@ snapshots:
     optionalDependencies:
       picomatch: 4.0.7
 
-  fflate@0.8.3: {}
+  fflate@0.8.3:
+    optional: true
 
   figures@6.1.0:
     dependencies:
@@ -13021,7 +12985,8 @@ snapshots:
     dependencies:
       safer-buffer: 2.1.2
 
-  idb-keyval@6.3.0: {}
+  idb-keyval@6.3.0:
+    optional: true
 
   identifier-regex@1.1.0:
     dependencies:
@@ -14454,10 +14419,6 @@ snapshots:
       playwright-core: 1.64.0
 
   pluralize@8.0.0: {}
-
-  pmtiles@4.5.0:
-    dependencies:
-      fflate: 0.8.3
 
   pngjs@7.0.0: {}
 
