@@ -12,7 +12,6 @@ import { useMapConfig } from '#lib/config.tsx';
 import { MapControlIcon, MapIconEye, MapIconEyeOff, MapIconSearch } from '#lib/icons.tsx';
 import { useTrackMap } from '#lib/track-hook.ts';
 import { MapSearchBox } from '#search/search-box.tsx';
-import { useMapSearchIndex, useSearchPick } from '#search/search-hooks.ts';
 import { useMapStore } from '#store/store.tsx';
 
 const telescopeDurationMs = 200;
@@ -120,9 +119,7 @@ const MapScopeBarHosted: FC = function MapScopeBarHosted() {
 	const isEnabled = useMapStore((state) => state.isScopeEnabled);
 	const { messages } = useMapConfig();
 	const barRef = useRef<HTMLDivElement>(null);
-	const index = useMapSearchIndex();
 	const { close, isOpen, open, openerRef, overlayRef } = useOverlay('search');
-	const pick = useSearchPick(close);
 
 	useTelescope(barRef, `${String(isOpen)}:${scopeTitle ?? ''}`);
 
@@ -134,7 +131,7 @@ const MapScopeBarHosted: FC = function MapScopeBarHosted() {
 				{...getBarProps(messages, isOpen, scopeTitle === undefined ? undefined : isEnabled)}
 			>
 				{isOpen ? (
-					<MapSearchBox index={index} onClose={close} onPick={pick} ref={overlayRef} />
+					<MapSearchBox onClose={close} ref={overlayRef} />
 				) : (
 					<MapScopeRest onOpen={open} openerRef={openerRef} />
 				)}

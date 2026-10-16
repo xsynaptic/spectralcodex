@@ -37,7 +37,7 @@ function makeScope(id: string, title: string, row: Partial<MapScopeRow> = {}): M
 }
 
 function getTitles(rows: Array<MapSourceItem>, scopes: Array<MapScopeRow>, query: string) {
-	return searchMap(createSearchIndex(rows, scopes), query).map(({ title }) => title.text);
+	return searchMap(createSearchIndex(rows, scopes), query)?.map(({ title }) => title.text);
 }
 
 describe('searchMap', () => {
@@ -85,7 +85,7 @@ describe('searchMap', () => {
 
 	test('every word must match, in any order, each highlighted where it lands', () => {
 		const rows = [makeRow('mine', 'Xindian Taiyi Coal Mine'), makeRow('hall', 'Taiyi Hall')];
-		const [result, ...rest] = searchMap(createSearchIndex(rows, []), 'mine taiyi');
+		const [result, ...rest] = searchMap(createSearchIndex(rows, []), 'mine taiyi') ?? [];
 
 		expect(rest).toEqual([]);
 		expect(result?.title).toEqual({
@@ -132,30 +132,32 @@ describe('searchMap', () => {
 	});
 
 	test('a Multilingual Title is its own field, highlighted in its own text', () => {
-		const [result] = searchMap(
-			createSearchIndex([makeRow('temple', 'Temple', { titleMultilingual: '臺南孔廟' })], []),
-			'孔廟',
-		);
+		const [result] =
+			searchMap(
+				createSearchIndex([makeRow('temple', 'Temple', { titleMultilingual: '臺南孔廟' })], []),
+				'孔廟',
+			) ?? [];
 
 		expect(result?.title).toEqual({ text: 'Temple' });
 		expect(result?.titleMultilingual).toEqual({ ranges: [[2, 4]], text: '臺南孔廟' });
 	});
 
 	test('a Multilingual Title in Latin script stays its own field', () => {
-		const [result] = searchMap(
-			createSearchIndex(
-				[makeRow('citadel', 'Hue Citadel (North Gate)', { titleMultilingual: 'Kinh thanh Hue' })],
-				[],
-			),
-			'kinh',
-		);
+		const [result] =
+			searchMap(
+				createSearchIndex(
+					[makeRow('citadel', 'Hue Citadel (North Gate)', { titleMultilingual: 'Kinh thanh Hue' })],
+					[],
+				),
+				'kinh',
+			) ?? [];
 
 		expect(result?.title).toEqual({ text: 'Hue Citadel (North Gate)' });
 		expect(result?.titleMultilingual).toEqual({ ranges: [[0, 4]], text: 'Kinh thanh Hue' });
 	});
 
 	test('a highlight covers the written characters a folded match came from', () => {
-		const [result] = searchMap(createSearchIndex([makeRow('hoi-an', 'Hội An')], []), 'hoi');
+		const [result] = searchMap(createSearchIndex([makeRow('hoi-an', 'Hội An')], []), 'hoi') ?? [];
 
 		expect(result?.title.ranges).toEqual([[0, 3]]);
 	});
@@ -171,18 +173,19 @@ describe('searchMap', () => {
 		const rows = [makeRow('a', 'Fort Zeelandia', { regionOrdinals: [99, 7] })];
 		const scopes = [makeScope('anping', 'Anping', { interval: [7, 8] })];
 
-		expect(searchMap(createSearchIndex(rows, scopes), 'fort')[0]).toMatchObject({
+		expect(searchMap(createSearchIndex(rows, scopes), 'fort')?.[0]).toMatchObject({
 			kind: 'location',
 			parentTitle: 'Anping',
 			pointId: 'a',
 		});
 	});
 
-	test('a blank query lists nothing, and a long list stops at fifty rows', () => {
+	test('a query with no terms lists nothing, and a long list stops at fifty rows', () => {
 		const rows = Array.from({ length: 60 }, (_, index) => makeRow(`row-${String(index)}`, 'Mill'));
 		const index = createSearchIndex(rows, []);
 
-		expect(searchMap(index, ' '.repeat(3))).toEqual([]);
+		expect(searchMap(index, ' '.repeat(3))).toBeUndefined();
+		expect(searchMap(index, "'")).toBeUndefined();
 		expect(searchMap(index, 'mill')).toHaveLength(50);
 	});
 });

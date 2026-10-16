@@ -1,15 +1,17 @@
 import type { FC, KeyboardEvent, RefObject } from 'react';
 
-import { useDeferredValue, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 
-import type { MapSearchIndex, MapSearchResult, MapSearchText } from '#search/search-factory.ts';
+import type { MapSearchResult, MapSearchText } from '#search/search-factory.ts';
 import type { MapMessages, MapOverlayClose } from '#types.ts';
 
 import { useMapConfig } from '#lib/config.tsx';
 import { MapControlIcon, MapIconArrowBack } from '#lib/icons.tsx';
-import { searchMap } from '#search/search-factory.ts';
+import { useMapSearch } from '#search/search-hooks.ts';
 
 const searchGapPx = 10;
+
+const noResults: Array<MapSearchResult> = [];
 
 const kindMessageKey = {
 	location: 'searchKindLocation',
@@ -202,58 +204,43 @@ const MapSearchBack: FC<{ onClose: (how: MapOverlayClose) => void }> = function 
 };
 
 // The live region stays mounted so its first status is announced
-const MapSearchStatus: FC<{ count: number; isLoading: boolean; query: string }> =
-	function MapSearchStatus({ count, isLoading, query }) {
-		const { messages } = useMapConfig();
-		const isQuiet = isLoading || query.trim() === '';
+const MapSearchStatus: FC<{ count: number | undefined }> = function MapSearchStatus({ count }) {
+	const { messages } = useMapConfig();
 
-		return (
-			<>
-				{!isQuiet && count === 0 ? (
-					<p aria-hidden="true" className="map-search-empty">
-						{messages.searchEmpty}
-					</p>
-				) : undefined}
-				<div aria-live="polite" className="map-sr-only">
-					{isQuiet ? '' : getStatus(messages, count)}
-				</div>
-			</>
-		);
-	};
+	return (
+		<>
+			{count === 0 ? (
+				<p aria-hidden="true" className="map-search-empty">
+					{messages.searchEmpty}
+				</p>
+			) : undefined}
+			<div aria-live="polite" className="map-sr-only">
+				{count === undefined ? '' : getStatus(messages, count)}
+			</div>
+		</>
+	);
+};
 
 export const MapSearchBox: FC<{
-	index: MapSearchIndex | undefined;
 	onClose: (how: MapOverlayClose) => void;
-	onPick: (result: MapSearchResult, how: MapOverlayClose) => void;
 	ref: RefObject<HTMLDivElement | null>;
-}> = function MapSearchBox({ index, onClose, onPick, ref }) {
+}> = function MapSearchBox({ onClose, ref }) {
 	const { messages } = useMapConfig();
 	const listboxId = useId();
 	const inputRef = useRef<HTMLInputElement>(null);
 	const listRef = useRef<HTMLUListElement>(null);
 	const [query, setQuery] = useState('');
-	const deferredQuery = useDeferredValue(query);
-	const results = useMemo(
-		() => (index ? searchMap(index, deferredQuery) : []),
-		[deferredQuery, index],
-	);
+	const { pick, pickOnEnter, results } = useMapSearch(query, onClose);
+	const listedResults = results ?? noResults;
 
 	function getOptionId(result: MapSearchResult) {
 		return `${listboxId}-${result.key}`;
 	}
 
-	function handleEnter(activeResult: MapSearchResult | undefined) {
-		if (!index) return;
-
-		const result = query === deferredQuery ? activeResult : searchMap(index, query)[0];
-
-		if (result) onPick(result, 'keyboard');
-	}
-
 	const { activeIndex, activeResult, handleKeyDown, setActiveIndex } = useSearchKeys({
 		getOptionId,
-		onEnter: handleEnter,
-		results,
+		onEnter: pickOnEnter,
+		results: listedResults,
 	});
 
 	useVisualViewportRoom(ref);
@@ -274,7 +261,7 @@ export const MapSearchBox: FC<{
 					aria-activedescendant={activeResult ? getOptionId(activeResult) : undefined}
 					aria-autocomplete="list"
 					aria-controls={listboxId}
-					aria-expanded={results.length > 0}
+					aria-expanded={listedResults.length > 0}
 					aria-label={messages.searchLabel}
 					autoComplete="off"
 					className="map-search-input"
@@ -294,12 +281,12 @@ export const MapSearchBox: FC<{
 			<ul
 				aria-label={messages.searchListAriaLabel}
 				className="map-search-list"
-				hidden={results.length === 0}
+				hidden={listedResults.length === 0}
 				id={listboxId}
 				ref={listRef}
 				role="listbox"
 			>
-				{results.map((result, resultIndex) => (
+				{listedResults.map((result, resultIndex) => (
 					<MapSearchOption
 						id={getOptionId(result)}
 						isActive={resultIndex === activeIndex}
@@ -308,13 +295,13 @@ export const MapSearchBox: FC<{
 							setActiveIndex(resultIndex);
 						}}
 						onPick={() => {
-							onPick(result, 'pointer');
+							pick(result, 'pointer');
 						}}
 						result={result}
 					/>
 				))}
 			</ul>
-			<MapSearchStatus count={results.length} isLoading={!index} query={deferredQuery} />
+			<MapSearchStatus count={results?.length} />
 		</div>
 	);
 };

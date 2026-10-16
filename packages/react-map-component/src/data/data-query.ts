@@ -40,7 +40,7 @@ function directoryQueryOptions(url: string) {
 	});
 }
 
-function mapRowsQueryOptions(url: string, rule: MapFeaturesRule) {
+export function mapRowsQueryOptions(url: string, rule: MapFeaturesRule) {
 	return queryOptions({
 		meta: { isDerived: true },
 		queryFn: async ({ client }) =>
@@ -61,13 +61,12 @@ function chunkQueryOptions(url: string | undefined) {
 	});
 }
 
-function scopeListQueryOptions(url: string, isEnabled: boolean) {
+export function scopeListQueryOptions(apiSourceUrl: string) {
+	const url = getPayloadUrl(apiSourceUrl, mapScopesFileName);
+
 	return queryOptions({
-		enabled: isEnabled,
 		queryFn: () => fetchMapJson(url, MapScopeRowSchema.array()),
 		queryKey: ['scope-list', url],
-		// An earlier deploy's list returns 404, and search shows nothing until this settles
-		retry: 1,
 		staleTime: 'static',
 	});
 }
@@ -120,10 +119,4 @@ export function useMapChunk(chunkKey: string | undefined) {
 
 export function useMapDivision(url: string | undefined) {
 	return useQuery(divisionQueryOptions(url));
-}
-
-export function useMapScopeList(isEnabled: boolean) {
-	const { apiSourceUrl } = useMapConfig();
-
-	return useQuery(scopeListQueryOptions(getPayloadUrl(apiSourceUrl, mapScopesFileName), isEnabled));
 }

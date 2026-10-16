@@ -1,11 +1,12 @@
 import type { MapInterval, MapScopeRow, MapSourceItem } from '@spectralcodex/map-codec';
 
 import { createRuleTest } from '@spectralcodex/map-codec';
-import { stripDiacritics } from '@spectralcodex/shared/text';
+
+import type { MapSearchRange } from '#search/search-normalize.ts';
+
+import { getWrittenRange, normalizeText } from '#search/search-normalize.ts';
 
 const mapSearchLimit = 50;
-
-type MapSearchRange = readonly [start: number, end: number];
 
 export interface MapSearchText {
 	ranges?: Array<MapSearchRange>;
@@ -26,8 +27,8 @@ export type MapSearchResult =
 type FieldName = 'id' | 'title' | 'titleMultilingual';
 
 interface SearchField {
-	folded: string;
 	name: FieldName;
+	normalized: string;
 }
 
 interface SearchEntry {
@@ -61,68 +62,8 @@ interface Candidate {
 	tier: MatchTier;
 }
 
-const droppedCharacters = new Set(["'", '‘', '’', 'ʻ', 'ʼ']);
-// The rarer form in the titles folds to the one most titles use
-const replacedCharacters = new Map([
-	['đ', 'd'],
-	['国', '國'],
-	['峯', '峰'],
-	['臺', '台'],
-	['舘', '館'],
-	['鉱', '礦'],
-	['鑛', '礦'],
-	['黄', '黃'],
-]);
-const foldedCharacterCache = new Map<string, string>();
-
-function foldCharacter(character: string) {
-	const cached = foldedCharacterCache.get(character);
-
-	if (cached !== undefined) return cached;
-
-	const lowered = stripDiacritics(character).toLowerCase();
-	const folded = droppedCharacters.has(character)
-		? ''
-		: (replacedCharacters.get(lowered) ?? lowered);
-
-	foldedCharacterCache.set(character, folded);
-
-	return folded;
-}
-
-function foldText(text: string) {
-	let folded = '';
-
-	for (const character of text) {
-		folded += foldCharacter(character);
-	}
-
-	return folded;
-}
-
 function createField(name: FieldName, text: string): SearchField {
-	return { folded: foldText(text), name };
-}
-
-function getRange(text: string, position: number, length: number): MapSearchRange {
-	const starts: Array<number> = [];
-	const ends: Array<number> = [];
-	let start = 0;
-
-	for (const character of text) {
-		const end = start + character.length;
-
-		for (let units = foldCharacter(character).length; units > 0; units -= 1) {
-			starts.push(start);
-			ends.push(end);
-		}
-
-		start = end;
-	}
-
-	const rangeStart = starts[position] ?? 0;
-
-	return [rangeStart, ends[position + length - 1] ?? rangeStart];
+	return { name, normalized: normalizeText(text) };
 }
 
 function getTitleFields(title: string, titleMultilingual: string | undefined) {
@@ -174,18 +115,18 @@ export function createSearchIndex(
 	};
 }
 
-function isWordStart(folded: string, position: number) {
-	return !/[\p{L}\p{N}]/u.test(folded.charAt(position - 1));
+function isWordStart(normalized: string, position: number) {
+	return !/[\p{L}\p{N}]/u.test(normalized.charAt(position - 1));
 }
 
-function matchField(folded: string, term: string) {
-	const first = folded.indexOf(term);
+function matchField(normalized: string, term: string) {
+	const first = normalized.indexOf(term);
 
 	if (first === -1) return;
 	if (first === 0) return { position: first, tier: matchTier.start };
 
-	for (let position = first; position !== -1; position = folded.indexOf(term, position + 1)) {
-		if (isWordStart(folded, position)) return { position, tier: matchTier.word };
+	for (let position = first; position !== -1; position = normalized.indexOf(term, position + 1)) {
+		if (isWordStart(normalized, position)) return { position, tier: matchTier.word };
 	}
 
 	return { position: first, tier: matchTier.inside };
@@ -194,8 +135,8 @@ function matchField(folded: string, term: string) {
 function matchTerm(fields: Array<SearchField>, term: string) {
 	let tier: MatchTier | undefined;
 
-	for (const { folded, name } of fields) {
-		const match = matchField(folded, term);
+	for (const { name, normalized } of fields) {
+		const match = matchField(normalized, term);
 
 		if (!match) continue;
 
@@ -270,8 +211,8 @@ function compareCandidates(first: Candidate, second: Candidate) {
 
 	if (scoreOrder !== 0) return scoreOrder;
 
-	const firstTitle = first.entry.fields[0]?.folded ?? '';
-	const secondTitle = second.entry.fields[0]?.folded ?? '';
+	const firstTitle = first.entry.fields[0]?.normalized ?? '';
+	const secondTitle = second.entry.fields[0]?.normalized ?? '';
 
 	// Not `localeCompare`, which costs too much across thousands of single-letter matches
 	if (firstTitle === secondTitle) return 0;
@@ -316,13 +257,13 @@ function getParentTitle(
 }
 
 function getRanges(text: string, terms: Array<string>) {
-	const folded = foldText(text);
+	const normalized = normalizeText(text);
 	const ranges: Array<MapSearchRange> = [];
 
 	for (const term of terms) {
-		const match = matchField(folded, term);
+		const match = matchField(normalized, term);
 
-		if (match) ranges.push(getRange(text, match.position, term.length));
+		if (match) ranges.push(getWrittenRange(text, match.position, term.length));
 	}
 
 	ranges.sort(([firstStart], [secondStart]) => firstStart - secondStart);
@@ -379,9 +320,9 @@ function toResult(
 }
 
 export function searchMap(index: MapSearchIndex, query: string) {
-	const terms = foldText(query).split(/\s+/u).filter(Boolean);
+	const terms = normalizeText(query).split(/\s+/u).filter(Boolean);
 
-	if (terms.length === 0) return [];
+	if (terms.length === 0) return;
 
 	const regionTestsByTerm = terms.map((term) => getRegionTests(index.regions, term));
 	const candidateByKey = new Map<string, Candidate>();

@@ -1,31 +1,46 @@
-import { useCallback, useMemo } from 'react';
+import type { MapFeaturesRule } from '@spectralcodex/map-codec';
+import type { QueryClient } from '@tanstack/react-query';
+
+import { queryOptions, useQuery } from '@tanstack/react-query';
+import { useCallback, useDeferredValue, useMemo } from 'react';
 import { useMap } from 'react-map-gl/maplibre';
 
 import type { MapSearchResult } from '#search/search-factory.ts';
 import type { MapOverlayClose } from '#types.ts';
 
-import { useMapRows, useMapScopeList } from '#data/data-query.ts';
+import { mapRowsQueryOptions, scopeListQueryOptions } from '#data/data-query.ts';
 import { useMapClick } from '#host/host-click.ts';
+import { useMapConfig } from '#lib/config.tsx';
 import { useTrackMap } from '#lib/track-hook.ts';
-import { createSearchIndex } from '#search/search-factory.ts';
-import { useMapStore } from '#store/store.tsx';
+import { createSearchIndex, searchMap } from '#search/search-factory.ts';
 
-const noScopes = [] as const;
-
-export function useMapSearchIndex() {
-	const isSearchOpen = useMapStore((state) => state.overlay === 'search');
-	const { data: rows } = useMapRows();
-	const { data: scopes, isError } = useMapScopeList(isSearchOpen);
-
-	const scopeRows = isError ? noScopes : scopes;
-
-	return useMemo(
-		() => (rows && scopeRows ? createSearchIndex(rows, scopeRows) : undefined),
-		[rows, scopeRows],
-	);
+async function queryScopeList(client: QueryClient, apiSourceUrl: string) {
+	try {
+		return await client.query(scopeListQueryOptions(apiSourceUrl));
+	} catch {
+		return [];
+	}
 }
 
-export function useSearchPick(close: (how: MapOverlayClose) => void) {
+function searchIndexQueryOptions(apiSourceUrl: string, mapFeaturesRule: MapFeaturesRule) {
+	return queryOptions({
+		meta: { isDerived: true },
+		queryFn: async ({ client }) => {
+			const [rows, scopes] = await Promise.all([
+				client.query({
+					...mapRowsQueryOptions(apiSourceUrl, mapFeaturesRule),
+					staleTime: 'static',
+				}),
+				queryScopeList(client, apiSourceUrl),
+			]);
+
+			return createSearchIndex(rows, scopes);
+		},
+		queryKey: ['search-index', apiSourceUrl, mapFeaturesRule],
+	});
+}
+
+function useSearchPick(close: (how: MapOverlayClose) => void) {
 	const { current: map } = useMap();
 	const click = useMapClick();
 	const trackMap = useTrackMap();
@@ -46,4 +61,25 @@ export function useSearchPick(close: (how: MapOverlayClose) => void) {
 		},
 		[click, close, map, trackMap],
 	);
+}
+
+export function useMapSearch(query: string, onClose: (how: MapOverlayClose) => void) {
+	const { apiSourceUrl, mapFeaturesRule } = useMapConfig();
+	const { data: index } = useQuery(searchIndexQueryOptions(apiSourceUrl, mapFeaturesRule));
+	const deferredQuery = useDeferredValue(query);
+	const results = useMemo(
+		() => (index ? searchMap(index, deferredQuery) : undefined),
+		[deferredQuery, index],
+	);
+	const pick = useSearchPick(onClose);
+
+	function pickOnEnter(activeResult: MapSearchResult | undefined) {
+		if (!index) return;
+
+		const result = query === deferredQuery ? activeResult : searchMap(index, query)?.[0];
+
+		if (result) pick(result, 'keyboard');
+	}
+
+	return { pick, pickOnEnter, results };
 }
