@@ -1,9 +1,8 @@
 @theme {
-	--breakpoint-xs: 22.5rem; /* Only used for image thumbnails as of 2026Q1 */
-	--spacing-content: 60.25rem; /* 964px = 900px + 4rem (for content padding) */
+	--breakpoint-xs: 22.5rem;
+	--spacing-content: 60.25rem;
 }
 
-/* Image shadow and caption sizes; caption min heights spread the gradient behind the text */
 @theme {
 	--spacing-image-shadow-sm: 15vh;
 	--spacing-image-shadow-md: 20vh;
@@ -31,7 +30,6 @@
 }
 
 @theme {
-	/* Primary colors: zinc */
 	--color-primary-50: var(--color-zinc-50);
 	--color-primary-100: var(--color-zinc-100);
 	--color-primary-200: var(--color-zinc-200);
@@ -43,8 +41,6 @@
 	--color-primary-800: var(--color-zinc-800);
 	--color-primary-900: var(--color-zinc-900);
 	--color-primary-950: var(--color-zinc-950);
-
-	/* Accent colors: calypso */
 	--color-accent-50: #f1f8fa;
 	--color-accent-100: #dceef1;
 	--color-accent-200: #bddee4;
@@ -56,8 +52,6 @@
 	--color-accent-800: #2f4d5b;
 	--color-accent-900: #2b434e;
 	--color-accent-950: #182a34;
-
-	/* Highlight colors: honey */
 	--color-highlight-50: #fdf7f0;
 	--color-highlight-100: #fff3e1;
 	--color-highlight-200: #f8dcb9;
@@ -69,8 +63,6 @@
 	--color-highlight-800: #744a11;
 	--color-highlight-900: #603e14;
 	--color-highlight-950: #3d260c;
-
-	/* Alternate colors: lima */
 	--color-alternate-50: #f5fee7;
 	--color-alternate-100: #e8fccb;
 	--color-alternate-200: #d2fa9c;
@@ -84,14 +76,6 @@
 	--color-alternate-950: #172e05;
 }
 
-/* Atlas split; atlas.css clamps the pane between them and atlas-pane.ts reads them from computed style */
-@theme {
-	--atlas-pane-min: 40rem;
-	--atlas-map-min: 20rem;
-	--atlas-pane-default: 45rem;
-}
-
-/* Stacking order; image chrome sits under the header so the site chrome overlaps a hero */
 @theme {
 	--z-index-image: 10;
 	--z-index-image-shadow: 11;

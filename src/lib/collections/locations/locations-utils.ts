@@ -16,9 +16,8 @@ import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/r
 import { createRegionAncestorsFunction } from '#lib/collections/regions/regions-utils.ts';
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getMapLanguages, getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
-import { getMapData } from '#lib/map/map-data.ts';
-import { getMapDirectoryData } from '#lib/map/map-directory.ts';
-import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
+import { createMapDataFunction } from '#lib/map/map-data.ts';
+import { getLocationsMapRule } from '#lib/map/map-locations.ts';
 import { contentPolicy } from '#lib/utils/content-policy.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description-data.ts';
 import { getContentPath } from '#lib/utils/routing.ts';
@@ -67,7 +66,6 @@ const locationNearbyRadiusKmMin = 1;
 const locationNearbyRadiusKmMax = 3;
 const locationNearbyRadiusNeighborCount = 5;
 
-// Resolve region, lang code, and multilingual title data for a location entry
 export async function createLocationEntryDisplayFunction() {
 	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
 
@@ -99,31 +97,23 @@ export async function createLocationEntryDisplayFunction() {
 	};
 }
 
-// Data for a single location entry page: map data, related posts, and backlinks
 export async function createQueryLocationsEntryFunction() {
 	const getPostsByIds = await createPostsByIdsFunction();
 	const getLocationsByIds = await createLocationsByIdsFunction();
 	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
 	const catalog = await getCatalog();
-	const { chunkKeyById, version } = await getMapDirectoryData();
+	const getMapData = await createMapDataFunction();
 
 	return function queryLocationsEntry(entry: CollectionEntry<'locations'>) {
 		const regionPrimary = getFirstRegionByReference(entry.data.regions);
 
-		// Inline the target and its nearby neighbors for context
-		// Frame from the target alone (boundsFeatureCollection) so the view centers on it
 		const nearbyIds = entry.data._nearby?.map(({ locationId }) => locationId) ?? [];
-		const mapLocations = getLocationsByIds([entry.id, ...nearbyIds]);
 
 		const mapData = getMapData({
 			boundsBuffer: getLocationNearbyRadius(entry.data._nearby),
-			boundsFeatureCollection: getLocationsFeatureCollection([entry]),
-			chunkKeyById,
-			featureCollection: getLocationsFeatureCollection(mapLocations),
-			locationCount: mapLocations.length,
 			mapId: `${entry.collection}/${entry.id}`,
+			rule: getLocationsMapRule(getLocationsByIds([entry.id, ...nearbyIds])),
 			targetId: entry.data._uuid ?? entry.id,
-			version,
 			...getMapLanguages(regionPrimary?.data._langCode),
 		});
 
@@ -174,7 +164,6 @@ export async function queryLocationsIndex() {
 	);
 }
 
-// Some entries in Taiwan also have Japanese titles; we'd like to display this as well
 function getLangCodeAdditional(regionPrimary: CollectionEntry<'regions'> | undefined) {
 	const isTaiwan =
 		regionPrimary?.id === 'taiwan' || regionPrimary?.data._ancestors?.includes('taiwan');
@@ -182,8 +171,6 @@ function getLangCodeAdditional(regionPrimary: CollectionEntry<'regions'> | undef
 	return isTaiwan ? { langCodeAdditional: LanguageCodeEnum.Japanese } : {};
 }
 
-// Center the location map on the target, sizing the frame to neighbor density
-// Dense areas keep the minimum radius, remote ones widen toward the maximum
 function getLocationNearbyRadius(nearby: Array<LocationsNearbyItem> | undefined): number {
 	if (!nearby || nearby.length === 0) return locationNearbyRadiusKmMin;
 

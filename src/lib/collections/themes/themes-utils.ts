@@ -2,6 +2,8 @@ import type { CollectionEntry } from 'astro:content';
 
 import * as R from 'remeda';
 
+import type { MapComponentData } from '#lib/map/map-types.ts';
+
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { buildEntryCatalogItems } from '#lib/catalog/catalog-utils.ts';
 import { createLocationsByIdsFunction } from '#lib/collections/locations/locations-data.ts';
@@ -9,9 +11,9 @@ import { createPostsByIdsFunction } from '#lib/collections/posts/posts-data.ts';
 import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-data.ts';
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { getMapLanguages } from '#lib/i18n/i18n-utils.ts';
-import { getMapData } from '#lib/map/map-data.ts';
-import { getMapDirectoryData, getMapThemeIndexById } from '#lib/map/map-directory.ts';
-import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
+import { createMapDataFunction } from '#lib/map/map-data.ts';
+import { getMapThemeIndexById } from '#lib/map/map-directory.ts';
+import { getThemeMapRule, hasEntryMap } from '#lib/map/map-locations.ts';
 import {
 	createCollectionLookupByIds,
 	hasEntries,
@@ -20,7 +22,6 @@ import {
 
 export const createThemesByIdsFunction = createCollectionLookupByIds('Themes', getThemesCollection);
 
-// Data for a single theme entry page: catalog items, map data, and related themes
 export async function createQueryThemesEntryFunction() {
 	const { entries: themes } = await getThemesCollection();
 
@@ -28,7 +29,7 @@ export async function createQueryThemesEntryFunction() {
 	const getPostsByTheme = await createPostsByThemeFunction();
 	const catalog = await getCatalog();
 	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
-	const { chunkKeyById, version } = await getMapDirectoryData();
+	const getMapData = await createMapDataFunction();
 	const themeIndexById = await getMapThemeIndexById();
 
 	return function queryThemesEntry(entry: CollectionEntry<'themes'>) {
@@ -39,7 +40,6 @@ export async function createQueryThemesEntryFunction() {
 
 		const postsFiltered = getPostsByTheme(entry);
 
-		// Catalog items are the posts and locations that are associated with the theme
 		const featuredCandidates = catalog.resolve([
 			...R.pipe(
 				locationsListed,
@@ -55,23 +55,14 @@ export async function createQueryThemesEntryFunction() {
 			restCandidates,
 		);
 
-		const themeIndex = themeIndexById.get(entry.id);
+		const mapData = hasEntryMap(entry)
+			? getMapData({
+					mapId: `${entry.collection}/${entry.id}`,
+					rule: getThemeMapRule(themeIndexById, entry.id),
+					...getMapLanguages(regionPrimary?.data._langCode),
+				})
+			: ({ hasGeodata: false } satisfies MapComponentData);
 
-		const mapData = getMapData({
-			chunkKeyById,
-			featureCollection: entry.data.hideMap
-				? undefined
-				: getLocationsFeatureCollection(locationsFiltered),
-			locationCount: locationsFiltered.length,
-			mapId: `${entry.collection}/${entry.id}`,
-			version,
-			...(themeIndex === undefined
-				? {}
-				: { mapFeaturesRule: { index: themeIndex, type: 'theme' } }),
-			...getMapLanguages(regionPrimary?.data._langCode),
-		});
-
-		// Related themes are those that reference the current theme
 		const relatedThemeIds = R.pipe(
 			themes,
 			R.filter((theme) => theme.data.themes?.some(({ id }) => id === entry.id) ?? false),
@@ -100,14 +91,12 @@ export async function queryThemesIndex() {
 	return R.pipe(
 		entries,
 		R.filter(hasEntries),
-		// Only display themes with associated images
 		R.filter((entry) => !!entry.data.imageFeatured),
 		R.sort(sortByEntryCount),
 		catalog.resolve,
 	);
 }
 
-// Get locations that have a term
 async function createLocationsByThemeFunction() {
 	const getLocationsByIds = await createLocationsByIdsFunction();
 
@@ -118,7 +107,6 @@ async function createLocationsByThemeFunction() {
 	};
 }
 
-// Get posts that have a term
 async function createPostsByThemeFunction() {
 	const getPostsByIds = await createPostsByIdsFunction();
 

@@ -3,13 +3,13 @@ import { trackMap } from '@spectralcodex/react-map-component/track';
 import type { AtlasSheetRest } from '#lib/atlas/atlas-layout-factory.ts';
 
 import { atlasSheetAttribute, atlasSheetRest } from '#lib/atlas/atlas-constants.ts';
-import { readSheetRest } from '#lib/atlas/atlas-layout.ts';
 import { getSheetStepRest, getSheetTapRest } from '#lib/atlas/atlas-sheet-factory.ts';
 import {
 	grabSheet,
 	isSheetGrabbed,
 	moveSheet,
 	readPreferredSheetRest,
+	readSheetRest,
 	readSheetRests,
 	storeSheetRest,
 } from '#lib/atlas/atlas-sheet.ts';

@@ -37,7 +37,7 @@ const t = getTranslations();
 				...mapComponentProps,
 				...(showAtlasOpen
 					? {
-							hasEnterControl: true,
+							controls: ['enter'],
 							messages: { enterAriaLabel: t('atlas.open.label') },
 						}
 					: {}),

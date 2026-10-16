@@ -2,7 +2,8 @@ import type { CollectionEntry } from 'astro:content';
 
 import * as R from 'remeda';
 
-import { mapDisplayRegionIds, mapDivisionsDataPath } from '#constants.ts';
+import type { MapComponentData } from '#lib/map/map-types.ts';
+
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { buildEntryCatalogItems } from '#lib/catalog/catalog-utils.ts';
 import { createLocationsByIdsFunction } from '#lib/collections/locations/locations-data.ts';
@@ -13,28 +14,24 @@ import {
 } from '#lib/collections/regions/regions-data.ts';
 import { getRegionsOptions } from '#lib/collections/regions/regions-options.ts';
 import { getMapLanguages } from '#lib/i18n/i18n-utils.ts';
-import { getMapData } from '#lib/map/map-data.ts';
+import { createMapDataFunction } from '#lib/map/map-data.ts';
 import { getMapDirectoryData } from '#lib/map/map-directory.ts';
-import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
+import { getRegionMapRule, hasEntryMap } from '#lib/map/map-locations.ts';
 import { hasEntries, sortByEntryCount } from '#lib/utils/collections.ts';
 import { contentPolicy } from '#lib/utils/content-policy.ts';
-import { getBasePath } from '#lib/utils/routing.ts';
 
-// Data for a single region entry page: catalog items, map data, and display options
 export async function createQueryRegionsEntryFunction() {
 	const getRegionAncestors = await createRegionAncestorsFunction();
 	const getPostsByIds = await createPostsByIdsFunction();
 	const getLocationsByIds = await createLocationsByIdsFunction();
 	const catalog = await getCatalog();
-	const { chunkKeyById, version } = await getMapDirectoryData();
+	const getMapData = await createMapDataFunction();
 	const { regionsTree } = await getRegionsCollection();
+	const { divisionUrlById } = await getMapDirectoryData();
 
 	return function queryRegionsEntry(entry: CollectionEntry<'regions'>) {
 		const ancestors = getRegionAncestors(entry);
-
-		const shouldShowRegionMap =
-			mapDisplayRegionIds.has(entry.id) ||
-			ancestors.some((ancestor) => mapDisplayRegionIds.has(ancestor.id));
+		const divisionUrl = divisionUrlById.get(entry.id);
 
 		const entryLocations = entry.data._locations ? getLocationsByIds(entry.data._locations) : [];
 		const entryLocationsListed = entryLocations.filter(({ data }) => !data.hideIndex);
@@ -61,24 +58,14 @@ export async function createQueryRegionsEntryFunction() {
 
 		const regionsOption = getRegionsOptions(ancestors.length);
 
-		const regionInterval = regionsTree.intervalById.get(entry.id);
-
-		const mapData = getMapData({
-			chunkKeyById,
-			featureCollection: shouldShowRegionMap
-				? getLocationsFeatureCollection(entryLocations)
-				: undefined,
-			locationCount: entryLocations.length,
-			mapId: `${entry.collection}/${entry.id}`,
-			version,
-			...(regionInterval ? { mapFeaturesRule: { interval: regionInterval, type: 'region' } } : {}),
-			...getMapLanguages(entry.data._langCode),
-			...(entry.data.divisionId && !entry.data.hideDivision
-				? {
-						apiDivisionUrl: getBasePath(mapDivisionsDataPath, `${entry.id}.fgb`),
-					}
-				: {}),
-		});
+		const mapData = hasEntryMap(entry)
+			? getMapData({
+					mapId: `${entry.collection}/${entry.id}`,
+					rule: getRegionMapRule(regionsTree.intervalById, entry.id),
+					...getMapLanguages(entry.data._langCode),
+					...(divisionUrl ? { apiDivisionUrl: divisionUrl } : {}),
+				})
+			: ({ hasGeodata: false } satisfies MapComponentData);
 
 		const backlinksCount = catalog.backlinksOf(entry.id).length;
 
@@ -93,7 +80,6 @@ export async function createQueryRegionsEntryFunction() {
 	};
 }
 
-// Related regions (children/siblings) filtered by content and sorted by content count
 export async function createQueryRegionsRelatedFunction() {
 	const getRegionsByIds = await createRegionsByIdsFunction();
 
@@ -104,7 +90,6 @@ export async function createQueryRegionsRelatedFunction() {
 	};
 }
 
-// References are not the complete entry; they still need to be fetched from the collection
 export async function createRegionAncestorsByIdFunction() {
 	const { entriesMap } = await getRegionsCollection();
 	const getRegionAncestors = await createRegionAncestorsFunction();
@@ -119,7 +104,6 @@ export async function createRegionAncestorsByIdFunction() {
 	};
 }
 
-// Get all ancestors of the specified region
 export async function createRegionAncestorsFunction() {
 	const getRegionsById = await createRegionsByIdsFunction();
 
@@ -130,7 +114,6 @@ export async function createRegionAncestorsFunction() {
 	};
 }
 
-// Filtered and sorted ancestral regions for the regions index page
 export async function queryRegionsIndex() {
 	const { entries } = await getRegionsCollection();
 	const catalog = await getCatalog();

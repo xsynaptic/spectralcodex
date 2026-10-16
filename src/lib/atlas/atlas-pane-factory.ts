@@ -1,6 +1,5 @@
 const keyStepRem = 2;
 
-// The same lengths atlas.css clamps `--atlas-pane-width` between, which covers restore and viewport resizes
 export interface AtlasPaneLimits {
 	mapMin: number;
 	paneMin: number;
@@ -9,23 +8,7 @@ export interface AtlasPaneLimits {
 }
 
 export function getPaneWidthRange({ mapMin, paneMin, viewportWidth }: AtlasPaneLimits) {
-	// Content styles follow viewport breakpoints, so the pane keeps its minimum when both cannot fit
 	return { max: Math.max(paneMin, viewportWidth - mapMin), min: paneMin };
-}
-
-// The clamp atlas.css puts on the pane, spelled out because `sizes` cannot read custom properties
-export function getPaneImageSizes({
-	mapMinRem,
-	mediaQuery,
-	paneMinRem,
-	paneSize,
-}: {
-	mapMinRem: number;
-	mediaQuery: string;
-	paneMinRem: number;
-	paneSize: string;
-}) {
-	return `${mediaQuery} clamp(${String(paneMinRem)}rem, ${paneSize}, 100vw - ${String(mapMinRem)}rem), 100vw`;
 }
 
 export function clampPaneWidth(width: number, limits: AtlasPaneLimits) {
@@ -34,17 +17,16 @@ export function clampPaneWidth(width: number, limits: AtlasPaneLimits) {
 	return Math.min(Math.max(width, min), max);
 }
 
-// The divider is the pane's left edge, so moving it left widens the pane
 export function getPaneWidthForKey(key: string, width: number, limits: AtlasPaneLimits) {
 	const { max, min } = getPaneWidthRange(limits);
 	const step = keyStepRem * limits.rootFontSize;
 
 	switch (key) {
 		case 'ArrowLeft': {
-			return clampPaneWidth(width + step, limits);
+			return width + step;
 		}
 		case 'ArrowRight': {
-			return clampPaneWidth(width - step, limits);
+			return width - step;
 		}
 		case 'End': {
 			return max;

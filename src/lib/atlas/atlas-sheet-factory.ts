@@ -41,6 +41,7 @@ export function getSheetTranslate({
 	linePx: number;
 	lines: AtlasSheetLines;
 }) {
+	// Less the half margin, so a grab draws the same frame as the half rest it left
 	return linePx - getMarginPx(from, lines);
 }
 
@@ -64,6 +65,7 @@ export function getSheetSlide({
 
 	if (to !== atlasSheetRest.raised) return { clipPx: undefined, translatePx };
 
+	// Leaving half drops the margin, so near a page's end the scroll clamps and raised stops short
 	const clampPx = Math.min(marginPx, Math.max(0, scrollY - (scrollMaxY - marginPx)));
 
 	if (clampPx === 0) return { clipPx: undefined, translatePx };

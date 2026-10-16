@@ -1,26 +1,14 @@
 @import 'tailwindcss' source(none);
 
-/**
- * Tailwind usually scans everything for class names
- * For performance reasons we're explicitly naming paths and file types here:
- * 1) CSS files, for which we need to check @apply rules and CSS variable names
- * 2) Astro files destined for the production build
- */
 @source './main/**/*.css';
 @source '../components/**/*.astro';
 @source '../layouts/**/*.astro';
 @source '../pages/**/*.astro';
-
-/* Safelist utilities applied to HTML we don't author directly */
 @source inline('sr-only');
 
 @custom-variant dark (&:where([data-mode="dark"], [data-mode="dark"] *));
 
-/*
- * Atlas mode works because everything above medium is mapped to container queries
- * Only the `sm` breakpoint remains on Tailwind defaults
- * The pane is never narrower than 40rem, so both readings would always agree
- */
+/* Outside `.main-pane` these match nothing, and they switch about 15px late because the pane excludes the scrollbar */
 @custom-variant md (@container pane (width >= 48rem));
 @custom-variant lg (@container pane (width >= 64rem));
 @custom-variant xl (@container pane (width >= 80rem));

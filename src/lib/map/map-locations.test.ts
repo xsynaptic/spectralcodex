@@ -1,11 +1,14 @@
 import type { CollectionEntry } from 'astro:content';
 
 import { MapPopupOwnField } from '@spectralcodex/map-codec';
-import { describe, expect, test } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 
-import { getLocationFeatureIds, getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
+import {
+	getLocationFeatureIds,
+	getLocationsFeatureCollection,
+	getLocationsMapSourceData,
+} from '#lib/map/map-locations.ts';
 
-// Minimal fixtures; only the fields the feature builder reads, cast to the collection entry type
 function makeLocation(
 	id: string,
 	data: Record<string, unknown> & { title: string },
@@ -141,25 +144,33 @@ describe('getLocationsFeatureCollection', () => {
 		]);
 	});
 
-	test('hideSensitiveLocations filters hidden locations, and false keeps them', () => {
-		const locations = [
-			makeLocation('sensitive-site', {
-				geometry: makePoint(121.5, 25),
-				hideLocation: true,
-				title: 'Sensitive Site',
-			}),
-			makeLocation('longshan-temple', {
-				geometry: makePoint(121.49, 25.03),
-				title: 'Longshan Temple',
-			}),
-		];
+	const sensitiveLocations = [
+		makeLocation('sensitive-site', {
+			geometry: makePoint(121.5, 25),
+			hideLocation: true,
+			title: 'Sensitive Site',
+		}),
+		makeLocation('longshan-temple', {
+			geometry: makePoint(121.49, 25.03),
+			title: 'Longshan Temple',
+		}),
+	];
 
+	test('drops hidden Locations under the content policy; includeHidden keeps them', async () => {
+		// The policy reads the environment when its module loads, so import a fresh production copy
+		vi.stubEnv('DEV', false);
+		vi.resetModules();
+
+		const production = await import('#lib/map/map-locations.ts');
+
+		vi.unstubAllEnvs();
+
+		expect(production.getLocationsFeatureCollection(sensitiveLocations)?.features).toHaveLength(1);
 		expect(
-			getLocationsFeatureCollection(locations, { hideSensitiveLocations: true })?.features,
-		).toHaveLength(1);
-		expect(
-			getLocationsFeatureCollection(locations, { hideSensitiveLocations: false })?.features,
+			production.getLocationsFeatureCollection(sensitiveLocations, { includeHidden: true })
+				?.features,
 		).toHaveLength(2);
+		expect(production.getLocationsMapRule(sensitiveLocations).ids).toEqual(['longshan-temple']);
 	});
 
 	test('reuses the same feature objects when a location is mapped again', () => {
@@ -177,7 +188,7 @@ describe('getLocationsFeatureCollection', () => {
 });
 
 describe('getLocationsFeatureCollection properties', () => {
-	test('reduces urls to relative paths and strips url scheme from external links', () => {
+	test('reduces the page url to a path and carries external links whole', () => {
 		const result = getLocationsFeatureCollection([
 			makeLocation('longshan-temple', {
 				_googleMapsUrl: 'https://maps.app.goo.gl/xYz123',
@@ -191,8 +202,8 @@ describe('getLocationsFeatureCollection properties', () => {
 		const properties = result?.features[0]?.properties;
 
 		expect(properties?.url).toBe('/locations/longshan-temple/');
-		expect(properties?.googleMapsUrl).toBe('xYz123');
-		expect(properties?.wikipediaUrl).toBe('en.wikipedia.org/wiki/Longshan_Temple');
+		expect(properties?.googleMapsUrl).toBe('https://maps.app.goo.gl/xYz123');
+		expect(properties?.wikipediaUrl).toBe('https://en.wikipedia.org/wiki/Longshan_Temple');
 	});
 
 	test('lets a point override entry-level properties', () => {
@@ -256,10 +267,8 @@ describe('getLocationsFeatureCollection properties', () => {
 
 		const properties = result?.features.map((feature) => feature.properties) ?? [];
 
-		// Inherited fields stay on the Feature for the other maps
 		expect(properties[0]?.description).toBe('<p>Entry description</p>');
 		expect(properties[0]?.image).toBe(thumbnail);
-		// A Point that repeats the Location's Precision still counts as setting it
 		expect(properties.map((item) => item.own)).toEqual([
 			undefined,
 			MapPopupOwnField.Description,
@@ -299,10 +308,33 @@ describe('getLocationsFeatureCollection properties', () => {
 
 		const properties = result?.features.map((feature) => feature.properties) ?? [];
 
-		expect(properties.map((item) => item.googleMapsUrl)).toEqual([undefined, 'pointPin']);
-		expect(properties.map((item) => item.wikipediaUrl)).toEqual([
-			'en.wikipedia.org/wiki/Bopiliao',
-			'en.wikipedia.org/wiki/North_Block',
+		expect(properties.map((item) => item.googleMapsUrl)).toEqual([
+			undefined,
+			'https://maps.app.goo.gl/pointPin',
 		]);
+		expect(properties.map((item) => item.wikipediaUrl)).toEqual([
+			'https://en.wikipedia.org/wiki/Bopiliao',
+			'https://en.wikipedia.org/wiki/North_Block',
+		]);
+	});
+});
+
+describe('getLocationsMapSourceData', () => {
+	test('carries the Multilingual Title beside the title, both stripped of marks for the map font', () => {
+		const [row] =
+			getLocationsMapSourceData(
+				getLocationsFeatureCollection([
+					makeLocation('hue-citadel', {
+						geometry: makePoint(107.58, 16.47),
+						title: 'Huế Citadel',
+						title_vi: 'Kinh thành Huế',
+					}),
+				]),
+			) ?? [];
+
+		expect(row?.properties).toMatchObject({
+			title: 'Hue Citadel',
+			titleMultilingual: 'Kinh thanh Hue',
+		});
 	});
 });

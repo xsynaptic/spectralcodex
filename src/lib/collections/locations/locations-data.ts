@@ -13,6 +13,7 @@ import {
 	getLocationThumbnailProps,
 } from '#lib/collections/locations/locations-factory.ts';
 import { createGenerateNearbyItemsFunction } from '#lib/collections/locations/locations-nearby.ts';
+import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { createSignedImagePathFunction } from '#lib/image/image-server.ts';
 import { getMatchingLinkUrl } from '#lib/schemas/resources.ts';
@@ -26,7 +27,6 @@ import { getDescriptionRendered } from '#lib/utils/description-data.ts';
 import { getDescription } from '#lib/utils/description.ts';
 import { getContentPath } from '#lib/utils/routing.ts';
 
-// Popup thumbnails are stored as signed paths; the popup prepends the image server URL at render time
 const getSignedImagePath = createSignedImagePathFunction({
 	imageFormat: imageLowQualityFormat,
 	imageQuality: imageLowQualityValue,
@@ -108,24 +108,20 @@ function setGeometryThumbnails(
 	}
 }
 
-// Nearby data is expensive; buffer zones cut the candidate set and a distance-pair Map halves the rest
 export const getLocationsCollection = createCollectionData({
 	collection: 'locations',
 	label: 'Locations',
 	async mutate(entries) {
-		// Flatten overrides onto entry.data so downstream code never needs to know
 		if (contentPolicy.applyOverrides) {
 			for (const entry of entries) {
 				if (!entry.data.override) continue;
 
-				// Exclude override ID from flattening; getPublicId() reads it separately
 				const { id: _, ...overrideFields } = entry.data.override;
 
 				Object.assign(entry.data, overrideFields);
 			}
 		}
 
-		// Narrows nearby-item candidates only; `mutate` cannot drop entries from the collection
 		const nearbyCandidates = contentPolicy.hideSensitiveLocations
 			? entries.filter((location) => !location.data.hideLocation)
 			: entries;
@@ -144,13 +140,11 @@ export const getLocationsCollection = createCollectionData({
 	},
 });
 
-// Transform IDs into entries (and emit a warning when an ID doesn't match)
 export const createLocationsByIdsFunction = createCollectionLookupByIds(
 	'Locations',
 	getLocationsCollection,
 );
 
-// Get all locations referenced by a set of posts
 export async function createLocationsByPostsFunction() {
 	const { entriesMap: locationsMap } = await getLocationsCollection();
 
@@ -164,5 +158,39 @@ export async function createLocationsByPostsFunction() {
 		return ids
 			.map((id) => locationsMap.get(id))
 			.filter((entry): entry is CollectionEntry<'locations'> => !!entry);
+	};
+}
+
+export async function createLocationsBySeriesFunction() {
+	const { entriesMap: locationsMap } = await getLocationsCollection();
+	const { entriesMap: postsMap } = await getPostsCollection();
+
+	const getLocationsByPosts = await createLocationsByPostsFunction();
+
+	return function getLocationsBySeries(
+		seriesItemIds: Array<string> | undefined,
+	): Array<CollectionEntry<'locations'>> {
+		if (!seriesItemIds || seriesItemIds.length === 0) return [];
+
+		const seriesLocationsMap = new Map<string, CollectionEntry<'locations'>>();
+
+		for (const seriesItemId of seriesItemIds) {
+			const location = locationsMap.get(seriesItemId);
+
+			if (location) {
+				seriesLocationsMap.set(seriesItemId, location);
+				continue;
+			}
+
+			const post = postsMap.get(seriesItemId);
+
+			if (!post) throw new Error(`[Series] Requested item "${seriesItemId}" not found!`);
+
+			for (const seriesPostLocation of getLocationsByPosts(post)) {
+				seriesLocationsMap.set(seriesPostLocation.id, seriesPostLocation);
+			}
+		}
+
+		return [...seriesLocationsMap.values()];
 	};
 }

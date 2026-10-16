@@ -2,13 +2,13 @@ html {
 	scrollbar-gutter: stable;
 }
 
+/* Astro ships its own rule beside a page's first island; a swap can take it away with the persisted shell */
 astro-island,
 astro-slot,
 astro-static-slot {
 	display: contents;
 }
 
-/* Layered so a component can still retune its own ring */
 :focus-visible {
 	outline: 2px solid light-dark(var(--color-accent-500), var(--color-accent-400));
 	outline-offset: 2px;

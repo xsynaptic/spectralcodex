@@ -1,14 +1,5 @@
-/**
- * Bin-packs popup payloads into size-bounded chunks
- * This is done by walking a Hilbert curve over world lon/lat and greedily filling each bin to a byte cap
- * The Hilbert order preserves spatial locality, so each bin is roughly contiguous
- * Keys are sequential integers, renumbered every build
- * Chunk URLs are version-busted client-side, so stable geographic keys buy nothing
- */
-
 const chunkBytesLimitKb = 150 * 1024;
 
-// Hilbert grid side is 2**ORDER; order 16 resolves the globe to ~600m at the equator, ample for packing
 const hilbertOrder = 16;
 const hilbertSide = 2 ** hilbertOrder;
 
@@ -20,7 +11,6 @@ export interface ChunkInputItem {
 }
 
 interface ChunkAssignment {
-	// Chunk keys in deterministic order, each mapped to the ids it holds
 	chunkIds: Map<string, Array<string>>;
 	chunkKeyById: Map<string, string>;
 }
@@ -29,7 +19,6 @@ interface ChunkAssignmentOptions {
 	capBytes?: number;
 }
 
-// Bin every item into a size-bounded chunk, ordered along the Hilbert curve so bins stay coherent
 export function assignChunks(
 	items: Array<ChunkInputItem>,
 	options?: ChunkAssignmentOptions,
@@ -46,7 +35,7 @@ export function assignChunks(
 	const result: ChunkAssignment = { chunkIds: new Map(), chunkKeyById: new Map() };
 
 	let bin: Array<ChunkInputItem> = [];
-	let binBytes = 2; // Opening + closing brackets, for completeness
+	let binBytes = 2;
 	let nextKey = 0;
 
 	function closeBin(): void {
@@ -63,9 +52,8 @@ export function assignChunks(
 		binBytes = 2;
 	}
 
-	// Next-fit: never reorders, so each closed bin is one contiguous curve run
 	for (const { item } of ordered) {
-		const wouldAdd = item.popupBytes + (bin.length > 0 ? 1 : 0); // Comma if not first
+		const wouldAdd = item.popupBytes + (bin.length > 0 ? 1 : 0);
 
 		if (bin.length > 0 && binBytes + wouldAdd > capBytes) closeBin();
 		binBytes += item.popupBytes + (bin.length > 0 ? 1 : 0);
@@ -83,7 +71,6 @@ function clampCell(value: number, min: number, span: number): number {
 	return raw;
 }
 
-// Standard xy2d: fold grid coords into a distance along the Hilbert curve
 function hilbertIndex(gridX: number, gridY: number): number {
 	let x = gridX;
 	let y = gridY;

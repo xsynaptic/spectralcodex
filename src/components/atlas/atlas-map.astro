@@ -16,7 +16,6 @@ const t = getTranslations();
 
 const directiveOptions: AtlasDirectiveOptions = { css: mapCssUrl };
 
-// Local to the map's own stacking context; the React component needs a number, not a class
 const zIndex = 10;
 ---
 
@@ -33,6 +32,7 @@ const zIndex = 10;
 			<ReactMapComponent
 				{...mapComponentProps}
 				client:atlas={JSON.stringify(directiveOptions)}
+				controls={['exit', 'expand']}
 				host={{ fullscreenContainerId: atlasRootId }}
 				messages={{
 					exitAriaLabel: t('atlas.close.label'),

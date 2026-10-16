@@ -1,13 +1,12 @@
+/* This steps at md: together with .img-group and .figure-wide; moving one to a viewport query makes it overhang the text */
 @utility content-column {
 	@apply mx-auto max-w-content px-4 md:px-8;
 }
 
-/* Drops the base padding so content reaches the viewport edge on mobile */
 @utility content-column-fill {
 	@apply mx-auto max-w-content sm:px-4 md:px-8;
 }
 
-/* Fade from the top */
 @utility bg-gradient-a {
 	background-image: linear-gradient(
 		180deg,
@@ -27,7 +26,6 @@
 	);
 }
 
-/* Fade from the bottom */
 @utility bg-gradient-b {
 	background-image: linear-gradient(
 		0deg,
@@ -73,13 +71,12 @@
 	}
 }
 
-/* This fallback pattern is a seamless seigaiha (青海波) pattern */
 @utility bg-fallback {
 	background-color: light-dark(var(--color-primary-200), var(--color-primary-700));
 	background-image: url('/seigaiha-light.svg');
 	background-repeat: repeat;
 
-	/* Image swap stays attribute-driven; light-dark() is color-only */
+	/* light-dark() only takes colours, so the image swap stays on the mode attribute */
 	[data-mode='dark'] & {
 		background-image: url('/seigaiha-dark.svg');
 		background-repeat: repeat;

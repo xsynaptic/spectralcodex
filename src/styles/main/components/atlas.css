@@ -1,3 +1,9 @@
+:root {
+	--atlas-pane-min: 40rem;
+	--atlas-map-min: 20rem;
+	--atlas-pane-default: 45rem;
+}
+
 .atlas-shell {
 	position: fixed;
 	inset: 0;
@@ -6,6 +12,10 @@
 	/* Hidden rather than removed so the live canvas keeps its size and state */
 	visibility: hidden;
 	outline: none;
+
+	.maplibregl-ctrl:has(> .maplibregl-ctrl-expand) {
+		display: none;
+	}
 }
 
 .main-pane {
@@ -26,17 +36,19 @@
 	display: none;
 }
 
-/* The offset is the dragged pane width less the current one */
 .atlas-divider-preview {
 	--atlas-preview-ink: light-dark(
 		color-mix(in srgb, var(--color-primary-900) 20%, transparent),
 		color-mix(in srgb, var(--color-primary-50) 20%, transparent)
 	);
 
-	position: absolute;
+	position: fixed;
 	inset-block: 0;
-	left: calc(50% + min(0px, var(--atlas-drag-offset, 0px)));
-	width: max(var(--atlas-drag-offset, 0px), -1 * var(--atlas-drag-offset, 0px));
+	right: min(var(--atlas-pane-width), var(--atlas-pane-current));
+	width: max(
+		var(--atlas-pane-width) - var(--atlas-pane-current),
+		var(--atlas-pane-current) - var(--atlas-pane-width)
+	);
 	pointer-events: none;
 	background: repeating-linear-gradient(
 		-45deg,
@@ -44,19 +56,21 @@
 		transparent 1px 7px
 	);
 	opacity: 0;
-
-	/* The handle follows the preview in the divider, so its band paints over the blur */
 	backdrop-filter: blur(6px);
 	transition: opacity 120ms ease-out;
+}
 
-	&::after {
-		position: absolute;
-		inset-block: 0;
-		left: max(0px, var(--atlas-drag-offset, 0px));
-		content: '';
-		border-left: 1px dashed light-dark(var(--color-primary-500), var(--color-primary-400));
-		translate: -50%;
-	}
+/* Kept outside the preview because its blur would make the preview the containing block of this fixed element */
+.atlas-divider::after {
+	position: fixed;
+	inset-block: 0;
+	right: var(--atlas-pane-current);
+	pointer-events: none;
+	content: '';
+	border-left: 1px dashed light-dark(var(--color-primary-500), var(--color-primary-400));
+	opacity: 0;
+	translate: 50%;
+	transition: opacity 120ms ease-out;
 }
 
 .atlas-divider-handle {
@@ -113,18 +127,32 @@
 	}
 }
 
-.atlas-divider:has([data-dragging]) .atlas-divider-preview {
-	opacity: 1;
+.atlas-divider:has([data-dragging]) {
+	.atlas-divider-preview,
+	&::after {
+		opacity: 1;
+	}
 }
 
 @media (width >= 64rem) {
+	:root {
+		--atlas-pane-layout: split;
+	}
+
 	:root[data-atlas][data-atlas-page='pane'] {
-		/* Percent resolves where the property is used, against a box without the scrollbar gutter that `100vw` counts */
-		--atlas-pane-width: clamp(
-			var(--atlas-pane-min),
-			var(--atlas-pane-size, var(--atlas-pane-default)),
-			100% - var(--atlas-map-min)
-		);
+		--atlas-pane-current: var(--atlas-pane-width);
+
+		/* A percentage resolves where the property is used, against a box without the scrollbar gutter that 100vw includes */
+
+		/* atlas-pane-factory.ts repeats this clamp for the divider's aria values and the hero image sizes */
+		&,
+		& .atlas-divider {
+			--atlas-pane-width: clamp(
+				var(--atlas-pane-min),
+				var(--atlas-pane-size, var(--atlas-pane-default)),
+				100% - var(--atlas-map-min)
+			);
+		}
 
 		.main-pane {
 			position: relative;
@@ -142,6 +170,10 @@
 			right: var(--atlas-pane-width);
 			visibility: visible;
 			view-transition-name: atlas-map;
+
+			.maplibregl-ctrl:has(> .maplibregl-ctrl-expand) {
+				display: block;
+			}
 		}
 
 		.atlas-divider {
@@ -151,7 +183,9 @@
 			z-index: var(--z-index-divider);
 			display: block;
 			width: 0.75rem;
-			translate: 50%;
+
+			/* Negative margin rather than a transform, which would make this the containing block of its fixed preview */
+			margin-right: -0.375rem;
 		}
 
 		.atlas-inline-map,
@@ -161,6 +195,7 @@
 	}
 }
 
+/* Registered so computed style yields pixels for `readLengthPx` */
 @property --atlas-sheet-split {
 	syntax: '<length>';
 	inherits: true;
@@ -175,8 +210,13 @@
 
 @media (width < 64rem) {
 	:root {
+		--atlas-pane-layout: sheet;
 		--atlas-sheet-handle-size: 1.5rem;
+
+		/* Reaches past the strip into the page or the map; 8px took enough of either to feel sticky */
 		--atlas-sheet-handle-reach: 0.25rem;
+
+		/* `svh` holds the split still when the iOS toolbar collapses mid-scroll */
 		--atlas-sheet-split: 40svh;
 		--atlas-sheet-rest: calc(100dvh - var(--atlas-sheet-handle-size));
 	}
@@ -196,12 +236,6 @@
 		.atlas-shell {
 			visibility: visible;
 			padding-bottom: var(--atlas-sheet-handle-size);
-
-			@media (height >= 30rem) {
-				--map-inset-bottom: calc(
-					100lvh - var(--atlas-sheet-handle-size) - var(--atlas-sheet-split)
-				);
-			}
 		}
 
 		.atlas-inline-map {
@@ -251,14 +285,6 @@
 			padding-top: var(--atlas-sheet-handle-size);
 		}
 
-		&[data-atlas-sheet='half'] .main-pane {
-			margin-top: var(--atlas-sheet-split);
-		}
-
-		&[data-atlas-sheet='half'] .atlas-sheet-handle {
-			top: var(--atlas-sheet-split);
-		}
-
 		.atlas-sheet-handle[data-stuck],
 		&[data-atlas-sheet] .atlas-sheet-handle,
 		.main-pane[data-grabbing] > .atlas-sheet-handle {
@@ -282,6 +308,7 @@
 		&:is([data-atlas-sheet='down'], :has(.main-pane[data-grabbing])) {
 			overflow: clip;
 
+			/* A translated pane is as tall as its page, so it would bring in the page above, not the map */
 			.main-pane {
 				clip-path: inset(
 					calc(var(--atlas-sheet-fold, 0px) - var(--atlas-sheet-clip-reach, 0px)) 0 0 0
@@ -301,32 +328,67 @@
 			visibility: hidden;
 		}
 
-		&[data-atlas-sheet='half'] {
-			scroll-padding-top: calc(var(--atlas-sheet-split) + var(--atlas-sheet-handle-size));
+		/* A click on the open Location then brings its page back rather than opening a popup; half sets it too */
+		&[data-atlas-sheet='down'] .atlas-shell {
+			--map-page-hidden: 1;
+		}
+	}
 
+	/* The half rest applies between the tallest landscape phone and an iPhone SE, so a collapsing toolbar cannot toggle it */
+	@media (height >= 30rem) {
+		:root {
+			--atlas-sheet-half: 1;
+		}
+
+		:root[data-atlas][data-atlas-page='pane'] {
+			/* Set with the layout, not the rest, so a rest change never moves the camera */
 			.atlas-shell {
-				--map-cover-bottom: calc(
+				--map-inset-bottom: calc(
 					100lvh - var(--atlas-sheet-handle-size) - var(--atlas-sheet-split)
 				);
 			}
 
-			&:not(:has(.main-pane[data-grabbing])) .atlas-shell {
-				z-index: var(--z-index-sheet-map);
-				clip-path: inset(0 0 calc(100% - var(--atlas-sheet-split)) 0);
+			&[data-atlas-sheet='half'] {
+				/* In-page links and focus land below the map; `progress-reading` reads this as the covered band */
+				scroll-padding-top: calc(var(--atlas-sheet-split) + var(--atlas-sheet-handle-size));
+
+				.main-pane {
+					margin-top: var(--atlas-sheet-split);
+				}
+
+				.atlas-sheet-handle {
+					top: var(--atlas-sheet-split);
+				}
+
+				/* Follows the rest so the controls clear the split; the camera inset stays put */
+				.atlas-shell {
+					--map-page-hidden: 1;
+					--map-cover-bottom: calc(
+						100lvh - var(--atlas-sheet-handle-size) - var(--atlas-sheet-split)
+					);
+				}
+
+				/* Lifted and cut rather than resized, so the canvas holds its size; the clip also cuts hit testing */
+
+				/* A grab drops the lift, so the drag draws the same frame as the rest it left */
+				&:not(:has(.main-pane[data-grabbing])) .atlas-shell {
+					z-index: var(--z-index-sheet-map);
+					clip-path: inset(0 0 calc(100% - var(--atlas-sheet-split)) 0);
+				}
 			}
 		}
 	}
 }
 
 @media (prefers-reduced-motion: no-preference) {
-	/* The same live map before and after: no crossfade to ghost the old camera */
+	/* The map is the same live element before and after, so a crossfade would only ghost the old camera */
 	::view-transition-old(atlas-map),
 	::view-transition-new(atlas-map) {
 		mix-blend-mode: normal;
 		animation-name: none;
 	}
 
-	/* `:only-child` matches a side entering or leaving, which gets the default fade back */
+	/* `:only-child` matches a side that is entering or leaving, which gets the default fade back */
 	::view-transition-new(atlas-map):only-child {
 		animation-name: -ua-view-transition-fade-in;
 	}
@@ -335,7 +397,7 @@
 		animation-name: -ua-view-transition-fade-out;
 	}
 
-	/* The canvas resizes whenever the split comes or goes, so those navigations are a cut; split to split is neither */
+	/* The canvas resizes whenever the split comes or goes, so those navigations cut instead of animating */
 	@media (width >= 64rem) {
 		:root[data-atlas]:is(
 				[data-atlas-page='pane']:not([data-atlas-from='pane']),
@@ -360,7 +422,6 @@
 		}
 	}
 
-	/* Leaving the full-screen map for a page without one resizes nothing, so the map slides away */
 	:root[data-atlas-from='map']::view-transition-old(atlas-map):only-child {
 		animation: atlas-exit-left 150ms ease-out both;
 	}

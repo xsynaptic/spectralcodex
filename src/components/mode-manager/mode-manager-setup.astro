@@ -1,10 +1,16 @@
 ---
+import { modeAttribute } from '@spectralcodex/shared/constants';
+
 import { modeStorageKey } from '#components/mode-manager/mode-constants.ts';
 import { ModeTypeEnum } from '#components/mode-manager/mode-types.ts';
 ---
 
 <script
-	define:vars={{ storageKey: modeStorageKey, validModes: Object.values(ModeTypeEnum) }}
+	define:vars={{
+		modeAttribute,
+		storageKey: modeStorageKey,
+		validModes: Object.values(ModeTypeEnum),
+	}}
 	is:inline
 >
 	let stored;
@@ -21,7 +27,7 @@ import { ModeTypeEnum } from '#components/mode-manager/mode-types.ts';
 		mode = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
 	}
 
-	document.documentElement.dataset.mode = mode;
+	document.documentElement.setAttribute(modeAttribute, mode);
 	document.documentElement.style.colorScheme = mode;
 
 	const themeColor = getComputedStyle(document.documentElement)

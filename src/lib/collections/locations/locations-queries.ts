@@ -1,14 +1,10 @@
 import { LocationStatusEnum } from '@spectralcodex/shared/map';
 import * as R from 'remeda';
 
+import { atlasRegionId } from '#constants.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import { sortLocationsByLatitude } from '#lib/collections/locations/locations-geometry.ts';
 import { createRegionsByIdsFunction } from '#lib/collections/regions/regions-data.ts';
-import { getMapDataDedicated } from '#lib/map/map-data.ts';
-import { getLocationsFeatureCollection } from '#lib/map/map-locations.ts';
-
-// Saved queries for use in MDX and other places
-// TODO: these should eventually be handled via user authentication and/or a database
 
 export async function getObjectiveLocations() {
 	const { entries } = await getLocationsCollection();
@@ -20,23 +16,10 @@ export async function getObjectiveLocations() {
 		R.filter((entry) => !!entry.data.objective && entry.data.objective >= 1),
 		R.filter((entry) =>
 			getRegionsByIds(entry.data.regions.map(({ id }) => id)).some(
-				(region) => region.id === 'taiwan' || region.data._ancestors?.includes('taiwan'),
+				(region) => region.id === atlasRegionId || region.data._ancestors?.includes(atlasRegionId),
 			),
 		),
 	);
-}
-
-export async function getObjectiveMapData() {
-	const objectiveLocations = await getObjectiveLocations();
-
-	// Dedicated source/popup endpoints keep hidden points off the shared directory
-	return getMapDataDedicated({
-		featureCollection: getLocationsFeatureCollection(objectiveLocations, {
-			hideSensitiveLocations: false,
-		}),
-		isObjectiveFilterEnabled: true,
-		mapId: 'objectives',
-	});
 }
 
 export async function getTheaterLocations() {

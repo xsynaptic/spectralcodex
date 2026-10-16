@@ -2,17 +2,16 @@ import type { ClientDirective } from 'astro';
 
 import { trackMap } from '@spectralcodex/react-map-component/track';
 
-import { readAtlasLayout } from '#lib/atlas/atlas-layout.ts';
+import { atlasFlagAttribute, atlasPageAttribute } from '#lib/atlas/atlas-constants.ts';
+import { isAtlasMapShown, readAtlasFlags } from '#lib/atlas/atlas-layout-factory.ts';
 
-// Serialized into the `client:atlas` value; a directive takes one string
 export interface AtlasDirectiveOptions {
 	css: string;
 }
 
-// Astro runs a directive again each time a persisted island reconnects, which is every swap
+// Astro reruns a directive whenever a persisted island reconnects, which happens on every swap
 const startedIslands = new WeakSet<HTMLElement>();
 
-// Keeps MapLibre from loading before the mode is on, or under a hidden shell
 const atlasDirective: ClientDirective = (load, options, element) => {
 	if (startedIslands.has(element)) return;
 
@@ -53,13 +52,16 @@ const atlasDirective: ClientDirective = (load, options, element) => {
 	const observer = new MutationObserver(hydrateWhenVisible);
 
 	function hydrateWhenVisible() {
-		if (readAtlasLayout() === 'regular') return;
+		if (!isAtlasMapShown(readAtlasFlags(root))) return;
 
 		observer.disconnect();
 		void hydrate();
 	}
 
-	observer.observe(root, { attributeFilter: ['data-atlas', 'data-atlas-page'], attributes: true });
+	observer.observe(root, {
+		attributeFilter: [atlasFlagAttribute, atlasPageAttribute],
+		attributes: true,
+	});
 
 	hydrateWhenVisible();
 };

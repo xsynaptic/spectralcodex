@@ -32,7 +32,7 @@ import {
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getImageFeaturedId, getImageHeroId } from '#lib/image/image-featured.ts';
 import { hasEntryContent } from '#lib/utils/astro.ts';
-import { contentPolicy } from '#lib/utils/content-policy.ts';
+import { isLocationHidden } from '#lib/utils/content-policy.ts';
 
 interface Props {
 	backlinks: Array<CatalogItem> | undefined;
@@ -59,7 +59,7 @@ const hasContent = hasEntryContent(entry);
 const hasHeroImage = !!getImageHeroId({ imageFeatured: entry.data.imageFeatured });
 const imageFeaturedId = getImageFeaturedId({ imageFeatured: entry.data.imageFeatured });
 
-const hideLocation = entry.data.hideLocation && contentPolicy.hideSensitiveLocations;
+const hideLocation = isLocationHidden(entry);
 
 const showChinese = regionLangCode?.startsWith('zh');
 
@@ -71,6 +71,7 @@ const t = getTranslations();
 <ContentEntryArticle
 	atlas={atlas}
 	entry={entry}
+	meta={{ prefetchUrls: mapData.prefetchUrls }}
 	schemas={await getLocationSchemas(entry, { url: Astro.url.toString() })}
 	titleMultilingual={titleMultilingual}
 	titleMultilingualAdditional={titleMultilingualAdditional}
