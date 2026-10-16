@@ -58,7 +58,7 @@ spectralcodex.com {
 	@immutable path /_x/*
 	header @immutable Cache-Control "public, max-age=31536000, immutable"
 
-	# Caddy sorts these by path specificity rather than file order, so the tiers must not overlap
+	# Caddy sorts single-path matchers by specificity and keeps the rest in file order, so the tiers must not overlap
 	@static {
 		path *.css *.js *.jpg *.jpeg *.png *.gif *.svg *.webp *.avif *.woff2 *.woff
 		not path /_x/*
@@ -90,9 +90,12 @@ spectralcodex.com {
 	header @html No-Vary-Search `params=("utm_source" "utm_medium" "utm_campaign" "utm_content" "utm_term" "utm_id" "gclid" "fbclid" "mc_cid" "mc_eid"), key-order`
 
 	# Half of the gate lives in Cloudflare cache rules; see .claude/docs/deploy-operations.md
+	# `route` sorts after every top-level header, so this Cache-Control overrides the tiers above wherever the block sits
 	@gated path /objectives /objectives/* /api/map/objectives/*
-	import spectralcodex-auth.conf
-	header @gated Cache-Control "private, no-store"
+	route @gated {
+		header Cache-Control "private, no-store"
+		import spectralcodex-auth.conf
+	}
 }
 
 u.spectralcodex.com {

@@ -4,6 +4,7 @@ import { loadDeployConfig } from '#deploy/deploy-config.ts';
 
 interface EdgeExpectation {
 	cacheControl: string;
+	cfCacheStatus?: string;
 	label: string;
 	path: string;
 	status: number;
@@ -25,7 +26,7 @@ export async function verifyEdge(): Promise<void> {
 	const failures: Array<string> = [];
 
 	function check(expectation: EdgeExpectation, response: Response) {
-		const { cacheControl, label, path, status } = expectation;
+		const { cacheControl, cfCacheStatus, label, path, status } = expectation;
 
 		if (response.status !== status) {
 			failures.push(
@@ -38,6 +39,15 @@ export async function verifyEdge(): Promise<void> {
 
 		if (actual !== cacheControl) {
 			failures.push(`${label} (${path}): expected "${cacheControl}", got "${actual}"`);
+			return;
+		}
+
+		const actualCfCacheStatus = response.headers.get('cf-cache-status') ?? '(absent)';
+
+		if (cfCacheStatus && actualCfCacheStatus !== cfCacheStatus) {
+			failures.push(
+				`${label} (${path}): expected cf-cache-status "${cfCacheStatus}", got "${actualCfCacheStatus}"`,
+			);
 			return;
 		}
 
@@ -96,7 +106,7 @@ export async function verifyEdge(): Promise<void> {
 			console.error(chalk.red(`  fail  ${failure}`));
 		}
 		throw new Error(
-			`Edge verification failed: ${String(failures.length)} check(s) do not match deploy/caddy/Caddyfile or a Cloudflare header rule is rewriting them`,
+			`Edge verification failed: ${String(failures.length)} check(s) do not match deploy/caddy/Caddyfile or a Cloudflare rule is overriding them`,
 		);
 	}
 
@@ -133,12 +143,14 @@ function getExpectations(token: string): Array<EdgeExpectation> {
 		},
 		{
 			cacheControl: 'private, no-store',
+			cfCacheStatus: 'DYNAMIC',
 			label: 'objectives gate',
 			path: '/objectives/',
 			status: 401,
 		},
 		{
 			cacheControl: 'private, no-store',
+			cfCacheStatus: 'DYNAMIC',
 			label: 'objectives data gate',
 			path: '/api/map/objectives/map-directory.json',
 			status: 401,

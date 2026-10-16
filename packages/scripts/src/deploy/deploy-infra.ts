@@ -3,6 +3,7 @@ import path from 'node:path';
 
 import type { DeployConfig } from '#deploy/deploy-config.ts';
 
+import { validateCaddyConfig } from '#deploy/deploy-caddy.ts';
 import { loadDeployConfig } from '#deploy/deploy-config.ts';
 import { rsyncTo, sshCapture, sshExec, sshExecWithInput } from '#deploy/rsync-exec.ts';
 
@@ -90,6 +91,8 @@ export async function deployInfra(options: DeployInfraOptions): Promise<void> {
 	console.log(chalk.gray(`  To: ${config.remoteHost}:${remotePath}/`));
 	if (dryRun) console.log(chalk.yellow('  DRY RUN'));
 
+	await validateCaddyConfig(deployDir);
+
 	const start = Date.now();
 
 	await syncInfraFiles({ config, deployDir, dryRun });
@@ -160,9 +163,5 @@ async function updateRemoteServices(config: DeployConfig, serverEnv: string): Pr
 
 	// Caddy serves its config from a bind mount, so a Caddyfile-only change needs a reload
 	console.log(chalk.gray('Reloading Caddy...'));
-	try {
-		await sshExec(config, 'docker exec caddy caddy reload --config /etc/caddy/Caddyfile');
-	} catch {
-		console.log(chalk.yellow('Warning: Caddy reload failed (container may not be running)'));
-	}
+	await sshExec(config, 'docker exec caddy caddy reload --config /etc/caddy/Caddyfile');
 }
