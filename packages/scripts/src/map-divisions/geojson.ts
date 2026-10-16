@@ -1,7 +1,9 @@
-import type { BBox } from 'geojson';
+import type { BBox, Feature } from 'geojson';
 
+import { bbox } from '@turf/bbox';
 import { bboxPolygon } from '@turf/bbox-polygon';
 import { difference } from '@turf/difference';
+import { distance } from '@turf/distance';
 import { feature, featureCollection } from '@turf/helpers';
 import { simplify } from '@turf/simplify';
 import { truncate } from '@turf/truncate';
@@ -18,8 +20,10 @@ import type {
 
 import { safelyCreateDirectory } from '#shared/utils.ts';
 
-const maskSimplifyTolerance = 0.00005;
-const maskCoordinatePrecision = 5;
+const maskToleranceExponent = 0.6;
+const maskToleranceMetresPerKm = 0.34;
+const maskCoordinatePrecision = 6;
+const metresPerDegree = 111_195;
 const worldBounds = [-180, -85, 180, 85] satisfies BBox;
 
 export function convertToFeatureCollection(
@@ -56,7 +60,11 @@ export async function saveDivisionMask(
 
 	if (!division) throw new Error(`No Division geometry to mask for ${id}`);
 
-	const simplified = simplify(division, { highQuality: true, tolerance: maskSimplifyTolerance });
+	const toleranceMetres = getMaskToleranceMetres(division);
+	const simplified = simplify(division, {
+		highQuality: true,
+		tolerance: toleranceMetres / metresPerDegree,
+	});
 	const mask = difference(featureCollection([bboxPolygon(worldBounds), simplified]));
 
 	if (!mask) throw new Error(`Division for ${id} covers the world, leaving no mask`);
@@ -69,5 +77,16 @@ export async function saveDivisionMask(
 
 	await fs.writeFile(filePath, JSON.stringify(rounded.geometry));
 
-	console.log(chalk.gray(`Saved Division mask to: ${chalk.cyan(filePath)}`));
+	console.log(
+		chalk.gray(
+			`Saved Division mask to: ${chalk.cyan(filePath)}  tolerance: ${chalk.yellow(`${toleranceMetres.toFixed(1)} m`)}`,
+		),
+	);
+}
+
+function getMaskToleranceMetres(division: Feature<DivisionGeometry>) {
+	const [west, south, east, north] = bbox(division);
+	const diagonalKm = distance([west, south], [east, north]);
+
+	return maskToleranceMetresPerKm * diagonalKm ** maskToleranceExponent;
 }

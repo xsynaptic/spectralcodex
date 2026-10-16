@@ -442,6 +442,9 @@ importers:
       '@spectralcodex/shared':
         specifier: workspace:*
         version: link:../shared
+      '@turf/bbox':
+        specifier: ^7.4.0
+        version: 7.4.0
       '@turf/bbox-clip':
         specifier: ^7.4.0
         version: 7.4.0
@@ -452,6 +455,9 @@ importers:
         specifier: ^7.4.0
         version: 7.4.0
       '@turf/difference':
+        specifier: ^7.4.0
+        version: 7.4.0
+      '@turf/distance':
         specifier: ^7.4.0
         version: 7.4.0
       '@turf/helpers':
@@ -2814,6 +2820,9 @@ packages:
 
   '@turf/bbox-polygon@7.4.0':
     resolution: {integrity: sha512-hF0ylAOhzwk9i7m/PCmTtg+TP5AnFb9B+bMXgEPIYd/C3BOVet1YaA8nF6ViN5bNF0GSkWFYivvclSgWbtZyqg==}
+
+  '@turf/bbox@7.4.0':
+    resolution: {integrity: sha512-yOX9lALc2GmjYUIE99+nRj7eZA7eDtx7Ixu/hrgIo+YqHvL1reaPVTC9rQWMHMm0pH0/WHjzk8uOpAHjptrudQ==}
 
   '@turf/boolean-clockwise@7.4.0':
     resolution: {integrity: sha512-3wO+W9P63JZMK1Ud5ER0kKXpiZaeXkOR5Omq5USKlPcopwZ6TP/mJjt8lUYYWsB2WGDXuUhlYmSVec43z3wwow==}
@@ -9263,6 +9272,13 @@ snapshots:
   '@turf/bbox-polygon@7.4.0':
     dependencies:
       '@turf/helpers': 7.4.0
+      '@types/geojson': 7946.0.16
+      tslib: 2.8.1
+
+  '@turf/bbox@7.4.0':
+    dependencies:
+      '@turf/helpers': 7.4.0
+      '@turf/meta': 7.4.0
       '@types/geojson': 7946.0.16
       tslib: 2.8.1
 

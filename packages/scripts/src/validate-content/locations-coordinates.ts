@@ -163,7 +163,6 @@ async function collectRegionGeometries(
 	return { geometries, validRegions };
 }
 
-// A Region missing any of its Division geometry is disqualified for the whole run
 function createRegionGeometryLoader(
 	divisionIdsByRegion: Map<string, Array<string>>,
 	divisionsPath: string,

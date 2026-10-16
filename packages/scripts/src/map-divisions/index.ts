@@ -73,7 +73,6 @@ async function collectProcessingNeeds(regions: Array<RegionMetadata>) {
 	return processingNeeds;
 }
 
-// Validation scripts read the raw cache
 async function isMissingDivisionCache(divisionIds: Array<string>) {
 	for (const divisionId of divisionIds) {
 		if (!(await isExistingFile(path.join(cachePath, `${divisionId}.geojson`)))) return true;

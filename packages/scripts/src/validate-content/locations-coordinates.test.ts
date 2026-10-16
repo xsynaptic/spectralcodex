@@ -4,7 +4,6 @@ import { describe, expect, test } from 'vitest';
 import { validateLocationsCoordinates } from '#validate-content/locations-coordinates.ts';
 import { makeEntry, makeRegionRefs } from '#validate-content/validate-test-utils.ts';
 
-// Real Taipei boundary, copied from the map-divisions cache
 const divisionsPath = path.join(import.meta.dirname, 'fixtures');
 
 const regionEntries = [
