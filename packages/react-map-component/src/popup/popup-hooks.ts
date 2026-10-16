@@ -16,7 +16,7 @@ import {
 import { useMapStore } from '#store/store.tsx';
 
 export type MapPopupItemExtended = MapPopupItem &
-	Pick<MapSourceItem['properties'], 'objective' | 'url'> & {
+	Pick<MapSourceItem['properties'], 'url'> & {
 		popupCoordinates: LngLat;
 		precision: number | undefined;
 	};
@@ -51,13 +51,12 @@ export function useMapCanvasPopup() {
 	const popupItem = useMemo(() => {
 		if (!selectedId || !selectedSourceItem) return;
 
-		const { objective, precision, url } = selectedSourceItem.properties;
+		const { precision, url } = selectedSourceItem.properties;
 
 		return {
 			title: getRowTitle(selectedSourceItem.properties),
 			...chunkData?.find((item) => item.id === selectedId),
 			id: selectedId,
-			objective,
 			popupCoordinates: getPopupCoordinates(selectedSourceItem),
 			precision,
 			url,

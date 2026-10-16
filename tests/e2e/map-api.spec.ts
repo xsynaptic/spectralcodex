@@ -3,6 +3,7 @@ import { MapSourceItemSchema, mapSourceKeys } from '@spectralcodex/map-codec';
 
 const id = mapSourceKeys.id;
 const chunkKey = mapSourceKeys.chunkKey;
+const objective = mapSourceKeys.objective;
 
 type MapApiItem = Record<string, unknown>;
 
@@ -17,6 +18,15 @@ test.describe('map data API', { tag: '@smoke' }, () => {
 		expect(directory.length).toBeGreaterThan(1000);
 		expect(directory.every((row) => typeof row[chunkKey] === 'string')).toBe(true);
 		expect(() => MapSourceItemSchema.array().parse(directory)).not.toThrow();
+	});
+
+	test('global directory carries no Objective; it is a private planning signal', async ({
+		request,
+	}) => {
+		const response = await request.get('/api/map/map-directory.json');
+		const directory = (await response.json()) as Array<MapApiItem>;
+
+		expect(directory.filter((row) => Object.hasOwn(row, objective))).toHaveLength(0);
 	});
 
 	test('sampled popup chunks resolve and contain their features', async ({ request }) => {

@@ -156,13 +156,12 @@ const MapPopupTitleText: FC<{ title: string; url: string | undefined }> =
 const MapPopupContent: FC<{ popupItem: MapPopupItemExtended }> = function MapPopupContent({
 	popupItem,
 }) {
-	const { imageServerUrl, isDev, messages } = useMapConfig();
+	const { imageServerUrl, messages } = useMapConfig();
 	const { maxWidthPx } = useMapPopupLayout();
 
 	const {
 		description,
 		image,
-		objective,
 		popupCoordinates,
 		precision,
 		title,
@@ -194,9 +193,6 @@ const MapPopupContent: FC<{ popupItem: MapPopupItemExtended }> = function MapPop
 				) : undefined}
 				<div className={mapControlClassName.popupTitle}>
 					<MapPopupTitleText title={title} url={url} />
-					{isDev && objective ? (
-						<span className="map-popup-objective">{objective}</span>
-					) : undefined}
 				</div>
 				<MapPopupPrecision precision={precision} />
 				{description ? (
