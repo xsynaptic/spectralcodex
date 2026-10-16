@@ -83,7 +83,6 @@ test('sensitive Locations stay out of the build output', { tag: '@smoke' }, asyn
 	}
 
 	const manifestResponse = await request.get(mapManifestPath);
-	// Division masks are boundary geometry that names no Location, and most of the download
 	const mapPaths = ((await manifestResponse.json()) as Array<string>).filter(
 		(surface) => !surface.startsWith('/api/map/divisions/'),
 	);
