@@ -83,6 +83,45 @@ describe('searchMap', () => {
 		]);
 	});
 
+	test('every word must match, in any order, each highlighted where it lands', () => {
+		const rows = [makeRow('mine', 'Xindian Taiyi Coal Mine'), makeRow('hall', 'Taiyi Hall')];
+		const [result, ...rest] = searchMap(createSearchIndex(rows, []), 'mine taiyi');
+
+		expect(rest).toEqual([]);
+		expect(result?.title).toEqual({
+			ranges: [
+				[8, 13],
+				[19, 23],
+			],
+			text: 'Xindian Taiyi Coal Mine',
+		});
+	});
+
+	test('a word that starts a Region title takes in the Locations inside it, below a title match', () => {
+		const rows = [
+			makeRow('mazu', 'Grand Mazu Temple', { rating: 5, regionOrdinals: [8] }),
+			makeRow('confucian', 'Tainan Confucian Temple', { regionOrdinals: [8] }),
+			makeRow('lukang', 'Lukang Longshan Temple', { regionOrdinals: [20] }),
+		];
+		const scopes = [makeScope('tainan', 'Tainan', { interval: [7, 10] })];
+
+		expect(getTitles(rows, scopes, 'temple tainan')).toEqual([
+			'Tainan Confucian Temple',
+			'Grand Mazu Temple',
+		]);
+		expect(getTitles(rows, scopes, 'nan temple')).toEqual(['Tainan Confucian Temple']);
+	});
+
+	test('臺 and 台 find each other, as do the other variant forms in the titles', () => {
+		const rows = [
+			makeRow('temple', 'Temple', { titleMultilingual: '臺南孔廟' }),
+			makeRow('mine', 'Gold Mine', { titleMultilingual: '牡丹坑金鑛' }),
+		];
+
+		expect(getTitles(rows, [], '台南')).toEqual(['Temple']);
+		expect(getTitles(rows, [], '金礦')).toEqual(['Gold Mine']);
+	});
+
 	test('a Location with several Points is one row', () => {
 		const rows = [
 			makeRow('salt-0', 'Budai Saltworks', { url: '/budai-saltworks/' }),
@@ -99,7 +138,7 @@ describe('searchMap', () => {
 		);
 
 		expect(result?.title).toEqual({ text: 'Temple' });
-		expect(result?.titleMultilingual).toEqual({ match: [2, 4], text: '臺南孔廟' });
+		expect(result?.titleMultilingual).toEqual({ ranges: [[2, 4]], text: '臺南孔廟' });
 	});
 
 	test('a Multilingual Title in Latin script stays its own field', () => {
@@ -112,13 +151,13 @@ describe('searchMap', () => {
 		);
 
 		expect(result?.title).toEqual({ text: 'Hue Citadel (North Gate)' });
-		expect(result?.titleMultilingual).toEqual({ match: [0, 4], text: 'Kinh thanh Hue' });
+		expect(result?.titleMultilingual).toEqual({ ranges: [[0, 4]], text: 'Kinh thanh Hue' });
 	});
 
 	test('a highlight covers the written characters a folded match came from', () => {
 		const [result] = searchMap(createSearchIndex([makeRow('hoi-an', 'Hội An')], []), 'hoi');
 
-		expect(result?.title.match).toEqual([0, 3]);
+		expect(result?.title.ranges).toEqual([[0, 3]]);
 	});
 
 	test('a match on a Scope slug alone ranks as a mid-word match', () => {
@@ -130,7 +169,7 @@ describe('searchMap', () => {
 
 	test('a Location names the first of its Regions the Scope list knows', () => {
 		const rows = [makeRow('a', 'Fort Zeelandia', { regionOrdinals: [99, 7] })];
-		const scopes = [makeScope('anping', 'Anping', { ordinal: 7 })];
+		const scopes = [makeScope('anping', 'Anping', { interval: [7, 8] })];
 
 		expect(searchMap(createSearchIndex(rows, scopes), 'fort')[0]).toMatchObject({
 			kind: 'location',

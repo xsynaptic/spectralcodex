@@ -27,12 +27,8 @@ async function getRegionFields(entry: ScopeListEntry) {
 	const { entriesMap, regionsTree } = await getRegionsCollection();
 	const parentId = regionsTree.parentOf(entry.id);
 	const parentTitle = parentId ? entriesMap.get(parentId)?.data.title : undefined;
-	const ordinal = regionsTree.ordinalById.get(entry.id);
 
-	return {
-		...(ordinal === undefined ? {} : { ordinal }),
-		...(parentTitle ? { parentTitle } : {}),
-	};
+	return parentTitle ? { parentTitle } : {};
 }
 
 export async function buildAtlasScopeList(
@@ -63,7 +59,8 @@ export async function buildAtlasScopeList(
 	for (const entry of [...regions, ...themes, ...series]) {
 		if (!hasEntryMap(entry)) continue;
 
-		const entryRows = selectMapRows(atlasRows, getScopeRule(entry));
+		const rule = getScopeRule(entry);
+		const entryRows = selectMapRows(atlasRows, rule);
 
 		if (!getMapBounds(entryRows)) continue;
 
@@ -74,6 +71,7 @@ export async function buildAtlasScopeList(
 		rows.push({
 			count,
 			id: entry.id,
+			...(rule.type === 'region' ? { interval: rule.interval } : {}),
 			kind: scopeKindByCollection[entry.collection],
 			title: entry.data.title,
 			url: getContentPath(entry.collection, entry.id),

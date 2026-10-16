@@ -19,7 +19,7 @@ export { MapPopupOwnField } from '#map-codes.ts';
 export { MapDivisionMaskSchema } from '#map-division.ts';
 export type { MapDivisionMask } from '#map-division.ts';
 export { createRuleTest, getMapRowById, selectMapRows } from '#map-rules.ts';
-export type { MapFeaturesRule } from '#map-rules.ts';
+export type { MapFeaturesRule, MapInterval } from '#map-rules.ts';
 export { MapScopeRowSchema } from '#map-scopes.ts';
 export type { MapScopeRow } from '#map-scopes.ts';
 export { MapViewSchema } from '#map-view.ts';

@@ -2,13 +2,16 @@ import { z } from 'zod';
 
 import type { MapSourceItem } from '#codec.ts';
 
+export const MapIntervalSchema = z.tuple([z.number(), z.number()]);
+
 export const MapFeaturesRuleSchema = z.discriminatedUnion('type', [
 	z.object({ ids: z.array(z.string()), type: z.literal('ids') }),
 	z.object({ index: z.number(), type: z.literal('theme') }),
-	z.object({ interval: z.tuple([z.number(), z.number()]), type: z.literal('region') }),
+	z.object({ interval: MapIntervalSchema, type: z.literal('region') }),
 ]);
 
 export type MapFeaturesRule = z.output<typeof MapFeaturesRuleSchema>;
+export type MapInterval = z.output<typeof MapIntervalSchema>;
 
 const rowByIdCache = new WeakMap<ReadonlyArray<MapSourceItem>, Map<string, MapSourceItem>>();
 

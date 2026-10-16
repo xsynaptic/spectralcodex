@@ -1,11 +1,14 @@
-import type { MapScopeRow, MapSourceItem } from '@spectralcodex/map-codec';
+import type { MapInterval, MapScopeRow, MapSourceItem } from '@spectralcodex/map-codec';
+
+import { createRuleTest } from '@spectralcodex/map-codec';
+import { stripDiacritics } from '@spectralcodex/shared/text';
 
 const mapSearchLimit = 50;
 
 type MapSearchRange = readonly [start: number, end: number];
 
 export interface MapSearchText {
-	match?: MapSearchRange;
+	ranges?: Array<MapSearchRange>;
 	text: string;
 }
 
@@ -25,7 +28,6 @@ type FieldName = 'id' | 'title' | 'titleMultilingual';
 interface SearchField {
 	folded: string;
 	name: FieldName;
-	text: string;
 }
 
 interface SearchEntry {
@@ -37,23 +39,40 @@ interface SearchEntry {
 		| { kind: 'scope'; row: MapScopeRow };
 }
 
+interface SearchRegion {
+	fields: Array<SearchField>;
+	interval: MapInterval;
+}
+
+type IsInRegion = (properties: MapSourceItem['properties']) => boolean;
+
 export interface MapSearchIndex {
 	entries: Array<SearchEntry>;
+	regions: Array<SearchRegion>;
 	regionTitleByOrdinal: ReadonlyMap<number, string>;
 }
 
-const matchTier = { inside: 2, start: 0, word: 1 } as const;
+const matchTier = { inside: 2, region: 3, start: 0, word: 1 } as const;
 
 type MatchTier = (typeof matchTier)[keyof typeof matchTier];
 
 interface Candidate {
 	entry: SearchEntry;
-	positionByName: Map<FieldName, number>;
 	tier: MatchTier;
 }
 
 const droppedCharacters = new Set(["'", '‘', '’', 'ʻ', 'ʼ']);
-const replacedCharacters = new Map([['đ', 'd']]);
+// The rarer form in the titles folds to the one most titles use
+const replacedCharacters = new Map([
+	['đ', 'd'],
+	['国', '國'],
+	['峯', '峰'],
+	['臺', '台'],
+	['舘', '館'],
+	['鉱', '礦'],
+	['鑛', '礦'],
+	['黄', '黃'],
+]);
 const foldedCharacterCache = new Map<string, string>();
 
 function foldCharacter(character: string) {
@@ -61,11 +80,7 @@ function foldCharacter(character: string) {
 
 	if (cached !== undefined) return cached;
 
-	// Marks fold only on a Latin base: in Thai they are vowels and tones that make the word
-	const lowered = character
-		.normalize('NFD')
-		.replace(/^(\p{Script=Latin})\p{M}+$/u, '$1')
-		.toLowerCase();
+	const lowered = stripDiacritics(character).toLowerCase();
 	const folded = droppedCharacters.has(character)
 		? ''
 		: (replacedCharacters.get(lowered) ?? lowered);
@@ -86,7 +101,7 @@ function foldText(text: string) {
 }
 
 function createField(name: FieldName, text: string): SearchField {
-	return { folded: foldText(text), name, text };
+	return { folded: foldText(text), name };
 }
 
 function getRange(text: string, position: number, length: number): MapSearchRange {
@@ -142,14 +157,19 @@ export function createSearchIndex(
 	rows: ReadonlyArray<MapSourceItem>,
 	scopes: ReadonlyArray<MapScopeRow>,
 ): MapSearchIndex {
+	const regions: Array<SearchRegion> = [];
 	const regionTitleByOrdinal = new Map<number, string>();
 
-	for (const { ordinal, title } of scopes) {
-		if (ordinal !== undefined) regionTitleByOrdinal.set(ordinal, title);
+	for (const { interval, title, titleMultilingual } of scopes) {
+		if (!interval) continue;
+
+		regions.push({ fields: getTitleFields(title, titleMultilingual), interval });
+		regionTitleByOrdinal.set(interval[0], title);
 	}
 
 	return {
 		entries: [...scopes.map(createScopeEntry), ...rows.map(createLocationEntry)],
+		regions,
 		regionTitleByOrdinal,
 	};
 }
@@ -158,36 +178,91 @@ function isWordStart(folded: string, position: number) {
 	return !/[\p{L}\p{N}]/u.test(folded.charAt(position - 1));
 }
 
-function matchField(folded: string, query: string) {
-	const first = folded.indexOf(query);
+function matchField(folded: string, term: string) {
+	const first = folded.indexOf(term);
 
 	if (first === -1) return;
 	if (first === 0) return { position: first, tier: matchTier.start };
 
-	for (let position = first; position !== -1; position = folded.indexOf(query, position + 1)) {
+	for (let position = first; position !== -1; position = folded.indexOf(term, position + 1)) {
 		if (isWordStart(folded, position)) return { position, tier: matchTier.word };
 	}
 
 	return { position: first, tier: matchTier.inside };
 }
 
-function matchEntry(entry: SearchEntry, query: string): Candidate | undefined {
-	const positionByName = new Map<FieldName, number>();
-	let tier: MatchTier = matchTier.inside;
+function matchTerm(fields: Array<SearchField>, term: string) {
+	let tier: MatchTier | undefined;
 
-	for (const { folded, name } of entry.fields) {
-		const match = matchField(folded, query);
+	for (const { folded, name } of fields) {
+		const match = matchField(folded, term);
 
 		if (!match) continue;
 
 		const fieldTier = name === 'id' ? matchTier.inside : match.tier;
 
-		if (fieldTier < tier) tier = fieldTier;
-
-		positionByName.set(name, match.position);
+		if (tier === undefined || fieldTier < tier) tier = fieldTier;
 	}
 
-	return positionByName.size > 0 ? { entry, positionByName, tier } : undefined;
+	return tier;
+}
+
+// A Region counts only when the word starts one of its words, so `an` does not take in every Tainan Location
+function isRegionNamedBy({ fields }: SearchRegion, term: string) {
+	const tier = matchTerm(fields, term);
+
+	return tier !== undefined && tier <= matchTier.word;
+}
+
+function getOutermostIntervals(intervals: Array<MapInterval>) {
+	const sorted = intervals.toSorted(([firstLeft], [secondLeft]) => firstLeft - secondLeft);
+	const outermost: Array<MapInterval> = [];
+	let right = 0;
+
+	for (const interval of sorted) {
+		if (interval[0] <= right) continue;
+
+		outermost.push(interval);
+		right = interval[1];
+	}
+
+	return outermost;
+}
+
+function getRegionTests(regions: Array<SearchRegion>, term: string): Array<IsInRegion> {
+	const intervals = regions
+		.filter((region) => isRegionNamedBy(region, term))
+		.map(({ interval }) => interval);
+
+	return getOutermostIntervals(intervals).map((interval) =>
+		createRuleTest({ interval, type: 'region' }),
+	);
+}
+
+function matchEntry(
+	entry: SearchEntry,
+	terms: Array<string>,
+	regionTestsByTerm: Array<Array<IsInRegion>>,
+): Candidate | undefined {
+	const { source } = entry;
+	let tier: MatchTier = matchTier.start;
+
+	for (const [termIndex, term] of terms.entries()) {
+		let termTier = matchTerm(entry.fields, term);
+
+		if (
+			termTier === undefined &&
+			source.kind === 'location' &&
+			regionTestsByTerm[termIndex]?.some((isInRegion) => isInRegion(source.properties))
+		) {
+			termTier = matchTier.region;
+		}
+
+		if (termTier === undefined) return;
+		if (termTier > tier) tier = termTier;
+	}
+
+	return { entry, tier };
 }
 
 function compareCandidates(first: Candidate, second: Candidate) {
@@ -205,7 +280,10 @@ function compareCandidates(first: Candidate, second: Candidate) {
 }
 
 function rankCandidates(candidates: Iterable<Candidate>, limit: number) {
-	const buckets: Array<Array<Candidate>> = Array.from({ length: 6 }, () => []);
+	const buckets: Array<Array<Candidate>> = Array.from(
+		{ length: (matchTier.region + 1) * 2 },
+		() => [],
+	);
 
 	for (const candidate of candidates) {
 		const isLocation = candidate.entry.source.kind === 'location';
@@ -237,24 +315,50 @@ function getParentTitle(
 	return;
 }
 
-function toResult(
-	{ entry, positionByName }: Candidate,
-	length: number,
-	regionTitleByOrdinal: MapSearchIndex['regionTitleByOrdinal'],
-): MapSearchResult {
-	function toText(name: FieldName, text: string): MapSearchText {
-		const position = positionByName.get(name);
+function getRanges(text: string, terms: Array<string>) {
+	const folded = foldText(text);
+	const ranges: Array<MapSearchRange> = [];
 
-		return position === undefined ? { text } : { match: getRange(text, position, length), text };
+	for (const term of terms) {
+		const match = matchField(folded, term);
+
+		if (match) ranges.push(getRange(text, match.position, term.length));
 	}
 
+	ranges.sort(([firstStart], [secondStart]) => firstStart - secondStart);
+
+	const merged: Array<MapSearchRange> = [];
+
+	for (const range of ranges) {
+		const last = merged.at(-1);
+
+		if (last && range[0] <= last[1]) {
+			merged[merged.length - 1] = [last[0], Math.max(last[1], range[1])];
+			continue;
+		}
+
+		merged.push(range);
+	}
+
+	return merged;
+}
+
+function toText(text: string, terms: Array<string>): MapSearchText {
+	const ranges = getRanges(text, terms);
+
+	return ranges.length > 0 ? { ranges, text } : { text };
+}
+
+function toResult(
+	{ entry }: Candidate,
+	terms: Array<string>,
+	regionTitleByOrdinal: MapSearchIndex['regionTitleByOrdinal'],
+): MapSearchResult {
 	const { source } = entry;
 	const { title, titleMultilingual } = source.kind === 'scope' ? source.row : source.properties;
 	const texts = {
-		title: toText('title', title),
-		...(titleMultilingual
-			? { titleMultilingual: toText('titleMultilingual', titleMultilingual) }
-			: {}),
+		title: toText(title, terms),
+		...(titleMultilingual ? { titleMultilingual: toText(titleMultilingual, terms) } : {}),
 	};
 
 	if (source.kind === 'scope') {
@@ -275,14 +379,15 @@ function toResult(
 }
 
 export function searchMap(index: MapSearchIndex, query: string) {
-	const folded = foldText(query.trim().replaceAll(/\s+/g, ' '));
+	const terms = foldText(query).split(/\s+/u).filter(Boolean);
 
-	if (folded === '') return [];
+	if (terms.length === 0) return [];
 
+	const regionTestsByTerm = terms.map((term) => getRegionTests(index.regions, term));
 	const candidateByKey = new Map<string, Candidate>();
 
 	for (const entry of index.entries) {
-		const candidate = matchEntry(entry, folded);
+		const candidate = matchEntry(entry, terms, regionTestsByTerm);
 		const current = candidateByKey.get(entry.key);
 
 		if (candidate && (!current || candidate.tier < current.tier)) {
@@ -291,6 +396,6 @@ export function searchMap(index: MapSearchIndex, query: string) {
 	}
 
 	return rankCandidates(candidateByKey.values(), mapSearchLimit).map((candidate) =>
-		toResult(candidate, folded.length, index.regionTitleByOrdinal),
+		toResult(candidate, terms, index.regionTitleByOrdinal),
 	);
 }

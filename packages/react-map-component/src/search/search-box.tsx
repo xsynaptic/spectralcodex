@@ -19,19 +19,24 @@ const kindMessageKey = {
 } as const satisfies Record<MapSearchResult['kind'], keyof MapMessages>;
 
 const MapSearchHighlight: FC<{ text: MapSearchText }> = function MapSearchHighlight({
-	text: { match, text },
+	text: { ranges = [], text },
 }) {
-	if (!match) return text;
+	const parts = [];
+	let cursor = 0;
 
-	const [start, end] = match;
+	for (const [start, end] of ranges) {
+		parts.push(
+			text.slice(cursor, start),
+			<mark className="map-search-match" key={start}>
+				{text.slice(start, end)}
+			</mark>,
+		);
+		cursor = end;
+	}
 
-	return (
-		<>
-			{text.slice(0, start)}
-			<mark className="map-search-match">{text.slice(start, end)}</mark>
-			{text.slice(end)}
-		</>
-	);
+	parts.push(text.slice(cursor));
+
+	return parts;
 };
 
 const MapSearchOption: FC<{
@@ -83,8 +88,7 @@ const MapSearchOption: FC<{
 	);
 };
 
-function getStatus(messages: MapMessages, query: string, count: number) {
-	if (query.trim() === '') return '';
+function getStatus(messages: MapMessages, count: number) {
 	if (count === 0) return messages.searchEmpty;
 
 	return `${String(count)} ${count === 1 ? messages.searchResult : messages.searchResults}`;
@@ -201,17 +205,17 @@ const MapSearchBack: FC<{ onClose: (how: MapOverlayClose) => void }> = function 
 const MapSearchStatus: FC<{ count: number; isLoading: boolean; query: string }> =
 	function MapSearchStatus({ count, isLoading, query }) {
 		const { messages } = useMapConfig();
-		const status = isLoading ? '' : getStatus(messages, query, count);
+		const isQuiet = isLoading || query.trim() === '';
 
 		return (
 			<>
-				{status === messages.searchEmpty ? (
+				{!isQuiet && count === 0 ? (
 					<p aria-hidden="true" className="map-search-empty">
 						{messages.searchEmpty}
 					</p>
 				) : undefined}
 				<div aria-live="polite" className="map-sr-only">
-					{status}
+					{isQuiet ? '' : getStatus(messages, count)}
 				</div>
 			</>
 		);
