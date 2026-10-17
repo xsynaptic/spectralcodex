@@ -88,6 +88,18 @@ interface MapHoverEvent {
 	mapInstance: MapLayerMouseEvent['target'];
 }
 
+const canvasErrorMessageMaxLength = 100;
+
+// Tile URLs carry the Protomaps key in their query string
+function getCanvasErrorData(error: Error) {
+	const probe = document.createElement('canvas');
+
+	return {
+		message: error.message.replaceAll(/\?\S*/g, '').slice(0, canvasErrorMessageMaxLength),
+		webgl: Boolean(probe.getContext('webgl2') ?? probe.getContext('webgl')),
+	};
+}
+
 function subscribeHover(callback: () => void) {
 	const query = matchMedia(hoverQuery);
 
@@ -132,7 +144,7 @@ export function useMapCanvasEvents() {
 		// Style, tile, and sprite failures leave onLoad unfired; clear the spinner rather than hang
 		onError: ({ error }) => {
 			setCanvasLoading(false);
-			trackMapErrorOnce('canvas');
+			trackMapErrorOnce('canvas', () => getCanvasErrorData(error));
 			console.warn('[Map]', error.message);
 		},
 		onLoad: () => {
