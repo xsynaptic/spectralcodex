@@ -104,6 +104,15 @@ u.spectralcodex.com {
 		respond "User-agent: *
 Disallow: /"
 	}
+	@foreign_beacon {
+		path /api/send*
+		not {
+			header Origin https://spectralcodex.com
+			header Origin https://synapticism.com
+			header Origin https://djbasilisk.com
+		}
+	}
+	respond @foreign_beacon 403
 	reverse_proxy umami:3000
 }
 
