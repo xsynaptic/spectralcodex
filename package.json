@@ -72,7 +72,7 @@
 		"@stryker-mutator/core": "^10.0.0",
 		"@stryker-mutator/vitest-runner": "^10.0.0",
 		"@tailwindcss/vite": "^4.3.3",
-		"@tanstack/eslint-plugin-query": "^5.104.2",
+		"@tanstack/eslint-plugin-query": "^5.104.3",
 		"@turf/centroid": "^7.4.0",
 		"@turf/distance": "^7.4.0",
 		"@turf/helpers": "^7.4.0",
@@ -117,7 +117,7 @@
 		"prettier": "^3.9.10",
 		"prettier-plugin-astro": "^1.1.1",
 		"prettier-plugin-tailwindcss": "^0.8.1",
-		"remeda": "^2.51.0",
+		"remeda": "^2.52.0",
 		"satteri": "^0.10.5",
 		"sharp": "^0.35.5",
 		"stylelint": "^17.16.0",
@@ -126,7 +126,7 @@
 		"typescript": "^6.0.3",
 		"unpic": "^4.2.2",
 		"vite": "^8.3.4",
-		"vitest": "^4.1.11",
+		"vitest": "^4.1.12",
 		"zod": "^4.6.7"
 	},
 	"packageManager": "pnpm@12.3.4"
