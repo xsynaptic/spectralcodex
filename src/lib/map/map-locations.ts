@@ -83,16 +83,20 @@ export function getLocationsMapRule(locations: Array<CollectionEntry<'locations'
 	} satisfies MapFeaturesRule;
 }
 
-export function hasEntryMap(entry: CollectionEntry<'regions' | 'series' | 'themes'>) {
+export function isEntryMapEnabled(
+	entry: CollectionEntry<'posts' | 'regions' | 'series' | 'themes'>,
+) {
 	switch (entry.collection) {
+		// Posts and Series cannot turn their map off; one still appears only when their Locations are mapped
+		case 'posts':
+		case 'series': {
+			return true;
+		}
 		case 'regions': {
 			return (
 				mapDisplayRegionIds.has(entry.id) ||
 				(entry.data._ancestors?.some((ancestor) => mapDisplayRegionIds.has(ancestor)) ?? false)
 			);
-		}
-		case 'series': {
-			return true;
 		}
 		case 'themes': {
 			return !entry.data.hideMap;

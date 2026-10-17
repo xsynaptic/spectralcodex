@@ -27,6 +27,119 @@ function getRowById(rows: ReadonlyArray<MapSourceItem>) {
 	return rowById;
 }
 
+interface RegionIndex {
+	ordinals: Array<number>;
+	positions: Array<number>;
+}
+
+const regionIndexCache = new WeakMap<ReadonlyArray<MapSourceItem>, RegionIndex>();
+
+function getRegionIndex(rows: ReadonlyArray<MapSourceItem>) {
+	const cached = regionIndexCache.get(rows);
+
+	if (cached) return cached;
+
+	const pairs: Array<[ordinal: number, position: number]> = [];
+
+	for (const [position, row] of rows.entries()) {
+		const ordinals = row.properties.regionOrdinals ?? [];
+
+		for (const ordinal of ordinals) {
+			pairs.push([ordinal, position]);
+		}
+	}
+
+	pairs.sort(([ordinalA], [ordinalB]) => ordinalA - ordinalB);
+
+	const regionIndex = {
+		ordinals: pairs.map(([ordinal]) => ordinal),
+		positions: pairs.map(([, position]) => position),
+	};
+
+	regionIndexCache.set(rows, regionIndex);
+
+	return regionIndex;
+}
+
+function getLowerBound(sorted: ReadonlyArray<number>, value: number) {
+	let low = 0;
+	let high = sorted.length;
+
+	while (low < high) {
+		const middle = (low + high) >>> 1;
+
+		if ((sorted[middle] ?? Infinity) < value) {
+			low = middle + 1;
+		} else {
+			high = middle;
+		}
+	}
+
+	return low;
+}
+
+function selectRegionRows(rows: ReadonlyArray<MapSourceItem>, [left, right]: MapInterval) {
+	const { ordinals, positions } = getRegionIndex(rows);
+	const matched: Array<number> = [];
+
+	for (
+		let pairIndex = getLowerBound(ordinals, left);
+		pairIndex < ordinals.length && (ordinals[pairIndex] ?? Infinity) <= right;
+		pairIndex++
+	) {
+		const position = positions[pairIndex];
+
+		if (position !== undefined) matched.push(position);
+	}
+
+	matched.sort((positionA, positionB) => positionA - positionB);
+
+	const selected: Array<MapSourceItem> = [];
+	let previous: number | undefined;
+
+	for (const position of matched) {
+		const row = rows[position];
+
+		if (position === previous || !row) continue;
+
+		selected.push(row);
+		previous = position;
+	}
+
+	return selected;
+}
+
+const rowsByThemeCache = new WeakMap<
+	ReadonlyArray<MapSourceItem>,
+	Map<number, Array<MapSourceItem>>
+>();
+
+function getRowsByTheme(rows: ReadonlyArray<MapSourceItem>) {
+	const cached = rowsByThemeCache.get(rows);
+
+	if (cached) return cached;
+
+	const rowsByTheme = new Map<number, Array<MapSourceItem>>();
+
+	for (const row of rows) {
+		const indices = new Set(row.properties.themeIndices);
+
+		for (const index of indices) {
+			const themeRows = rowsByTheme.get(index);
+
+			if (themeRows) {
+				themeRows.push(row);
+			} else {
+				rowsByTheme.set(index, [row]);
+			}
+		}
+	}
+
+	rowsByThemeCache.set(rows, rowsByTheme);
+
+	return rowsByTheme;
+}
+
 export function getMapRowById(rows: ReadonlyArray<MapSourceItem>, id: string) {
 	return getRowById(rows).get(id);
 }
@@ -56,13 +169,17 @@ export function selectMapRows(
 	rows: ReadonlyArray<MapSourceItem>,
 	rule: MapFeaturesRule,
 ): Array<MapSourceItem> {
-	if (rule.type === 'ids') {
-		const rowById = getRowById(rows);
+	switch (rule.type) {
+		case 'ids': {
+			const rowById = getRowById(rows);
 
-		return rule.ids.map((id) => rowById.get(id)).filter((row) => row !== undefined);
+			return rule.ids.map((id) => rowById.get(id)).filter((row) => row !== undefined);
+		}
+		case 'region': {
+			return selectRegionRows(rows, rule.interval);
+		}
+		case 'theme': {
+			return [...(getRowsByTheme(rows).get(rule.index) ?? [])];
+		}
 	}
-
-	const isInRule = createRuleTest(rule);
-
-	return rows.filter(({ properties }) => isInRule(properties));
 }

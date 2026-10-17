@@ -35,14 +35,7 @@ vi.mock('#lib/collections/regions/regions-data.ts', () => ({
 	getRegionsCollection: getRegionsCollectionMock,
 }));
 vi.mock('#lib/map/map-data.ts', () => ({
-	createMapDataFunction: () => Promise.resolve(() => ({ hasGeodata: false })),
-}));
-vi.mock('#lib/map/map-directory.ts', () => ({
-	getMapDirectoryData: () => Promise.resolve({ divisionUrlById: new Map() }),
-}));
-vi.mock('#lib/map/map-locations.ts', () => ({
-	getRegionMapRule: vi.fn(),
-	hasEntryMap: () => false,
+	createEntryMapDataFunction: () => Promise.resolve(() => ({ hasGeodata: false })),
 }));
 
 const { createQueryRegionsEntryFunction } =

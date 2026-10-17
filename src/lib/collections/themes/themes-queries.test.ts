@@ -26,21 +26,11 @@ vi.mock('#lib/collections/locations/locations-data.ts', () => ({
 vi.mock('#lib/collections/posts/posts-data.ts', () => ({
 	createPostsByIdsFunction: () => Promise.resolve(getPostsByIdsMock),
 }));
-vi.mock('#lib/collections/regions/regions-data.ts', () => ({
-	createFirstRegionByReferenceFunction: () => Promise.resolve(vi.fn()),
-}));
 vi.mock('#lib/collections/themes/themes-data.ts', () => ({
 	getThemesCollection: getThemesCollectionMock,
 }));
 vi.mock('#lib/map/map-data.ts', () => ({
-	createMapDataFunction: () => Promise.resolve(() => ({ hasGeodata: false })),
-}));
-vi.mock('#lib/map/map-directory.ts', () => ({
-	getMapThemeIndexById: () => Promise.resolve(new Map()),
-}));
-vi.mock('#lib/map/map-locations.ts', () => ({
-	getThemeMapRule: vi.fn(),
-	hasEntryMap: () => false,
+	createEntryMapDataFunction: () => Promise.resolve(() => ({ hasGeodata: false })),
 }));
 
 const { createQueryThemesEntryFunction } =

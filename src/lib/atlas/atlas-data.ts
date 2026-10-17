@@ -1,77 +1,43 @@
-import type { MapSourceItem } from '@spectralcodex/map-codec';
-import type { MapComponentProps, MapView } from '@spectralcodex/react-map-component';
+import type { MapView } from '@spectralcodex/react-map-component';
 import type { CollectionEntry } from 'astro:content';
 
 import { selectMapRows } from '@spectralcodex/map-codec';
 import pMemoize from 'p-memoize';
 
 import type { MapComponentData } from '#lib/map/map-data.ts';
+import type { MapScopeEntry } from '#lib/map/map-entry-rules.ts';
 
 import { atlasRegionId } from '#constants.ts';
 import { atlasPage } from '#lib/atlas/atlas-constants.ts';
 import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';
 import { getMapLanguages } from '#lib/i18n/i18n-utils.ts';
-import { getMapBounds } from '#lib/map/map-bounds.ts';
 import { createMapDataFunction } from '#lib/map/map-data.ts';
 import { getMapDirectoryData } from '#lib/map/map-directory.ts';
+import { getMapScopeKey } from '#lib/map/map-scopes.ts';
 import { isGeometryHidden } from '#lib/utils/content-policy.ts';
-import { getContentPath } from '#lib/utils/routing.ts';
 
 export type AtlasPageProps =
 	{ page: typeof atlasPage.map } | { page: typeof atlasPage.pane; view: MapView };
 
-type AtlasEntry = CollectionEntry<'locations' | 'posts' | 'regions' | 'series' | 'themes'>;
-
-function getAtlasLocationView(
+export async function getAtlasLocationPage(
 	entry: CollectionEntry<'locations'>,
-	atlasRows: ReadonlyArray<MapSourceItem>,
-	props: MapComponentProps,
-): MapView | undefined {
-	if (isGeometryHidden(entry)) return;
+	mapData: MapComponentData,
+): Promise<AtlasPageProps | undefined> {
+	if (!mapData.hasGeodata || isGeometryHidden(entry)) return;
 
-	const targetIds = props.targetIds ?? [];
+	const { atlasRows } = await getMapDirectoryData();
+	const targetIds = mapData.props.targetIds ?? [];
 
 	if (selectMapRows(atlasRows, { ids: targetIds, type: 'ids' }).length === 0) return;
 
-	return { targetIds };
+	return { page: atlasPage.pane, view: { targetIds } };
 }
 
-function getAtlasScopeView(
-	entry: Exclude<AtlasEntry, CollectionEntry<'locations'>>,
-	atlasRows: ReadonlyArray<MapSourceItem>,
-	props: MapComponentProps,
-): MapView | undefined {
-	const rule = props.mapFeaturesRule;
-	const rows = selectMapRows(atlasRows, rule);
+export async function getAtlasScopePage(entry: MapScopeEntry): Promise<AtlasPageProps | undefined> {
+	const { mapScopeByKey } = await getMapDirectoryData();
+	const scope = mapScopeByKey.get(getMapScopeKey(entry));
 
-	if (rows.length === 0) return;
-
-	const bounds = getMapBounds(rows)?.bounds;
-
-	return {
-		scope: {
-			rule,
-			title: entry.data.title,
-			url: getContentPath(entry.collection, entry.id),
-			...(bounds ? { bounds } : {}),
-			...(props.apiDivisionUrl ? { apiDivisionUrl: props.apiDivisionUrl } : {}),
-		},
-	};
-}
-
-export async function getAtlasPage(
-	entry: AtlasEntry,
-	mapData: MapComponentData,
-): Promise<AtlasPageProps | undefined> {
-	if (!mapData.hasGeodata) return;
-
-	const { atlasRows } = await getMapDirectoryData();
-	const view =
-		entry.collection === 'locations'
-			? getAtlasLocationView(entry, atlasRows, mapData.props)
-			: getAtlasScopeView(entry, atlasRows, mapData.props);
-
-	return view ? { page: atlasPage.pane, view } : undefined;
+	return scope ? { page: atlasPage.pane, view: { scope } } : undefined;
 }
 
 export const getAtlasMapData = pMemoize(async (): Promise<MapComponentData> => {

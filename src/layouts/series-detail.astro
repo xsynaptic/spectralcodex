@@ -13,7 +13,7 @@ import SectionDateList from '#components/sections/section-date-list.astro';
 import SectionMap from '#components/sections/section-map.astro';
 import SectionPreviews from '#components/sections/section-previews.astro';
 import SectionWebmentions from '#components/sections/section-webmentions.astro';
-import { getAtlasPage } from '#lib/atlas/atlas-data.ts';
+import { getAtlasScopePage } from '#lib/atlas/atlas-data.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { formatNumber } from '#lib/utils/text.ts';
 
@@ -30,7 +30,7 @@ const entryCount = entry.data._entryCount ?? 0;
 
 const t = getTranslations();
 
-const atlas = await getAtlasPage(entry, mapData);
+const atlas = await getAtlasScopePage(entry);
 ---
 
 <ContentEntryDetail atlas={atlas} entry={entry}>

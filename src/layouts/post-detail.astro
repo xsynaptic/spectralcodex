@@ -21,7 +21,7 @@ import SectionSimilar from '#components/sections/section-similar.astro';
 import SectionSources from '#components/sections/section-sources.astro';
 import SectionThemes from '#components/sections/section-themes.astro';
 import SectionWebmentions from '#components/sections/section-webmentions.astro';
-import { getAtlasPage } from '#lib/atlas/atlas-data.ts';
+import { getAtlasScopePage } from '#lib/atlas/atlas-data.ts';
 import { getPostStructuredData } from '#lib/collections/posts/posts-structured-data.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
@@ -46,7 +46,7 @@ const { Content } = await render(entry);
 
 const seoImage = getSeoImageProps({ alt: entry.data.title, id: entry.id });
 
-const atlas = await getAtlasPage(entry, mapData);
+const atlas = await getAtlasScopePage(entry);
 ---
 
 <ContentEntryArticle

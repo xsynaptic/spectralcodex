@@ -2,18 +2,12 @@ import type { CollectionEntry } from 'astro:content';
 
 import * as R from 'remeda';
 
-import type { MapComponentData } from '#lib/map/map-data.ts';
-
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { buildEntryCatalogItems } from '#lib/catalog/catalog-utils.ts';
 import { createLocationsByIdsFunction } from '#lib/collections/locations/locations-data.ts';
 import { createPostsByIdsFunction } from '#lib/collections/posts/posts-data.ts';
-import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-data.ts';
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
-import { getMapLanguages } from '#lib/i18n/i18n-utils.ts';
-import { createMapDataFunction } from '#lib/map/map-data.ts';
-import { getMapThemeIndexById } from '#lib/map/map-directory.ts';
-import { getThemeMapRule, hasEntryMap } from '#lib/map/map-locations.ts';
+import { createEntryMapDataFunction } from '#lib/map/map-data.ts';
 import { hasEntries, sortByEntryCount } from '#lib/utils/collections.ts';
 import { isListed, isListedQuality } from '#lib/utils/content-policy.ts';
 
@@ -23,13 +17,9 @@ export async function createQueryThemesEntryFunction() {
 	const getLocationsByTheme = await createLocationsByThemeFunction();
 	const getPostsByTheme = await createPostsByThemeFunction();
 	const catalog = await getCatalog();
-	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
-	const getMapData = await createMapDataFunction();
-	const themeIndexById = await getMapThemeIndexById();
+	const getEntryMapData = await createEntryMapDataFunction();
 
 	return function queryThemesEntry(entry: CollectionEntry<'themes'>) {
-		const regionPrimary = getFirstRegionByReference(entry.data.regions);
-
 		const locationsFiltered = getLocationsByTheme(entry);
 		const locationsListed = locationsFiltered.filter(({ data }) => isListed(data));
 
@@ -50,13 +40,7 @@ export async function createQueryThemesEntryFunction() {
 			restCandidates,
 		);
 
-		const mapData = hasEntryMap(entry)
-			? getMapData({
-					mapId: `${entry.collection}/${entry.id}`,
-					rule: getThemeMapRule(themeIndexById, entry.id),
-					...getMapLanguages(regionPrimary?.data._langCode),
-				})
-			: ({ hasGeodata: false } satisfies MapComponentData);
+		const mapData = getEntryMapData(entry);
 
 		const relatedThemeIds = R.pipe(
 			themes,

@@ -1,4 +1,4 @@
-import type { MapFeaturesRule, MapSourceItem } from '@spectralcodex/map-codec';
+import type { MapFeaturesRule, MapScope, MapSourceItem } from '@spectralcodex/map-codec';
 import type { CollectionEntry } from 'astro:content';
 
 import {
@@ -20,9 +20,9 @@ import { getLocationsCollection } from '#lib/collections/locations/locations-dat
 import { getObjectiveLocations } from '#lib/collections/locations/locations-subsets.ts';
 import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';
 import { resolveLocationRegions } from '#lib/collections/regions/regions-factory.ts';
-import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { assignChunks } from '#lib/map/map-chunks.ts';
 import { hashMapPayloads } from '#lib/map/map-directory-hash.ts';
+import { getMapThemeIndexById } from '#lib/map/map-entry-rules.ts';
 import {
 	getLocationFeatureIds,
 	getLocationFeatures,
@@ -30,7 +30,7 @@ import {
 	getLocationsMapSourceData,
 	getRegionMapRule,
 } from '#lib/map/map-locations.ts';
-import { buildAtlasScopeList } from '#lib/map/map-scopes.ts';
+import { buildMapScopes, getMapScopeKey } from '#lib/map/map-scopes.ts';
 import { getBasePath } from '#lib/utils/routing.ts';
 
 export type MapDatasetName = 'objectives' | 'shared';
@@ -55,23 +55,13 @@ interface MapDirectoryData {
 	atlasRule: MapFeaturesRule;
 	datasets: Record<MapDatasetName, MapDataset>;
 	divisionUrlById: Map<string, string>;
+	mapScopeByKey: Map<string, MapScope>;
 	payloads: Map<string, string>;
 }
 
 export function getMapPayloadUrl(id: string, version: string) {
 	return getBasePath('api/map', `${id}.json?v=${version}`);
 }
-
-export const getMapThemeIndexById = pMemoize(async () => {
-	const { entries: themes } = await getThemesCollection();
-	const themeIndexById = new Map<string, number>();
-	const sortedThemeIds = themes.map((entry) => entry.id).toSorted((a, b) => a.localeCompare(b));
-
-	for (const [index, id] of sortedThemeIds.entries()) {
-		themeIndexById.set(id, index);
-	}
-	return themeIndexById;
-});
 
 // No hidden-location filtering needed: only ids present in the (already filtered) source data are looked up
 function buildLocationByFeatureId(
@@ -226,13 +216,16 @@ export const getMapDirectoryData = pMemoize(async (): Promise<MapDirectoryData> 
 	const shared = buildMapDataset(locations, { ...context, prefix: '' });
 	const atlasRule = getRegionMapRule(regionsTree.intervalById, atlasRegionId);
 	const atlasRows = selectMapRows(shared.directory, atlasRule);
-	const scopes = await buildAtlasScopeList(atlasRows, themeIndexById);
+	const mapScopes = await buildMapScopes(atlasRows);
 	const divisionMaskById = await readDivisionMasks(regions);
 
 	for (const [id, body] of divisionMaskById) {
 		shared.payloads.set(getDivisionPayloadId(id), body);
 	}
-	shared.payloads.set(mapScopesFileName, JSON.stringify(scopes));
+	shared.payloads.set(
+		mapScopesFileName,
+		JSON.stringify(mapScopes.flatMap(({ row }) => (row ? [row] : []))),
+	);
 
 	const datasets = {
 		objectives: withVersion(objectives),
@@ -244,7 +237,15 @@ export const getMapDirectoryData = pMemoize(async (): Promise<MapDirectoryData> 
 			getMapPayloadUrl(getDivisionPayloadId(id), datasets.shared.version),
 		]),
 	);
+	const mapScopeByKey = new Map(
+		mapScopes.map(({ entry, scope }) => {
+			const apiDivisionUrl =
+				entry.collection === 'regions' ? divisionUrlById.get(entry.id) : undefined;
+
+			return [getMapScopeKey(entry), apiDivisionUrl ? { ...scope, apiDivisionUrl } : scope];
+		}),
+	);
 	const payloads = new Map([...datasets.objectives.payloads, ...datasets.shared.payloads]);
 
-	return { atlasRows, atlasRule, datasets, divisionUrlById, payloads };
+	return { atlasRows, atlasRule, datasets, divisionUrlById, mapScopeByKey, payloads };
 });

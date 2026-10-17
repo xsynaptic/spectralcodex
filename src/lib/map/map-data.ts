@@ -7,9 +7,14 @@ import { IMAGE_SERVER_URL } from 'astro:env/server';
 
 import type { MapBoundsOptions } from '#lib/map/map-bounds.ts';
 import type { MapDatasetName } from '#lib/map/map-directory.ts';
+import type { MapScopeEntry } from '#lib/map/map-entry-rules.ts';
 
+import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-data.ts';
+import { getMapLanguages } from '#lib/i18n/i18n-utils.ts';
 import { getMapBounds, isTargetFeature } from '#lib/map/map-bounds.ts';
 import { getMapDirectoryData } from '#lib/map/map-directory.ts';
+import { createEntryMapRuleFunction } from '#lib/map/map-entry-rules.ts';
+import { isEntryMapEnabled } from '#lib/map/map-locations.ts';
 
 export type MapComponentData =
 	{ hasGeodata: false; props?: never } | { hasGeodata: true; props: MapComponentProps };
@@ -66,6 +71,34 @@ export async function createMapDataFunction() {
 		};
 
 		return { hasGeodata: true, props: mapProps };
+	};
+}
+
+export async function createEntryMapDataFunction() {
+	const getMapData = await createMapDataFunction();
+	const getEntryMapRule = await createEntryMapRuleFunction();
+	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
+	const { divisionUrlById } = await getMapDirectoryData();
+
+	return function getEntryMapData(entry: MapScopeEntry): MapComponentData {
+		if (!isEntryMapEnabled(entry)) return { hasGeodata: false };
+
+		if (entry.collection === 'regions') {
+			const divisionUrl = divisionUrlById.get(entry.id);
+
+			return getMapData({
+				mapId: `${entry.collection}/${entry.id}`,
+				rule: getEntryMapRule(entry),
+				...getMapLanguages(entry.data._langCode),
+				...(divisionUrl ? { apiDivisionUrl: divisionUrl } : {}),
+			});
+		}
+
+		return getMapData({
+			mapId: `${entry.collection}/${entry.id}`,
+			rule: getEntryMapRule(entry),
+			...getMapLanguages(getFirstRegionByReference(entry.data.regions)?.data._langCode),
+		});
 	};
 }
 

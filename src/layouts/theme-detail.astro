@@ -19,7 +19,7 @@ import SectionSources from '#components/sections/section-sources.astro';
 import SectionStats from '#components/sections/section-stats.astro';
 import SectionThemes from '#components/sections/section-themes.astro';
 import SectionWebmentions from '#components/sections/section-webmentions.astro';
-import { getAtlasPage } from '#lib/atlas/atlas-data.ts';
+import { getAtlasScopePage } from '#lib/atlas/atlas-data.ts';
 
 interface Props {
 	backlinksCount: number;
@@ -38,7 +38,7 @@ const regionIds = entry.data.regions?.map(({ id }) => id);
 const themeIds = entry.data.themes?.map(({ id }) => id);
 const allThemeIds = [...new Set([...(themeIds ?? []), ...relatedThemeIds])];
 
-const atlas = await getAtlasPage(entry, mapData);
+const atlas = await getAtlasScopePage(entry);
 ---
 
 <ContentEntryDetail atlas={atlas} entry={entry}>

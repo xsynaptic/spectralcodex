@@ -6,12 +6,8 @@ import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { hasFeaturedImage } from '#lib/catalog/catalog-utils.ts';
-import { createLocationsBySeriesFunction } from '#lib/collections/locations/locations-data.ts';
-import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-data.ts';
 import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
-import { getMapLanguages } from '#lib/i18n/i18n-utils.ts';
-import { createMapDataFunction } from '#lib/map/map-data.ts';
-import { getLocationsMapRule } from '#lib/map/map-locations.ts';
+import { createEntryMapDataFunction } from '#lib/map/map-data.ts';
 import { isListedQuality } from '#lib/utils/content-policy.ts';
 
 export async function createQuerySeriesEntryFunction() {
@@ -19,9 +15,7 @@ export async function createQuerySeriesEntryFunction() {
 
 	const catalog = await getCatalog();
 	const getSeriesCatalogItems = await createSeriesCatalogItemsFunction();
-	const getSeriesLocations = await createLocationsBySeriesFunction();
-	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
-	const getMapData = await createMapDataFunction();
+	const getEntryMapData = await createEntryMapDataFunction();
 
 	const seriesCatalogItems = catalog.resolve(series);
 
@@ -30,14 +24,7 @@ export async function createQuerySeriesEntryFunction() {
 
 		if (!catalogItems) return;
 
-		const seriesLocations = getSeriesLocations(entry.data.seriesItems);
-		const regionPrimary = getFirstRegionByReference(entry.data.regions);
-
-		const mapData = getMapData({
-			mapId: `${entry.collection}/${entry.id}`,
-			rule: getLocationsMapRule(seriesLocations),
-			...getMapLanguages(regionPrimary?.data._langCode),
-		});
+		const mapData = getEntryMapData(entry);
 
 		const wordCount = seriesCatalogItems.find((item) => item.id === entry.id)?.wordCount;
 
