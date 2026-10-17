@@ -79,7 +79,7 @@ const t = getTranslations();
 			noIndex={!!meta?.noIndex || !indexing.index}
 		/>
 		{UMAMI_ID && UMAMI_DOMAIN && import.meta.env.PROD ? (
-			<Analytics isViewTransitionsEnabled={true} umamiDomain={UMAMI_DOMAIN} umamiId={UMAMI_ID} />
+			<Analytics umamiDomain={UMAMI_DOMAIN} umamiId={UMAMI_ID} />
 		) : undefined}
 		<ClientRouter />
 		<meta content={import.meta.env.BUILD_VERSION} name="build-version" />
