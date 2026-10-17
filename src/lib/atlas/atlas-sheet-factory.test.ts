@@ -13,7 +13,7 @@ import {
 	isSheetArrivalAtStart,
 } from '#lib/atlas/atlas-sheet-factory.ts';
 
-const lines = { down: 776, half: 320, raised: 0 };
+const lines = { half: 320, lowered: 776, raised: 0 };
 const viewportHeight = 800;
 
 describe('getSheetDragLine', () => {
@@ -31,12 +31,12 @@ describe('getSheetDragLine', () => {
 	test('no sheet is pushed below where a lowered one rests', () => {
 		expect(getSheetDragLine({ deltaY: 5000, from: 'raised', lines })).toBe(776);
 		expect(getSheetDragLine({ deltaY: 900, from: 'half', lines })).toBe(776);
-		expect(getSheetDragLine({ deltaY: 60, from: 'down', lines })).toBe(776);
+		expect(getSheetDragLine({ deltaY: 60, from: 'lowered', lines })).toBe(776);
 	});
 
 	test('a lowered sheet follows the pointer up from where it rests', () => {
-		expect(getSheetDragLine({ deltaY: -200, from: 'down', lines })).toBe(576);
-		expect(getSheetDragLine({ deltaY: -2000, from: 'down', lines })).toBe(0);
+		expect(getSheetDragLine({ deltaY: -200, from: 'lowered', lines })).toBe(576);
+		expect(getSheetDragLine({ deltaY: -2000, from: 'lowered', lines })).toBe(0);
 	});
 });
 
@@ -44,7 +44,7 @@ describe('getSheetReleaseRest', () => {
 	const rests = getSheetRests(true);
 	const drag = { kind: 'drag', lines, preferred: 'half', rests, viewportHeight } as const;
 
-	function getRest(from: 'down' | 'half' | 'raised', linePx: number, dragRests = rests) {
+	function getRest(from: 'half' | 'lowered' | 'raised', linePx: number, dragRests = rests) {
 		return getSheetReleaseRest({ ...drag, from, linePx, rests: dragRests });
 	}
 
@@ -54,40 +54,42 @@ describe('getSheetReleaseRest', () => {
 		expect(getRest('half', 320 - 159)).toBe('half');
 		expect(getRest('half', 320 - 160)).toBe('raised');
 		expect(getRest('half', 320 + 159)).toBe('half');
-		expect(getRest('half', 320 + 160)).toBe('down');
-		expect(getRest('down', 776 - 159)).toBe('down');
-		expect(getRest('down', 776 - 160)).toBe('half');
+		expect(getRest('half', 320 + 160)).toBe('lowered');
+		expect(getRest('lowered', 776 - 159)).toBe('lowered');
+		expect(getRest('lowered', 776 - 160)).toBe('half');
 	});
 
 	test('a long pull skips half for the rest nearer the release point', () => {
 		expect(getRest('raised', 547)).toBe('half');
-		expect(getRest('raised', 549)).toBe('down');
-		expect(getRest('down', 161)).toBe('half');
-		expect(getRest('down', 159)).toBe('raised');
+		expect(getRest('raised', 549)).toBe('lowered');
+		expect(getRest('lowered', 161)).toBe('half');
+		expect(getRest('lowered', 159)).toBe('raised');
 	});
 
 	test('a release never lands behind the rest the drag started from', () => {
 		expect(getRest('half', 0)).toBe('raised');
-		expect(getRest('half', 776)).toBe('down');
+		expect(getRest('half', 776)).toBe('lowered');
 	});
 
 	test('without the half rest a committed drag crosses to the other rest', () => {
 		const twoRests = getSheetRests(false);
 
-		expect(getRest('raised', 160, twoRests)).toBe('down');
+		expect(getRest('raised', 160, twoRests)).toBe('lowered');
 		expect(getRest('raised', 159, twoRests)).toBe('raised');
-		expect(getRest('down', 776 - 160, twoRests)).toBe('raised');
+		expect(getRest('lowered', 776 - 160, twoRests)).toBe('raised');
 	});
 
 	test('a drag pushed against the clamp stays, having travelled nowhere', () => {
-		expect(getRest('down', getSheetDragLine({ deltaY: 400, from: 'down', lines }))).toBe('down');
+		expect(getRest('lowered', getSheetDragLine({ deltaY: 400, from: 'lowered', lines }))).toBe(
+			'lowered',
+		);
 	});
 
 	test('a press released inside the tolerance is a tap, whatever line it ended on', () => {
 		const tap = { ...drag, kind: 'tap', linePx: 600 } as const;
 
-		expect(getSheetReleaseRest({ ...tap, from: 'half' })).toBe('down');
-		expect(getSheetReleaseRest({ ...tap, from: 'down', preferred: 'raised' })).toBe('raised');
+		expect(getSheetReleaseRest({ ...tap, from: 'half' })).toBe('lowered');
+		expect(getSheetReleaseRest({ ...tap, from: 'lowered', preferred: 'raised' })).toBe('raised');
 	});
 
 	test('a cancelled pointer stays whatever it did', () => {
@@ -115,26 +117,28 @@ describe('the frame a moving sheet draws', () => {
 	test('a grab moves nothing: the pane starts untranslated at every rest but lowered', () => {
 		expect(getSheetTranslate({ from: 'raised', linePx: lines.raised, lines })).toBe(0);
 		expect(getSheetTranslate({ from: 'half', linePx: lines.half, lines })).toBe(0);
-		expect(getSheetTranslate({ from: 'down', linePx: lines.down, lines })).toBe(lines.down);
+		expect(getSheetTranslate({ from: 'lowered', linePx: lines.lowered, lines })).toBe(
+			lines.lowered,
+		);
 	});
 
 	test('a half sheet travels from the split, so its range is shorter by its margin', () => {
 		expect(getSheetTranslate({ from: 'half', linePx: lines.raised, lines })).toBe(-lines.half);
-		expect(getSheetTranslate({ from: 'half', linePx: lines.down, lines })).toBe(
-			lines.down - lines.half,
+		expect(getSheetTranslate({ from: 'half', linePx: lines.lowered, lines })).toBe(
+			lines.lowered - lines.half,
 		);
 	});
 
 	test('a slide ends where the rest it lands on draws the pane', () => {
-		expect(getSheetSlide({ ...slide, from: 'raised', to: 'down' })).toEqual({
+		expect(getSheetSlide({ ...slide, from: 'raised', to: 'lowered' })).toEqual({
 			clipPx: undefined,
-			translatePx: lines.down,
+			translatePx: lines.lowered,
 		});
 		expect(getSheetSlide({ ...slide, from: 'half', to: 'raised' })).toEqual({
 			clipPx: undefined,
 			translatePx: -lines.half,
 		});
-		expect(getSheetSlide({ ...slide, from: 'down', to: 'half' })).toEqual({
+		expect(getSheetSlide({ ...slide, from: 'lowered', to: 'half' })).toEqual({
 			clipPx: undefined,
 			translatePx: lines.half,
 		});
@@ -155,8 +159,8 @@ describe('the frame a moving sheet draws', () => {
 	test('only a margin leaving clamps: a raised or lowering sheet slides the whole way', () => {
 		const atEnd = { ...slide, foldPx: scrollMaxY, scrollY: scrollMaxY };
 
-		expect(getSheetSlide({ ...atEnd, from: 'half', to: 'down' }).clipPx).toBeUndefined();
-		expect(getSheetSlide({ ...atEnd, from: 'down', to: 'raised' })).toEqual({
+		expect(getSheetSlide({ ...atEnd, from: 'half', to: 'lowered' }).clipPx).toBeUndefined();
+		expect(getSheetSlide({ ...atEnd, from: 'lowered', to: 'raised' })).toEqual({
 			clipPx: undefined,
 			translatePx: 0,
 		});
@@ -165,13 +169,13 @@ describe('the frame a moving sheet draws', () => {
 
 describe('getSheetTapRest', () => {
 	test('a tap hides the page from either open rest', () => {
-		expect(getSheetTapRest({ from: 'raised', preferred: 'half' })).toBe('down');
-		expect(getSheetTapRest({ from: 'half', preferred: 'raised' })).toBe('down');
+		expect(getSheetTapRest({ from: 'raised', preferred: 'half' })).toBe('lowered');
+		expect(getSheetTapRest({ from: 'half', preferred: 'raised' })).toBe('lowered');
 	});
 
 	test('a tap on a lowered sheet shows the page at the preferred rest', () => {
-		expect(getSheetTapRest({ from: 'down', preferred: 'half' })).toBe('half');
-		expect(getSheetTapRest({ from: 'down', preferred: 'raised' })).toBe('raised');
+		expect(getSheetTapRest({ from: 'lowered', preferred: 'half' })).toBe('half');
+		expect(getSheetTapRest({ from: 'lowered', preferred: 'raised' })).toBe('raised');
 	});
 });
 
@@ -179,22 +183,24 @@ describe('getSheetStepRest', () => {
 	const rests = getSheetRests(true);
 
 	test('an arrow key steps one rest, so the keyboard reaches the open rest a tap skips', () => {
-		expect(getSheetStepRest({ direction: 'up', from: 'down', rests })).toBe('half');
+		expect(getSheetStepRest({ direction: 'up', from: 'lowered', rests })).toBe('half');
 		expect(getSheetStepRest({ direction: 'up', from: 'half', rests })).toBe('raised');
 		expect(getSheetStepRest({ direction: 'down', from: 'raised', rests })).toBe('half');
-		expect(getSheetStepRest({ direction: 'down', from: 'half', rests })).toBe('down');
+		expect(getSheetStepRest({ direction: 'down', from: 'half', rests })).toBe('lowered');
 	});
 
 	test('a step past either end stays', () => {
 		expect(getSheetStepRest({ direction: 'up', from: 'raised', rests })).toBe('raised');
-		expect(getSheetStepRest({ direction: 'down', from: 'down', rests })).toBe('down');
+		expect(getSheetStepRest({ direction: 'down', from: 'lowered', rests })).toBe('lowered');
 	});
 
 	test('without the half rest a step crosses to the other rest', () => {
 		const twoRests = getSheetRests(false);
 
-		expect(getSheetStepRest({ direction: 'up', from: 'down', rests: twoRests })).toBe('raised');
-		expect(getSheetStepRest({ direction: 'down', from: 'raised', rests: twoRests })).toBe('down');
+		expect(getSheetStepRest({ direction: 'up', from: 'lowered', rests: twoRests })).toBe('raised');
+		expect(getSheetStepRest({ direction: 'down', from: 'raised', rests: twoRests })).toBe(
+			'lowered',
+		);
 	});
 });
 
@@ -206,7 +212,7 @@ describe('getPreferredSheetRest', () => {
 
 	test('with nothing usable stored every arrival is half', () => {
 		expect(getPreferredSheetRest({ hasHalf: true, stored: undefined })).toBe('half');
-		expect(getPreferredSheetRest({ hasHalf: true, stored: 'down' })).toBe('half');
+		expect(getPreferredSheetRest({ hasHalf: true, stored: 'lowered' })).toBe('half');
 	});
 
 	test('where the height gate fails every arrival is raised', () => {
@@ -230,6 +236,6 @@ describe('isSheetArrivalAtStart', () => {
 
 	test('only a half sheet has a split to start at', () => {
 		expect(isSheetArrivalAtStart({ ...arrival, rest: 'raised' })).toBe(false);
-		expect(isSheetArrivalAtStart({ ...arrival, rest: 'down' })).toBe(false);
+		expect(isSheetArrivalAtStart({ ...arrival, rest: 'lowered' })).toBe(false);
 	});
 });

@@ -197,13 +197,13 @@
 }
 
 /* Registered so computed style yields pixels for `readLengthPx` */
-@property --atlas-sheet-split {
+@property --atlas-sheet-half-line {
 	syntax: '<length>';
 	inherits: true;
 	initial-value: 0;
 }
 
-@property --atlas-sheet-rest {
+@property --atlas-sheet-lowered-line {
 	syntax: '<length>';
 	inherits: true;
 	initial-value: 0;
@@ -218,8 +218,8 @@
 		--atlas-sheet-handle-reach: 0.25rem;
 
 		/* `svh` holds the split still when the iOS toolbar collapses mid-scroll */
-		--atlas-sheet-split: 40svh;
-		--atlas-sheet-rest: calc(100dvh - var(--atlas-sheet-handle-size));
+		--atlas-sheet-half-line: 40svh;
+		--atlas-sheet-lowered-line: calc(100dvh - var(--atlas-sheet-handle-size));
 	}
 
 	/* The large viewport never changes, so a collapsing toolbar cannot resize the canvas under a scrolling page */
@@ -240,10 +240,6 @@
 		}
 
 		.atlas-inline-map {
-			display: none;
-		}
-
-		.atlas-shell .maplibregl-ctrl:has(> .map-ctrl-expand) {
 			display: none;
 		}
 
@@ -278,7 +274,7 @@
 			content: '';
 		}
 
-		&[data-atlas-sheet='down'] .atlas-sheet-handle button::after {
+		&[data-atlas-sheet='lowered'] .atlas-sheet-handle button::after {
 			inset-block: calc(-1 * var(--atlas-sheet-handle-reach)) 0;
 		}
 
@@ -292,8 +288,8 @@
 			background-color: light-dark(var(--color-primary-100), var(--color-primary-800));
 		}
 
-		&[data-atlas-sheet='down'] .main-pane {
-			translate: 0 var(--atlas-sheet-rest);
+		&[data-atlas-sheet='lowered'] .main-pane {
+			translate: 0 var(--atlas-sheet-lowered-line);
 
 			&:not([data-grabbing]) {
 				--atlas-sheet-clip-reach: var(--atlas-sheet-handle-reach);
@@ -306,7 +302,7 @@
 			}
 		}
 
-		&:is([data-atlas-sheet='down'], :has(.main-pane[data-grabbing])) {
+		&:is([data-atlas-sheet='lowered'], :has(.main-pane[data-grabbing])) {
 			overflow: clip;
 
 			/* A translated pane is as tall as its page, so it would bring in the page above, not the map */
@@ -325,12 +321,12 @@
 			}
 		}
 
-		&[data-atlas-sheet='down'] progress-reading {
+		&[data-atlas-sheet='lowered'] progress-reading {
 			visibility: hidden;
 		}
 
 		/* A click on the open Location then brings its page back rather than opening a popup; half sets it too */
-		&[data-atlas-sheet='down'] .atlas-shell {
+		&[data-atlas-sheet='lowered'] .atlas-shell {
 			--map-page-hidden: 1;
 		}
 	}
@@ -345,20 +341,20 @@
 			/* Set with the layout, not the rest, so a rest change never moves the camera */
 			.atlas-shell {
 				--map-inset-bottom: calc(
-					100lvh - var(--atlas-sheet-handle-size) - var(--atlas-sheet-split)
+					100lvh - var(--atlas-sheet-handle-size) - var(--atlas-sheet-half-line)
 				);
 			}
 
 			&[data-atlas-sheet='half'] {
 				/* In-page links and focus land below the map; `progress-reading` reads this as the covered band */
-				scroll-padding-top: calc(var(--atlas-sheet-split) + var(--atlas-sheet-handle-size));
+				scroll-padding-top: calc(var(--atlas-sheet-half-line) + var(--atlas-sheet-handle-size));
 
 				.main-pane {
-					margin-top: var(--atlas-sheet-split);
+					margin-top: var(--atlas-sheet-half-line);
 				}
 
 				.atlas-sheet-handle {
-					top: var(--atlas-sheet-split);
+					top: var(--atlas-sheet-half-line);
 				}
 
 				.atlas-sheet-handle button {
@@ -369,7 +365,7 @@
 				.atlas-shell {
 					--map-page-hidden: 1;
 					--map-cover-bottom: calc(
-						100lvh - var(--atlas-sheet-handle-size) - var(--atlas-sheet-split)
+						100lvh - var(--atlas-sheet-handle-size) - var(--atlas-sheet-half-line)
 					);
 				}
 
@@ -378,7 +374,7 @@
 				/* A grab drops the lift, so the drag draws the same frame as the rest it left */
 				&:not(:has(.main-pane[data-grabbing])) .atlas-shell {
 					z-index: var(--z-index-sheet-map);
-					clip-path: inset(0 0 calc(100% - var(--atlas-sheet-split)) 0);
+					clip-path: inset(0 0 calc(100% - var(--atlas-sheet-half-line)) 0);
 				}
 			}
 		}

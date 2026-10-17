@@ -35,8 +35,8 @@ export const atlasSheetHalfProperty = '--atlas-sheet-half';
 export const atlasSheetFoldProperty = '--atlas-sheet-fold';
 
 export const atlasSheetAttribute = 'data-atlas-sheet';
-export const atlasSheetRest = { down: 'down', half: 'half', raised: 'raised' } as const;
+export const atlasSheetRest = { half: 'half', lowered: 'lowered', raised: 'raised' } as const;
 
-export const atlasSheetSplitProperty = '--atlas-sheet-split';
-export const atlasSheetRestProperty = '--atlas-sheet-rest';
+export const atlasSheetHalfLineProperty = '--atlas-sheet-half-line';
+export const atlasSheetLoweredLineProperty = '--atlas-sheet-lowered-line';
 export const atlasSheetGrabbingAttribute = 'data-grabbing';

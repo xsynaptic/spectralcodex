@@ -23,6 +23,7 @@ import {
 	resetSheet,
 	startColdSheetArrival,
 } from '#lib/atlas/atlas-sheet.ts';
+import { writeStorage } from '#lib/utils/storage.ts';
 
 const paneAnchorSelector = `${atlasPaneSelector} a[href]`;
 
@@ -60,15 +61,6 @@ function handleLinkClick(event: MouseEvent) {
 	else anchor.removeAttribute('target');
 }
 
-function storeFlag(isEnabled: boolean) {
-	try {
-		if (isEnabled) sessionStorage.setItem(atlasFlagStorageKey, '1');
-		else sessionStorage.removeItem(atlasFlagStorageKey);
-	} catch {
-		// sessionStorage unavailable
-	}
-}
-
 function getSheetMainTop() {
 	if (readPaneLayout() === 'split') return 0;
 
@@ -85,13 +77,13 @@ export function setFlag(isEnabled: boolean) {
 	document.documentElement.toggleAttribute(atlasFlagAttribute, isEnabled);
 	window.scrollBy({ behavior: 'instant', top: getSheetMainTop() - mainTop });
 
-	storeFlag(isEnabled);
+	writeStorage('sessionStorage', atlasFlagStorageKey, isEnabled ? '1' : undefined);
 	updateHeroSizes(readAtlasLayout() === 'split');
 	dispatchSync();
 }
 
 function getFromPage(screen: AtlasScreen) {
-	const isLowered = screen.layout === 'sheet' && screen.rest === atlasSheetRest.down;
+	const isLowered = screen.layout === 'sheet' && screen.rest === atlasSheetRest.lowered;
 
 	return isLowered ? atlasPage.map : readAtlasFlags(document.documentElement).page;
 }
@@ -136,7 +128,7 @@ export function startAtlasMode() {
 		const incomingRoot = event.newDocument.documentElement;
 		const isMap = readAtlasFlags(incomingRoot).page === atlasPage.map;
 
-		if (isMap) storeFlag(true);
+		if (isMap) writeStorage('sessionStorage', atlasFlagStorageKey, '1');
 
 		incomingRoot.toggleAttribute(
 			atlasFlagAttribute,

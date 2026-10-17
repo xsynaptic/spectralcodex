@@ -9,12 +9,12 @@ import {
 	atlasSheetAttribute,
 	atlasSheetFoldProperty,
 	atlasSheetGrabbingAttribute,
+	atlasSheetHalfLineProperty,
 	atlasSheetHalfProperty,
 	atlasSheetHandleSelector,
+	atlasSheetLoweredLineProperty,
 	atlasSheetRest,
-	atlasSheetRestProperty,
 	atlasSheetRestStorageKey,
-	atlasSheetSplitProperty,
 	atlasSheetStartSelector,
 } from '#lib/atlas/atlas-constants.ts';
 import {
@@ -28,6 +28,7 @@ import {
 	getSheetTranslate,
 	isSheetArrivalAtStart,
 } from '#lib/atlas/atlas-sheet-factory.ts';
+import { readStorage, writeStorage } from '#lib/utils/storage.ts';
 
 const sheetMoveDurationMs = { lower: 150, raise: 200 } as const;
 
@@ -53,26 +54,17 @@ export function hasHalfRest() {
 export function readSheetRest(): AtlasSheetRest {
 	const value = document.documentElement.getAttribute(atlasSheetAttribute);
 
-	if (value === atlasSheetRest.down || value === atlasSheetRest.half) return value;
+	if (value === atlasSheetRest.lowered || value === atlasSheetRest.half) return value;
 
 	return atlasSheetRest.raised;
 }
 
 function readLines(): AtlasSheetLines {
 	return {
-		down: readLengthPx(atlasSheetRestProperty),
-		half: readLengthPx(atlasSheetSplitProperty),
+		half: readLengthPx(atlasSheetHalfLineProperty),
+		lowered: readLengthPx(atlasSheetLoweredLineProperty),
 		raised: 0,
 	};
-}
-
-function readStoredRest() {
-	try {
-		return localStorage.getItem(atlasSheetRestStorageKey) ?? undefined;
-	} catch {
-		// localStorage unavailable
-		return;
-	}
 }
 
 function writeRest(root: HTMLElement, rest: AtlasSheetRest) {
@@ -113,9 +105,9 @@ export function setSheet(rest: AtlasSheetRest) {
 
 	writeRest(root, rest);
 
-	if (rest !== atlasSheetRest.down) {
+	if (rest !== atlasSheetRest.lowered) {
 		root.style.removeProperty(atlasSheetFoldProperty);
-	} else if (pane && from !== atlasSheetRest.down) {
+	} else if (pane && from !== atlasSheetRest.lowered) {
 		// Read once the attribute has landed: the margin leaving can clamp the scroll offset at the end of a page
 		writeFoldPx(0, pane.offsetTop - window.scrollY);
 	}
@@ -133,7 +125,7 @@ function holdSheet(lines: AtlasSheetLines) {
 
 	releaseFragmentScroll();
 
-	if (from !== atlasSheetRest.down) writeFoldPx(lines[from], pane.getBoundingClientRect().top);
+	if (from !== atlasSheetRest.lowered) writeFoldPx(lines[from], pane.getBoundingClientRect().top);
 
 	pane.toggleAttribute(atlasSheetGrabbingAttribute, true);
 
@@ -145,7 +137,10 @@ export function readSheetRests() {
 }
 
 export function readPreferredSheetRest() {
-	return getPreferredSheetRest({ hasHalf: hasHalfRest(), stored: readStoredRest() });
+	return getPreferredSheetRest({
+		hasHalf: hasHalfRest(),
+		stored: readStorage('localStorage', atlasSheetRestStorageKey),
+	});
 }
 
 export function readSheetEnterRest() {
@@ -153,13 +148,9 @@ export function readSheetEnterRest() {
 }
 
 export function storeSheetRest(rest: AtlasSheetRest) {
-	if (rest === atlasSheetRest.down) return;
+	if (rest === atlasSheetRest.lowered) return;
 
-	try {
-		localStorage.setItem(atlasSheetRestStorageKey, rest);
-	} catch {
-		// localStorage unavailable
-	}
+	writeStorage('localStorage', atlasSheetRestStorageKey, rest);
 }
 
 export function isSheetGrabbed() {
@@ -174,7 +165,7 @@ export function scrollToSheetStart(
 	if (!element) return;
 
 	const handle = document.querySelector(atlasSheetHandleSelector);
-	const startPx = readLengthPx(atlasSheetSplitProperty) + (handle?.clientHeight ?? 0);
+	const startPx = readLengthPx(atlasSheetHalfLineProperty) + (handle?.clientHeight ?? 0);
 
 	window.scrollBy({ behavior, top: element.getBoundingClientRect().top - startPx });
 }
@@ -243,13 +234,13 @@ function getMoveKeyframe(from: AtlasSheetRest, to: AtlasSheetRest, lines: AtlasS
 function getMoveDuration(rest: AtlasSheetRest) {
 	if (matchMedia('(prefers-reduced-motion: reduce)').matches) return 0;
 
-	return rest === atlasSheetRest.down ? sheetMoveDurationMs.lower : sheetMoveDurationMs.raise;
+	return rest === atlasSheetRest.lowered ? sheetMoveDurationMs.lower : sheetMoveDurationMs.raise;
 }
 
 function slidePane(pane: HTMLElement, keyframe: PropertyIndexedKeyframes, rest: AtlasSheetRest) {
 	return pane.animate(keyframe, {
 		duration: getMoveDuration(rest),
-		easing: rest === atlasSheetRest.down ? 'ease-in' : 'ease-out',
+		easing: rest === atlasSheetRest.lowered ? 'ease-in' : 'ease-out',
 		fill: 'forwards',
 	});
 }

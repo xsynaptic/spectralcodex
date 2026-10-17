@@ -117,9 +117,10 @@ async function lowerSheet(page: Page) {
 
 	await expect(root).toHaveAttribute(atlasSheetAttribute);
 
-	if ((await root.getAttribute(atlasSheetAttribute)) !== atlasSheetRest.down) await handle.click();
+	if ((await root.getAttribute(atlasSheetAttribute)) !== atlasSheetRest.lowered)
+		await handle.click();
 
-	await expect(root).toHaveAttribute(atlasSheetAttribute, atlasSheetRest.down);
+	await expect(root).toHaveAttribute(atlasSheetAttribute, atlasSheetRest.lowered);
 }
 
 // Gecko and WebKit log a reload's cancelled loads, so only Chromium guards the console here
@@ -551,7 +552,7 @@ test.describe('a sheet on a phone viewport', { tag: '@engines' }, () => {
 		await expect(marker).toHaveAttribute('style', markerStyle);
 	});
 
-	test('the sheet goes down without leaving its page, comes back, rises and closes', async ({
+	test('the sheet lowers without leaving its page, comes back, rises and closes', async ({
 		page,
 	}) => {
 		const { close, handle, root, shell, title } = getAtlas(page);
@@ -563,8 +564,8 @@ test.describe('a sheet on a phone viewport', { tag: '@engines' }, () => {
 
 		await handle.click();
 
-		await expect(root).toHaveAttribute(atlasSheetAttribute, atlasSheetRest.down);
-		await expect(handle).toHaveAccessibleName(t('atlas.sheet.open.label'));
+		await expect(root).toHaveAttribute(atlasSheetAttribute, atlasSheetRest.lowered);
+		await expect(handle).toHaveAccessibleName(t('atlas.sheet.raise.label'));
 		await expect(handle).toHaveAttribute('aria-expanded', 'false');
 		await expect(title).toBeHidden();
 		expect(new URL(page.url()).pathname).toBe(paths.locationSinglePoint);
@@ -691,7 +692,7 @@ test.describe('the rest a sheet takes on a phone viewport', { tag: '@engines' },
 		await expect(canvas).toHaveCSS(mapInsetProperty, '0px');
 
 		await handle.press('ArrowDown');
-		await expect(root).toHaveAttribute(atlasSheetAttribute, atlasSheetRest.down);
+		await expect(root).toHaveAttribute(atlasSheetAttribute, atlasSheetRest.lowered);
 
 		await handle.press('ArrowUp');
 		await expect(root).not.toHaveAttribute(atlasSheetAttribute);
@@ -728,7 +729,7 @@ test.describe('reading in a sheet on a phone viewport', { tag: '@engines' }, () 
 
 		// Playwright's scroll into view moves the page; the handle sits in the half rest's scroll padding
 		await handle.click({ scroll: 'none' });
-		await expect(root).toHaveAttribute(atlasSheetAttribute, atlasSheetRest.down);
+		await expect(root).toHaveAttribute(atlasSheetAttribute, atlasSheetRest.lowered);
 		await expect(footnote).toBeHidden();
 
 		images.resolve(undefined);
@@ -772,7 +773,7 @@ test.describe('reading in a sheet on a phone viewport', { tag: '@engines' }, () 
 		await beforeMap.scrollIntoViewIfNeeded();
 
 		await handle.press('ArrowDown');
-		await expect(root).toHaveAttribute(atlasSheetAttribute, atlasSheetRest.down);
+		await expect(root).toHaveAttribute(atlasSheetAttribute, atlasSheetRest.lowered);
 
 		await close.click();
 

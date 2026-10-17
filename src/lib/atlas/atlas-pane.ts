@@ -7,6 +7,7 @@ import {
 	atlasPaneStorageKey,
 } from '#lib/atlas/atlas-constants.ts';
 import { clampPaneWidth } from '#lib/atlas/atlas-pane-factory.ts';
+import { writeStorage } from '#lib/utils/storage.ts';
 
 const heroSelector = 'img[data-hero-image]';
 
@@ -72,11 +73,7 @@ export function stampPaneSize(incomingRoot: HTMLElement) {
 export function requestPaneWidth(width: number) {
 	document.documentElement.style.setProperty(atlasPaneSizeProperty, `${String(width)}px`);
 
-	try {
-		localStorage.setItem(atlasPaneStorageKey, String(Math.round(width)));
-	} catch {
-		// localStorage unavailable
-	}
+	writeStorage('localStorage', atlasPaneStorageKey, String(Math.round(width)));
 
 	updateHeroSizes(true);
 }

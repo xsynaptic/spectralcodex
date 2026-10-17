@@ -8,6 +8,7 @@ import type {
 
 import { modeStorageKey } from '#components/mode-manager/mode-constants.ts';
 import { ModeTypeEnum } from '#components/mode-manager/mode-types.ts';
+import { readStorage, writeStorage } from '#lib/utils/storage.ts';
 
 const validModes: ReadonlySet<string> = new Set([
 	ModeTypeEnum.Auto,
@@ -25,13 +26,7 @@ class ModeManager extends HTMLElement {
 		this.#systemMode = this.#mediaMatcher.matches ? ModeTypeEnum.Light : ModeTypeEnum.Dark;
 		this.#mediaMatcher.addEventListener('change', this.#handleMediaChange);
 
-		let stored: string | undefined;
-
-		try {
-			stored = localStorage.getItem(modeStorageKey) ?? undefined;
-		} catch {
-			// localStorage unavailable
-		}
+		const stored = readStorage('localStorage', modeStorageKey);
 
 		if (isModeValid(stored)) this.#mode = stored;
 
@@ -52,11 +47,7 @@ class ModeManager extends HTMLElement {
 		this.#mode = mode;
 		this.#applyMode(mode);
 
-		try {
-			localStorage.setItem(modeStorageKey, mode);
-		} catch {
-			// The mode still applies when saving it fails
-		}
+		writeStorage('localStorage', modeStorageKey, mode);
 	}
 
 	#applyMode(mode: ModeGeneralType) {

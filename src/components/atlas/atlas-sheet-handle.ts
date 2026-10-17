@@ -60,10 +60,10 @@ class AtlasSheetHandle extends HTMLElement {
 		);
 
 		const updateButton = () => {
-			const isDown = readSheetRest() === atlasSheetRest.down;
-			const label = isDown ? this.dataset.labelRaise : this.dataset.labelLower;
+			const isLowered = readSheetRest() === atlasSheetRest.lowered;
+			const label = isLowered ? this.dataset.labelRaise : this.dataset.labelLower;
 
-			button.setAttribute('aria-expanded', String(!isDown));
+			button.setAttribute('aria-expanded', String(!isLowered));
 
 			if (label) button.setAttribute('aria-label', label);
 		};

@@ -6,7 +6,7 @@ export type AtlasSheetLines = Record<AtlasSheetRest, number>;
 
 const moveViewportShare = 0.2;
 
-const restOrder = [atlasSheetRest.raised, atlasSheetRest.half, atlasSheetRest.down] as const;
+const restOrder = [atlasSheetRest.raised, atlasSheetRest.half, atlasSheetRest.lowered] as const;
 
 export function getSheetRests(hasHalf: boolean): Array<AtlasSheetRest> {
 	return restOrder.filter((rest) => hasHalf || rest !== atlasSheetRest.half);
@@ -21,7 +21,7 @@ export function getSheetDragLine({
 	from: AtlasSheetRest;
 	lines: AtlasSheetLines;
 }) {
-	return Math.min(lines.down, Math.max(lines.raised, lines[from] + deltaY));
+	return Math.min(lines.lowered, Math.max(lines.raised, lines[from] + deltaY));
 }
 
 function getMarginPx(from: AtlasSheetRest, lines: AtlasSheetLines) {
@@ -110,7 +110,7 @@ export function getSheetTapRest({
 	from: AtlasSheetRest;
 	preferred: AtlasSheetRest;
 }) {
-	return from === atlasSheetRest.down ? preferred : atlasSheetRest.down;
+	return from === atlasSheetRest.lowered ? preferred : atlasSheetRest.lowered;
 }
 
 export type AtlasSheetReleaseKind = 'cancel' | 'drag' | 'tap';
@@ -154,7 +154,7 @@ export function getSheetStepRest({
 	return rests[index] ?? from;
 }
 
-function isOpenRest(value: unknown): value is Exclude<AtlasSheetRest, 'down'> {
+function isOpenRest(value: unknown): value is Exclude<AtlasSheetRest, 'lowered'> {
 	return value === atlasSheetRest.half || value === atlasSheetRest.raised;
 }
 
@@ -171,7 +171,7 @@ export function getPreferredSheetRest({
 }
 
 export function getSheetEnterRest(hasHalf: boolean) {
-	return hasHalf ? atlasSheetRest.half : atlasSheetRest.down;
+	return hasHalf ? atlasSheetRest.half : atlasSheetRest.lowered;
 }
 
 export function isSheetArrivalAtStart({

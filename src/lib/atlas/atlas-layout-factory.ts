@@ -47,7 +47,7 @@ export function getAtlasOpenAction({ pathname, screen, url }: AtlasOpenInput) {
 
 	const rest = screen.layout === 'sheet' ? screen.rest : undefined;
 
-	if (rest === atlasSheetRest.down) return { type: 'raise' } as const;
+	if (rest === atlasSheetRest.lowered) return { type: 'raise' } as const;
 	if (rest === atlasSheetRest.half) return { type: 'start' } as const;
 
 	return { type: 'top' } as const;

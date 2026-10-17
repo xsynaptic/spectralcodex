@@ -22,11 +22,12 @@ import {
 	setSheet,
 } from '#lib/atlas/atlas-sheet.ts';
 import { getSitePath } from '#lib/utils/routing.ts';
+import { readStorage, writeStorage } from '#lib/utils/storage.ts';
 
 function openSheet() {
 	const rest = readSheetEnterRest();
 
-	if (rest === atlasSheetRest.down) {
+	if (rest === atlasSheetRest.lowered) {
 		void moveSheet(rest);
 		return;
 	}
@@ -78,20 +79,7 @@ function runOpenAction(action: ReturnType<typeof getAtlasOpenAction>) {
 function storeReturnPath() {
 	if (readAtlasLayout() === 'map') return;
 
-	try {
-		sessionStorage.setItem(atlasReturnStorageKey, location.pathname + location.search);
-	} catch {
-		// sessionStorage unavailable
-	}
-}
-
-function readReturnPath() {
-	try {
-		return sessionStorage.getItem(atlasReturnStorageKey) ?? undefined;
-	} catch {
-		// sessionStorage unavailable
-		return;
-	}
+	writeStorage('sessionStorage', atlasReturnStorageKey, location.pathname + location.search);
 }
 
 function leaveMap() {
@@ -100,11 +88,13 @@ function leaveMap() {
 		return;
 	}
 
-	void navigate(readReturnPath() ?? getSitePath(), { history: 'replace' });
+	void navigate(readStorage('sessionStorage', atlasReturnStorageKey) ?? getSitePath(), {
+		history: 'replace',
+	});
 }
 
 async function closeAtlas() {
-	if (readSheetRest() === atlasSheetRest.down) await moveSheet(atlasSheetRest.raised);
+	if (readSheetRest() === atlasSheetRest.lowered) await moveSheet(atlasSheetRest.raised);
 
 	const hasShellFocus = document
 		.querySelector(atlasShellSelector)

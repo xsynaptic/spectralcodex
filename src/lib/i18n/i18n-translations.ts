@@ -190,8 +190,8 @@ const translationStrings = {
 		'atlas.noscript':
 			'The atlas needs JavaScript to draw the map. Browse the same places as lists instead.',
 		'atlas.open.label': 'Open in atlas',
-		'atlas.sheet.close.label': 'Back to the map',
-		'atlas.sheet.open.label': 'Back to the page',
+		'atlas.sheet.lower.label': 'Back to the map',
+		'atlas.sheet.raise.label': 'Back to the page',
 		'atlas.title': 'Atlas',
 
 		// Objectives
