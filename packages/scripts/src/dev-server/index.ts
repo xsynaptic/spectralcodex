@@ -38,6 +38,9 @@ let isCleanedUp = false;
 async function cleanup() {
 	if (isCleanedUp) return;
 	isCleanedUp = true;
+
+	if (astroDev.stage === 'running') await astroDev.kill('SIGINT');
+
 	log(chalk.gray('Stopping containers...'));
 	try {
 		await $`docker compose -f ${composePath} --project-directory ${rootPath} down`.quiet();
@@ -46,9 +49,6 @@ async function cleanup() {
 	}
 	process.exit(0);
 }
-
-process.on('SIGINT', () => void cleanup());
-process.on('SIGTERM', () => void cleanup());
 
 log('Starting containers...');
 
@@ -67,8 +67,13 @@ void startContainers();
 // Run the bin directly; `npx` warns about deprecations and `pnpm exec` prints a spurious error when exiting
 const astroBinPath = path.join(rootPath, 'node_modules', '.bin', 'astro');
 
+const astroDev = $({ cwd: rootPath, stdio: 'inherit' })`${astroBinPath} dev`;
+
+process.on('SIGINT', () => void cleanup());
+process.on('SIGTERM', () => void cleanup());
+
 try {
-	await $({ cwd: rootPath, stdio: 'inherit' })`${astroBinPath} dev`;
+	await astroDev;
 } catch {
 	// astro dev exited (Ctrl+C or crash); fall through to teardown
 }
