@@ -1,4 +1,5 @@
 import type {
+	getInstanceManager,
 	Instance,
 	PagefindModal,
 	PagefindModalTrigger,
@@ -14,7 +15,9 @@ const searchQueryMaxLength = 100;
 // Pagefind reads these by name off a registered modal-trigger; a rename fails silently without this
 type ModalTriggerContract = Pick<PagefindModalTrigger, 'buttonEl' | 'handleModalClose'>;
 
-let isSearchAnalyticsRegistered = false;
+const instancesWithAnalytics = new WeakSet<Instance>();
+
+let instanceManager: ReturnType<typeof getInstanceManager> | undefined;
 
 class SearchToggle extends HTMLElement implements ModalTriggerContract {
 	// eslint-disable-next-line unicorn/no-null -- matches Pagefind's PagefindComponent interface
@@ -100,16 +103,16 @@ class SearchToggle extends HTMLElement implements ModalTriggerContract {
 
 	// Importing defines the <pagefind-*> elements, which upgrade and register themselves before this resolves
 	#ensurePagefindRegistered = async (): Promise<void> => {
-		const { getInstanceManager } = await import('@pagefind/component-ui');
+		const pagefind = await import('@pagefind/component-ui');
+
+		instanceManager = pagefind.getInstanceManager();
 
 		if (this.instance || !this.#controller) return;
 
-		this.instance = getInstanceManager().getInstance(this.getAttribute('instance') ?? 'default');
+		this.instance = instanceManager.getInstance(this.getAttribute('instance') ?? 'default');
 
 		registerSearchAnalytics(this.instance);
 
-		// Pagefind exposes no deregisterUtility so each navigation's fresh trigger would pile up
-		// The astro:before-swap handler in search.astro clears the registry to bound it; keep these two in sync
 		this.instance.registerUtility(this, 'modal-trigger', { keyboardNavigation: true });
 
 		this.instance.registerShortcut(
@@ -159,9 +162,9 @@ function getResultCount(result: unknown): number | undefined {
 }
 
 function registerSearchAnalytics(instance: Instance) {
-	if (isSearchAnalyticsRegistered) return;
+	if (instancesWithAnalytics.has(instance)) return;
 
-	isSearchAnalyticsRegistered = true;
+	instancesWithAnalytics.add(instance);
 
 	let debounceTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -181,6 +184,15 @@ function registerSearchAnalytics(instance: Instance) {
 		}, searchQueryDebounceMs);
 	});
 }
+
+// Pagefind components never deregister (Pagefind/pagefind#1230); a fresh instance per page keeps the registry bounded
+document.addEventListener('astro:before-swap', () => {
+	if (!instanceManager) return;
+
+	for (const name of instanceManager.getInstanceNames()) {
+		instanceManager.removeInstance(name);
+	}
+});
 
 if (!customElements.get('search-toggle')) {
 	customElements.define('search-toggle', SearchToggle);

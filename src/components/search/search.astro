@@ -16,25 +16,6 @@ const t = getTranslations();
 
 <script>
 	import '#components/search/search-toggle.ts';
-
-	// Clears the Pagefind registry on navigation so search-toggle's modal-trigger registrations don't pile up
-	// Pagefind has no deregisterUtility; see search-toggle.ts
-	document.addEventListener('astro:before-swap', () => {
-		const modal = document.querySelector('pagefind-modal') as
-			| (Element & {
-					instance?: {
-						components: Array<unknown>;
-						componentsByType: Record<string, Array<unknown>>;
-					};
-			  })
-			| null;
-		const instance = modal?.instance;
-
-		if (instance) {
-			instance.components = [];
-			instance.componentsByType = {};
-		}
-	});
 </script>
 
 <pagefind-config bundle-path={bundlePath}></pagefind-config>
