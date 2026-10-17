@@ -361,6 +361,10 @@
 					top: var(--atlas-sheet-split);
 				}
 
+				.atlas-sheet-handle button {
+					scroll-margin-top: calc(-1 * var(--atlas-sheet-handle-size));
+				}
+
 				/* Follows the rest so the controls clear the split; the camera inset stays put */
 				.atlas-shell {
 					--map-page-hidden: 1;

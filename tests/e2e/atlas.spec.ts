@@ -79,15 +79,14 @@ async function openInPane(page: Page, link: Locator) {
 	return getHeading(page);
 }
 
-// The map band counts as in viewport, so landing under the handle takes two live boxes; rounded for sub-pixel layout
+// The map band counts as in viewport, so landing under the handle takes two live boxes
 async function expectUnderHandle(page: Page, locator: Locator) {
 	await expect(async () => {
 		const handleBox = await page.locator(atlasSheetHandleSelector).boundingBox();
 		const box = await locator.boundingBox();
+		const handleBottom = (handleBox?.y ?? 0) + (handleBox?.height ?? 0);
 
-		expect(Math.round(box?.y ?? 0)).toBe(
-			Math.round((handleBox?.y ?? 0) + (handleBox?.height ?? 0)),
-		);
+		expect(Math.abs((box?.y ?? 0) - handleBottom)).toBeLessThanOrEqual(1);
 	}).toPass();
 }
 
@@ -524,11 +523,8 @@ test.describe('a sheet on a phone viewport', { tag: '@engines' }, () => {
 	test.use({ viewport: phoneViewport });
 
 	test('an atlas link lands at half with its title in view and its address spent, and no rest moves the camera', async ({
-		browserName,
 		page,
 	}) => {
-		test.fail(browserName === 'webkit', 'WebKit rounds the fractional scroll to the start down');
-
 		const { canvas, handle, marker, root } = getAtlas(page);
 
 		await visit(page, `${paths.locationSinglePoint}?atlas`);
@@ -598,11 +594,6 @@ test.describe('a sheet on a phone viewport', { tag: '@engines' }, () => {
 		browserName,
 		page,
 	}) => {
-		test.fail(
-			browserName !== 'firefox',
-			'Focus scrolls the handle clear of the scroll padding it sits in',
-		);
-
 		const { handle, root } = getAtlas(page);
 		const start = page.locator(atlasSheetStartSelector);
 
@@ -718,6 +709,14 @@ test.describe('reading in a sheet on a phone viewport', { tag: '@engines' }, () 
 			.locator(`${atlasPaneMainSelector} a[href^="#user-content-fn-"]`)
 			.first();
 
+		const images = Promise.withResolvers<undefined>();
+
+		await page.route('**/*', async (route) => {
+			if (route.request().resourceType() === 'image') await images.promise;
+
+			await route.fallback();
+		});
+
 		await visit(page, `${paths.postDetail}?atlas`);
 		await expect(root).toHaveAttribute(atlasSheetAttribute, atlasSheetRest.half);
 
@@ -731,6 +730,9 @@ test.describe('reading in a sheet on a phone viewport', { tag: '@engines' }, () 
 		await handle.click({ scroll: 'none' });
 		await expect(root).toHaveAttribute(atlasSheetAttribute, atlasSheetRest.down);
 		await expect(footnote).toBeHidden();
+
+		images.resolve(undefined);
+		await page.waitForLoadState('load');
 
 		await handle.press('Enter');
 		await expect(root).toHaveAttribute(atlasSheetAttribute, atlasSheetRest.half);

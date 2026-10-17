@@ -97,6 +97,15 @@ function writeFoldPx(linePx: number, paneTop: number) {
 	document.documentElement.style.setProperty(atlasSheetFoldProperty, `${String(foldPx)}px`);
 }
 
+function releaseFragmentScroll() {
+	if (document.readyState === 'complete' || location.hash === '') return;
+
+	const top = window.scrollY;
+
+	window.scrollTo({ behavior: 'instant', top: top > 0 ? top - 1 : top + 1 });
+	window.scrollTo({ behavior: 'instant', top });
+}
+
 export function setSheet(rest: AtlasSheetRest) {
 	const root = document.documentElement;
 	const pane = getPane();
@@ -121,6 +130,8 @@ function holdSheet(lines: AtlasSheetLines) {
 	if (pane.hasAttribute(atlasSheetGrabbingAttribute)) return pane;
 
 	const from = readSheetRest();
+
+	releaseFragmentScroll();
 
 	if (from !== atlasSheetRest.down) writeFoldPx(lines[from], pane.getBoundingClientRect().top);
 
