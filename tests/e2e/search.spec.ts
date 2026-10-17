@@ -237,8 +237,7 @@ test('search analytics mark a result click', async ({ page, site }) => {
 });
 
 test('search analytics flag a search with no results', async ({ page }) => {
-	// Pagefind matches Latin gibberish fuzzily; this letter appears in no content
-	const query = 'ꙮꙮꙮ';
+	const query = 'qqqqqqqq';
 
 	await recordTracking(page);
 	await visit(page, '/');
