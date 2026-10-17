@@ -7,9 +7,24 @@ interface Props extends HTMLAttributes<'script'> {
 }
 
 const { umamiDomain, umamiId, ...props } = Astro.props;
+
+const beforeSendName = 'scxUmamiBeforeSend';
+
+// Crawler cohorts seen in Umami that hide navigator.webdriver but keep a fixed screen
+const excludedScreens = ['800x600', '1280x1200', '1600x1600'];
 ---
 
+<script define:vars={{ beforeSendName, excludedScreens }} is:inline>
+	window[beforeSendName] = (_type, payload) => {
+		if (navigator.webdriver) return false;
+		if (excludedScreens.includes(`${screen.width}x${screen.height}`)) return false;
+
+		return payload;
+	};
+</script>
+
 <script
+	data-before-send={beforeSendName}
 	data-do-not-track={true}
 	data-exclude-hash={true}
 	data-performance={true}
