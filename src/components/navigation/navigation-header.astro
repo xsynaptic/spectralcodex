@@ -1,48 +1,30 @@
 ---
-import type { HTMLAttributes } from 'astro/types';
+import NavigationHeaderMenu from '#components/navigation/navigation-header-menu.astro';
+import {
+	getNavigationHeaderItems,
+	getNavigationHeaderUrls,
+} from '#components/navigation/navigation-header.ts';
+import RenderCache from '#components/parts/render-cache.astro';
 
-import NavigationHeaderSubmenu from '#components/navigation/navigation-header-submenu.astro';
-import NavigationHeaderTrigger from '#components/navigation/navigation-header-trigger.astro';
-import { getNavigationHeaderItems } from '#components/navigation/navigation-header.ts';
-import { getNavigationItemAriaLabel } from '#components/navigation/navigation-utils.ts';
-import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-
-interface Props extends HTMLAttributes<'nav'> {
+interface Props {
 	hasHeroImage: boolean;
 }
 
-const { hasHeroImage, ...props } = Astro.props;
+const { hasHeroImage } = Astro.props;
 
 const navigationItems = await getNavigationHeaderItems();
+const navigationUrls = await getNavigationHeaderUrls();
 
-const t = getTranslations();
+const currentPath = navigationUrls.has(Astro.url.pathname) ? Astro.url.pathname : undefined;
 ---
 
-<site-navigation>
-	<nav aria-label={t('site.navigation.header.label')} class="nav-menu" data-nosnippet {...props}>
-		<ul class:list={['nav-ul', hasHeroImage ? 'nav-hero' : 'nav-no-hero']}>
-			{navigationItems.map((item) => {
-				const children = item.children ?? [];
-				const hasChildren = children.length > 0;
-
-				return (
-					<li class="nav-item">
-						<NavigationHeaderTrigger hasChildren={hasChildren} item={item} variant="item">
-							<Fragment set:html={item.title} />
-						</NavigationHeaderTrigger>
-						{hasChildren ? (
-							<NavigationHeaderSubmenu
-								ariaLabel={getNavigationItemAriaLabel(item)}
-								depth={1}
-								navigationItems={children}
-							/>
-						) : undefined}
-					</li>
-				);
-			})}
-		</ul>
-	</nav>
-</site-navigation>
+<RenderCache cacheKey={`navigation-header:${String(hasHeroImage)}:${currentPath ?? ''}`}>
+	<NavigationHeaderMenu
+		currentPath={currentPath}
+		hasHeroImage={hasHeroImage}
+		navigationItems={navigationItems}
+	/>
+</RenderCache>
 
 <script>
 	import '#components/navigation/navigation-site.ts';

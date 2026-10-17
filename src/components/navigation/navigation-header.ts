@@ -4,6 +4,7 @@ import pMemoize from 'p-memoize';
 
 import type { NavigationItem } from '#components/navigation/navigation-types.ts';
 
+import { getNavigationItemUrls } from '#components/navigation/navigation-utils.ts';
 import { getChronologyData } from '#lib/collections/chronology/chronology-data.ts';
 import { getPagesCollection } from '#lib/collections/pages/pages-data.ts';
 import {
@@ -167,3 +168,7 @@ function getNavigationItemData({
 }
 
 export const getNavigationHeaderItems = pMemoize(createNavigationHeaderItems);
+
+export const getNavigationHeaderUrls = pMemoize(
+	async () => new Set(getNavigationItemUrls(await getNavigationHeaderItems())),
+);

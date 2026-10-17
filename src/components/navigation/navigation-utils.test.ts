@@ -25,6 +25,7 @@ describe('isCurrentNavigationItem', () => {
 
 	test('an item with no url is never current', () => {
 		expect(isCurrentNavigationItem({ title: 'Browse' }, '/regions/')).toBe(false);
+		expect(isCurrentNavigationItem({ title: 'Browse' }, undefined)).toBe(false);
 	});
 });
 

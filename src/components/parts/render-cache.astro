@@ -1,0 +1,11 @@
+---
+import { renderSlotCached } from '#lib/utils/astro.ts';
+
+interface Props {
+	cacheKey: string;
+}
+
+const html = await renderSlotCached(Astro.slots, Astro.props.cacheKey);
+---
+
+<Fragment set:html={html} />

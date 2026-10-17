@@ -12,12 +12,20 @@ import TextMultilingual from '#components/parts/text-multilingual.astro';
 
 interface Props extends HTMLAttributes<'ul'> {
 	ariaLabel?: string;
+	currentPath: string | undefined;
 	depth: number;
 	isFirstNavigationItem?: boolean;
 	navigationItems: Array<NavigationItem>;
 }
 
-const { ariaLabel, depth, isFirstNavigationItem = true, navigationItems, ...props } = Astro.props;
+const {
+	ariaLabel,
+	currentPath,
+	depth,
+	isFirstNavigationItem = true,
+	navigationItems,
+	...props
+} = Astro.props;
 
 const hasNestedMenu = navigationItems.some((item) => (item.children ?? []).length > 0);
 
@@ -38,7 +46,12 @@ const submenuClasses = [
 
 		return (
 			<li class="nav-sub-item">
-				<NavigationHeaderTrigger hasChildren={hasChildren} item={item} variant="submenu">
+				<NavigationHeaderTrigger
+					currentPath={currentPath}
+					hasChildren={hasChildren}
+					item={item}
+					variant="submenu"
+				>
 					<Fragment set:html={item.title} />
 					{shouldShowNavigationItemMultilingual(item, depth) ? (
 						<TextMultilingual class="nav-ml" content={item.titleMultilingual} parenthesis={true} />
@@ -47,6 +60,7 @@ const submenuClasses = [
 				{hasChildren ? (
 					<Astro.self
 						ariaLabel={getNavigationItemAriaLabel(item)}
+						currentPath={currentPath}
 						depth={depth + 1}
 						isFirstNavigationItem={isFirstNavigationItem && index === 0}
 						navigationItems={children}

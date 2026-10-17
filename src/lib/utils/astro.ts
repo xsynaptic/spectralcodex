@@ -14,3 +14,19 @@ export async function renderSlot(slots: AstroGlobal['slots'], slotName = 'defaul
 
 	return contentTrimmed ?? undefined;
 }
+
+const renderedSlots = new Map<string, Promise<string>>();
+
+export function renderSlotCached(slots: AstroGlobal['slots'], cacheKey: string) {
+	if (import.meta.env.DEV) return slots.render('default');
+
+	const cached = renderedSlots.get(cacheKey);
+
+	if (cached) return cached;
+
+	const rendered = slots.render('default');
+
+	renderedSlots.set(cacheKey, rendered);
+
+	return rendered;
+}

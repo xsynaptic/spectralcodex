@@ -17,15 +17,28 @@ export function getNavigationItemTriggerType(item: NavigationItem) {
 	return 'span';
 }
 
-export function isActiveNavigationItem(item: NavigationItem, pathname: string): boolean {
+export function getNavigationItemUrls(items: Array<NavigationItem>): Array<string> {
+	return items.flatMap((item) => [
+		...(item.url ? [item.url] : []),
+		...getNavigationItemUrls(item.children ?? []),
+	]);
+}
+
+export function isActiveNavigationItem(
+	item: NavigationItem,
+	pathname: string | undefined,
+): boolean {
 	if (isCurrentNavigationItem(item, pathname)) return true;
 
 	return item.children?.some((child) => isActiveNavigationItem(child, pathname)) ?? false;
 }
 
 // Exact match only; aria-current="page" must not land on an ancestor of the current page
-export function isCurrentNavigationItem(item: NavigationItem, pathname: string): boolean {
-	return item.url === pathname;
+export function isCurrentNavigationItem(
+	item: NavigationItem,
+	pathname: string | undefined,
+): boolean {
+	return pathname !== undefined && item.url === pathname;
 }
 
 const multilingualRegions = new Set(['hong-kong', 'taiwan']);

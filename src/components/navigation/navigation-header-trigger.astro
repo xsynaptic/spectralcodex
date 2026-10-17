@@ -24,19 +24,20 @@ const triggerVariants = {
 } as const;
 
 interface Props {
+	currentPath: string | undefined;
 	hasChildren: boolean;
 	item: NavigationItem;
 	variant: keyof typeof triggerVariants;
 }
 
-const { hasChildren, item, variant } = Astro.props;
+const { currentPath, hasChildren, item, variant } = Astro.props;
 
 const variantClasses = triggerVariants[variant];
 const triggerType = getNavigationItemTriggerType(item);
-const isCurrent = isCurrentNavigationItem(item, Astro.url.pathname);
+const isCurrent = isCurrentNavigationItem(item, currentPath);
 const triggerClasses = [
 	variantClasses.link,
-	isActiveNavigationItem(item, Astro.url.pathname) ? 'anchor-active' : undefined,
+	isActiveNavigationItem(item, currentPath) ? 'anchor-active' : undefined,
 ];
 ---
 
