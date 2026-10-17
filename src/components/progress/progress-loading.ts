@@ -65,7 +65,7 @@ class ProgressLoading extends HTMLElement {
 		this.#fadeTimeout = window.setTimeout(() => {
 			this.#fadeTimeout = undefined;
 			setProgressBarOpacity(this, 0);
-		}, animationDuration / 2);
+		}, animationDuration);
 
 		this.#resetTimeout = window.setTimeout(() => {
 			this.#resetTimeout = undefined;

@@ -45,7 +45,7 @@ top-button:not(:defined) {
 	transform-origin: 0;
 	transition:
 		background-color 100ms 100ms ease-in-out,
-		opacity 150ms 150ms ease-in,
+		opacity 150ms ease-in,
 		transform 300ms ease-out;
 }
 
