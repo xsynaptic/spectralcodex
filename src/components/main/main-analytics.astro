@@ -11,7 +11,7 @@ const { umamiDomain, umamiId, ...props } = Astro.props;
 const beforeSendName = 'scxUmamiBeforeSend';
 
 // Crawler cohorts seen in Umami that hide navigator.webdriver but keep a fixed screen
-const excludedScreens = ['800x600', '1280x1200', '1600x1600'];
+const excludedScreens = ['800x600', '1280x1200', '1280x1280', '1600x1600'];
 ---
 
 <script define:vars={{ beforeSendName, excludedScreens }} is:inline>
@@ -26,6 +26,7 @@ const excludedScreens = ['800x600', '1280x1200', '1600x1600'];
 <script
 	data-before-send={beforeSendName}
 	data-do-not-track={true}
+	data-domains={Astro.site?.hostname}
 	data-exclude-hash={true}
 	data-performance={true}
 	data-website-id={umamiId}
