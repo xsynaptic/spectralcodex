@@ -9,10 +9,10 @@ const millisecondsPerDay = 1000 * 60 * 60 * 24;
 
 let browserQueryClient: QueryClient | undefined;
 
-function createQueryClient() {
+function createQueryClient(gcTime: number) {
 	return new QueryClient({
 		defaultOptions: {
-			queries: { gcTime: millisecondsPerDay, networkMode: 'offlineFirst', staleTime: Infinity },
+			queries: { gcTime, networkMode: 'offlineFirst', staleTime: Infinity },
 		},
 		queryCache: new QueryCache({
 			onError: (_error, query) => {
@@ -25,10 +25,11 @@ function createQueryClient() {
 }
 
 function getQueryClient() {
-	// On the server a shared client would keep a query for every page built
-	if (typeof window === 'undefined') return createQueryClient();
+	// On the server a shared client keeps a query for every page built
+	// Infinity means no cleanup timer and faster builds
+	if (typeof window === 'undefined') return createQueryClient(Infinity);
 
-	if (!browserQueryClient) browserQueryClient = createQueryClient();
+	if (!browserQueryClient) browserQueryClient = createQueryClient(millisecondsPerDay);
 
 	return browserQueryClient;
 }

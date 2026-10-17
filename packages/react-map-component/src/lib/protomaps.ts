@@ -20,9 +20,10 @@ export function useProtomaps({
 		return baseMapTheme ?? namedFlavor(isDarkMode ? 'dark' : 'light');
 	}, [baseMapTheme, isDarkMode]);
 
+	// The map only draws in the browser, which builds this style when the map loads, so the build skips it
 	const protomapsStyleSpec = useMemo(
 		() =>
-			protomapsApiKey
+			protomapsApiKey && typeof window !== 'undefined'
 				? {
 						glyphs: 'https://protomaps.github.io/basemaps-assets/fonts/{fontstack}/{range}.pbf',
 						layers: layers('protomaps', flavor, { lang: languages.at(0) ?? 'en' }),
