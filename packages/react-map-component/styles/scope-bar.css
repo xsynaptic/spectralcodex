@@ -2,7 +2,7 @@
 .map-scope-bar {
 	position: absolute;
 	inset-inline: 3rem;
-	top: 10px;
+	top: var(--map-control-margin);
 	z-index: var(--map-z-scope-bar);
 	display: flex;
 	width: fit-content;
@@ -21,13 +21,15 @@
 		width: 20rem;
 		max-height: min(
 			24rem,
-			calc(100% - 20px - max(var(--map-inset-bottom), var(--map-cover-bottom)))
+			calc(
+				100% - 2 * var(--map-control-margin) - max(var(--map-inset-bottom), var(--map-cover-bottom))
+			)
 		);
 	}
 }
 
 .map-scope-button {
-	height: 29px;
+	height: var(--map-control-size);
 	padding: 0;
 	color: inherit;
 	cursor: pointer;
@@ -35,6 +37,7 @@
 	background-color: transparent;
 	border: 0;
 	border-radius: inherit;
+	transition: background-color var(--map-duration-fast) var(--map-ease);
 
 	&:focus-visible {
 		background-color: var(--map-surface-hover);
@@ -52,12 +55,14 @@
 	padding-inline: 0.5rem;
 	overflow: hidden;
 	text-overflow: ellipsis;
-	line-height: 29px;
+	line-height: var(--map-control-size);
 	white-space: nowrap;
 	text-decoration: none;
 	border-start-end-radius: 0;
 	border-end-end-radius: 0;
-	transition: color 150ms ease-out;
+	transition:
+		color var(--map-duration) var(--map-ease),
+		background-color var(--map-duration-fast) var(--map-ease);
 }
 
 .map-scope-bar:not([data-active]) .map-scope-name {
@@ -71,7 +76,7 @@
 	flex-shrink: 0;
 	align-items: center;
 	justify-content: center;
-	width: 29px;
+	width: var(--map-control-size);
 	border-inline-start: 1px solid var(--map-divider);
 }
 
@@ -124,7 +129,7 @@
 .map-search-input {
 	flex-grow: 1;
 	min-width: 0;
-	height: 29px;
+	height: var(--map-control-size);
 	padding: 0 0.5rem 0 0;
 	font-family: inherit;
 	font-size: inherit;
@@ -155,7 +160,7 @@
 	overscroll-behavior: contain;
 	list-style: none;
 	border-top: 1px solid var(--map-divider);
-	transition: opacity 150ms ease-out;
+	transition: opacity var(--map-duration) var(--map-ease);
 
 	@starting-style {
 		opacity: 0;

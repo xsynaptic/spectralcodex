@@ -1,21 +1,22 @@
-import type { CSSProperties, FC, PropsWithChildren } from 'react';
+import type { FC, PropsWithChildren } from 'react';
 
-export const MapControlIcon: FC<PropsWithChildren<{ style?: CSSProperties; viewBox?: string }>> =
-	function MapControlIcon({ children, style, viewBox = '0 0 24 24' }) {
-		return (
-			<span className="map-ctrl-icon-frame">
-				<svg
-					aria-hidden="true"
-					className="map-ctrl-icon"
-					style={style}
-					viewBox={viewBox}
-					xmlns="http://www.w3.org/2000/svg"
-				>
-					{children}
-				</svg>
-			</span>
-		);
-	};
+export const MapControlIcon: FC<PropsWithChildren<{ viewBox?: string }>> = function MapControlIcon({
+	children,
+	viewBox = '0 0 24 24',
+}) {
+	return (
+		<span className="map-ctrl-icon-frame">
+			<svg
+				aria-hidden="true"
+				className="map-ctrl-icon"
+				viewBox={viewBox}
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				{children}
+			</svg>
+		</span>
+	);
+};
 
 export const MapIconClose: FC = function MapIconClose() {
 	return (

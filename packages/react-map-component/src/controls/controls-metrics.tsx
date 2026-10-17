@@ -7,6 +7,7 @@ import { mapControlClassName } from '#constants.ts';
 import { CustomControlPortal } from '#controls/controls-custom.tsx';
 import { useMapCanvasData } from '#data/data-canvas.tsx';
 import { useMapRows } from '#data/data-query.ts';
+import { getActiveAttribute } from '#lib/active-attribute.ts';
 import { useMapConfig } from '#lib/config.tsx';
 
 export const MetricsControl: FC<{
@@ -21,7 +22,7 @@ export const MetricsControl: FC<{
 		<CustomControlPortal className="maplibregl-ctrl" position={position}>
 			{isSourceDataLoading ? (
 				<div className="map-ctrl-metrics-loading">
-					<div className="map-loading-animation" />
+					<div className="map-loading-animation" {...getActiveAttribute(isSourceDataLoading)} />
 				</div>
 			) : (
 				<div className={mapControlClassName.metrics} role="status">

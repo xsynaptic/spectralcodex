@@ -36,11 +36,16 @@
 .map-filter-menu-item {
 	background-color: transparent;
 	border-radius: var(--map-radius-sm);
-	transition: background-color 150ms;
+	transition: background-color var(--map-duration) var(--map-ease);
 
 	&[data-active] {
 		background-color: var(--map-surface-active);
 	}
+}
+
+.map-filter-menu-item:has(:focus-visible) {
+	background-image: linear-gradient(var(--map-surface-hover) 0 0);
+	background-repeat: no-repeat;
 }
 
 @media (hover: hover) {
@@ -121,7 +126,7 @@
 	width: 16px;
 	color: var(--map-text-faint);
 	cursor: pointer;
-	transition: color 200ms;
+	transition: color var(--map-duration) var(--map-ease);
 
 	&[data-active] {
 		color: var(--map-highlight);

@@ -1,6 +1,15 @@
+.maplibregl-ctrl button {
+	transition: background-color var(--map-duration-fast) var(--map-ease);
+}
+
 .maplibregl-ctrl-group {
 	background-color: var(--map-surface);
 	border-radius: var(--map-radius-sm);
+
+	& button {
+		width: var(--map-control-size);
+		height: var(--map-control-size);
+	}
 
 	&:not(:empty) {
 		box-shadow: var(--map-elevation);
@@ -21,7 +30,7 @@
 	}
 }
 
-.maplibregl-ctrl-attrib.maplibregl-compact {
+.maplibregl-compact {
 	color: var(--map-text);
 	background-color: var(--map-surface);
 
@@ -31,7 +40,7 @@
 }
 
 /* MapLibre forces the open attribution visible, which shows through a host hiding the map with `visibility` */
-.maplibregl-ctrl-attrib.maplibregl-compact-show {
+.maplibregl-compact-show {
 	visibility: inherit;
 }
 
@@ -49,6 +58,10 @@
 	box-shadow: none;
 }
 
+.maplibregl-ctrl button:not(:disabled):focus-visible {
+	background-color: var(--map-surface-hover);
+}
+
 @media (hover: hover) {
 	.maplibregl-ctrl button:not(:disabled):hover {
 		background-color: var(--map-surface-hover);
@@ -56,7 +69,7 @@
 }
 
 .maplibregl-ctrl button:not(:disabled):active {
-	background-color: var(--map-surface-hover);
+	background-color: var(--map-surface-active);
 }
 
 @media not (forced-colors: active) {
@@ -93,8 +106,8 @@
 	opacity: 0;
 	scale: 0.4;
 	transition:
-		opacity 150ms ease-out,
-		scale 150ms ease-out;
+		opacity var(--map-duration) var(--map-ease),
+		scale var(--map-duration) var(--map-ease);
 
 	&[data-active] {
 		opacity: 1;
@@ -112,6 +125,15 @@
 	width: 20px;
 	height: 20px;
 	color: var(--map-icon);
+}
+
+.map-ctrl-filter[aria-expanded='true'] .map-ctrl-icon {
+	margin-top: 1px;
+	opacity: 0.6;
+}
+
+.map-ctrl-filter:disabled .map-ctrl-icon {
+	opacity: 0.6;
 }
 
 .maplibregl-ctrl-bottom-left {
@@ -163,7 +185,7 @@
 /* Forced colours drop every `box-shadow`, MapLibre's `ButtonText` edge included, and a tint alone vanishes */
 @media (forced-colors: active) {
 	.maplibregl-ctrl-group:not(:empty),
-	.maplibregl-ctrl-attrib.maplibregl-compact {
+	.maplibregl-compact {
 		outline: 2px solid ButtonText;
 	}
 

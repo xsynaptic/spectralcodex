@@ -39,6 +39,13 @@
 	--map-z-scope-bar-open: 3;
 	--map-z-popup: 5;
 	--map-z-filter-menu: 10;
+	--map-control-size: 30px;
+	--map-control-margin: 10px;
+	--map-duration-fast: 100ms;
+	--map-duration: 150ms;
+	--map-duration-slow: 500ms;
+	--map-ease: ease-out;
+	--map-font-base: 'Helvetica Neue', arial, helvetica, sans-serif;
 	--map-font-display: ui-sans-serif, system-ui, sans-serif;
 	--map-font-sans: ui-sans-serif, system-ui, sans-serif;
 	--map-surface: light-dark(#fff, var(--map-color-neutral-800));
@@ -47,6 +54,7 @@
 	--map-edge: light-dark(rgb(0 0 0 / 10%), rgb(255 255 255 / 14%));
 	--map-lift: light-dark(transparent, rgb(0 0 0 / 40%));
 	--map-elevation: 0 0 0 2px var(--map-edge), 0 1px 3px var(--map-lift);
+	--map-shadow-overlay: 0 1px 2px rgb(0 0 0 / 10%);
 	--map-divider: light-dark(var(--map-color-neutral-300), var(--map-color-neutral-700));
 	--map-text: light-dark(var(--map-color-neutral-800), var(--map-color-neutral-200));
 	--map-text-body: light-dark(var(--map-color-neutral-800), var(--map-color-neutral-300));
@@ -54,6 +62,7 @@
 	--map-text-faint: light-dark(var(--map-color-neutral-400), var(--map-color-neutral-500));
 	--map-icon: light-dark(#333, #ccc);
 	--map-accent: light-dark(var(--map-color-accent-500), var(--map-color-accent-400));
+	--map-accent-deep: light-dark(var(--map-color-accent-600), var(--map-color-accent-500));
 	--map-highlight: light-dark(var(--map-color-highlight-500), var(--map-color-highlight-400));
 	--map-highlight-hover: light-dark(var(--map-color-highlight-600), var(--map-color-highlight-300));
 	--map-warning-text: light-dark(var(--map-color-highlight-700), var(--map-color-highlight-400));

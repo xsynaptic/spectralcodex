@@ -2,26 +2,46 @@
 	z-index: var(--map-z-popup);
 }
 
+.maplibregl-popup.map-popup-hidden {
+	visibility: hidden;
+}
+
 .maplibregl-popup-content {
 	padding: 0;
 	overflow: auto;
 	color: var(--map-text);
 	background-color: var(--map-surface);
 	border-radius: var(--map-radius-sm);
+	box-shadow: var(--map-shadow-overlay);
 }
 
 .maplibregl-popup-close-button {
 	width: 20px;
-	font-size: 16px;
-	color: #fff;
-	border-bottom-left-radius: 3px;
-	mix-blend-mode: difference;
+	font-size: 1rem;
+	color: var(--map-text);
+	border-bottom-left-radius: var(--map-radius-sm);
+	transition: background-color var(--map-duration-fast) var(--map-ease);
+
+	&:focus-visible {
+		background-color: var(--map-surface-hover);
+	}
 
 	.map-popup-narrow & {
 		width: 25px;
 		height: 25px;
-		font-size: 18px;
+		font-size: 1.125rem;
 	}
+}
+
+@media (hover: hover) {
+	.maplibregl-popup-close-button:hover {
+		background-color: var(--map-surface-hover);
+	}
+}
+
+.maplibregl-popup-content:has(.map-popup-image) .maplibregl-popup-close-button {
+	color: #fff;
+	mix-blend-mode: difference;
 }
 
 .maplibregl-popup-anchor-left .maplibregl-popup-tip {
@@ -100,11 +120,7 @@
 	font-weight: 500;
 	line-height: 1.375;
 	color: transparent;
-	background-image: linear-gradient(
-		to bottom,
-		light-dark(var(--map-color-accent-500), var(--map-color-accent-400)),
-		light-dark(var(--map-color-accent-600), var(--map-color-accent-500))
-	);
+	background-image: linear-gradient(to bottom, var(--map-accent), var(--map-accent-deep));
 	background-repeat: no-repeat;
 	background-clip: text;
 }
@@ -173,7 +189,7 @@
 
 .map-popup-coord-text {
 	color: var(--map-text-faint);
-	transition: color 300ms;
+	transition: color var(--map-duration) var(--map-ease);
 }
 
 .map-popup-coord:focus-visible .map-popup-coord-text {
@@ -189,7 +205,7 @@
 .map-popup-copy-icon {
 	height: 14px;
 	color: var(--map-text-muted);
-	transition: color 300ms;
+	transition: color var(--map-duration) var(--map-ease);
 }
 
 .map-popup-coord:focus-visible .map-popup-copy-icon {
@@ -224,6 +240,10 @@
 	.map-popup-link-icon {
 		height: 16px;
 	}
+}
+
+[data-map-root] .maplibregl-popup-close-button:focus-visible {
+	outline-offset: -2px;
 }
 
 @media (forced-colors: active) {

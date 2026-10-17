@@ -5,10 +5,11 @@ import type { ControlPosition } from 'react-map-gl/maplibre';
 import { locationStatusOrder, LocationStatusRecords } from '@spectralcodex/shared/map';
 import { memo, useId, useLayoutEffect } from 'react';
 
-import { mapActiveAttribute, mapControlClassName } from '#constants.ts';
+import { mapControlClassName } from '#constants.ts';
 import { CustomControlPortal } from '#controls/controls-custom.tsx';
 import { useOverlay } from '#controls/controls-overlay.ts';
 import { useIsMapLoading } from '#data/data-query.ts';
+import { getActiveAttribute } from '#lib/active-attribute.ts';
 import { useMapConfig } from '#lib/config.tsx';
 import { MapControlIcon, MapIconFilters, MapIconRating } from '#lib/icons.tsx';
 import { useTrackMap } from '#lib/track-hook.ts';
@@ -22,10 +23,6 @@ const chineseShowHideLabels = {
 } as const;
 
 const filterLevels = [1, 2, 3, 4, 5] as const;
-
-function getActiveAttribute(isActive: boolean) {
-	return { [mapActiveAttribute]: isActive ? '' : undefined };
-}
 
 interface StatusSwatchStyle extends CSSProperties {
 	'--map-status-edge': string;
@@ -286,18 +283,10 @@ export const FilterControl: FC<{ position: ControlPosition }> = function FilterC
 					ref={openerRef}
 					type="button"
 				>
-					<MapControlIcon
-						style={{
-							...(isOpen ? { marginTop: '1px', opacity: '0.6' } : {}),
-							...(isLoading ? { opacity: '0.6' } : {}),
-						}}
-					>
+					<MapControlIcon>
 						<MapIconFilters />
 					</MapControlIcon>
-					<span
-						className="map-filter-indicator"
-						{...{ [mapActiveAttribute]: isFilterActive ? '' : undefined }}
-					></span>
+					<span className="map-filter-indicator" {...getActiveAttribute(isFilterActive)}></span>
 				</button>
 			</CustomControlPortal>
 			{isOpen ? (

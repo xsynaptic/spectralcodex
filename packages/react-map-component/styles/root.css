@@ -20,4 +20,5 @@
 
 .maplibregl-map {
 	container: map / size;
+	font-family: var(--map-font-base);
 }

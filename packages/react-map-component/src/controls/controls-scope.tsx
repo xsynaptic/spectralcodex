@@ -4,10 +4,11 @@ import { useLayoutEffect, useRef } from 'react';
 
 import type { MapMessages, MapScope } from '#types.ts';
 
-import { mapActiveAttribute, mapControlClassName } from '#constants.ts';
+import { mapControlClassName } from '#constants.ts';
 import { TopCenterControlPortal } from '#controls/controls-custom.tsx';
 import { useOverlay } from '#controls/controls-overlay.ts';
 import { useMapLinkClick } from '#host/host-click.ts';
+import { getActiveAttribute } from '#lib/active-attribute.ts';
 import { useMapConfig } from '#lib/config.tsx';
 import { MapControlIcon, MapIconEye, MapIconEyeOff, MapIconSearch } from '#lib/icons.tsx';
 import { useTrackMap } from '#lib/track-hook.ts';
@@ -109,7 +110,7 @@ function getBarProps(messages: MapMessages, isOpen: boolean, isEnabled: boolean 
 
 	return {
 		'aria-label': isEnabled ? messages.scopeAriaLabel : messages.scopeOffAriaLabel,
-		[mapActiveAttribute]: isEnabled ? '' : undefined,
+		...getActiveAttribute(isEnabled),
 		role: 'group',
 	};
 }

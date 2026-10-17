@@ -15,6 +15,7 @@ import { MapControls } from '#controls/controls.tsx';
 import { CanvasDataProvider } from '#data/data-canvas.tsx';
 import { useIsMapLoading } from '#data/data-query.ts';
 import { useHostViewSync } from '#host/host-view.ts';
+import { getActiveAttribute } from '#lib/active-attribute.ts';
 import { useMapConfig } from '#lib/config.tsx';
 import { useIsDarkMode } from '#lib/dark-mode.ts';
 import { useProtomaps } from '#lib/protomaps.ts';
@@ -40,7 +41,7 @@ const MapCanvasLoading: FC = function MapCanvasLoading() {
 
 	return (
 		<div className="map-canvas-loading">
-			<div className="map-loading-animation" style={{ opacity: isLoading ? 1 : 0 }} />
+			<div className="map-loading-animation" {...getActiveAttribute(isLoading)} />
 		</div>
 	);
 };

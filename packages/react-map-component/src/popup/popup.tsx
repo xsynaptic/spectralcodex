@@ -8,6 +8,7 @@ import type { MapPopupItemExtended } from '#popup/popup-hooks.ts';
 
 import { mapControlClassName } from '#constants.ts';
 import { useMapLinkClick } from '#host/host-click.ts';
+import { getActiveAttribute } from '#lib/active-attribute.ts';
 import { useMapConfig } from '#lib/config.tsx';
 import { MapIconCopy, MapIconGoogle, MapIconWarning, MapIconWikipedia } from '#lib/icons.tsx';
 import { useTrackMap } from '#lib/track-hook.ts';
@@ -218,6 +219,15 @@ const popupPlacementNarrow = { anchor: 'top', offset: 10 } as const;
 
 const popupPlacementWide = { anchor: 'left', offset: 16 } as const;
 
+function getPopupClassName(isNarrow: boolean, isVisible: boolean) {
+	const classNames = [];
+
+	if (isNarrow) classNames.push('map-popup-narrow');
+	if (!isVisible) classNames.push('map-popup-hidden');
+
+	return classNames.join(' ');
+}
+
 function getPopupPlacement(isNarrow: boolean, isTarget: boolean) {
 	const placement = isNarrow ? popupPlacementNarrow : popupPlacementWide;
 
@@ -262,18 +272,17 @@ const MapPopupFrame: FC<{
 			latitude={popupItem.popupCoordinates.lat}
 			longitude={popupItem.popupCoordinates.lng}
 			{...popupPlacement}
-			className={isNarrow ? 'map-popup-narrow' : ''}
+			className={getPopupClassName(isNarrow, isPopupVisible)}
 			closeOnClick={false}
 			maxWidth={`${String(maxWidthPx)}px`}
 			onClose={clearSelection}
 			ref={popupRef}
-			style={{ visibility: isPopupVisible ? 'visible' : 'hidden' }}
 		>
 			<div className="map-popup-frame" ref={frameRef}>
 				<div className="map-popup-loading">
-					<div className="map-loading-animation" style={{ opacity: isLoading ? 1 : 0 }} />
+					<div className="map-loading-animation" {...getActiveAttribute(isLoading)} />
 				</div>
-				<div style={{ opacity: isLoading ? 0 : 1 }}>
+				<div>
 					{isLoading ? undefined : (
 						<MapPopupContent
 							key={popupItem.id}
