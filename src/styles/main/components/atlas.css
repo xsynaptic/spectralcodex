@@ -161,7 +161,7 @@
 			margin-left: auto;
 		}
 
-		.progress-bar {
+		progress-reading {
 			right: 0;
 			left: auto;
 			width: var(--atlas-pane-width);
