@@ -1,8 +1,15 @@
 import { defineConfig, devices } from '@playwright/test';
 
-import { getBaseUrl, isDev, isProd, localPort, localUrl } from '#e2e/constants.ts';
+import { getBaseUrl, isAllEngines, isDev, isProd, localPort, localUrl } from '#e2e/constants.ts';
+
+const engineGrep = isAllEngines ? [/@engines/] : [];
+
+// The dev server renders each page on request, taking seconds per page once workers contend for it
+const expectTimeout = isDev ? 12_000 : 5000;
 
 export default defineConfig({
+	// `toPass` ignores the expect timeout and would otherwise retry until the test times out
+	expect: { timeout: expectTimeout, toPass: { timeout: expectTimeout } },
 	fullyParallel: true,
 	outputDir: './temp/playwright-results',
 	projects: [
@@ -10,8 +17,18 @@ export default defineConfig({
 			name: 'chromium',
 			use: { ...devices['Desktop Chrome'], launchOptions: { args: ['--enable-gpu'] } },
 		},
-		{ grep: /@firefox/, name: 'firefox', use: { ...devices['Desktop Firefox'] }, workers: 1 },
-		{ grep: /@webkit/, name: 'webkit', use: { ...devices['Desktop Safari'] }, workers: 1 },
+		{
+			grep: [/@firefox/, ...engineGrep],
+			name: 'firefox',
+			use: { ...devices['Desktop Firefox'] },
+			workers: 1,
+		},
+		{
+			grep: [/@webkit/, ...engineGrep],
+			name: 'webkit',
+			use: { ...devices['Desktop Safari'] },
+			workers: 1,
+		},
 	],
 	reporter: [['list'], ['html', { open: 'never', outputFolder: './temp/playwright-report' }]],
 	retries: 0,
@@ -20,8 +37,7 @@ export default defineConfig({
 	use: {
 		baseURL: getBaseUrl(),
 	},
-	// The dev server renders each page on request, taking seconds per page once workers contend for it
-	...(isDev ? { expect: { timeout: 12_000 }, workers: 3 } : {}),
+	...(isDev ? { workers: 3 } : {}),
 	...(isProd || isDev
 		? {}
 		: {

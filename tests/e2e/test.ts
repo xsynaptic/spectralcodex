@@ -9,7 +9,7 @@ import { getSitePaths } from '#e2e/site-paths.ts';
 
 export { expect } from '@playwright/test';
 
-interface ConsoleGuard {
+export interface ConsoleGuard {
 	allow: (...patterns: Array<RegExp>) => void;
 }
 
@@ -28,8 +28,10 @@ export const test = base.extend<{ consoleGuard: ConsoleGuard; site: SitePaths }>
 			const errors: Array<string> = [];
 			const allowed: Array<RegExp> = [blockedResourcePattern, ...devPatterns];
 
+			// Chromium leaves the URL out of a failed resource's text, so patterns also see where the message came from
 			page.on('console', (message) => {
-				if (message.type() === 'error') errors.push(message.text());
+				if (message.type() === 'error')
+					errors.push(`${message.text()} (${message.location().url})`);
 			});
 			page.on('pageerror', (error) => {
 				errors.push(error.message);
