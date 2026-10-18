@@ -2,7 +2,6 @@
 import type { MapComponentProps } from '@spectralcodex/react-map-component';
 import type { HTMLAttributes } from 'astro/types';
 
-import { getMapPayloadUrl, mapPayloadName } from '@spectralcodex/map-codec';
 import { ReactMapComponent } from '@spectralcodex/react-map-component';
 import mapCssUrl from '@spectralcodex/react-map-component/styles/map-component.css?url';
 
@@ -24,13 +23,6 @@ const zIndex = 10;
 ---
 
 <link href={mapCssUrl} rel="stylesheet" />
-<link
-	as="fetch"
-	crossorigin="anonymous"
-	fetchpriority="low"
-	href={getMapPayloadUrl(mapComponentProps.payloadBase, mapPayloadName.directory)}
-	rel="preload"
-/>
 <div
 	aria-label={
 		entryTitle ? formatStringTemplate(t('section.map.label'), { title: entryTitle }) : undefined
@@ -44,6 +36,10 @@ const zIndex = 10;
 	{...props}
 	data-pagefind-ignore
 >
-	<ReactMapComponent {...mapComponentProps} client:visible style={{ zIndex: zIndex + 1 }} />
+	<ReactMapComponent
+		{...mapComponentProps}
+		client:visible={{ rootMargin: '100%' }}
+		style={{ zIndex: zIndex + 1 }}
+	/>
 	<MapLoading zIndex={zIndex} />
 </div>
