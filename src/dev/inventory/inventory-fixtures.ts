@@ -70,9 +70,11 @@ export async function getSampleNearbyLocations() {
 
 	if (!entry) return [];
 
-	const locations = await getLocationsNearbyList(entry, 5);
+	const locations = await getLocationsNearbyList(entry);
 
-	return locations.map((location) => ({ ...location, url: getSampleUrl('locations-nearby-list') }));
+	return locations
+		.slice(0, 5)
+		.map((location) => ({ ...location, url: getSampleUrl('locations-nearby-list') }));
 }
 
 export async function getSampleRegions() {

@@ -1,4 +1,3 @@
-import { getPublicId } from '@spectralcodex/shared/entries';
 import * as R from 'remeda';
 
 import type { ComputedEntry } from '#lib/collections/collections-types.ts';
@@ -6,16 +5,14 @@ import type { LocationsNearbyItem } from '#lib/collections/locations/locations-n
 
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { isEditorialEntry, sortCatalogByDate } from '#lib/catalog/catalog-utils.ts';
-import {
-	createLocationsByIdsFunction,
-	getLocationsCollection,
-} from '#lib/collections/locations/locations-data.ts';
+import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import { createPostsByIdsFunction } from '#lib/collections/posts/posts-data.ts';
 import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-data.ts';
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { getMapLanguages, getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { createMapDataFunction } from '#lib/map/map-data.ts';
-import { getLocationsMapRule } from '#lib/map/map-locations.ts';
+import { getMapDirectoryData } from '#lib/map/map-directory.ts';
+import { getLocationFeatureIds } from '#lib/map/map-locations.ts';
 import { isListed, isListedQuality } from '#lib/utils/content-policy.ts';
 import { getContentPath } from '#lib/utils/routing.ts';
 
@@ -56,21 +53,22 @@ export async function createLocationEntryDisplayFunction() {
 
 export async function createQueryLocationsEntryFunction() {
 	const getPostsByIds = await createPostsByIdsFunction();
-	const getLocationsByIds = await createLocationsByIdsFunction();
 	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
 	const catalog = await getCatalog();
 	const getMapData = await createMapDataFunction();
+	const { globalRule, rootRuleById } = await getMapDirectoryData();
 
 	return function queryLocationsEntry(entry: ComputedEntry<'locations'>) {
 		const regionPrimary = getFirstRegionByReference(entry.data.regions);
 
-		const nearbyIds = entry.data._nearby.map(({ locationId }) => locationId);
-
 		const mapData = getMapData({
 			boundsBuffer: getLocationNearbyRadius(entry.data._nearby),
+			limitRule: regionPrimary
+				? rootRuleById.get(regionPrimary.data._ancestors.at(-1) ?? regionPrimary.id)
+				: undefined,
 			mapId: `${entry.collection}/${entry.id}`,
-			rule: getLocationsMapRule(getLocationsByIds([entry.id, ...nearbyIds])),
-			targetId: getPublicId(entry),
+			rule: globalRule,
+			targetIds: getLocationFeatureIds(entry),
 			...getMapLanguages(regionPrimary?.data._langCode),
 		});
 
@@ -87,10 +85,10 @@ export async function createQueryLocationsEntryFunction() {
 	};
 }
 
-export async function getLocationsNearbyList(entry: ComputedEntry<'locations'>, limit: number) {
+export async function getLocationsNearbyList(entry: ComputedEntry<'locations'>) {
 	const { entriesMap } = await getLocationsCollection();
 
-	return entry.data._nearby.slice(0, limit).flatMap(({ distanceDisplay, locationId }) => {
+	return entry.data._nearby.flatMap(({ distanceDisplay, locationId }) => {
 		const location = entriesMap.get(locationId);
 
 		if (!location) return [];
@@ -98,6 +96,7 @@ export async function getLocationsNearbyList(entry: ComputedEntry<'locations'>, 
 		return [
 			{
 				distanceDisplay,
+				status: location.data.status,
 				title: location.data.title,
 				titleMultilingual: getMultilingualContent({ data: location.data, prop: 'title' })?.primary,
 				url: getContentPath('locations', location.id),

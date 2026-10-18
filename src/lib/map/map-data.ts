@@ -11,7 +11,7 @@ import type { MapScopeEntry } from '#lib/map/map-entry-rules.ts';
 
 import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-data.ts';
 import { getMapLanguages } from '#lib/i18n/i18n-utils.ts';
-import { getMapBounds, isTargetFeature } from '#lib/map/map-bounds.ts';
+import { getMapBounds } from '#lib/map/map-bounds.ts';
 import { getMapDirectoryData } from '#lib/map/map-directory.ts';
 import { createEntryMapRuleFunction } from '#lib/map/map-entry-rules.ts';
 import { isEntryMapEnabled } from '#lib/map/map-locations.ts';
@@ -22,39 +22,54 @@ export type MapComponentData =
 type MapDataOptions = MapBoundsOptions &
 	Omit<
 		MapComponentProps,
-		| 'bounds'
-		| 'center'
-		| 'mapFeaturesRule'
-		| 'maxBounds'
-		| 'payloadBase'
-		| 'protomapsApiKey'
-		| 'targetIds'
+		'bounds' | 'center' | 'mapFeaturesRule' | 'maxBounds' | 'payloadBase' | 'protomapsApiKey'
 	> & {
 		dataset?: MapDatasetName | undefined;
+		limitRule?: MapFeaturesRule | undefined;
 		rule: MapFeaturesRule;
 	};
 
 export async function createMapDataFunction() {
 	const { datasets } = await getMapDirectoryData();
+	const rowsByRuleByDataset: Record<
+		MapDatasetName,
+		WeakMap<MapFeaturesRule, Array<MapSourceItem>>
+	> = { objectives: new WeakMap(), shared: new WeakMap() };
+
+	function selectDatasetRows(dataset: MapDatasetName, rule: MapFeaturesRule) {
+		const rowsByRule = rowsByRuleByDataset[dataset];
+		const cachedRows = rowsByRule.get(rule);
+
+		if (cachedRows) return cachedRows;
+
+		const rows = selectMapRows(datasets[dataset].directory, rule);
+
+		rowsByRule.set(rule, rows);
+
+		return rows;
+	}
 
 	return function getMapData({
 		boundsBuffer,
 		boundsBufferPercentage,
 		dataset = 'shared',
+		limitRule,
 		limitsBuffer,
 		limitsBufferPercentage,
 		rule,
-		targetId,
+		targetIds,
 		...props
 	}: MapDataOptions): MapComponentData {
-		const { directory, payloadBase } = datasets[dataset];
-		const rows = selectMapRows(directory, rule);
+		const { payloadBase } = datasets[dataset];
+		const rows = selectDatasetRows(dataset, rule);
+		const targetRows = targetIds ? selectMapRows(rows, { ids: targetIds, type: 'ids' }) : [];
 		const mapBounds = getMapBounds(rows, {
 			boundsBuffer,
 			boundsBufferPercentage,
+			limitRows: limitRule ? selectDatasetRows(dataset, limitRule) : rows,
 			limitsBuffer,
 			limitsBufferPercentage,
-			targetId,
+			targetRows,
 		});
 
 		if (!mapBounds) return { hasGeodata: false };
@@ -67,7 +82,7 @@ export async function createMapDataFunction() {
 			...props,
 			mapFeaturesRule: rule,
 			payloadBase,
-			targetIds: getTargetIds(rows, targetId),
+			targetIds: targetIds ? targetRows.map(({ properties }) => properties.id) : undefined,
 		};
 
 		return { hasGeodata: true, props: mapProps };
@@ -112,12 +127,4 @@ export async function getObjectiveMapData() {
 		mapId: 'objectives',
 		rule: atlasRule,
 	});
-}
-
-function getTargetIds(rows: ReadonlyArray<MapSourceItem>, targetId: string | undefined) {
-	if (!targetId) return;
-
-	return rows
-		.filter(({ properties }) => isTargetFeature(properties.id, targetId))
-		.map(({ properties }) => properties.id);
 }

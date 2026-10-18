@@ -1,6 +1,9 @@
 ---
+import type { LocationStatus } from '@spectralcodex/shared/map';
+
 import type { MultilingualContent } from '#lib/i18n/i18n-types.ts';
 
+import LocationsStatus from '#components/locations/locations-status.astro';
 import Anchor from '#components/parts/anchor.astro';
 import ListColumnItem from '#components/parts/list-column-item.astro';
 import ListColumn from '#components/parts/list-column.astro';
@@ -12,20 +15,22 @@ interface Props {
 	class?: string | undefined;
 	locations: Array<{
 		distanceDisplay: string;
+		status: LocationStatus;
 		title: string;
 		titleMultilingual: MultilingualContent | undefined;
 		url: string;
 	}>;
+	showChinese?: boolean | undefined;
 }
 
-const { class: className, locations } = Astro.props;
+const { class: className, locations, showChinese } = Astro.props;
 
 const t = getTranslations();
 ---
 
 {locations.length > 0 ? (
 	<ListColumn class:list={['font-serif text-xs sm:text-sm', className]}>
-		{locations.map(({ distanceDisplay, title, titleMultilingual, url }) => (
+		{locations.map(({ distanceDisplay, status, title, titleMultilingual, url }) => (
 			<ListColumnItem>
 				<Anchor href={url}>{title}</Anchor>
 				{titleMultilingual ? (
@@ -35,13 +40,15 @@ const t = getTranslations();
 					<>
 						<span class="text-primary-300 dark:text-primary-700">—</span>
 						<span
-							class:list={['text-primary-500 dark:text-primary-600', 'break-keep']}
+							class="text-subtle break-keep"
 							set:html={formatStringTemplate(t('locations.unit.km'), {
 								distance: distanceDisplay,
 							})}
 						/>
 					</>
 				) : undefined}
+				<span class="text-primary-300 dark:text-primary-700">—</span>
+				<LocationsStatus showChinese={showChinese} status={status} />
 			</ListColumnItem>
 		))}
 	</ListColumn>

@@ -5,18 +5,17 @@ import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 
 import ContentSection from '#components/content/content-section.astro';
 import LocationsNearbyList from '#components/locations/locations-nearby-list.astro';
-import { locationsNearbyCountLimit } from '#constants.ts';
 import { getLocationsNearbyList } from '#lib/collections/locations/locations-queries.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 interface Props extends HTMLAttributes<'div'> {
 	entry: ComputedEntry<'locations'>;
-	limit?: number | undefined;
+	showChinese?: boolean | undefined;
 }
 
-const { entry, limit = locationsNearbyCountLimit, ...props } = Astro.props;
+const { entry, showChinese, ...props } = Astro.props;
 
-const locations = await getLocationsNearbyList(entry, limit);
+const locations = await getLocationsNearbyList(entry);
 
 const t = getTranslations();
 ---
@@ -27,5 +26,5 @@ const t = getTranslations();
 	sectionTitle={t('section.locationsNearby')}
 	{...props}
 >
-	<LocationsNearbyList locations={locations} />
+	<LocationsNearbyList locations={locations} showChinese={showChinese} />
 </ContentSection>

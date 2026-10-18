@@ -189,8 +189,7 @@
 			margin-right: -0.375rem;
 		}
 
-		.atlas-inline-map,
-		.atlas-inline-nearby {
+		.atlas-inline-map {
 			display: none;
 		}
 	}

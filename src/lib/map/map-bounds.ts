@@ -1,6 +1,5 @@
 import type { MapSourceItem } from '@spectralcodex/map-codec';
 
-import { getMapRowById, mapPointIdSeparator } from '@spectralcodex/map-codec';
 import { distance } from '@turf/distance';
 import { degreesToRadians, lengthToDegrees } from '@turf/helpers';
 import { geoBounds } from 'd3-geo';
@@ -12,11 +11,19 @@ export interface MapBoundsOptions {
 	boundsBufferPercentage?: number | undefined;
 	limitsBuffer?: number | undefined;
 	limitsBufferPercentage?: number | undefined;
-	targetId?: string | undefined;
 }
+
+interface MapBoundsInput extends MapBoundsOptions {
+	limitRows?: ReadonlyArray<MapSourceItem> | undefined;
+	targetRows?: ReadonlyArray<MapSourceItem> | undefined;
+}
+
+type MapBbox = [number, number, number, number];
 
 const mapBoundsBufferMin = 1;
 const mapLimitsBufferMin = 10;
+
+const inlierBoundsCache = new WeakMap<ReadonlyArray<MapSourceItem>, MapBbox | undefined>();
 
 interface BboxBufferOptions {
 	bufferPercentage: number;
@@ -29,71 +36,86 @@ export function getMapBounds(
 	{
 		boundsBuffer,
 		boundsBufferPercentage = 10,
+		limitRows = rows,
 		limitsBuffer,
 		limitsBufferPercentage = 100,
-		targetId,
-	}: MapBoundsOptions = {},
-):
-	| undefined
-	| {
-			bounds: [number, number, number, number];
-			center: [number, number];
-			maxBounds: [number, number, number, number];
-	  } {
-	const shownRows = rows.filter(
-		({ properties }) => properties.outlier !== true || isTargetFeature(properties.id, targetId),
-	);
-	const targetRows = shownRows.filter(({ properties }) => isTargetFeature(properties.id, targetId));
-	const frameRows = targetRows.length > 0 ? targetRows : shownRows;
+		targetRows = [],
+	}: MapBoundsInput = {},
+): undefined | { bounds: MapBbox; center: [number, number]; maxBounds: MapBbox } {
+	const frameRows = getFrameRows(rows, targetRows);
+	const limitNaturalBounds = getLimitNaturalBounds(limitRows, targetRows);
 
-	const bounds = getBufferedBbox(frameRows, {
+	if (!limitNaturalBounds || frameRows.length === 0) return;
+
+	const frameNaturalBounds = getNaturalBounds(frameRows);
+	const bounds = getBufferedBbox(frameNaturalBounds, {
 		bufferPercentage: boundsBufferPercentage,
 		explicitBuffer: boundsBuffer,
 		minBuffer: mapBoundsBufferMin,
 	});
-	const maxBounds = getBufferedBbox(shownRows, {
+	const maxBounds = getBufferedBbox(limitNaturalBounds, {
 		bufferPercentage: limitsBufferPercentage,
 		explicitBuffer: limitsBuffer,
 		minBuffer: mapLimitsBufferMin,
 	});
 
-	if (!bounds || !maxBounds) return;
-
-	return { bounds, center: getMapCenter(frameRows, targetId), maxBounds };
+	return { bounds, center: getBboxCenter(frameNaturalBounds), maxBounds };
 }
 
-export function isTargetFeature(id: number | string | undefined, targetId: string | undefined) {
-	if (!targetId) return false;
+function getFrameRows(
+	rows: ReadonlyArray<MapSourceItem>,
+	targetRows: ReadonlyArray<MapSourceItem>,
+) {
+	if (targetRows.length > 0) return targetRows;
 
-	return id === targetId || String(id).startsWith(`${targetId}${mapPointIdSeparator}`);
+	return rows.filter(({ properties }) => properties.outlier !== true);
+}
+
+function getLimitNaturalBounds(
+	limitRows: ReadonlyArray<MapSourceItem>,
+	targetRows: ReadonlyArray<MapSourceItem>,
+): MapBbox | undefined {
+	const inlierBounds = getInlierNaturalBounds(limitRows);
+
+	if (targetRows.length === 0) return inlierBounds;
+
+	const targetBounds = getNaturalBounds(targetRows);
+
+	if (!inlierBounds) return targetBounds;
+
+	return [
+		Math.min(inlierBounds[0], targetBounds[0]),
+		Math.min(inlierBounds[1], targetBounds[1]),
+		Math.max(inlierBounds[2], targetBounds[2]),
+		Math.max(inlierBounds[3], targetBounds[3]),
+	];
+}
+
+function getInlierNaturalBounds(rows: ReadonlyArray<MapSourceItem>) {
+	if (inlierBoundsCache.has(rows)) return inlierBoundsCache.get(rows);
+
+	const inlierRows = rows.filter(({ properties }) => properties.outlier !== true);
+	const inlierBounds = inlierRows.length > 0 ? getNaturalBounds(inlierRows) : undefined;
+
+	inlierBoundsCache.set(rows, inlierBounds);
+
+	return inlierBounds;
 }
 
 function getBufferedBbox(
-	rows: ReadonlyArray<MapSourceItem>,
+	naturalBounds: MapBbox,
 	{ bufferPercentage, explicitBuffer, minBuffer }: BboxBufferOptions,
-): [number, number, number, number] | undefined {
-	if (rows.length === 0) return undefined;
-
-	const naturalBounds = getNaturalBounds(rows);
-
-	let bufferRadius = explicitBuffer;
-
-	if (bufferRadius === undefined) {
-		if (rows.length === 1) {
-			bufferRadius = minBuffer;
-		} else {
-			const spanX = distance(
-				[naturalBounds[0], naturalBounds[1]],
-				[naturalBounds[2], naturalBounds[1]],
-			);
-			const spanY = distance(
-				[naturalBounds[0], naturalBounds[1]],
-				[naturalBounds[0], naturalBounds[3]],
-			);
-			const spanMax = Math.max(spanX, spanY);
-			bufferRadius = Math.max(minBuffer, spanMax * (bufferPercentage / 100));
-		}
-	}
+): MapBbox {
+	const spanX = distance(
+		[naturalBounds[0], naturalBounds[1]],
+		[naturalBounds[2], naturalBounds[1]],
+	);
+	const spanY = distance(
+		[naturalBounds[0], naturalBounds[1]],
+		[naturalBounds[0], naturalBounds[3]],
+	);
+	const bufferRadius =
+		explicitBuffer ?? Math.max(minBuffer, Math.max(spanX, spanY) * (bufferPercentage / 100));
 
 	const latPad = lengthToDegrees(bufferRadius);
 	const lngPad = latPad / Math.cos(degreesToRadians((naturalBounds[1] + naturalBounds[3]) / 2));
@@ -109,22 +131,14 @@ function getBufferedBbox(
 	return [west, south, east, north];
 }
 
-function getMapCenter(
-	rows: ReadonlyArray<MapSourceItem>,
-	targetId: string | undefined,
-): [number, number] {
-	const targetRow = targetId ? getMapRowById(rows, targetId) : undefined;
-
-	if (targetRow) return getTruncatedLngLat(targetRow.geometry.coordinates);
-
-	const [west, south, east, north] = getNaturalBounds(rows);
+function getBboxCenter([west, south, east, north]: MapBbox): [number, number] {
 	const longitude = (((west + east) / 2 + 180) % 360) - 180;
 
 	return getTruncatedLngLat([longitude, (south + north) / 2]);
 }
 
 // East goes past 180 when the shortest span crosses the antimeridian, which MapLibre accepts
-function getNaturalBounds(rows: ReadonlyArray<MapSourceItem>): [number, number, number, number] {
+function getNaturalBounds(rows: ReadonlyArray<MapSourceItem>): MapBbox {
 	const [[west, south], [east, north]] = geoBounds({
 		coordinates: rows.map(({ geometry }) => geometry.coordinates),
 		type: 'MultiPoint',

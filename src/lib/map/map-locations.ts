@@ -111,6 +111,18 @@ export function getRegionMapRule(
 	return { interval, type: 'region' };
 }
 
+export function getGlobalMapRule(
+	intervalById: ReadonlyMap<string, [number, number]>,
+	rootIds: ReadonlyArray<string>,
+): MapFeaturesRule {
+	const firstInterval = intervalById.get(rootIds.at(0) ?? '');
+	const lastInterval = intervalById.get(rootIds.at(-1) ?? '');
+
+	if (!firstInterval || !lastInterval) throw new Error('No root region intervals to span');
+
+	return { interval: [firstInterval[0], lastInterval[1]], type: 'region' };
+}
+
 export function getThemeMapRule(
 	themeIndexById: ReadonlyMap<string, number>,
 	id: string,

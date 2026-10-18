@@ -23,9 +23,15 @@ ol.list-column > .list-item::marker {
 }
 
 .list-item-body {
+	--list-item-color: light-dark(var(--color-primary-700), var(--color-primary-400));
+
 	display: flex;
 	flex-wrap: wrap;
 	gap: calc(var(--spacing) * 1);
 	align-items: center;
-	color: light-dark(var(--color-primary-700), var(--color-primary-400));
+	color: var(--list-item-color);
+}
+
+.list-item-label {
+	color: var(--list-item-color);
 }

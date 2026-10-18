@@ -30,6 +30,7 @@ vi.mock('#lib/collections/locations/locations-data.ts', () => ({
 vi.mock('#lib/collections/posts/posts-data.ts', () => ({}));
 vi.mock('#lib/collections/regions/regions-data.ts', () => ({}));
 vi.mock('#lib/map/map-data.ts', () => ({}));
+vi.mock('#lib/map/map-directory.ts', () => ({}));
 vi.mock('#lib/map/map-locations.ts', () => ({}));
 
 const { queryLocationsIndex } = await import('#lib/collections/locations/locations-queries.ts');

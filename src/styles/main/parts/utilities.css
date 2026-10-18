@@ -108,3 +108,7 @@
 	border: 1px solid light-dark(var(--status-stroke), var(--status-stroke-dark));
 	border-radius: 50%;
 }
+
+@utility text-subtle {
+	color: light-dark(var(--color-primary-500), var(--color-primary-600));
+}

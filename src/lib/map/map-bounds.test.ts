@@ -39,10 +39,10 @@ describe('getMapBounds', () => {
 	});
 
 	test('an outlier that is the target still frames its own map', () => {
-		const result = getMapBounds(
-			[makePoint('far', [150, 50], true), makePoint('other', [10, 10], true)],
-			{ targetId: 'far' },
-		);
+		const far = makePoint('far', [150, 50], true);
+		const result = getMapBounds([far, makePoint('other', [10, 10], true)], {
+			targetRows: [far],
+		});
 
 		expect(result).toBeDefined();
 		expect(result!.center).toEqual([150, 50]);
@@ -104,9 +104,8 @@ describe('getMapBounds', () => {
 	});
 
 	test('the Target is framed and centered while the pan limit spans every row', () => {
-		const result = getMapBounds([makePoint('a', [121, 24]), makePoint('b', [122, 25])], {
-			targetId: 'b',
-		});
+		const target = makePoint('b', [122, 25]);
+		const result = getMapBounds([makePoint('a', [121, 24]), target], { targetRows: [target] });
 
 		expect(result).toBeDefined();
 		expect(result!.center).toEqual([122, 25]);
@@ -116,10 +115,8 @@ describe('getMapBounds', () => {
 	});
 
 	test('every Point of a multi-point Target is framed', () => {
-		const result = getMapBounds(
-			[makePoint('a', [120, 23]), makePoint('b:0', [121, 24]), makePoint('b:1', [121.2, 24.2])],
-			{ targetId: 'b' },
-		);
+		const targetRows = [makePoint('b:0', [121, 24]), makePoint('b:1', [121.2, 24.2])];
+		const result = getMapBounds([makePoint('a', [120, 23]), ...targetRows], { targetRows });
 
 		expect(result).toBeDefined();
 		expectWithinBounds(result!.bounds, 121, 24);
@@ -128,13 +125,32 @@ describe('getMapBounds', () => {
 		expect(result!.center).toEqual([121.1, 24.1]);
 	});
 
-	test('a Location whose id extends the Target id is not framed as a Target', () => {
-		const result = getMapBounds([makePoint('b', [121, 24]), makePoint('b-annex', [123, 26])], {
-			targetId: 'b',
-		});
+	test('limit rows narrower than the shown rows give a narrower pan limit', () => {
+		const country = [makePoint('a', [121, 24]), makePoint('b', [121.5, 25])];
+		const shownRows = [...country, makePoint('abroad', [139.7, 35.7])];
+
+		const targetRows = country.slice(0, 1);
+		const wide = getMapBounds(shownRows, { targetRows });
+		const narrow = getMapBounds(shownRows, { limitRows: country, targetRows });
+
+		expect(wide).toBeDefined();
+		expect(narrow).toBeDefined();
+		expect(narrow!.bounds).toEqual(wide!.bounds);
+		expect(narrow!.maxBounds[2]).toBeLessThan(wide!.maxBounds[2]);
+		expect(narrow!.maxBounds[2]).toBeLessThan(139.7);
+		expectWithinBounds(narrow!.maxBounds, 121.5, 25);
+	});
+
+	test('an outlier Target outside the limit rows still lies inside the pan limit', () => {
+		const country = [makePoint('a', [121, 24]), makePoint('b', [121.5, 25])];
+		const islet = makePoint('islet', [118.3, 24.4], true);
+
+		const result = getMapBounds([...country, islet], { limitRows: country, targetRows: [islet] });
 
 		expect(result).toBeDefined();
-		expect(result!.center).toEqual([121, 24]);
+		expect(result!.center).toEqual([118.3, 24.4]);
+		expectWithinBounds(result!.maxBounds, 118.3, 24.4);
+		expectWithinBounds(result!.maxBounds, 121.5, 25);
 	});
 
 	test('explicit buffers override the computed radius', () => {

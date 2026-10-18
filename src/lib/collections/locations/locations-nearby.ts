@@ -1,7 +1,7 @@
 import type { CollectionEntry } from 'astro:content';
 import type { Position } from 'geojson';
 
-import { GeometryTypeEnum, LocationStatusEnum } from '@spectralcodex/shared/map';
+import { GeometryTypeEnum } from '@spectralcodex/shared/map';
 import { centroid } from '@turf/centroid';
 import { distance as getDistance, around as getPointsAround } from 'geokdbush';
 import GeospatialIndex from 'kdbush';
@@ -18,13 +18,9 @@ interface NearbyIndexPoint {
 	id: string;
 	lat: number;
 	lng: number;
-	status: string;
 }
 
-/**
- * Use geokdbush for O(n log n) spatial queries to avoid any sort of O(n²) issues
- * Post-query filtering handles status checks (vanished, etc.)
- */
+// Use geokdbush for O(n log n) spatial queries to avoid any sort of O(n²) issues
 export function createLocationNearbyFunction(locations: Array<CollectionEntry<'locations'>>) {
 	const { pointsIndex, pointsMap } = extractPoints(locations);
 
@@ -38,12 +34,11 @@ export function createLocationNearbyFunction(locations: Array<CollectionEntry<'l
 	index.finish();
 
 	function collectNearbyItems(entryPoint: NearbyIndexPoint): Array<LocationsNearbyItem> {
-		// Query for more than we need to account for post-filtering
 		const pointsAroundIds = getPointsAround(
 			index,
 			entryPoint.lng,
 			entryPoint.lat,
-			locationsNearbyCountLimit * 2,
+			locationsNearbyCountLimit + 1,
 			locationsNearbyDistanceLimit,
 		);
 
@@ -55,18 +50,13 @@ export function createLocationNearbyFunction(locations: Array<CollectionEntry<'l
 			// Skip invalid points and self
 			if (!point || point.id === entryPoint.id) continue;
 
-			// Post-index filtering: skip vanished locations
-			if (point.status === LocationStatusEnum.Vanished) continue;
-
 			const dist = getDistance(entryPoint.lng, entryPoint.lat, point.lng, point.lat);
 
-			if (dist > 0) {
-				nearby.push({
-					distance: dist,
-					distanceDisplay: dist.toFixed(2),
-					locationId: point.id,
-				});
-			}
+			nearby.push({
+				distance: dist,
+				distanceDisplay: dist.toFixed(2),
+				locationId: point.id,
+			});
 
 			if (nearby.length >= locationsNearbyCountLimit) break;
 		}
@@ -101,7 +91,6 @@ function extractPoints(locations: Array<CollectionEntry<'locations'>>): {
 			id: entry.id,
 			lat,
 			lng,
-			status: entry.data.status,
 		};
 
 		pointsMap.set(entry.id, point);

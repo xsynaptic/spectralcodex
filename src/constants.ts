@@ -14,7 +14,7 @@ export const imageDownloadWidthMax = 3600;
 export const backlinksDisplayCountMinimum = 3;
 
 // The nearby distance limit is in kilometers
-export const locationsNearbyCountLimit = 20;
+export const locationsNearbyCountLimit = 12;
 export const locationsNearbyDistanceLimit = 10;
 
 export const mapGeometryCoordinatesPrecision = 6;

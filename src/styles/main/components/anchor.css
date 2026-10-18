@@ -41,7 +41,7 @@
 }
 
 .anchor-copy {
-	--anchor-color: light-dark(var(--color-primary-600), var(--color-primary-300));
+	--anchor-color: currentcolor;
 	--anchor-hover: light-dark(var(--color-highlight-500), var(--color-highlight-400));
 }
 

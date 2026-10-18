@@ -54,12 +54,12 @@ const t = getTranslations();
 <ContentSection data-nosnippet data-pagefind-ignore sectionTitle={t('section.details')} {...props}>
 	<ListColumn class="font-serif text-xs sm:text-sm">
 		{status ? (
-			<ListColumnItem label={t('locations.status.label')}>
+			<ListColumnItem class="text-subtle" label={t('locations.status.label')}>
 				<LocationsStatus showChinese={showChinese} status={status} />
 			</ListColumnItem>
 		) : undefined}
 		{details.heritage.length > 0 ? (
-			<ListColumnItem label={t('locations.heritage.label')}>
+			<ListColumnItem class="text-subtle" label={t('locations.heritage.label')}>
 				{details.heritage.map((heritage) => (
 					<DividedItem as="span" dividerWeight="thin">
 						<LocationsHeritage heritage={heritage} />
@@ -68,7 +68,7 @@ const t = getTranslations();
 			</ListColumnItem>
 		) : undefined}
 		{addressParts.length > 0 ? (
-			<ListColumnItem class="tabular-nums" label={t('locations.address.label')}>
+			<ListColumnItem class="text-subtle tabular-nums" label={t('locations.address.label')}>
 				{addressParts.map((part) => (
 					<DividedItem as="span" dividerWeight="thin">
 						<TextMultilingual content={part} />
@@ -77,7 +77,7 @@ const t = getTranslations();
 			</ListColumnItem>
 		) : undefined}
 		{coordinates ? (
-			<ListColumnItem label={t('locations.coordinates.label')}>
+			<ListColumnItem class="text-subtle" label={t('locations.coordinates.label')}>
 				<LocationsCoordinates coordinates={coordinates} />
 			</ListColumnItem>
 		) : undefined}

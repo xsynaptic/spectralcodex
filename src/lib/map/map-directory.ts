@@ -31,6 +31,7 @@ import { assignChunks } from '#lib/map/map-chunks.ts';
 import { hashMapPayloads } from '#lib/map/map-directory-hash.ts';
 import { getMapThemeIndexById } from '#lib/map/map-entry-rules.ts';
 import {
+	getGlobalMapRule,
 	getLocationFeatureIds,
 	getLocationFeatures,
 	getLocationsMapPopupData,
@@ -60,8 +61,10 @@ interface MapDirectoryData {
 	atlasRule: MapFeaturesRule;
 	datasets: Record<MapDatasetName, MapDataset>;
 	divisionUrlById: Map<string, string>;
+	globalRule: MapFeaturesRule;
 	mapScopeByKey: Map<string, MapScope>;
 	payloads: Map<string, string>;
+	rootRuleById: Map<string, MapFeaturesRule>;
 }
 
 // No hidden-location filtering needed: only ids present in the (already filtered) source data are looked up
@@ -231,6 +234,10 @@ export const getMapDirectoryData = pMemoize(async (): Promise<MapDirectoryData> 
 	});
 	const shared = buildMapDataset(locations, { ...context, prefix: '' });
 	const atlasRule = getRegionMapRule(regionsTree.intervalById, atlasRegionId);
+	const globalRule = getGlobalMapRule(regionsTree.intervalById, regionsTree.roots);
+	const rootRuleById = new Map(
+		regionsTree.roots.map((rootId) => [rootId, getRegionMapRule(regionsTree.intervalById, rootId)]),
+	);
 	const atlasRows = selectMapRows(shared.directory, atlasRule);
 	const mapScopes = await buildMapScopes(atlasRows);
 	const divisionMaskById = await readDivisionMasks(regions);
@@ -269,5 +276,14 @@ export const getMapDirectoryData = pMemoize(async (): Promise<MapDirectoryData> 
 		...divisionPayloads,
 	]);
 
-	return { atlasRows, atlasRule, datasets, divisionUrlById, mapScopeByKey, payloads };
+	return {
+		atlasRows,
+		atlasRule,
+		datasets,
+		divisionUrlById,
+		globalRule,
+		mapScopeByKey,
+		payloads,
+		rootRuleById,
+	};
 });

@@ -121,9 +121,7 @@ const t = getTranslations();
 	<SectionSeries entry={entry} />
 	<SectionBacklinks backlinks={backlinks} />
 	<SectionWebmentions entry={entry} />
-	{hideGeometry ? undefined : (
-		<SectionNearbyList class="atlas-inline-nearby" entry={entry} limit={12} />
-	)}
+	{hideGeometry ? undefined : <SectionNearbyList entry={entry} showChinese={showChinese} />}
 	<SectionPreviews items={catalogItems} sectionTitle={t('section.content.locations')} />
 	<SectionSimilar entry={entry} limit={12} showPreviews={true} />
 </ContentEntryArticle>

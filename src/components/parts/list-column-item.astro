@@ -15,7 +15,7 @@ const children = await renderSlot(Astro.slots, 'default');
 {children ? (
 	<li class="list-item">
 		<div class:list={['list-item-body', className]} {...props}>
-			{label ? <span class="font-semibold">{label}</span> : undefined}
+			{label ? <span class="list-item-label font-semibold">{label}</span> : undefined}
 			<Fragment set:html={children} />
 		</div>
 	</li>
