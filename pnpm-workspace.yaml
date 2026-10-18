@@ -12,9 +12,8 @@ minimumReleaseAgeExclude:
   - astro
 
 # TypeScript 7 native binaries for fallow's type-aware mode, which this project does not use
-# Removal override because pnpm 12.3.4 still installs packages listed in ignoredOptionalDependencies
-overrides:
-  fallow-type-aware: '-'
+ignoredOptionalDependencies:
+  - fallow-type-aware
 
 # This is required for pnpm deploy, which we use in combination with the image-server service
 injectWorkspacePackages: true
