@@ -77,8 +77,8 @@ async function createNavigationHeaderItems(): Promise<Array<NavigationItem>> {
 
 	return [
 		{
-			title: t('collection.posts.labelPlural'),
-			url: getSitePath('posts'),
+			title: t('atlas.title'),
+			url: getSitePath('atlas'),
 		},
 		{
 			title: t('collection.locations.labelPlural'),
@@ -90,14 +90,18 @@ async function createNavigationHeaderItems(): Promise<Array<NavigationItem>> {
 			url: getSitePath('regions'),
 		},
 		{
-			children: seriesMenu,
-			title: t('collection.series.labelPlural'),
-			url: getSitePath('series'),
+			title: t('collection.posts.labelPlural'),
+			url: getSitePath('posts'),
 		},
 		{
 			children: themesMenu,
 			title: t('collection.themes.labelPlural'),
 			url: getSitePath('themes'),
+		},
+		{
+			children: seriesMenu,
+			title: t('collection.series.labelPlural'),
+			url: getSitePath('series'),
 		},
 		{
 			children: chronologyData.chronologyYears.slice(0, 12).map((year) => ({
@@ -106,10 +110,6 @@ async function createNavigationHeaderItems(): Promise<Array<NavigationItem>> {
 			})),
 			title: t('navigation.chronology.label'),
 			url: getSitePath('chronology'),
-		},
-		{
-			title: t('atlas.title'),
-			url: getSitePath('atlas'),
 		},
 		{
 			children: aboutMenu,
