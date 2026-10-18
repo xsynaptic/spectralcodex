@@ -3,6 +3,7 @@ import type { CollectionEntry, CollectionKey } from 'astro:content';
 import { getCollection } from 'astro:content';
 import { performance } from 'node:perf_hooks';
 import pMemoize, { pMemoizeClear } from 'p-memoize';
+import * as R from 'remeda';
 
 interface CollectionEntryWithEntryCount {
 	data: {
@@ -115,7 +116,7 @@ export function createCollectionLookupByIds<E extends { id: string }>(
 					}
 					return entry;
 				})
-				.filter((entry): entry is E => !!entry);
+				.filter(R.isNonNullish);
 		};
 	};
 }

@@ -342,14 +342,10 @@ export function createChronologyData(
 	const chronologyDailyData = buildChronologyDailyData(items);
 
 	return {
-		chronologyDailyData: Object.fromEntries(
-			Object.entries(chronologyDailyData).filter(([year]) => yearHasView.has(year)),
-		),
+		chronologyDailyData: R.pickBy(chronologyDailyData, (_, year) => yearHasView.has(year)),
 		chronologyIndexData,
 		chronologyMonthlyData: chronologyMonthlyData.filter((item) => yearHasView.has(item.year)),
-		chronologyMonths: Object.fromEntries(
-			Object.entries(chronologyMonths).filter(([year]) => yearHasView.has(year)),
-		),
+		chronologyMonths: R.pickBy(chronologyMonths, (_, year) => yearHasView.has(year)),
 		chronologyYearlyData,
 		chronologyYears,
 	};

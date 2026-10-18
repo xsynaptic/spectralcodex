@@ -2,6 +2,7 @@ import type { CollectionEntry } from 'astro:content';
 
 import { getPublicId } from '@spectralcodex/shared/entries';
 import { IMAGE_SERVER_SECRET } from 'astro:env/server';
+import * as R from 'remeda';
 
 import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 import type { ImageThumbnail } from '#lib/collections/locations/locations-factory.ts';
@@ -131,9 +132,7 @@ export async function createLocationsByPostsFunction() {
 			...new Set(posts.flatMap((post) => post.data.locations?.map((entry) => entry.id) ?? [])),
 		];
 
-		return ids
-			.map((id) => locationsMap.get(id))
-			.filter((entry): entry is ComputedEntry<'locations'> => !!entry);
+		return ids.map((id) => locationsMap.get(id)).filter(R.isNonNullish);
 	};
 }
 

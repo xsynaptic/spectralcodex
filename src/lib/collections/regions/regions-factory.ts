@@ -1,5 +1,7 @@
 import type { CollectionEntry } from 'astro:content';
 
+import * as R from 'remeda';
+
 import type { RegionLanguage } from '#lib/collections/regions/regions-types.ts';
 import type { Hierarchy } from '#lib/utils/hierarchy.ts';
 
@@ -81,8 +83,10 @@ export function getRegionLangCode(
 }
 
 function collectByRegion(regionIds: Array<string>, map: Map<string, Array<string>>): Array<string> {
-	return [...new Set(regionIds.flatMap((id) => map.get(id)))].filter(
-		(item): item is string => !!item,
+	return R.pipe(
+		regionIds,
+		R.flatMap((id) => map.get(id) ?? []),
+		R.unique(),
 	);
 }
 

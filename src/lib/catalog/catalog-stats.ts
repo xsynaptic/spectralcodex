@@ -21,11 +21,7 @@ export async function getCatalogStats() {
 		},
 		linksExternal: {
 			itemCount: formatNumber({
-				number: catalogItems.reduce(
-					(linksExternalCountPrevious, { linksExternalCount }) =>
-						linksExternalCountPrevious + (linksExternalCount ?? 0),
-					0,
-				),
+				number: R.sumBy(catalogItems, (item) => item.linksExternalCount ?? 0),
 			}),
 		},
 		locations: {
@@ -53,7 +49,7 @@ function getCatalogCounts(data: Array<CatalogItem> | undefined) {
 	return {
 		itemCount: formatNumber({ number: data?.length ?? 0 }),
 		wordCount: formatNumber({
-			number: data?.reduce((previous, { wordCount }) => previous + (wordCount ?? 0), 0) ?? 0,
+			number: R.sumBy(data ?? [], (item) => item.wordCount ?? 0),
 		}),
 	};
 }
