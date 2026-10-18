@@ -169,6 +169,10 @@ async function fetchText(url: string): Promise<string> {
 	return response.text();
 }
 
+function getBuildAssets(html: string): Set<string> {
+	return new Set(html.match(assetRegex));
+}
+
 function getFailureLines(failures: Array<WarmResult>): Array<string> {
 	if (failures.length === 0) return [];
 
@@ -228,6 +232,25 @@ async function getSitemapUrls(): Promise<Array<string>> {
 	const urls: Array<string> = [];
 	for (const sitemap of sitemaps) urls.push(...extractLocations(await fetchText(sitemap)));
 	return urls;
+}
+
+// The edge misses on a query string it hasn't seen, and the origin ignores it, so this fetch gets the latest build
+async function getStaleEdgeNote(): Promise<string | undefined> {
+	try {
+		const [edgeHtml, originHtml] = await Promise.all([
+			fetchText(`${siteUrl}/`),
+			fetchText(`${siteUrl}/?edge-check=${String(Date.now())}`),
+		]);
+
+		const edgeAssets = getBuildAssets(edgeHtml);
+		const originAssets = getBuildAssets(originHtml);
+
+		if (edgeAssets.size === originAssets.size && edgeAssets.isSubsetOf(originAssets)) return;
+
+		return "The edge is still serving an older build of / than the origin. The purge didn't take, and maps can break until it's purged again";
+	} catch (error) {
+		return `Couldn't compare the edge's / with the origin's: ${messageOf(error)}`;
+	}
 }
 
 function getWarmedImages(): { note?: string; seen: Set<string> } {
@@ -312,6 +335,13 @@ async function main(): Promise<void> {
 	else await purge();
 
 	const targets = await warmPages(run);
+
+	if (!shouldSkipPurge) {
+		const staleEdgeNote = await getStaleEdgeNote();
+
+		if (staleEdgeNote !== undefined) run.notes.push(staleEdgeNote);
+	}
+
 	await warmAssets(run, targets);
 
 	// Runs last so every scraped body has contributed to the image set
