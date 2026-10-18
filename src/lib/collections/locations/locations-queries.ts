@@ -1,5 +1,6 @@
 import type { CollectionEntry } from 'astro:content';
 
+import { getPublicId } from '@spectralcodex/shared/entries';
 import * as R from 'remeda';
 
 import type { LocationsNearbyItem } from '#lib/collections/locations/locations-schemas.ts';
@@ -70,7 +71,7 @@ export async function createQueryLocationsEntryFunction() {
 			boundsBuffer: getLocationNearbyRadius(entry.data._nearby),
 			mapId: `${entry.collection}/${entry.id}`,
 			rule: getLocationsMapRule(getLocationsByIds([entry.id, ...nearbyIds])),
-			targetId: entry.data._uuid ?? entry.id,
+			targetId: getPublicId(entry),
 			...getMapLanguages(regionPrimary?.data._langCode),
 		});
 

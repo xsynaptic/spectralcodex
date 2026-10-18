@@ -1,10 +1,6 @@
 import type { MapSourceItem } from '@spectralcodex/map-codec';
 
-import {
-	GeometryTypeEnum,
-	LocationCategoryEnum,
-	LocationStatusEnum,
-} from '@spectralcodex/shared/map';
+import { GeometryTypeEnum, LocationStatusEnum } from '@spectralcodex/shared/map';
 import { describe, expect, test } from 'vitest';
 
 import type { MapScope } from '#types.ts';
@@ -142,7 +138,6 @@ describe('syncView', () => {
 		{
 			geometry: { coordinates: [0, 0], type: GeometryTypeEnum.Point },
 			properties: {
-				category: LocationCategoryEnum.Unknown,
 				entryQuality: 1,
 				hasImage: false,
 				id: 'mine',

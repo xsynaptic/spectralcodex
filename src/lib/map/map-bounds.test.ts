@@ -19,7 +19,6 @@ function makePoint(id: string, coordinates: [number, number], isOutlier?: boolea
 	return {
 		geometry: { coordinates, type: 'Point' },
 		properties: {
-			category: 'unknown',
 			entryQuality: 1,
 			hasImage: false,
 			id,
@@ -118,7 +117,7 @@ describe('getMapBounds', () => {
 
 	test('every Point of a multi-point Target is framed', () => {
 		const result = getMapBounds(
-			[makePoint('a', [120, 23]), makePoint('b-0', [121, 24]), makePoint('b-1', [121.2, 24.2])],
+			[makePoint('a', [120, 23]), makePoint('b:0', [121, 24]), makePoint('b:1', [121.2, 24.2])],
 			{ targetId: 'b' },
 		);
 
@@ -127,6 +126,15 @@ describe('getMapBounds', () => {
 		expectWithinBounds(result!.bounds, 121.2, 24.2);
 		expect(result!.bounds[0]).toBeGreaterThan(120);
 		expect(result!.center).toEqual([121.1, 24.1]);
+	});
+
+	test('a Location whose id extends the Target id is not framed as a Target', () => {
+		const result = getMapBounds([makePoint('b', [121, 24]), makePoint('b-annex', [123, 26])], {
+			targetId: 'b',
+		});
+
+		expect(result).toBeDefined();
+		expect(result!.center).toEqual([121, 24]);
 	});
 
 	test('explicit buffers override the computed radius', () => {

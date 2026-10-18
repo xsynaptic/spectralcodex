@@ -13,7 +13,6 @@ import { hashMapPayloads } from '#lib/map/map-directory-hash.ts';
 const sourceItem = {
 	geometry: { coordinates: [100, 10], type: 'Point' },
 	properties: {
-		category: 'other',
 		entryQuality: 1,
 		hasImage: false,
 		id: 'alpha',

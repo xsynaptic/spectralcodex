@@ -44,7 +44,6 @@ export const locations = defineCollection({
 			_postCount: z.number().int().optional(),
 			_posts: z.string().array().optional(),
 			_url: z.url().optional(),
-			_uuid: z.string().optional(),
 			_wikipediaUrl: z.url().optional(),
 			dateCreated: DateSchema,
 			dateRecorded: DateRecordedSchema.optional(),

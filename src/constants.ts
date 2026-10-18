@@ -19,6 +19,8 @@ export const locationsNearbyDistanceLimit = 10;
 
 export const mapGeometryCoordinatesPrecision = 6;
 
+export const mapPointIdSeparator = ':';
+
 export const atlasRegionId = 'taiwan';
 
 export const mapDisplayRegionIds = new Set([

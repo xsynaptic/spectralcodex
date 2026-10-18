@@ -1,10 +1,6 @@
 import type { MapScopeRow, MapSourceItem } from '@spectralcodex/map-codec';
 
-import {
-	GeometryTypeEnum,
-	LocationCategoryEnum,
-	LocationStatusEnum,
-} from '@spectralcodex/shared/map';
+import { GeometryTypeEnum, LocationStatusEnum } from '@spectralcodex/shared/map';
 import { describe, expect, test } from 'vitest';
 
 import { createSearchIndex, searchMap } from '#search/search-factory.ts';
@@ -17,7 +13,6 @@ function makeRow(
 	return {
 		geometry: { coordinates: [120, 23], type: GeometryTypeEnum.Point },
 		properties: {
-			category: LocationCategoryEnum.Unknown,
 			entryQuality: 1,
 			hasImage: false,
 			id,

@@ -12,12 +12,13 @@ import {
 	pickMapPopupProperties,
 	pickMapSourceProperties,
 } from '@spectralcodex/map-codec';
+import { getPublicId } from '@spectralcodex/shared/entries';
 import { GeometryTypeEnum } from '@spectralcodex/shared/map';
 import { stripDiacritics } from '@spectralcodex/shared/text';
 
 import type { MultilingualContent } from '#lib/i18n/i18n-types.ts';
 
-import { mapDisplayRegionIds } from '#constants.ts';
+import { mapDisplayRegionIds, mapPointIdSeparator } from '#constants.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getTruncatedLngLat } from '#lib/map/map-utils.ts';
 import { isGeometryHidden } from '#lib/utils/content-policy.ts';
@@ -33,14 +34,14 @@ interface LocationFeaturesOptions {
 }
 
 export function getLocationFeatureIds(entry: CollectionEntry<'locations'>): Array<string> {
-	const uuid = entry.data._uuid ?? entry.id;
+	const publicId = getPublicId(entry);
 	const geometryArray = Array.isArray(entry.data.geometry)
 		? entry.data.geometry
 		: [entry.data.geometry];
 
 	return geometryArray.length > 1
-		? [...geometryArray.keys()].map((index) => `${uuid}-${String(index)}`)
-		: [uuid];
+		? [...geometryArray.keys()].map((index) => `${publicId}${mapPointIdSeparator}${String(index)}`)
+		: [publicId];
 }
 
 function getMapPosition(coordinates: Position, featureId: string): [number, number] {
@@ -263,7 +264,6 @@ function getGeometryFeatureProperties(
 	const image = (geometry._imageThumbnail === undefined ? entry.data : geometry)._imageThumbnail;
 
 	return {
-		category: geometry.category ?? entry.data.category,
 		description: geometry.description ?? entry.data._descriptionHtml,
 		precision: geometry.precision ?? entry.data.precision,
 		status: geometry.status ?? entry.data.status,

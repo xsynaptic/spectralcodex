@@ -1,8 +1,4 @@
-import {
-	GeometryTypeEnum,
-	LocationCategoryEnum,
-	LocationStatusEnum,
-} from '@spectralcodex/shared/map';
+import { GeometryTypeEnum, LocationStatusEnum } from '@spectralcodex/shared/map';
 import { describe, expect, test } from 'vitest';
 import { z } from 'zod';
 
@@ -10,7 +6,7 @@ import type { MapPopupItem, MapSourceItem } from '#codec.ts';
 
 import { createFieldCodec, plain } from '#codec-fields.ts';
 import { MapPopupItemSchema, mapPopupKeys, MapSourceItemSchema, mapSourceKeys } from '#codec.ts';
-import { LocationCategoryNumericMapping, LocationStatusNumericMapping } from '#map-codes.ts';
+import { LocationStatusNumericMapping } from '#map-codes.ts';
 
 function byCodePoint(first: string, second: string): number {
 	return first.localeCompare(second);
@@ -19,7 +15,6 @@ function byCodePoint(first: string, second: string): number {
 describe('MapSourceItemSchema decode', () => {
 	test('decompresses keys, inverts numeric enum codes, applies hasImage and entryQuality defaults', () => {
 		const result = MapSourceItemSchema.parse({
-			[mapSourceKeys.category]: LocationCategoryNumericMapping[LocationCategoryEnum.Temple],
 			[mapSourceKeys.geometry]: [100, 13],
 			[mapSourceKeys.id]: 'location-1',
 			[mapSourceKeys.objective]: 2,
@@ -35,7 +30,6 @@ describe('MapSourceItemSchema decode', () => {
 				type: GeometryTypeEnum.Point,
 			},
 			properties: {
-				category: LocationCategoryEnum.Temple,
 				entryQuality: 1,
 				hasImage: false,
 				id: 'location-1',
@@ -99,7 +93,6 @@ describe('MapSourceItemSchema encode (byte-faithful compressed form)', () => {
 		const standard: MapSourceItem = {
 			geometry: { coordinates: [0, 0], type: GeometryTypeEnum.Point },
 			properties: {
-				category: LocationCategoryEnum.Temple,
 				entryQuality: 1,
 				hasImage: false,
 				id: 'b',
@@ -118,7 +111,6 @@ describe('MapSourceItemSchema encode (byte-faithful compressed form)', () => {
 			[
 				mapSourceKeys.id,
 				mapSourceKeys.title,
-				mapSourceKeys.category,
 				mapSourceKeys.status,
 				mapSourceKeys.precision,
 				mapSourceKeys.rating,
@@ -133,7 +125,6 @@ describe('round trips', () => {
 		const standard: MapSourceItem = {
 			geometry: { coordinates: [100, 13], type: GeometryTypeEnum.Point },
 			properties: {
-				category: LocationCategoryEnum.Temple,
 				chunkKey: '7',
 				entryQuality: 4,
 				hasImage: true,

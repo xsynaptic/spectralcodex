@@ -1,10 +1,6 @@
 import type { MapSourceItem } from '@spectralcodex/map-codec';
 
-import {
-	GeometryTypeEnum,
-	LocationCategoryEnum,
-	LocationStatusEnum,
-} from '@spectralcodex/shared/map';
+import { GeometryTypeEnum, LocationStatusEnum } from '@spectralcodex/shared/map';
 import { describe, expect, test } from 'vitest';
 
 import type { MapScope, MapView } from '#types.ts';
@@ -16,7 +12,6 @@ function makeItem(properties: Partial<MapSourceItem['properties']>): MapSourceIt
 	return {
 		geometry: { coordinates: [0, 0], type: GeometryTypeEnum.Point },
 		properties: {
-			category: LocationCategoryEnum.Unknown,
 			entryQuality: 1,
 			hasImage: false,
 			id: 'location-id',

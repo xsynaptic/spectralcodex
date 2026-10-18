@@ -2,11 +2,10 @@ import type { CollectionEntry } from 'astro:content';
 
 import { getPublicId } from '@spectralcodex/shared/entries';
 import { IMAGE_SERVER_SECRET } from 'astro:env/server';
-import { hash } from 'ohash';
 
 import type { ImageThumbnail } from '#lib/schemas/index.ts';
 
-import { hashShortLength, imageLowQualityFormat, imageLowQualityValue } from '#constants.ts';
+import { imageLowQualityFormat, imageLowQualityValue } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/images-data.ts';
 import {
 	createGenerateLocationPostDataFunction,
@@ -24,7 +23,6 @@ import {
 } from '#lib/utils/collections.ts';
 import { contentPolicy, isGeometryHidden } from '#lib/utils/content-policy.ts';
 import { getDescriptionRendered } from '#lib/utils/description-data.ts';
-import { getDescription } from '#lib/utils/description.ts';
 import { getContentPath } from '#lib/utils/routing.ts';
 
 // Popup thumbnails are stored as signed paths; the popup prepends the image server URL at render time
@@ -54,14 +52,6 @@ async function generateLocationImageData(locations: Array<CollectionEntry<'locat
 }
 
 function generateLocationMapData(entry: CollectionEntry<'locations'>) {
-	const locationMapDataHash = hash({
-		description: getDescription(entry),
-		id: entry.id,
-		links: entry.data.links,
-		title: entry.data.title,
-	}).slice(0, hashShortLength);
-
-	entry.data._uuid = locationMapDataHash;
 	entry.data._url = getContentPath('locations', getPublicId(entry));
 	entry.data._googleMapsUrl = getMatchingLinkUrl('maps.app.goo.gl', entry.data.links);
 	entry.data._wikipediaUrl = getMatchingLinkUrl('wikipedia.org', entry.data.links);

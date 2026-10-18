@@ -1,12 +1,8 @@
-import {
-	GeometryTypeEnum,
-	LocationCategoryEnum,
-	LocationStatusEnum,
-} from '@spectralcodex/shared/map';
+import { GeometryTypeEnum, LocationStatusEnum } from '@spectralcodex/shared/map';
 import { z } from 'zod';
 
 import { coded, createFieldCodec, field, keysOf, plain, withFallback } from '#codec-fields.ts';
-import { LocationCategoryNumericMapping, LocationStatusNumericMapping } from '#map-codes.ts';
+import { LocationStatusNumericMapping } from '#map-codes.ts';
 
 export const MapPositionSchema = z.tuple([z.number(), z.number()]);
 
@@ -20,7 +16,6 @@ const geometryCodec = z.codec(
 );
 
 const sourceCodec = createFieldCodec({
-	category: coded('c', LocationCategoryNumericMapping, LocationCategoryEnum.Unknown),
 	chunkKey: plain('k', z.string().optional()),
 	entryQuality: withFallback('f', z.number().int(), 1),
 	hasImage: withFallback('n', z.boolean(), false),

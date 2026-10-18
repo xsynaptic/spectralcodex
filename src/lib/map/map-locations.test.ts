@@ -32,17 +32,7 @@ function makePoint(longitude: number, latitude: number, extra: Record<string, un
 }
 
 describe('getLocationFeatureIds', () => {
-	test('uses the map uuid for a single-geometry location', () => {
-		const entry = makeLocation('longshan-temple', {
-			_uuid: 'abc123',
-			geometry: makePoint(121.5, 25),
-			title: 'Longshan Temple',
-		});
-
-		expect(getLocationFeatureIds(entry)).toEqual(['abc123']);
-	});
-
-	test('falls back to the entry id when no uuid was stamped', () => {
+	test('uses the entry id for a single-geometry location', () => {
 		const entry = makeLocation('longshan-temple', {
 			geometry: makePoint(121.5, 25),
 			title: 'Longshan Temple',
@@ -51,24 +41,32 @@ describe('getLocationFeatureIds', () => {
 		expect(getLocationFeatureIds(entry)).toEqual(['longshan-temple']);
 	});
 
+	test('uses the override id that the page url uses', () => {
+		const entry = makeLocation('wanhua-longshan-temple', {
+			geometry: makePoint(121.5, 25),
+			override: { id: 'longshan-temple' },
+			title: 'Longshan Temple',
+		});
+
+		expect(getLocationFeatureIds(entry)).toEqual(['longshan-temple']);
+	});
+
 	test('suffixes each point of a multi-geometry location', () => {
 		const entry = makeLocation('bopiliao', {
-			_uuid: 'abc123',
 			geometry: [makePoint(121.5, 25), makePoint(121.51, 25.01), makePoint(121.52, 25.02)],
 			title: 'Bopiliao',
 		});
 
-		expect(getLocationFeatureIds(entry)).toEqual(['abc123-0', 'abc123-1', 'abc123-2']);
+		expect(getLocationFeatureIds(entry)).toEqual(['bopiliao:0', 'bopiliao:1', 'bopiliao:2']);
 	});
 
 	test('does not suffix a geometry array of one', () => {
 		const entry = makeLocation('bopiliao', {
-			_uuid: 'abc123',
 			geometry: [makePoint(121.5, 25)],
 			title: 'Bopiliao',
 		});
 
-		expect(getLocationFeatureIds(entry)).toEqual(['abc123']);
+		expect(getLocationFeatureIds(entry)).toEqual(['bopiliao']);
 	});
 });
 
@@ -80,14 +78,13 @@ describe('getLocationFeatures', () => {
 	test('builds one feature per single-geometry location', () => {
 		const result = getLocationFeatures([
 			makeLocation('longshan-temple', {
-				_uuid: 'abc123',
 				geometry: makePoint(121.5, 25),
 				title: 'Longshan Temple',
 			}),
 		]);
 
 		expect(result).toHaveLength(1);
-		expect(result[0]?.id).toBe('abc123');
+		expect(result[0]?.id).toBe('longshan-temple');
 		expect(result[0]?.geometry).toEqual({ coordinates: [121.5, 25], type: 'Point' });
 		expect(result[0]?.properties.title).toBe('Longshan Temple');
 	});
@@ -95,13 +92,12 @@ describe('getLocationFeatures', () => {
 	test('builds one feature per point and suffixes point titles', () => {
 		const result = getLocationFeatures([
 			makeLocation('bopiliao', {
-				_uuid: 'abc123',
 				geometry: [makePoint(121.5, 25, { title: 'North Block' }), makePoint(121.51, 25.01)],
 				title: 'Bopiliao',
 			}),
 		]);
 
-		expect(result.map((feature) => feature.id)).toEqual(['abc123-0', 'abc123-1']);
+		expect(result.map((feature) => feature.id)).toEqual(['bopiliao:0', 'bopiliao:1']);
 		expect(result[0]?.properties.title).toBe('Bopiliao: North Block');
 		expect(result[1]?.properties.title).toBe('Bopiliao');
 	});
@@ -205,7 +201,6 @@ describe('getLocationFeatures properties', () => {
 
 		expect(properties?.description).toBe('Point description');
 		expect(properties?.precision).toBe(2);
-		expect(properties?.category).toBe('temple');
 	});
 
 	test('omits the image when a point nulls the entry thumbnail', () => {
