@@ -1,7 +1,6 @@
 type Position = [longitude: number, latitude: number];
 
-// Past the cluster max zoom, so a Target reached from far out draws as its own point
-const targetZoomDefault = 15;
+const targetZoomDefault = 14;
 const targetZoomMax = 17;
 const targetZoomMin = 12;
 const targetInViewZoomMin = 10;

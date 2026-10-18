@@ -37,7 +37,7 @@ describe('getTargetZoom', () => {
 	});
 
 	test('a far-out zoom pulls in, never past the fit', () => {
-		expect(getTargetZoom(8, 19)).toBe(15);
+		expect(getTargetZoom(8, 19)).toBe(14);
 		expect(getTargetZoom(8, 10)).toBe(10);
 	});
 
