@@ -29,7 +29,7 @@ check:
           - name: complexity
             run: out=$(fallow health --complexity --quiet 2>&1) || { printf '%s\n' "$out"; exit 1; }
           - name: architecture
-            run: fallow dead-code --boundary-violations --circular-deps --quiet
+            run: fallow architecture --quiet
           - name: test
             run: vitest run
 
@@ -60,4 +60,4 @@ fix:
           - name: complexity
             run: out=$(fallow health --complexity --quiet 2>&1) || { printf '%s\n' "$out"; exit 1; }
           - name: architecture
-            run: fallow dead-code --boundary-violations --circular-deps --quiet
+            run: fallow architecture --quiet

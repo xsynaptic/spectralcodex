@@ -19,7 +19,6 @@ Scripts live in `package.json`. Only the ones with a catch are worth stating her
 
 - **Images are referenced by URL, never imported** (Vite/Rolldown runs out of memory on the large library); they are signed at build time and transformed on demand by imagor.
 - **Build-time validation is load-bearing**: internal IDs (locations, regions, themes, series), geospatial placement, and Zod schemas are checked during the build, so a bad reference fails loudly rather than shipping.
-- **Collections have two read paths** (`src/lib/utils/collections.ts`): enriched wrappers from `createCollectionData` (stamp computed `_` fields onto `entry.data`), and `getRawCollection` for cross-collection assembly that must dodge circular init. Raw reads see pristine frontmatter only, never computed `_` fields. A lint rule forbids bare `getCollection` under `src/lib/collections/**`.
 - Dynamic route files must be lowercase: `[...id].astro`, not `[...ID].astro`.
 - Do not import from the main Astro app (`src/`) into anything under `packages/**` (the Vite/Rolldown build breaks on it). Duplicate the needed types locally in the package and leave a comment naming the source. Keep the duplication minimal.
 - We prefer conditional rendering without abusing logical operators: `{condition ? <Element /> : undefined}`, never `{condition && <Element />}`.

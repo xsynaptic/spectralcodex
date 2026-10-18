@@ -6,7 +6,6 @@ import {
 	getBrowserConfig,
 	getConfig,
 	getWebComponentConfig,
-	restrictedSyntaxDefaults,
 } from '@xsynaptic/eslint-config';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import globals from 'globals';
@@ -53,22 +52,6 @@ export default getConfig(
 			files: ['**/*.d.ts'],
 			rules: {
 				'max-params': 'off',
-			},
-		},
-		// Foreign collections are read through getRawCollection() from utils/collections.ts
-		// Direct getCollection() here bypasses the raw-vs-enriched access path and its ordering contract
-		{
-			files: ['src/lib/collections/**/*.ts'],
-			rules: {
-				'no-restricted-syntax': [
-					'error',
-					...restrictedSyntaxDefaults,
-					{
-						message:
-							'Use getRawCollection() from #lib/utils/collections.ts instead of getCollection() inside src/lib/collections.',
-						selector: "CallExpression[callee.name='getCollection']",
-					},
-				],
 			},
 		},
 		{

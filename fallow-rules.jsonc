@@ -1,0 +1,30 @@
+{
+	"$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/rule-pack-schema.json",
+	"version": 1,
+	"name": "spectralcodex",
+	"description": "Collection read paths",
+	"rules": [
+		{
+			"id": "collection-access",
+			"kind": "banned-call",
+			"callees": [
+				"astro:content.getCollection",
+				"astro:content.getEntry",
+				"astro:content.getEntries",
+			],
+			"exclude": ["src/lib/utils/collections.ts"],
+			"message": "Read collections through the enriched wrappers from createCollectionData, or getRawCollection on the read path; both live in src/lib/utils/collections.ts and own the load order.",
+		},
+		{
+			"id": "raw-read-path",
+			"kind": "banned-call",
+			"callees": ["getRawCollection"],
+			"exclude": [
+				"src/lib/collections/*/*-data.ts",
+				"src/lib/utils/collections.ts",
+				"**/*.test.ts",
+			],
+			"message": "Raw reads return pristine frontmatter without computed `_` fields; they exist for cross-collection assembly in *-data.ts that must dodge circular init. Use the enriched collection data instead.",
+		},
+	],
+}

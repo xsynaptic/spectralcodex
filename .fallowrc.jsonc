@@ -1,5 +1,10 @@
 {
-	"ignorePatterns": ["packages/scripts/src/validate-content/fixtures/**"],
+	"ignorePatterns": [
+		"packages/scripts/src/validate-content/fixtures/**",
+		// Docker build context with its own package.json; fallow reads it as an undeclared workspace
+		"deploy/**",
+	],
+	"rulePacks": ["fallow-rules.jsonc"],
 	"rules": {
 		// Dead code and dependency hygiene belong to knip
 		"unused-files": "off",
@@ -18,6 +23,8 @@
 		"dev-dependencies-in-production": "off",
 		"unused-dependency-overrides": "off",
 		"misconfigured-dependency-overrides": "off",
+		"re-export-cycle": "error",
+		"package-cycle": "error",
 	},
 	"health": {
 		// Zero disables CRAP; without Istanbul data fallow estimates coverage from the module graph
@@ -42,23 +49,6 @@
 				"functions": ["<template>"],
 				"maxCognitive": 22,
 				"reason": "Flat optional slots and class switches",
-			},
-			{
-				"files": ["packages/react-map-component/src/canvas/canvas.tsx"],
-				"functions": ["MapCanvasContainer"],
-				"maxCognitive": 28,
-				"reason": "Flat provider tree; JSX depth read as nesting",
-			},
-			{
-				"files": ["src/**/*.astro"],
-				"functions": ["<template>"],
-				"maxUnitSize": 200,
-				"reason": "Astro markup scores as one synthetic unit; length is structural",
-			},
-			{
-				"files": ["**/*.test.ts"],
-				"maxUnitSize": 150,
-				"reason": "Suites are tables of cases; describe and it blocks read as long functions",
 			},
 		],
 	},
@@ -95,6 +85,8 @@
 			},
 			{ "name": "map-base", "patterns": ["packages/react-map-component/src/**"] },
 			{ "name": "packages", "patterns": ["packages/**"] },
+			// Dev-only routes; no other zone may import them
+			{ "name": "dev", "patterns": ["src/dev/**"] },
 			// The read path sits below the Catalog and Map Directory, which import it
 			{
 				"name": "assembly",
@@ -106,27 +98,36 @@
 				],
 			},
 			{ "name": "read-path", "patterns": ["src/lib/collections/*/*-data.ts"] },
-			{ "name": "lib", "patterns": ["src/lib/**"] },
-			{ "name": "components", "patterns": ["src/components/**", "src/layouts/**", "src/pages/**"] },
+			{ "name": "lib", "patterns": ["src/lib/**", "src/constants.ts", "src/types/**"] },
+			{
+				"name": "components",
+				"patterns": [
+					"src/components/**",
+					"src/layouts/**",
+					"src/pages/**",
+					"src/styles/**",
+					"src/content.config.ts",
+				],
+			},
 		],
+		// Unzoned files are unrestricted both ways, so every analyzed file needs a zone
+		"coverage": {
+			"requireAllFiles": true,
+			"allowUnmatched": ["*.config.{ts,mjs}", "tests/**"],
+		},
+		// Imports within a zone are always allowed
 		"rules": [
 			{ "from": "map-ui", "allow": ["map-state", "map-base", "packages"] },
 			{ "from": "map-state", "allow": ["map-base", "packages"] },
 			{ "from": "map-base", "allow": ["packages"] },
 			// Vite/Rolldown build breaks when packages import the app
-			{ "from": "packages", "allow": ["packages"] },
-			{ "from": "read-path", "allow": ["read-path", "lib", "packages"] },
-			{
-				"from": "assembly",
-				"allow": ["assembly", "read-path", "lib", "packages", "map-ui", "map-base"],
-			},
-			{
-				"from": "lib",
-				"allow": ["lib", "assembly", "read-path", "packages", "map-ui", "map-base"],
-			},
+			{ "from": "packages", "allow": [] },
+			{ "from": "read-path", "allow": ["lib", "packages"] },
+			{ "from": "assembly", "allow": ["read-path", "lib", "packages", "map-ui", "map-base"] },
+			{ "from": "lib", "allow": ["assembly", "read-path", "packages", "map-ui", "map-base"] },
 			{
 				"from": "components",
-				"allow": ["components", "lib", "assembly", "read-path", "packages", "map-ui", "map-base"],
+				"allow": ["lib", "assembly", "read-path", "packages", "map-ui", "map-base"],
 			},
 		],
 	},
