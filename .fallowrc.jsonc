@@ -1,10 +1,8 @@
 {
-	"ignorePatterns": [
-		"packages/scripts/src/validate-content/fixtures/**",
-		// Docker build context with its own package.json; fallow reads it as an undeclared workspace
-		"deploy/**",
-	],
+	"ignorePatterns": ["packages/scripts/src/validate-content/fixtures/**", "deploy/**"],
 	"rulePacks": ["fallow-rules.jsonc"],
+	// Rule packs only check reachable files; MDX components are reached by auto-import
+	"dynamicallyLoaded": ["src/components/mdx/*.astro"],
 	"rules": {
 		// Dead code and dependency hygiene belong to knip
 		"unused-files": "off",
@@ -85,7 +83,6 @@
 			},
 			{ "name": "map-base", "patterns": ["packages/react-map-component/src/**"] },
 			{ "name": "packages", "patterns": ["packages/**"] },
-			// Dev-only routes; no other zone may import them
 			{ "name": "dev", "patterns": ["src/dev/**"] },
 			// The read path sits below the Catalog and Map Directory, which import it
 			{
@@ -115,7 +112,6 @@
 			"requireAllFiles": true,
 			"allowUnmatched": ["*.config.{ts,mjs}", "tests/**"],
 		},
-		// Imports within a zone are always allowed
 		"rules": [
 			{ "from": "map-ui", "allow": ["map-state", "map-base", "packages"] },
 			{ "from": "map-state", "allow": ["map-base", "packages"] },
