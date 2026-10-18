@@ -179,6 +179,7 @@ function getResultCount(result: unknown): number | undefined {
 	return Array.isArray(results) ? results.filter((match) => isTextMatch(match)).length : undefined;
 }
 
+// Pagefind searches every meta field, so the image URL alone matches gibberish and hides zero-result searches
 function isTextMatch({ matchedMetaFields = [], words }: PagefindMatch) {
 	return words.length > 0 || matchedMetaFields.some((field) => !imageMetaFields.has(field));
 }

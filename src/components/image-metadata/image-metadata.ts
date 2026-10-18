@@ -13,3 +13,14 @@ document.addEventListener(
 	},
 	{ capture: true },
 );
+
+// Not `data-umami-event`: on a link the tracker holds navigation until its beacon returns
+document.addEventListener('click', ({ target }) => {
+	if (!(target instanceof Element)) return;
+
+	const image = target.closest<HTMLElement>('[data-meta-download]')?.dataset.metaDownload;
+
+	if (!image) return;
+
+	window.umami?.track('image-download', { image });
+});

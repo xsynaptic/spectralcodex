@@ -135,12 +135,7 @@ const downloadUrl = downloadWidth ? getImageUrl(entry.id, { width: downloadWidth
 						{t('collection.images.metadata.download.label')}
 					</Fragment>
 					{downloadUrl && downloadHeight ? (
-						<a
-							class="anchor-plain"
-							data-umami-event="image-download"
-							data-umami-event-image={entry.id}
-							href={downloadUrl}
-						>
+						<a class="anchor-plain" data-meta-download={entry.id} href={downloadUrl}>
 							<Fragment
 								set:html={`${String(downloadWidth)}&#8202;&#215;&#8202;${String(downloadHeight)}`}
 							/>
