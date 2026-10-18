@@ -47,13 +47,11 @@ const scrollRegionProps = { 'aria-label': caption, role: 'region' as const, tabi
 			<caption class="sr-only">{caption}</caption>
 			<thead>
 				<tr>
-					{columns.map((column, index) => (
+					{columns.map((column) => (
 						<th
 							class:list={[
-								'border-b px-2 py-1 text-left align-text-top font-display text-sm font-medium uppercase',
+								'border-b px-2 py-1 text-left align-text-top font-display text-sm font-medium uppercase first:rounded-tl-lg last:rounded-tr-lg',
 								'border-primary-300 bg-primary-100 dark:border-primary-600 dark:bg-primary-600',
-								index === 0 ? 'rounded-tl-lg' : undefined,
-								index === columns.length - 1 ? 'rounded-tr-lg' : undefined,
 							]}
 							scope="col"
 						>

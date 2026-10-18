@@ -30,6 +30,15 @@ const {
 const indexUrl = getSitePath(item.collection);
 
 const t = getTranslations();
+
+const counts = [
+	{
+		isShown: showLocations,
+		label: t('collection.locations.labelPlural'),
+		number: item.locationCount ?? 0,
+	},
+	{ isShown: showPosts, label: t('collection.posts.labelPlural'), number: item.postCount ?? 0 },
+].filter((count) => count.isShown && count.number > 0);
 ---
 
 {showCollection ? (
@@ -54,20 +63,11 @@ const t = getTranslations();
 		))}
 	</DividedItem>
 ) : undefined}
-{showLocations && item.locationCount && item.locationCount > 0 ? (
+{counts.map((count) => (
 	<DividedItem>
-		<span
-			set:html={`${t('collection.locations.labelPlural')}: ${formatNumber({ number: item.locationCount })}`}
-		/>
+		<span set:html={`${count.label}: ${formatNumber({ number: count.number })}`} />
 	</DividedItem>
-) : undefined}
-{showPosts && item.postCount && item.postCount > 0 ? (
-	<DividedItem>
-		<span
-			set:html={`${t('collection.posts.labelPlural')}: ${formatNumber({ number: item.postCount })}`}
-		/>
-	</DividedItem>
-) : undefined}
+))}
 {showDate ? (
 	<DividedItem>
 		<DateDisplay

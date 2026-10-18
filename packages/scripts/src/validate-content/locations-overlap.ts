@@ -87,11 +87,7 @@ function findOverlaps(points: Array<IndexedPoint>, thresholdMeters: number) {
 	for (const point of points) {
 		const nearbyIds = getPointsAround(index, point.lng, point.lat, Infinity, thresholdKm);
 
-		for (const nearbyId of nearbyIds) {
-			const nearby = points[nearbyId];
-
-			if (!nearby || nearby.locationId === point.locationId) continue;
-
+		for (const nearby of getOtherLocationPoints(points, nearbyIds, point.locationId)) {
 			// Canonical pair key, so A-B and B-A are reported once
 			const pairKey = [point.locationId, nearby.locationId]
 				.toSorted((idA, idB) => idA.localeCompare(idB))
@@ -114,4 +110,20 @@ function findOverlaps(points: Array<IndexedPoint>, thresholdMeters: number) {
 	}
 
 	return overlaps.toSorted((overlapA, overlapB) => overlapA.distance - overlapB.distance);
+}
+
+function getOtherLocationPoints(
+	points: Array<IndexedPoint>,
+	ids: Array<number>,
+	locationId: string,
+) {
+	const otherPoints: Array<IndexedPoint> = [];
+
+	for (const id of ids) {
+		const point = points[id];
+
+		if (point && point.locationId !== locationId) otherPoints.push(point);
+	}
+
+	return otherPoints;
 }

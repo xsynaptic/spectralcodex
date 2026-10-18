@@ -12,23 +12,15 @@ export function collectSourceIdIssues(
 	entries: Array<ContentEntry>,
 	resourceEntries: Array<ContentEntry>,
 ) {
-	const validIds = new Set<string>();
-
-	for (const entry of resourceEntries) {
-		validIds.add(entry.id);
-	}
+	const validIds = new Set(resourceEntries.map((entry) => entry.id));
 
 	const issues: Array<SourceIdIssue> = [];
 
 	for (const entry of entries) {
-		const sources = entry.data.sources as Array<object | string> | undefined;
-
-		if (!sources) continue;
+		const sources = (entry.data.sources as Array<object | string> | undefined) ?? [];
 
 		for (const source of sources) {
-			if (typeof source !== 'string') continue;
-
-			if (!validIds.has(source)) {
+			if (typeof source === 'string' && !validIds.has(source)) {
 				issues.push({ id: source, location: entry.filePath ?? entry.id });
 			}
 		}

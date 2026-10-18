@@ -1,7 +1,6 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
-import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 import type { ImageContext, ImageLayout } from '#lib/image/image-types.ts';
 import type { ImageComponentProps, ImagePlaceholderProps } from '#lib/image/image-types.ts';
 
@@ -66,23 +65,12 @@ function getImageAlt(title: string) {
 	return sanitizeImageAltAttribute(title);
 }
 
-async function getImageProps(): Promise<{
-	aspectRatioString: string | undefined;
-	imageEntry: ComputedEntry<'images'> | undefined;
-	imageProps: ImageComponentProps | undefined;
-	placeholderProps: ImagePlaceholderProps | undefined;
-}> {
+async function getImageProps() {
 	const getImageById = await getImageByIdFunction();
 
 	const imageEntry = getImageById(imageId);
 
-	if (!imageEntry)
-		return {
-			aspectRatioString: undefined,
-			imageEntry: undefined,
-			imageProps: undefined,
-			placeholderProps: undefined,
-		};
+	if (!imageEntry) return;
 
 	const { width } = getImageInferredWidth({
 		context,
@@ -114,15 +102,15 @@ async function getImageProps(): Promise<{
 			unstyled: true,
 			...(priority ? { priority: true } : {}),
 			alt: getImageAlt(imageEntry.data.title),
-		},
+		} satisfies ImageComponentProps,
 		placeholderProps: {
 			aspectRatio: imageEntry.data.width / imageEntry.data.height,
 			imageId,
-		},
+		} satisfies ImagePlaceholderProps,
 	};
 }
 
-const { aspectRatioString, imageEntry, imageProps, placeholderProps } = await getImageProps();
+const image = await getImageProps();
 
 const caption = slotContents ? sanitizeImageCaption(slotContents) : undefined;
 
@@ -135,15 +123,12 @@ function getFigureClass() {
 }
 ---
 
-{imageProps && !isFeed ? (
+{image && !isFeed ? (
 	<figure class:list={['figure-frame prose-escape', getFigureClass()]} {...props}>
-		<ImagePlaceholder placeholderProps={placeholderProps}>
-			<Image
-				{...(aspectRatioString ? { style: { aspectRatio: aspectRatioString } } : {})}
-				{...imageProps}
-			/>
-			{showMetadata && imageEntry && context !== ImageContextEnum.Carousel ? (
-				<ImageMetadata entry={imageEntry} />
+		<ImagePlaceholder placeholderProps={image.placeholderProps}>
+			<Image style={{ aspectRatio: image.aspectRatioString }} {...image.imageProps} />
+			{showMetadata && context !== ImageContextEnum.Carousel ? (
+				<ImageMetadata entry={image.imageEntry} />
 			) : undefined}
 		</ImagePlaceholder>
 		{caption ? (
@@ -153,9 +138,9 @@ function getFigureClass() {
 		) : undefined}
 	</figure>
 ) : undefined}
-{imageProps && isFeed ? (
+{image && isFeed ? (
 	<figure {...props}>
-		<Image {...imageProps} />
+		<Image {...image.imageProps} />
 		{caption ? (
 			<figcaption>
 				<Fragment set:html={caption} />

@@ -38,6 +38,8 @@ async function getRegions() {
 }
 
 const regions = showSingleRegionAncestors ? await getRegions() : terms;
+
+const itemClass = showMicroformats ? MicroformatClassNames.Category : undefined;
 ---
 
 {regions && regions.length > 0 ? (
@@ -50,7 +52,7 @@ const regions = showSingleRegionAncestors ? await getRegions() : terms;
 			return (
 				<DividedItem
 					as="li"
-					class:list={[showMicroformats ? MicroformatClassNames.Category : undefined]}
+					class:list={[itemClass]}
 					data-pagefind-filter="region"
 					dividerContent={dividerContent}
 				>
