@@ -1,9 +1,9 @@
 import type { MapSourceItem } from '@spectralcodex/map-codec';
 
 import {
-	encodeMapSourceData,
+	encodeMapDirectory,
+	MapDirectorySchema,
 	mapPayloadName,
-	MapSourceItemSchema,
 	mapSourceKeys,
 } from '@spectralcodex/map-codec';
 import { describe, expect, test } from 'vitest';
@@ -24,24 +24,22 @@ const sourceItem = {
 	type: 'Feature',
 } satisfies MapSourceItem;
 
-function payloadsOf(rows: ReadonlyArray<unknown>) {
-	return new Map([['map-directory', JSON.stringify(rows)]]);
+function payloadsOf(directory: unknown) {
+	return new Map([['map-directory', JSON.stringify(directory)]]);
 }
 
 describe('hashMapPayloads', () => {
 	test('moves when a converter changes bytes but not decoded rows', () => {
-		const before = encodeMapSourceData([sourceItem]);
-		const after = before.map((row) => ({ ...row, [mapSourceKeys.entryQuality]: 1 }));
+		const before = encodeMapDirectory([sourceItem]);
+		const after = { ...before, [mapSourceKeys.entryQuality]: [1] };
 
-		expect(after.map((row) => MapSourceItemSchema.parse(row))).toEqual(
-			before.map((row) => MapSourceItemSchema.parse(row)),
-		);
+		expect(MapDirectorySchema.parse(after)).toEqual(MapDirectorySchema.parse(before));
 		expect(hashMapPayloads(payloadsOf(after))).not.toBe(hashMapPayloads(payloadsOf(before)));
 	});
 
 	test('ignores the order payloads were collected in', () => {
 		const payloads = new Map([
-			['map-directory', JSON.stringify(encodeMapSourceData([sourceItem]))],
+			['map-directory', JSON.stringify(encodeMapDirectory([sourceItem]))],
 			[mapPayloadName.scopes, '[]'],
 		]);
 

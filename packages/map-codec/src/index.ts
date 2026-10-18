@@ -1,6 +1,7 @@
 export {
+	encodeMapDirectory,
 	encodeMapPopupData,
-	encodeMapSourceData,
+	MapDirectorySchema,
 	MapPopupItemSchema,
 	mapPopupKeys,
 	MapSourceItemSchema,
@@ -18,6 +19,7 @@ export type {
 export { MapPopupOwnField } from '#map-codes.ts';
 export { MapDivisionMaskSchema } from '#map-division.ts';
 export type { MapDivisionMask } from '#map-division.ts';
+export { getMapRowUrl, mapPointIdSeparator } from '#map-ids.ts';
 export { getMapPayloadUrl, mapPayloadName } from '#map-payloads.ts';
 export type { MapPayloadBase } from '#map-payloads.ts';
 export { createRuleTest, getMapRowById, selectMapRows } from '#map-rules.ts';

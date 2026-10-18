@@ -1,11 +1,10 @@
 import type { MapSourceItem } from '@spectralcodex/map-codec';
 
-import { getMapRowById } from '@spectralcodex/map-codec';
+import { getMapRowById, mapPointIdSeparator } from '@spectralcodex/map-codec';
 import { distance } from '@turf/distance';
 import { degreesToRadians, lengthToDegrees } from '@turf/helpers';
 import { geoBounds } from 'd3-geo';
 
-import { mapPointIdSeparator } from '#constants.ts';
 import { getTruncatedLngLat } from '#lib/map/map-utils.ts';
 
 export interface MapBoundsOptions {

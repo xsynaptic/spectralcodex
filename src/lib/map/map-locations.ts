@@ -7,6 +7,7 @@ import type {
 import type { Feature, Position } from 'geojson';
 
 import {
+	mapPointIdSeparator,
 	MapPopupOwnField,
 	pickMapPopupProperties,
 	pickMapSourceProperties,
@@ -19,7 +20,7 @@ import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 import type { LocationPoint } from '#lib/collections/locations/locations-data.ts';
 import type { MultilingualContent } from '#lib/i18n/i18n-types.ts';
 
-import { mapDisplayRegionIds, mapPointIdSeparator } from '#constants.ts';
+import { mapDisplayRegionIds } from '#constants.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getTruncatedLngLat } from '#lib/map/map-utils.ts';
 import { isGeometryHidden } from '#lib/utils/content-policy.ts';

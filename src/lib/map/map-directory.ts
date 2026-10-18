@@ -6,9 +6,10 @@ import type {
 } from '@spectralcodex/map-codec';
 
 import {
+	encodeMapDirectory,
 	encodeMapPopupData,
-	encodeMapSourceData,
 	getMapPayloadUrl,
+	getMapRowUrl,
 	MapDivisionMaskSchema,
 	mapPayloadName,
 	mapPopupKeys,
@@ -91,6 +92,16 @@ function getMembershipIndices(
 	);
 }
 
+function assertDerivedUrl({ properties: { id, url } }: MapSourceItem) {
+	const derivedUrl = getMapRowUrl(id);
+
+	if (derivedUrl === url) return;
+
+	throw new Error(
+		`Location "${id}" routes to ${url ?? 'no url'} but the map directory derives ${derivedUrl}`,
+	);
+}
+
 function buildMapDataset(
 	locations: Array<ComputedEntry<'locations'>>,
 	{ isPrivate, ordinalById, prefix, themeIndexById }: MapDatasetContext,
@@ -119,6 +130,8 @@ function buildMapDataset(
 		const id = sourceItem.properties.id;
 		const location = locationByFeatureId.get(id);
 
+		assertDerivedUrl(sourceItem);
+
 		const regionOrdinals = location ? getMembershipIndices(location.data.regions, ordinalById) : [];
 		const themeIndices = location
 			? getMembershipIndices(location.data.themes ?? [], themeIndexById)
@@ -136,7 +149,7 @@ function buildMapDataset(
 	});
 
 	const payloads = new Map([
-		[getDirectoryPayloadId(prefix), JSON.stringify(encodeMapSourceData(directory))],
+		[getDirectoryPayloadId(prefix), JSON.stringify(encodeMapDirectory(directory))],
 	]);
 
 	for (const [chunkKey, ids] of chunkIds) {

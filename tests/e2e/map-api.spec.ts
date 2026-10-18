@@ -1,15 +1,9 @@
 import { expect, test } from '@playwright/test';
 import {
+	MapDirectorySchema,
 	MapDivisionMaskSchema,
-	MapSourceItemSchema,
-	mapSourceKeys,
+	MapPopupItemSchema,
 } from '@spectralcodex/map-codec';
-
-const id = mapSourceKeys.id;
-const chunkKey = mapSourceKeys.chunkKey;
-const objective = mapSourceKeys.objective;
-
-type MapApiItem = Record<string, unknown>;
 
 test.describe('map data API', { tag: '@smoke' }, () => {
 	test('the global directory decodes, every row has a Chunk, and no row carries an Objective', async ({
@@ -19,12 +13,11 @@ test.describe('map data API', { tag: '@smoke' }, () => {
 
 		expect(response.ok()).toBe(true);
 
-		const directory = (await response.json()) as Array<MapApiItem>;
+		const directory = MapDirectorySchema.parse(await response.json());
 
 		expect(directory.length).toBeGreaterThan(1000);
-		expect(directory.every((row) => typeof row[chunkKey] === 'string')).toBe(true);
-		expect(directory.filter((row) => Object.hasOwn(row, objective))).toHaveLength(0);
-		expect(() => MapSourceItemSchema.array().parse(directory)).not.toThrow();
+		expect(directory.every((row) => typeof row.properties.chunkKey === 'string')).toBe(true);
+		expect(directory.filter((row) => row.properties.objective !== undefined)).toHaveLength(0);
 	});
 
 	test('the warm list includes the directory and every Chunk, and sampled Chunks contain their rows', async ({
@@ -35,8 +28,8 @@ test.describe('map data API', { tag: '@smoke' }, () => {
 			request.get('/api/map/map-directory.json'),
 		]);
 		const warmUrls = (await manifestResponse.json()) as Array<string>;
-		const directory = (await directoryResponse.json()) as Array<MapApiItem>;
-		const chunkKeys = new Set(directory.map((row) => String(row[chunkKey])));
+		const directory = MapDirectorySchema.parse(await directoryResponse.json());
+		const chunkKeys = new Set(directory.map((row) => String(row.properties.chunkKey)));
 
 		expect(warmUrls.some((url) => url.startsWith('/api/map/map-directory.json?v='))).toBe(true);
 		for (const chunkKey of chunkKeys) {
@@ -53,13 +46,13 @@ test.describe('map data API', { tag: '@smoke' }, () => {
 			expect(row).toBeDefined();
 			if (!row) continue;
 
-			const response = await request.get(`/api/map/${String(row[chunkKey])}.json`);
+			const response = await request.get(`/api/map/${String(row.properties.chunkKey)}.json`);
 
 			expect(response.ok()).toBe(true);
 
-			const chunk = (await response.json()) as Array<MapApiItem>;
+			const chunk = MapPopupItemSchema.array().parse(await response.json());
 
-			expect(chunk.some((item) => item[id] === row[id])).toBe(true);
+			expect(chunk.some((item) => item.id === row.properties.id)).toBe(true);
 		}
 	});
 

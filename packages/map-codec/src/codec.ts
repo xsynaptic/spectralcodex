@@ -3,6 +3,7 @@ import { z } from 'zod';
 
 import { coded, createFieldCodec, field, keysOf, plain, withFallback } from '#codec-fields.ts';
 import { LocationStatusNumericMapping } from '#map-codes.ts';
+import { decodeMapRowId, encodeMapRowId, getMapRowUrl } from '#map-ids.ts';
 
 export const MapPositionSchema = z.tuple([z.number(), z.number()]);
 
@@ -30,7 +31,6 @@ const sourceCodec = createFieldCodec({
 	themeIndices: plain('h', z.number().int().array().optional()),
 	title: plain('t', z.string()),
 	titleMultilingual: plain('v', z.string().optional()),
-	url: plain('u', z.string().optional()),
 });
 
 const googleMapsHost = 'https://maps.app.goo.gl/';
@@ -85,19 +85,64 @@ export const MapSourceItemSchema = z.codec(
 	z.object({ ...sourceCodec.compressedShape, [geometryKey]: geometryCodec.in }).strict(),
 	z.object({
 		geometry: geometryCodec.out,
-		properties: z.object(sourceCodec.standardShape),
+		properties: z.object({ ...sourceCodec.standardShape, url: z.string().optional() }),
 		type: z.literal('Feature'),
 	}),
 	{
-		decode: (data) => ({
-			geometry: z.decode(geometryCodec, data[geometryKey]),
-			properties: sourceCodec.decode(data),
-			type: 'Feature' as const,
-		}),
+		decode: (data) => {
+			const properties = sourceCodec.decode(data);
+			const id = decodeMapRowId(properties.id, properties.title);
+
+			return {
+				geometry: z.decode(geometryCodec, data[geometryKey]),
+				properties: { ...properties, id, url: getMapRowUrl(id) },
+				type: 'Feature' as const,
+			};
+		},
 		encode: ({ geometry, properties }) => ({
 			...sourceCodec.encode(properties),
 			[geometryKey]: z.encode(geometryCodec, geometry),
+			[sourceCodec.keys.id]: encodeMapRowId(properties.id, properties.title),
 		}),
+	},
+);
+
+const mapDirectoryColumnKeys = Object.values(mapSourceKeys);
+
+export const MapDirectorySchema = z.codec(
+	z
+		.partialRecord(z.enum(mapDirectoryColumnKeys), z.array(z.unknown()))
+		.refine((columns) => new Set(Object.values(columns).map((column) => column.length)).size <= 1, {
+			message: 'Every directory column must hold one value per row',
+		}),
+	z.array(MapSourceItemSchema),
+	{
+		decode: (columns) => {
+			const rowCount = Object.values(columns).at(0)?.length ?? 0;
+
+			return Array.from({ length: rowCount }, (_, index) => {
+				const row: Record<string, unknown> = {};
+
+				for (const [key, column] of Object.entries(columns)) {
+					const value = column[index] ?? undefined;
+
+					if (value !== undefined) row[key] = value;
+				}
+
+				return row as MapSourceItemCompressed;
+			});
+		},
+		encode: (rows) => {
+			const columns: Partial<Record<(typeof mapDirectoryColumnKeys)[number], Array<unknown>>> = {};
+
+			for (const key of mapDirectoryColumnKeys) {
+				const column = rows.map((row) => row[key]);
+
+				if (column.some((value) => value !== undefined)) columns[key] = column;
+			}
+
+			return columns;
+		},
 	},
 );
 
@@ -133,7 +178,7 @@ function pickByNames<Names extends string>(names: ReadonlyArray<Names>) {
 	};
 }
 
-export const pickMapSourceProperties = pickByNames(keysOf(sourceCodec.keys));
+export const pickMapSourceProperties = pickByNames([...keysOf(sourceCodec.keys), 'url'] as const);
 export const pickMapPopupProperties = pickByNames(keysOf(popupCodec.keys));
 
 export function encodeMapPopupData(
@@ -142,8 +187,6 @@ export function encodeMapPopupData(
 	return items.map((item) => z.encode(MapPopupItemSchema, item));
 }
 
-export function encodeMapSourceData(
-	items: ReadonlyArray<MapSourceItem>,
-): Array<MapSourceItemCompressed> {
-	return items.map((item) => z.encode(MapSourceItemSchema, item));
+export function encodeMapDirectory(items: Array<MapSourceItem>) {
+	return z.encode(MapDirectorySchema, items);
 }

@@ -4,11 +4,11 @@ import type { z } from 'zod';
 import {
 	getMapPayloadUrl,
 	getMapRowById,
+	MapDirectorySchema,
 	MapDivisionMaskSchema,
 	mapPayloadName,
 	MapPopupItemSchema,
 	MapScopeRowSchema,
-	MapSourceItemSchema,
 	selectMapRows,
 } from '@spectralcodex/map-codec';
 import { queryOptions, skipToken, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -31,7 +31,7 @@ async function fetchMapJson<Schema extends z.ZodType>(
 
 function directoryQueryOptions(url: string) {
 	return queryOptions({
-		queryFn: () => fetchMapJson(url, MapSourceItemSchema.array()),
+		queryFn: () => fetchMapJson(url, MapDirectorySchema),
 		queryKey: ['map-directory', url],
 	});
 }
