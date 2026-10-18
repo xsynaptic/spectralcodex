@@ -1,7 +1,11 @@
 import type { MapSourceItem } from '@spectralcodex/map-codec';
 
-import { encodeMapSourceData, MapSourceItemSchema, mapSourceKeys } from '@spectralcodex/map-codec';
-import { mapScopesFileName } from '@spectralcodex/react-map-component/constants';
+import {
+	encodeMapSourceData,
+	mapPayloadName,
+	MapSourceItemSchema,
+	mapSourceKeys,
+} from '@spectralcodex/map-codec';
 import { describe, expect, test } from 'vitest';
 
 import { hashMapPayloads } from '#lib/map/map-directory-hash.ts';
@@ -39,7 +43,7 @@ describe('hashMapPayloads', () => {
 	test('ignores the order payloads were collected in', () => {
 		const payloads = new Map([
 			['map-directory', JSON.stringify(encodeMapSourceData([sourceItem]))],
-			[mapScopesFileName, '[]'],
+			[mapPayloadName.scopes, '[]'],
 		]);
 
 		expect(hashMapPayloads(new Map([...payloads].toReversed()))).toBe(hashMapPayloads(payloads));

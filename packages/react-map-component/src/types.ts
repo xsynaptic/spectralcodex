@@ -1,5 +1,5 @@
 import type { Flavor } from '@protomaps/basemaps';
-import type { MapFeaturesRule, MapScope, MapView } from '@spectralcodex/map-codec';
+import type { MapFeaturesRule, MapPayloadBase, MapScope, MapView } from '@spectralcodex/map-codec';
 import type { Feature, Point } from 'geojson';
 import type { MapOptions } from 'maplibre-gl';
 import type { CSSProperties } from 'react';
@@ -11,7 +11,6 @@ export interface MapComponentProps extends Partial<
 	Pick<MapOptions, 'hash' | 'interactive' | 'zoom'>
 > {
 	apiDivisionUrl?: string | undefined;
-	apiSourceUrl: string;
 	baseMapTheme?: Flavor | undefined;
 	bounds?: MapScope['bounds'] | undefined;
 	center?: [number, number];
@@ -25,6 +24,7 @@ export interface MapComponentProps extends Partial<
 	mapId?: string | undefined;
 	maxBounds?: MapScope['bounds'] | undefined;
 	messages?: Partial<MapMessages> | undefined;
+	payloadBase: MapPayloadBase;
 	protomapsApiKey?: string | undefined;
 	style?: CSSProperties | undefined;
 	targetIds?: Array<string> | undefined;
@@ -44,9 +44,9 @@ export type MapOverlayClose = 'dismiss' | 'keyboard' | 'pointer';
 export type MapHostControlName = 'enter' | 'exit' | 'expand';
 
 export interface MapHost {
-	canOpen: boolean;
 	controls: ReadonlyArray<MapHostControlName>;
 	fullscreenContainerId: string | undefined;
+	isHosted: boolean;
 	open: (url: string) => void;
 	readView: () => MapStoreView;
 	send: (name: MapHostControlName) => void;
@@ -61,20 +61,23 @@ export type MapInitialViewState = MapProps['initialViewState'];
 
 export type MapMessages = Record<keyof typeof defaultMapMessages, string>;
 
-export type MapTrackName =
+type MapTrackName =
 	| 'map-error'
 	| 'map-filter-open'
 	| 'map-load'
 	| 'map-popup-open'
 	| 'map-popup-visit'
 	| 'map-scope-toggle'
+	| 'map-search-empty'
 	| 'map-search-pick'
+	| 'map-search-query'
+	| 'map-sheet-toggle'
 	| `map-${MapHostControlName}`;
 
 export interface MapTrackDetail {
 	data?: Record<string, unknown>;
 	mapId?: string | undefined;
-	name: string;
+	name: MapTrackName;
 }
 
 export interface MapStoreView {

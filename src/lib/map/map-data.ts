@@ -22,11 +22,11 @@ export type MapComponentData =
 type MapDataOptions = MapBoundsOptions &
 	Omit<
 		MapComponentProps,
-		| 'apiSourceUrl'
 		| 'bounds'
 		| 'center'
 		| 'mapFeaturesRule'
 		| 'maxBounds'
+		| 'payloadBase'
 		| 'protomapsApiKey'
 		| 'targetIds'
 	> & {
@@ -47,7 +47,7 @@ export async function createMapDataFunction() {
 		targetId,
 		...props
 	}: MapDataOptions): MapComponentData {
-		const { directory, directoryUrl: apiSourceUrl } = datasets[dataset];
+		const { directory, payloadBase } = datasets[dataset];
 		const rows = selectMapRows(directory, rule);
 		const mapBounds = getMapBounds(rows, {
 			boundsBuffer,
@@ -65,8 +65,8 @@ export async function createMapDataFunction() {
 			protomapsApiKey: MAP_PROTOMAPS_API_KEY,
 			...mapBounds,
 			...props,
-			apiSourceUrl,
 			mapFeaturesRule: rule,
+			payloadBase,
 			targetIds: getTargetIds(rows, targetId),
 		};
 

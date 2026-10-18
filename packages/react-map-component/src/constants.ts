@@ -10,7 +10,6 @@ export const mapViewAttribute = 'data-map-view';
 export const mapActiveAttribute = 'data-active';
 export const mapInsetProperty = '--map-inset-bottom';
 export const mapPageHiddenProperty = '--map-page-hidden';
-export const mapScopesFileName = 'map-scopes';
 
 export function getHostControlClassName(name: MapHostControlName) {
 	return `map-ctrl-${name}`;

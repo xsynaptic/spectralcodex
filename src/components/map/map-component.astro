@@ -2,6 +2,7 @@
 import type { MapComponentProps } from '@spectralcodex/react-map-component';
 import type { HTMLAttributes } from 'astro/types';
 
+import { getMapPayloadUrl, mapPayloadName } from '@spectralcodex/map-codec';
 import { ReactMapComponent } from '@spectralcodex/react-map-component';
 import mapCssUrl from '@spectralcodex/react-map-component/styles/map-component.css?url';
 
@@ -27,7 +28,7 @@ const zIndex = 10;
 	as="fetch"
 	crossorigin="anonymous"
 	fetchpriority="low"
-	href={mapComponentProps.apiSourceUrl}
+	href={getMapPayloadUrl(mapComponentProps.payloadBase, mapPayloadName.directory)}
 	rel="preload"
 />
 <div

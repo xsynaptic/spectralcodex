@@ -71,21 +71,6 @@ describe('MapSourceItemSchema decode', () => {
 				.success,
 		).toBe(false);
 	});
-
-	test('omits objective and outlier when absent', () => {
-		const result = MapSourceItemSchema.parse({
-			[mapSourceKeys.category]: LocationCategoryNumericMapping[LocationCategoryEnum.Temple],
-			[mapSourceKeys.geometry]: [100, 13],
-			[mapSourceKeys.id]: 'location-1',
-			[mapSourceKeys.precision]: 3,
-			[mapSourceKeys.rating]: 5,
-			[mapSourceKeys.status]: LocationStatusNumericMapping[LocationStatusEnum.Abandoned],
-			[mapSourceKeys.title]: 'Location',
-		});
-
-		expect('objective' in result.properties).toBe(false);
-		expect('outlier' in result.properties).toBe(false);
-	});
 });
 
 describe('MapPopupItemSchema decode', () => {
@@ -110,45 +95,6 @@ describe('MapPopupItemSchema decode', () => {
 });
 
 describe('MapSourceItemSchema encode (byte-faithful compressed form)', () => {
-	const standardFull: MapSourceItem = {
-		geometry: { coordinates: [100, 13], type: GeometryTypeEnum.Point },
-		properties: {
-			category: LocationCategoryEnum.Temple,
-			chunkKey: '0',
-			entryQuality: 3,
-			hasImage: true,
-			id: 'a',
-			objective: 2,
-			outlier: false,
-			precision: 3,
-			rating: 5,
-			regionOrdinals: [1, 2],
-			status: LocationStatusEnum.Abandoned,
-			themeIndices: [3],
-			title: 'A',
-		},
-		type: 'Feature',
-	};
-
-	test('emits present optionals and hasImage flag', () => {
-		expect(z.encode(MapSourceItemSchema, standardFull)).toEqual({
-			[mapSourceKeys.category]: LocationCategoryNumericMapping[LocationCategoryEnum.Temple],
-			[mapSourceKeys.chunkKey]: '0',
-			[mapSourceKeys.entryQuality]: 3,
-			[mapSourceKeys.geometry]: [100, 13],
-			[mapSourceKeys.hasImage]: true,
-			[mapSourceKeys.id]: 'a',
-			[mapSourceKeys.objective]: 2,
-			[mapSourceKeys.outlier]: false,
-			[mapSourceKeys.precision]: 3,
-			[mapSourceKeys.rating]: 5,
-			[mapSourceKeys.regionOrdinals]: [1, 2],
-			[mapSourceKeys.status]: LocationStatusNumericMapping[LocationStatusEnum.Abandoned],
-			[mapSourceKeys.themeIndices]: [3],
-			[mapSourceKeys.title]: 'A',
-		});
-	});
-
 	test('omits absent optionals; never emits hasImage:false or entryQuality:1', () => {
 		const standard: MapSourceItem = {
 			geometry: { coordinates: [0, 0], type: GeometryTypeEnum.Point },

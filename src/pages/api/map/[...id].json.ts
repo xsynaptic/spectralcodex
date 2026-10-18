@@ -1,6 +1,8 @@
 import type { APIRoute, GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
-import { getMapDirectoryData, getMapPayloadUrl } from '#lib/map/map-directory.ts';
+import { getMapPayloadUrl, mapPayloadName } from '@spectralcodex/map-codec';
+
+import { getMapDirectoryData } from '#lib/map/map-directory.ts';
 
 export const getStaticPaths = (async () => {
 	const {
@@ -9,12 +11,12 @@ export const getStaticPaths = (async () => {
 	} = await getMapDirectoryData();
 
 	const manifestUrls = [...shared.payloads.keys()].map((id) =>
-		getMapPayloadUrl(id, shared.version),
+		getMapPayloadUrl(shared.payloadBase, id),
 	);
 
 	return [
 		...[...payloads].map(([id, body]) => ({ params: { id }, props: { body } })),
-		{ params: { id: 'map-manifest' }, props: { body: JSON.stringify(manifestUrls) } },
+		{ params: { id: mapPayloadName.manifest }, props: { body: JSON.stringify(manifestUrls) } },
 	];
 }) satisfies GetStaticPaths;
 

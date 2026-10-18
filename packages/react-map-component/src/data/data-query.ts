@@ -1,9 +1,11 @@
-import type { MapFeaturesRule } from '@spectralcodex/map-codec';
+import type { MapFeaturesRule, MapPayloadBase } from '@spectralcodex/map-codec';
 import type { z } from 'zod';
 
 import {
+	getMapPayloadUrl,
 	getMapRowById,
 	MapDivisionMaskSchema,
+	mapPayloadName,
 	MapPopupItemSchema,
 	MapScopeRowSchema,
 	MapSourceItemSchema,
@@ -12,7 +14,7 @@ import {
 import { queryOptions, skipToken, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 
-import { fetchTimeoutMs, mapScopesFileName } from '#constants.ts';
+import { fetchTimeoutMs } from '#constants.ts';
 import { useMapConfig } from '#lib/config.tsx';
 import { useMapStore } from '#store/store.tsx';
 
@@ -27,12 +29,6 @@ async function fetchMapJson<Schema extends z.ZodType>(
 	return schema.parse(await response.json());
 }
 
-export function getPayloadUrl(directoryUrl: string, name: string) {
-	const [path = '', search = ''] = directoryUrl.split('?', 2);
-
-	return `${path.slice(0, path.lastIndexOf('/') + 1)}${name}.json?${search}`;
-}
-
 function directoryQueryOptions(url: string) {
 	return queryOptions({
 		queryFn: () => fetchMapJson(url, MapSourceItemSchema.array()),
@@ -40,14 +36,13 @@ function directoryQueryOptions(url: string) {
 	});
 }
 
-export function mapRowsQueryOptions(url: string, rule: MapFeaturesRule) {
+export function mapRowsQueryOptions(payloadBase: MapPayloadBase, rule: MapFeaturesRule) {
+	const url = getMapPayloadUrl(payloadBase, mapPayloadName.directory);
+
 	return queryOptions({
 		meta: { isDerived: true },
 		queryFn: async ({ client }) =>
-			selectMapRows(
-				await client.query({ ...directoryQueryOptions(url), staleTime: 'static' }),
-				rule,
-			),
+			selectMapRows(await client.query(directoryQueryOptions(url)), rule),
 		queryKey: ['source-data', url, rule],
 	});
 }
@@ -61,13 +56,12 @@ function chunkQueryOptions(url: string | undefined) {
 	});
 }
 
-export function scopeListQueryOptions(apiSourceUrl: string) {
-	const url = getPayloadUrl(apiSourceUrl, mapScopesFileName);
+export function scopeListQueryOptions(payloadBase: MapPayloadBase) {
+	const url = getMapPayloadUrl(payloadBase, mapPayloadName.scopes);
 
 	return queryOptions({
 		queryFn: () => fetchMapJson(url, MapScopeRowSchema.array()),
 		queryKey: ['scope-list', url],
-		staleTime: 'static',
 	});
 }
 
@@ -79,9 +73,9 @@ function divisionQueryOptions(url: string | undefined) {
 }
 
 export function useMapRows() {
-	const { apiSourceUrl, mapFeaturesRule } = useMapConfig();
+	const { mapFeaturesRule, payloadBase } = useMapConfig();
 
-	return useQuery(mapRowsQueryOptions(apiSourceUrl, mapFeaturesRule));
+	return useQuery(mapRowsQueryOptions(payloadBase, mapFeaturesRule));
 }
 
 export function useIsMapLoading() {
@@ -93,15 +87,11 @@ export function useIsMapLoading() {
 
 export function useEnsureMapRows() {
 	const client = useQueryClient();
-	const { apiSourceUrl, mapFeaturesRule } = useMapConfig();
+	const { mapFeaturesRule, payloadBase } = useMapConfig();
 
 	return useCallback(
-		() =>
-			client.query({
-				...mapRowsQueryOptions(apiSourceUrl, mapFeaturesRule),
-				staleTime: 'static',
-			}),
-		[apiSourceUrl, client, mapFeaturesRule],
+		() => client.query(mapRowsQueryOptions(payloadBase, mapFeaturesRule)),
+		[client, mapFeaturesRule, payloadBase],
 	);
 }
 
@@ -112,9 +102,11 @@ export function useMapRow(id: string | undefined) {
 }
 
 export function useMapChunk(chunkKey: string | undefined) {
-	const { apiSourceUrl } = useMapConfig();
+	const { payloadBase } = useMapConfig();
 
-	return useQuery(chunkQueryOptions(chunkKey ? getPayloadUrl(apiSourceUrl, chunkKey) : undefined));
+	return useQuery(
+		chunkQueryOptions(chunkKey ? getMapPayloadUrl(payloadBase, chunkKey) : undefined),
+	);
 }
 
 export function useMapDivision(url: string | undefined) {
