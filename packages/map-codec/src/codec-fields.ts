@@ -1,66 +1,48 @@
-import { z } from 'zod';
-
-interface MapCodecField<
-	Key extends string,
-	Compressed extends z.ZodType,
-	Standard extends z.ZodType,
-> {
-	compressed: Compressed;
-	decode: (value: z.output<Compressed>) => z.output<Standard>;
-	encode: (value: z.output<Standard>) => z.output<Compressed>;
+interface MapCodecField<Key extends string, Compressed, Standard> {
+	decode: (value: Compressed) => Standard;
+	encode: (value: Standard) => Compressed;
 	key: Key;
-	standard: Standard;
 }
 
 // Typing the parameters as `never` lets one table hold fields of any value type
 interface MapCodecFieldLike {
-	compressed: z.ZodType;
 	decode: (value: never) => unknown;
 	encode: (value: never) => unknown;
 	key: string;
-	standard: z.ZodType;
 }
 
-type MapCodecTable = Record<string, MapCodecFieldLike>;
+export type MapCodecTable = Record<string, MapCodecFieldLike>;
 
-type CompressedShape<Table extends MapCodecTable> = {
-	[Name in keyof Table as Table[Name]['key']]: Table[Name]['compressed'];
-};
-
-type StandardShape<Table extends MapCodecTable> = {
-	[Name in keyof Table]: Table[Name]['standard'];
-};
+type ValueCodec = (value: unknown) => unknown;
 
 export function keysOf<Table extends object>(table: Table) {
 	return Object.keys(table) as Array<keyof Table & string>;
 }
 
-export function field<Key extends string, Compressed extends z.ZodType, Standard extends z.ZodType>(
+export function getFieldKeys<Table extends MapCodecTable>(table: Table) {
+	return Object.fromEntries(Object.entries(table).map(([name, { key }]) => [name, key])) as {
+		[Name in keyof Table]: Table[Name]['key'];
+	};
+}
+
+export function field<Key extends string, Compressed, Standard>(
 	key: Key,
 	definition: Omit<MapCodecField<Key, Compressed, Standard>, 'key'>,
 ): MapCodecField<Key, Compressed, Standard> {
 	return { ...definition, key };
 }
 
-export function plain<Key extends string, Schema extends z.ZodType>(key: Key, schema: Schema) {
+export function plain<Key extends string>(key: Key) {
 	return field(key, {
-		compressed: schema,
-		decode: (value) => value,
-		encode: (value) => value,
-		standard: schema,
+		decode: (value: unknown) => value,
+		encode: (value: unknown) => value,
 	});
 }
 
-export function withFallback<Key extends string, Schema extends z.ZodType>(
-	key: Key,
-	schema: Schema,
-	fallback: z.output<Schema>,
-) {
+export function withFallback<Key extends string, Value>(key: Key, fallback: Value) {
 	return field(key, {
-		compressed: schema.optional(),
-		decode: (value) => value ?? fallback,
-		encode: (value) => (value === fallback ? undefined : value),
-		standard: schema,
+		decode: (value: undefined | Value) => value ?? fallback,
+		encode: (value: Value) => (value === fallback ? undefined : value),
 	});
 }
 
@@ -69,71 +51,36 @@ export function coded<Key extends string, Value extends string>(
 	codes: Readonly<Record<Value, number>>,
 	fallback: NoInfer<Value>,
 ) {
-	const values = Object.keys(codes) as [Value, ...Array<Value>];
-	const valueByCode = new Map(values.map((value) => [codes[value], value]));
+	const valueByCode = new Map(keysOf(codes).map((value) => [codes[value], value]));
 
 	return field(key, {
-		compressed: z.enum(codes),
-		decode: (code) => valueByCode.get(code) ?? fallback,
-		encode: (value) => codes[value],
-		standard: z.enum(values),
+		decode: (code: number) => valueByCode.get(code) ?? fallback,
+		encode: (value: Value) => codes[value],
 	});
 }
 
-export function createFieldCodec<Table extends MapCodecTable>(table: Table) {
-	const entries = Object.entries(table);
-	const namesByKey = new Map<string, string>();
+export function decodeFields(table: MapCodecTable, data: object) {
+	const compressed = data as Record<string, unknown>;
+	const standard: Record<string, unknown> = {};
 
-	for (const [name, { key }] of entries) {
-		const taken = namesByKey.get(key);
+	for (const [name, { decode, key }] of Object.entries(table)) {
+		const value = (decode as ValueCodec)(compressed[key]);
 
-		if (taken) throw new Error(`[Map codec] "${name}" reuses the key "${key}" of "${taken}"`);
-
-		namesByKey.set(key, name);
+		if (value !== undefined) standard[name] = value;
 	}
 
-	const compressedShape = Object.fromEntries(
-		entries.map(([, { compressed, key }]) => [key, compressed]),
-	) as CompressedShape<Table>;
-	const standardShape = Object.fromEntries(
-		entries.map(([name, { standard }]) => [name, standard]),
-	) as StandardShape<Table>;
-	const keys = Object.fromEntries(entries.map(([name, { key }]) => [name, key])) as {
-		[Name in keyof Table]: Table[Name]['key'];
-	};
+	return standard;
+}
 
-	type Compressed = z.output<z.ZodObject<CompressedShape<Table>>>;
-	type Standard = z.output<z.ZodObject<StandardShape<Table>>>;
+export function encodeFields(table: MapCodecTable, data: object) {
+	const standard = data as Record<string, unknown>;
+	const compressed: Record<string, unknown> = {};
 
-	function decode(data: Compressed) {
-		const standard: Record<string, unknown> = {};
+	for (const [name, { encode, key }] of Object.entries(table)) {
+		const value = (encode as ValueCodec)(standard[name]);
 
-		for (const [name, { decode: decodeValue, key }] of entries) {
-			const value = (decodeValue as (value: unknown) => unknown)(data[key as keyof Compressed]);
-
-			if (value !== undefined) standard[name] = value;
-		}
-
-		return standard as Standard;
+		if (value !== undefined) compressed[key] = value;
 	}
 
-	function encode(data: Standard) {
-		const compressed: Record<string, unknown> = {};
-
-		for (const [name, { encode: encodeValue, key }] of entries) {
-			const value = (encodeValue as (value: unknown) => unknown)(data[name as keyof Standard]);
-
-			if (value !== undefined) compressed[key] = value;
-		}
-
-		return compressed as Compressed;
-	}
-
-	return {
-		compressedShape,
-		decode,
-		encode,
-		keys,
-		standardShape,
-	};
+	return compressed;
 }

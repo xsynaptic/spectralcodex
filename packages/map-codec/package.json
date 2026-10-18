@@ -3,7 +3,10 @@
 	"version": "1.0.0",
 	"description": "Map data codec for Spectral Codex",
 	"type": "module",
-	"exports": "./src/index.ts",
+	"exports": {
+		".": "./src/index.ts",
+		"./schemas": "./src/schemas/index.ts"
+	},
 	"imports": {
 		"#*": "./src/*"
 	},

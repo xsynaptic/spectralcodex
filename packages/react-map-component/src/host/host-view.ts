@@ -1,4 +1,4 @@
-import { MapViewSchema } from '@spectralcodex/map-codec';
+import { isMapView } from '@spectralcodex/map-codec';
 import { useEffect } from 'react';
 
 import type { MapView } from '#types.ts';
@@ -12,7 +12,11 @@ export function parseMapView(value: string | undefined, isDev = false): MapView 
 	if (!value) return {};
 
 	try {
-		return MapViewSchema.parse(JSON.parse(value));
+		const view: unknown = JSON.parse(value);
+
+		if (!isMapView(view)) throw new TypeError(`Not a map view: ${value}`);
+
+		return view;
 	} catch (error) {
 		if (isDev) console.warn('[Map] Malformed host view:', error);
 

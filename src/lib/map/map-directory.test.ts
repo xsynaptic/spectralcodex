@@ -1,11 +1,7 @@
 import type { MapSourceItem } from '@spectralcodex/map-codec';
 
-import {
-	encodeMapDirectory,
-	MapDirectorySchema,
-	mapPayloadName,
-	mapSourceKeys,
-} from '@spectralcodex/map-codec';
+import { mapPayloadName, mapSourceKeys } from '@spectralcodex/map-codec';
+import { encodeMapDirectory, MapDirectorySchema } from '@spectralcodex/map-codec/schemas';
 import { describe, expect, test } from 'vitest';
 
 import { hashMapPayloads } from '#lib/map/map-directory-hash.ts';

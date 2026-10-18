@@ -1,8 +1,8 @@
 import { GeometryTypeEnum, LocationStatusEnum } from '@spectralcodex/shared/map';
 import { describe, expect, test } from 'vitest';
 
-import type { MapSourceItem } from '#codec.ts';
 import type { MapFeaturesRule, MapInterval } from '#map-rules.ts';
+import type { MapSourceItem } from '#schemas/codec.ts';
 
 import { createRuleTest, selectMapRows } from '#map-rules.ts';
 

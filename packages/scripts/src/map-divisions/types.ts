@@ -1,4 +1,4 @@
-import type { GeometryBoundingBox } from '@spectralcodex/shared/map';
+import type { GeometryBoundingBox } from '@spectralcodex/shared/schemas';
 import type { FeatureCollection, MultiPolygon, Polygon } from 'geojson';
 
 export type DivisionFeatureCollection = FeatureCollection<DivisionGeometry>;

@@ -2,7 +2,7 @@
 	"$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/rule-pack-schema.json",
 	"version": 1,
 	"name": "spectralcodex",
-	"description": "Collection read paths",
+	"description": "Collection read paths and the Zod-free map island",
 	"rules": [
 		{
 			"id": "collection-access",
@@ -25,6 +25,19 @@
 				"**/*.test.ts",
 			],
 			"message": "Raw reads return pristine frontmatter without computed `_` fields; they exist for cross-collection assembly in *-data.ts that must dodge circular init. Use the wrapper's collection data instead.",
+		},
+		{
+			"id": "client-zod",
+			"kind": "banned-import",
+			"specifiers": ["zod", "@spectralcodex/map-codec/schemas", "@spectralcodex/shared/schemas"],
+			"files": [
+				"packages/react-map-component/src/**",
+				"packages/map-codec/src/**",
+				"packages/shared/src/map/**",
+			],
+			"exclude": ["packages/map-codec/src/schemas/**", "**/*.test.ts"],
+			"message": "The map island ships without Zod; classic schemas never tree-shake. Put schemas in packages/map-codec/src/schemas or @spectralcodex/shared/schemas, and keep both out of client code.",
+			"severity": "error",
 		},
 	],
 }

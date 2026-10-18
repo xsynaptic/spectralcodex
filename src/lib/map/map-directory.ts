@@ -6,15 +6,17 @@ import type {
 } from '@spectralcodex/map-codec';
 
 import {
-	encodeMapDirectory,
-	encodeMapPopupData,
 	getMapPayloadUrl,
 	getMapRowUrl,
-	MapDivisionMaskSchema,
 	mapPayloadName,
 	mapPopupKeys,
 	selectMapRows,
 } from '@spectralcodex/map-codec';
+import {
+	encodeMapDirectory,
+	encodeMapPopupData,
+	MapDivisionMaskSchema,
+} from '@spectralcodex/map-codec/schemas';
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';

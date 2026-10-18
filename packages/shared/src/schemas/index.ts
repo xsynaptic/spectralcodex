@@ -1,3 +1,6 @@
+export { GeometryBoundingBoxSchema, GeometryDivisionIdSchema } from '#schemas/geometry.ts';
+export type { GeometryBoundingBox } from '#schemas/geometry.ts';
+
 export { ImageFeaturedSchema } from '#schemas/image-featured.ts';
 export type {
 	ImageFeatured,

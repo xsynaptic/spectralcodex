@@ -1,4 +1,4 @@
-import type { GeometryBoundingBox } from '@spectralcodex/shared/map';
+import type { GeometryBoundingBox } from '@spectralcodex/shared/schemas';
 import type { GeoPath } from 'd3-geo';
 import type { Feature } from 'geojson';
 

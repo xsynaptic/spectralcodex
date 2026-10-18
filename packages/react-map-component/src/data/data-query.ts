@@ -1,14 +1,18 @@
-import type { MapFeaturesRule, MapPayloadBase } from '@spectralcodex/map-codec';
-import type { z } from 'zod';
+import type {
+	MapDirectoryColumns,
+	MapDivisionMask,
+	MapFeaturesRule,
+	MapPayloadBase,
+	MapPopupItemCompressed,
+	MapScopeRow,
+} from '@spectralcodex/map-codec';
 
 import {
+	decodeMapDirectory,
+	decodeMapPopupData,
 	getMapPayloadUrl,
 	getMapRowById,
-	MapDirectorySchema,
-	MapDivisionMaskSchema,
 	mapPayloadName,
-	MapPopupItemSchema,
-	MapScopeRowSchema,
 	selectMapRows,
 } from '@spectralcodex/map-codec';
 import { queryOptions, skipToken, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -18,20 +22,18 @@ import { fetchTimeoutMs } from '#constants.ts';
 import { useMapConfig } from '#lib/config.tsx';
 import { useMapStore } from '#store/store.tsx';
 
-async function fetchMapJson<Schema extends z.ZodType>(
-	url: string,
-	schema: Schema,
-): Promise<z.output<Schema>> {
+// Payloads are validated when the build encodes them and share a deploy hash with this script
+async function fetchMapJson<Payload>(url: string): Promise<Payload> {
 	const response = await fetch(url, { signal: AbortSignal.timeout(fetchTimeoutMs) });
 
 	if (!response.ok) throw new Error(`[Map] Fetch failed: ${String(response.status)} ${url}`);
 
-	return schema.parse(await response.json());
+	return (await response.json()) as Payload;
 }
 
 function directoryQueryOptions(url: string) {
 	return queryOptions({
-		queryFn: () => fetchMapJson(url, MapDirectorySchema),
+		queryFn: async () => decodeMapDirectory(await fetchMapJson<MapDirectoryColumns>(url)),
 		queryKey: ['map-directory', url],
 	});
 }
@@ -49,7 +51,9 @@ export function mapRowsQueryOptions(payloadBase: MapPayloadBase, rule: MapFeatur
 
 function chunkQueryOptions(url: string | undefined) {
 	return queryOptions({
-		queryFn: url ? () => fetchMapJson(url, MapPopupItemSchema.array()) : skipToken,
+		queryFn: url
+			? async () => decodeMapPopupData(await fetchMapJson<Array<MapPopupItemCompressed>>(url))
+			: skipToken,
 		queryKey: ['popup-chunk', url],
 		// A Chunk from an earlier deploy returns 404, so retry once and then fall back to a title-only popup
 		retry: 1,
@@ -60,14 +64,14 @@ export function scopeListQueryOptions(payloadBase: MapPayloadBase) {
 	const url = getMapPayloadUrl(payloadBase, mapPayloadName.scopes);
 
 	return queryOptions({
-		queryFn: () => fetchMapJson(url, MapScopeRowSchema.array()),
+		queryFn: () => fetchMapJson<Array<MapScopeRow>>(url),
 		queryKey: ['scope-list', url],
 	});
 }
 
 function divisionQueryOptions(url: string | undefined) {
 	return queryOptions({
-		queryFn: url ? () => fetchMapJson(url, MapDivisionMaskSchema) : skipToken,
+		queryFn: url ? () => fetchMapJson<MapDivisionMask>(url) : skipToken,
 		queryKey: ['division-mask', url],
 	});
 }

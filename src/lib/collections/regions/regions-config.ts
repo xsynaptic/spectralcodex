@@ -1,5 +1,8 @@
-import { GeometryBoundingBoxSchema, GeometryDivisionIdSchema } from '@spectralcodex/shared/map';
-import { ImageFeaturedSchema } from '@spectralcodex/shared/schemas';
+import {
+	GeometryBoundingBoxSchema,
+	GeometryDivisionIdSchema,
+	ImageFeaturedSchema,
+} from '@spectralcodex/shared/schemas';
 import { defineCollection } from 'astro:content';
 import { z } from 'zod';
 

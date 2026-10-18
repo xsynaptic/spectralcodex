@@ -1,9 +1,12 @@
+import type { MapDirectoryColumns } from '@spectralcodex/map-codec';
+
 import { expect, test } from '@playwright/test';
+import { decodeMapDirectory } from '@spectralcodex/map-codec';
 import {
 	MapDirectorySchema,
 	MapDivisionMaskSchema,
 	MapPopupItemSchema,
-} from '@spectralcodex/map-codec';
+} from '@spectralcodex/map-codec/schemas';
 
 test.describe('map data API', { tag: '@smoke' }, () => {
 	test('the global directory decodes, every row has a Chunk, and no row carries an Objective', async ({
@@ -18,6 +21,13 @@ test.describe('map data API', { tag: '@smoke' }, () => {
 		expect(directory.length).toBeGreaterThan(1000);
 		expect(directory.every((row) => typeof row.properties.chunkKey === 'string')).toBe(true);
 		expect(directory.filter((row) => row.properties.objective !== undefined)).toHaveLength(0);
+	});
+
+	test('the client decode matches the schema on the live directory', async ({ request }) => {
+		const response = await request.get('/api/map/map-directory.json');
+		const columns = (await response.json()) as MapDirectoryColumns;
+
+		expect(decodeMapDirectory(columns)).toStrictEqual(MapDirectorySchema.parse(columns));
 	});
 
 	test('the warm list includes the directory and every Chunk, and sampled Chunks contain their rows', async ({
