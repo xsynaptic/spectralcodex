@@ -20,7 +20,8 @@ services:
         condition: service_completed_successfully
     mem_limit: 256m
     healthcheck:
-      test: ['CMD', 'wget', '--spider', '--quiet', 'http://127.0.0.1:2019/config/']
+      # `/config/` returns the whole config (~170 KB); --spider hangs up mid-body and Caddy logs a broken pipe
+      test: ['CMD', 'wget', '--spider', '--quiet', 'http://127.0.0.1:2019/reverse_proxy/upstreams']
       interval: 30s
       timeout: 3s
       retries: 3
@@ -154,6 +155,9 @@ services:
       - POSTGRES_PASSWORD=${UMAMI_DB_PASSWORD}
     volumes:
       - ${UMAMI_BACKUP_PATH}:/backups
+    # The postgres base image declares PGDATA a volume; tmpfs stops Docker creating an unused anonymous one
+    tmpfs:
+      - /var/lib/postgresql/data:size=1m
     depends_on:
       umami-db:
         condition: service_healthy

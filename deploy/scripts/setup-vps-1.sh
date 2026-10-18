@@ -49,6 +49,16 @@ Unattended-Upgrade::Automatic-Reboot-WithUsers "true";
 EOF
 chmod 644 /etc/apt/apt.conf.d/52-local.conf
 
+echo "Configuring needrestart automatic restarts..."
+mkdir -p /etc/needrestart/conf.d
+cat > /etc/needrestart/conf.d/10-auto.conf <<'EOF'
+# Under unattended-upgrades needrestart only lists, leaving services on the old library until reboot
+$nrconf{restart} = 'a';
+# Restarting the engine bounces every container; leave that to a manual upgrade or the reboot window
+$nrconf{override_rc}{qr(^(docker|containerd)\.service$)} = 0;
+EOF
+chmod 644 /etc/needrestart/conf.d/10-auto.conf
+
 echo "Applying SSH hardening drop-in..."
 cat > /etc/ssh/sshd_config.d/10-hardening.conf <<'EOF'
 # Hardening overrides. Loaded first via 10- prefix; sshd uses
