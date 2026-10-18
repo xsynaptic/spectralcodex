@@ -58,7 +58,7 @@ export function useClickResolver() {
 			const row = rows && hit.kind === 'point' ? getMapRowById(rows, hit.pointId) : undefined;
 
 			return resolveClick({
-				canOpen: host.canOpen,
+				canOpen: host.isHosted,
 				hit,
 				isPageHidden: isHostPageHidden(map.getContainer()),
 				pointUrl: row?.properties.url,

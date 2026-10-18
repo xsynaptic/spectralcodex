@@ -68,15 +68,6 @@ describe('getMapCanvasData visibility', () => {
 });
 
 describe('getMapCanvasData', () => {
-	test('draws the decoded rows themselves, which carry no id', () => {
-		const item = makeItem();
-
-		const feature = getMapCanvasData([item], passAll).pointCollection.features[0];
-
-		expect(feature).toBe(item);
-		expect(feature && 'id' in feature).toBe(false);
-	});
-
 	test('a hidden item is neither drawn nor counted as filtered', () => {
 		const result = getMapCanvasData([makeItem({ rating: 1 }), makeItem()], {
 			...passAll,

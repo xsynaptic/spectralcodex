@@ -19,9 +19,9 @@ export function createMapHost({
 		const view = { view: targetIds ? { targetIds } : {}, viewKey: undefined };
 
 		return {
-			canOpen: false,
 			controls,
 			fullscreenContainerId: undefined,
+			isHosted: false,
 			open: R.doNothing(),
 			readView: () => view,
 			send,
@@ -29,9 +29,9 @@ export function createMapHost({
 	}
 
 	return {
-		canOpen: true,
 		controls,
 		fullscreenContainerId: host.fullscreenContainerId,
+		isHosted: true,
 		open: (url) => {
 			document.dispatchEvent(new CustomEvent(mapOpenEventName, { detail: { url } }));
 		},

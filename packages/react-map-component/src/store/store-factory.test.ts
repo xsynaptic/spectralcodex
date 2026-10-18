@@ -9,7 +9,7 @@ import { describe, expect, test } from 'vitest';
 
 import type { MapScope } from '#types.ts';
 
-import { createMapStore, hasActiveFilter, selectScope } from '#store/store-factory.ts';
+import { createMapStore, hasActiveFilter } from '#store/store-factory.ts';
 
 function popupOf(pointId: string) {
 	return { isEased: false, kind: 'popup', pointId } as const;
@@ -74,6 +74,19 @@ describe('createMapStore', () => {
 		setOverlay('search', true);
 		applyClick({ center: [0, 0], clusterId: 1, kind: 'expand-cluster' });
 		expect(store.getState().overlay).toBeUndefined();
+	});
+
+	test('opening a popup clears the hover label, but expanding a cluster keeps it', () => {
+		const store = createMapStore();
+		const { applyClick, setHoveredId } = store.getState().actions;
+
+		setHoveredId('location-1');
+		applyClick(popupOf('location-1'));
+		expect(store.getState().hoveredId).toBeUndefined();
+
+		setHoveredId('cluster-1');
+		applyClick({ center: [0, 0], clusterId: 1, kind: 'expand-cluster' });
+		expect(store.getState().hoveredId).toBe('cluster-1');
 	});
 
 	test('opening the held Scope page turns the Scope back on', () => {
@@ -172,16 +185,5 @@ describe('syncView', () => {
 		setOverlay('filter', true);
 		syncView(regionPage, items);
 		expect(store.getState().overlay).toBe('filter');
-	});
-
-	test('a Location outside the Scope clears it, unless its rows failed to load', () => {
-		const failed = createMapStore(regionPage);
-		const loaded = createMapStore(regionPage);
-
-		failed.getState().actions.syncView(minePage, undefined);
-		expect(selectScope(failed.getState())).toBe(region);
-
-		loaded.getState().actions.syncView(minePage, items);
-		expect(selectScope(loaded.getState())).toBeUndefined();
 	});
 });

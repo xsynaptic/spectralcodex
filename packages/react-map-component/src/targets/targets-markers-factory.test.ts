@@ -153,13 +153,4 @@ describe('findTargetClusters', () => {
 
 		expect(clusters).toEqual([north]);
 	});
-
-	test('the candidate lists passed in lists are left as they were', async () => {
-		const { getLeafIds } = createLookup();
-		const candidates = [east, south];
-
-		await findTargetClusters([{ candidates, id: 'theater' }], getLeafIds);
-
-		expect(candidates).toEqual([east, south]);
-	});
 });

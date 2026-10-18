@@ -42,6 +42,9 @@ export function useHostViewSync() {
 
 		document.addEventListener(mapSyncEventName, handleSync);
 
+		// A sync can land after render reads the view but before this listener attaches
+		void sync();
+
 		return () => {
 			document.removeEventListener(mapSyncEventName, handleSync);
 		};

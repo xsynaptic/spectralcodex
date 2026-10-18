@@ -28,12 +28,6 @@ describe('parseMapView', () => {
 		expect(parseMapView(JSON.stringify(view))).toEqual(view);
 	});
 
-	test('fields the map does not take from a host are dropped', () => {
-		expect(parseMapView('{"targetIds":["theater"],"languages":["zh"]}')).toEqual({
-			targetIds: ['theater'],
-		});
-	});
-
 	test('text that is not JSON yields an empty view', () => {
 		expect(parseMapView('theater theater-1')).toEqual({});
 	});

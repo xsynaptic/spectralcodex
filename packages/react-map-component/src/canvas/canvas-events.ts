@@ -2,7 +2,7 @@ import type { GeoJSONSource, MapGeoJSONFeature, Source } from 'maplibre-gl';
 import type { MapCallbacks, MapLayerMouseEvent, ViewStateChangeEvent } from 'react-map-gl/maplibre';
 
 import { GeometryTypeEnum } from '@spectralcodex/shared/map';
-import { useCallback, useMemo, useRef, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useSyncExternalStore } from 'react';
 import * as R from 'remeda';
 
 import type { MapCanvasClickInput, MapHoverInput } from '#canvas/canvas-events-factory.ts';
@@ -217,7 +217,7 @@ function useThrottledMouseMoveHandler() {
 		[setHoveredId, mapStoreInstance],
 	);
 
-	return useMemo(
+	const throttledOnMouseMove = useMemo(
 		() =>
 			R.funnel(onMouseMove, {
 				minGapMs: 20,
@@ -230,4 +230,13 @@ function useThrottledMouseMoveHandler() {
 			}),
 		[onMouseMove],
 	);
+
+	useEffect(
+		() => () => {
+			throttledOnMouseMove.cancel();
+		},
+		[throttledOnMouseMove],
+	);
+
+	return throttledOnMouseMove;
 }

@@ -144,5 +144,5 @@ const MapScopeBarHosted: FC = function MapScopeBarHosted() {
 export const MapScopeBar: FC = function MapScopeBar() {
 	const { host } = useMapConfig();
 
-	return host.canOpen ? <MapScopeBarHosted /> : undefined;
+	return host.isHosted ? <MapScopeBarHosted /> : undefined;
 };

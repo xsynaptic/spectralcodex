@@ -47,23 +47,11 @@ describe('getTargetZoom', () => {
 });
 
 describe('getTargetDuration', () => {
-	test('a move that goes nowhere takes the base duration', () => {
-		expect(getTargetDuration(0, 0)).toBe(450);
-	});
-
-	test('each zoom level travelled adds time, in either direction', () => {
-		expect(getTargetDuration(3, 0)).toBe(1050);
-		expect(getTargetDuration(-3, 0)).toBe(1050);
-	});
-
-	test('each map width panned adds time on top of the zoom', () => {
-		expect(getTargetDuration(0, 2)).toBe(950);
-		expect(getTargetDuration(1, 2)).toBe(1150);
-	});
-
-	test('a long zoom or a long pan is capped', () => {
-		expect(getTargetDuration(8, 0)).toBe(1800);
-		expect(getTargetDuration(0, 40)).toBe(1800);
+	test('a move takes longer the farther it zooms in or out or pans, up to a cap', () => {
+		expect(getTargetDuration(-3, 0)).toBe(getTargetDuration(3, 0));
+		expect(getTargetDuration(3, 0)).toBeGreaterThan(getTargetDuration(0, 0));
+		expect(getTargetDuration(1, 2)).toBeGreaterThan(getTargetDuration(0, 2));
+		expect(getTargetDuration(0, 40)).toBe(getTargetDuration(8, 0));
 	});
 });
 

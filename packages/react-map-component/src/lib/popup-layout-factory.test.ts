@@ -3,9 +3,9 @@ import { describe, expect, test } from 'vitest';
 import { getPopupLayout, popupEasePaddingPx } from '#lib/popup-layout-factory.ts';
 
 describe('getPopupLayout', () => {
-	test('the popup drops under the Point once the map is 640px or less', () => {
-		expect(getPopupLayout(641).isNarrow).toBe(false);
-		expect(getPopupLayout(640).isNarrow).toBe(true);
+	test('the popup drops under the Point once the map is narrower than 640px', () => {
+		expect(getPopupLayout(640).isNarrow).toBe(false);
+		expect(getPopupLayout(639).isNarrow).toBe(true);
 	});
 
 	test('the popup never takes more than four fifths of the map', () => {
@@ -14,7 +14,7 @@ describe('getPopupLayout', () => {
 	});
 
 	test('a wide popup beside a centred Point stays inside the narrowest wide map', () => {
-		const containerWidth = 641;
+		const containerWidth = 640;
 		const popupOffset = 16;
 		const pointX = (containerWidth - popupEasePaddingPx) / 2;
 

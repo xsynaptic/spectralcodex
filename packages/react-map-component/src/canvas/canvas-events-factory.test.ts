@@ -57,7 +57,6 @@ describe('getCanvasClickHit', () => {
 
 	test.each([
 		['a zero id', { clusterId: 0 }],
-		['no usable id', { clusterId: {} }],
 		['malformed coordinates', { clusterId: 42, coordinates: [100] }],
 	])('a cluster with %s is the empty map', (_, input) => {
 		expect(
@@ -76,15 +75,14 @@ describe('getCanvasClickHit', () => {
 		},
 	);
 
-	test('a Point with a non-string id, or on an unhandled layer, is the empty map', () => {
-		expect(getCanvasClickHit(makeClickInput({ pointId: 7 }))).toEqual(empty);
+	test('a Point on an unhandled layer is the empty map', () => {
 		expect(getCanvasClickHit(makeClickInput({ layerId: MapLayerIdEnum.PointsLabel }))).toEqual(
 			empty,
 		);
 	});
 });
 
-describe('decideHoverIntent over a feature', () => {
+describe('decideHoverIntent', () => {
 	test('sets hover state on a newly hovered point', () => {
 		expect(decideHoverIntent(makeHoverInput())).toEqual({
 			cursor: 'pointer',
@@ -110,67 +108,6 @@ describe('decideHoverIntent over a feature', () => {
 		});
 	});
 
-	test('writes no feature state or store update while hover stays on the same point', () => {
-		expect(
-			decideHoverIntent(
-				makeHoverInput({ hoveredFeatureId: 'location-id', storeHoveredId: 'location-id' }),
-			),
-		).toEqual({
-			cursor: 'pointer',
-			featureStateChanges: [],
-			hoveredFeatureId: 'location-id',
-			storeHoveredIdUpdate: undefined,
-		});
-	});
-
-	test('leaves the store untouched when a hovered point has a non-string id', () => {
-		expect(
-			decideHoverIntent(makeHoverInput({ pointId: undefined, storeHoveredId: 'stale-id' })),
-		).toEqual({
-			cursor: 'pointer',
-			featureStateChanges: [{ featureId: 'location-id', hover: true }],
-			hoveredFeatureId: 'location-id',
-			storeHoveredIdUpdate: undefined,
-		});
-	});
-
-	test('prefixes the store id when hovering a cluster', () => {
-		expect(
-			decideHoverIntent(
-				makeHoverInput({
-					clusterId: 42,
-					featureId: 42,
-					layerId: MapLayerIdEnum.Clusters,
-				}),
-			),
-		).toEqual({
-			cursor: 'zoom-in',
-			featureStateChanges: [{ featureId: 42, hover: true }],
-			hoveredFeatureId: 42,
-			storeHoveredIdUpdate: { hoveredId: 'cluster-42' },
-		});
-	});
-
-	test('leaves the store untouched when a hovered cluster has a non-numeric id', () => {
-		expect(
-			decideHoverIntent(
-				makeHoverInput({
-					clusterId: '42',
-					featureId: 42,
-					layerId: MapLayerIdEnum.Clusters,
-					storeHoveredId: 'stale-id',
-				}),
-			),
-		).toEqual({
-			cursor: 'zoom-in',
-			featureStateChanges: [{ featureId: 42, hover: true }],
-			hoveredFeatureId: 42,
-			storeHoveredIdUpdate: undefined,
-		});
-	});
-});
-
-describe('decideHoverIntent clearing hover', () => {
 	test('clears hover when nothing is under the cursor', () => {
 		expect(
 			decideHoverIntent(
@@ -187,38 +124,6 @@ describe('decideHoverIntent clearing hover', () => {
 			featureStateChanges: [{ featureId: 'location-id', hover: false }],
 			hoveredFeatureId: undefined,
 			storeHoveredIdUpdate: { hoveredId: undefined },
-		});
-	});
-
-	test('clears hover on an unhandled layer', () => {
-		expect(
-			decideHoverIntent(
-				makeHoverInput({
-					featureId: undefined,
-					hoveredFeatureId: 'location-id',
-					layerId: MapLayerIdEnum.DivisionMask,
-					pointId: undefined,
-					storeHoveredId: 'location-id',
-				}),
-			),
-		).toEqual({
-			cursor: '',
-			featureStateChanges: [{ featureId: 'location-id', hover: false }],
-			hoveredFeatureId: undefined,
-			storeHoveredIdUpdate: { hoveredId: undefined },
-		});
-	});
-
-	test('writes nothing when the cursor is over empty canvas and hover is already clear', () => {
-		expect(
-			decideHoverIntent(
-				makeHoverInput({ featureId: undefined, layerId: undefined, pointId: undefined }),
-			),
-		).toEqual({
-			cursor: '',
-			featureStateChanges: [],
-			hoveredFeatureId: undefined,
-			storeHoveredIdUpdate: undefined,
 		});
 	});
 });

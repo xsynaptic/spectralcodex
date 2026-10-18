@@ -8,7 +8,7 @@ const popupContainerShare = 0.8;
 export const popupEasePaddingPx = 180;
 
 export function getPopupLayout(containerWidth: number) {
-	const isNarrow = containerWidth <= popupNarrowContainerPx;
+	const isNarrow = containerWidth < popupNarrowContainerPx;
 
 	return {
 		isNarrow,

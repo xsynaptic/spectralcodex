@@ -71,8 +71,8 @@ describe('searchMap', () => {
 			makeRow('written', 'Tainan Theater', { entryQuality: 5, rating: 2 }),
 		];
 		const scopes = [
-			makeScope('tainan', 'Tainan', { count: 40 }),
-			makeScope('tainan-old', 'Tainan Old Town', { count: 90 }),
+			makeScope('tainan', 'Tainan', { count: 1 }),
+			makeScope('tainan-old', 'Tainan Old Town', { count: 2 }),
 		];
 
 		expect(getTitles(rows, scopes, 'tainan')).toEqual([
@@ -110,6 +110,24 @@ describe('searchMap', () => {
 			'Grand Mazu Temple',
 		]);
 		expect(getTitles(rows, scopes, 'nan temple')).toEqual(['Tainan Confucian Temple']);
+	});
+
+	test('when the query names a Region and one inside it, the outer Region still takes in all its Locations', () => {
+		const rows = [
+			makeRow('fort', 'Fort Zeelandia', { regionOrdinals: [8] }),
+			makeRow('salt', 'Qigu Salt Mountain', { regionOrdinals: [10] }),
+		];
+		const scopes = [
+			makeScope('tainan', 'Tainan', { interval: [7, 10] }),
+			makeScope('tainan-old', 'Tainan Old Town', { interval: [8, 9] }),
+		];
+
+		expect(getTitles(rows, scopes, 'tainan')).toEqual([
+			'Tainan',
+			'Tainan Old Town',
+			'Fort Zeelandia',
+			'Qigu Salt Mountain',
+		]);
 	});
 
 	test('臺 and 台 find each other, as do the other variant forms in the titles', () => {
