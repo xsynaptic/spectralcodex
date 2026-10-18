@@ -1,4 +1,6 @@
 ---
+import { getMapPayloadUrl, mapPayloadName } from '@spectralcodex/map-codec';
+
 import Document from '#components/main/main-document.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
 import { atlasPage } from '#lib/atlas/atlas-constants.ts';
@@ -23,7 +25,9 @@ const titleMultilingual = { lang: langCodeZh, value: t('atlas.title', langCodeZh
 	meta={{
 		description: t('atlas.description'),
 		image: getSeoImageProps({ alt: t('atlas.title'), id: 'index-atlas' }),
-		preloadUrls: atlasMapProps ? [atlasMapProps.apiSourceUrl] : undefined,
+		preloadUrls: atlasMapProps
+			? [getMapPayloadUrl(atlasMapProps.payloadBase, mapPayloadName.directory)]
+			: undefined,
 		title: formatTitleMultilingual(t('atlas.title'), titleMultilingual),
 	}}
 >

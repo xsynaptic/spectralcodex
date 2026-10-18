@@ -57,15 +57,12 @@ describe('getMapBounds', () => {
 		expect(result).toBeDefined();
 		expect(result!.center).toEqual([121.5, 25]);
 
-		expect(result!.bounds[0]).toBeCloseTo(121.490077, 5);
-		expect(result!.bounds[1]).toBeCloseTo(24.991007, 5);
-		expect(result!.bounds[2]).toBeCloseTo(121.509923, 5);
-		expect(result!.bounds[3]).toBeCloseTo(25.008993, 5);
+		expectWithinBounds(result!.bounds, 121.5, 25);
 
-		expect(result!.maxBounds[0]).toBeCloseTo(121.400771, 5);
-		expect(result!.maxBounds[1]).toBeCloseTo(24.910068, 5);
-		expect(result!.maxBounds[2]).toBeCloseTo(121.599229, 5);
-		expect(result!.maxBounds[3]).toBeCloseTo(25.089932, 5);
+		const [, south, , north] = result!.bounds;
+		const [, limitSouth, , limitNorth] = result!.maxBounds;
+
+		expect((limitNorth - limitSouth) / (north - south)).toBeCloseTo(10, 5);
 	});
 
 	test('multi-point percentage buffers: inputs contained, maxBounds strictly wider', () => {

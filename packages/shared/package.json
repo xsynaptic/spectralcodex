@@ -15,6 +15,7 @@
 		"./open-graph": "./src/open-graph.ts",
 		"./routing": "./src/routing.ts",
 		"./schemas": "./src/schemas/index.ts",
+		"./search-tracker": "./src/search-tracker.ts",
 		"./sitemap": "./src/sitemap.ts",
 		"./text": "./src/text.ts"
 	},

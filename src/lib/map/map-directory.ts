@@ -1,14 +1,20 @@
-import type { MapFeaturesRule, MapScope, MapSourceItem } from '@spectralcodex/map-codec';
+import type {
+	MapFeaturesRule,
+	MapPayloadBase,
+	MapScope,
+	MapSourceItem,
+} from '@spectralcodex/map-codec';
 import type { CollectionEntry } from 'astro:content';
 
 import {
 	encodeMapPopupData,
 	encodeMapSourceData,
+	getMapPayloadUrl,
 	MapDivisionMaskSchema,
+	mapPayloadName,
 	mapPopupKeys,
 	selectMapRows,
 } from '@spectralcodex/map-codec';
-import { mapScopesFileName } from '@spectralcodex/react-map-component/constants';
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -37,10 +43,8 @@ export type MapDatasetName = 'objectives' | 'shared';
 
 interface MapDataset {
 	directory: Array<MapSourceItem>;
-	directoryUrl: string;
+	payloadBase: MapPayloadBase;
 	payloads: Map<string, string>;
-	prefix: string;
-	version: string;
 }
 
 interface MapDatasetContext {
@@ -57,10 +61,6 @@ interface MapDirectoryData {
 	divisionUrlById: Map<string, string>;
 	mapScopeByKey: Map<string, MapScope>;
 	payloads: Map<string, string>;
-}
-
-export function getMapPayloadUrl(id: string, version: string) {
-	return getBasePath('api/map', `${id}.json?v=${version}`);
 }
 
 // No hidden-location filtering needed: only ids present in the (already filtered) source data are looked up
@@ -183,21 +183,25 @@ async function readDivisionMasks(regions: Array<CollectionEntry<'regions'>>) {
 }
 
 function getDirectoryPayloadId(prefix: string) {
-	return `${prefix}map-directory`;
+	return `${prefix}${mapPayloadName.directory}`;
 }
 
 function getDivisionPayloadId(regionId: string) {
 	return `divisions/${regionId}`;
 }
 
-function withVersion(dataset: Omit<MapDataset, 'directoryUrl' | 'version'>): MapDataset {
-	const version = hashMapPayloads(dataset.payloads);
-
-	return {
-		...dataset,
-		directoryUrl: getMapPayloadUrl(getDirectoryPayloadId(dataset.prefix), version),
-		version,
+function withVersion({
+	directory,
+	payloads,
+	prefix,
+}: Omit<MapDataset, 'payloadBase'> & { prefix: string }): MapDataset {
+	const payloadBase = {
+		path: getBasePath('api/map'),
+		prefix,
+		version: hashMapPayloads(payloads),
 	};
+
+	return { directory, payloadBase, payloads };
 }
 
 export const getMapDirectoryData = pMemoize(async (): Promise<MapDirectoryData> => {
@@ -223,7 +227,7 @@ export const getMapDirectoryData = pMemoize(async (): Promise<MapDirectoryData> 
 		shared.payloads.set(getDivisionPayloadId(id), body);
 	}
 	shared.payloads.set(
-		mapScopesFileName,
+		mapPayloadName.scopes,
 		JSON.stringify(mapScopes.flatMap(({ row }) => (row ? [row] : []))),
 	);
 
@@ -234,7 +238,7 @@ export const getMapDirectoryData = pMemoize(async (): Promise<MapDirectoryData> 
 	const divisionUrlById = new Map(
 		[...divisionMaskById.keys()].map((id) => [
 			id,
-			getMapPayloadUrl(getDivisionPayloadId(id), datasets.shared.version),
+			getMapPayloadUrl(datasets.shared.payloadBase, getDivisionPayloadId(id)),
 		]),
 	);
 	const mapScopeByKey = new Map(

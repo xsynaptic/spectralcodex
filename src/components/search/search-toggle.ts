@@ -4,30 +4,23 @@ import type {
 	PagefindModal,
 	PagefindModalTrigger,
 } from '@pagefind/component-ui';
+import type { SearchTracker } from '@spectralcodex/shared/search-tracker';
+
+import { createSearchTracker } from '@spectralcodex/shared/search-tracker';
 
 const isMac = typeof navigator !== 'undefined' && /mac/i.test(navigator.userAgent);
 
-const searchQueryMinLength = 2;
-const searchQueryMaxLength = 100;
-
 // Pagefind reads these by name off a registered modal-trigger; a rename fails silently without this
 type ModalTriggerContract = Pick<PagefindModalTrigger, 'buttonEl' | 'handleModalClose'>;
-
-type CommitSearch = (isClicked: boolean) => void;
 
 interface PagefindMatch {
 	matchedMetaFields?: Array<string>;
 	words: Array<number>;
 }
 
-interface PendingSearch {
-	query: string;
-	results: number;
-}
-
 const imageMetaFields = new Set(['image', 'image_2x']);
 
-const searchCommitters = new WeakMap<Instance, CommitSearch>();
+const searchTrackers = new WeakMap<Instance, SearchTracker>();
 
 let instanceManager: ReturnType<typeof getInstanceManager> | undefined;
 
@@ -39,9 +32,9 @@ class SearchToggle extends HTMLElement implements ModalTriggerContract {
 		return this.querySelector<HTMLButtonElement>('button');
 	}
 
-	#commitSearch: CommitSearch | undefined;
 	#controller: AbortController | undefined;
 	#cssReady?: Promise<void>;
+	#searchTracker: SearchTracker | undefined;
 
 	connectedCallback() {
 		this.#controller = new AbortController();
@@ -57,7 +50,7 @@ class SearchToggle extends HTMLElement implements ModalTriggerContract {
 		this.addEventListener('click', this.#handleClickEvent, { signal });
 		document.addEventListener('keydown', this.#handleKeydown, { signal });
 
-		// Capture commits before the result link's navigation closes the modal
+		// Ends the search before the result link's navigation closes the modal
 		document.addEventListener('click', this.#handleResultClick, { capture: true, signal });
 	}
 
@@ -65,14 +58,14 @@ class SearchToggle extends HTMLElement implements ModalTriggerContract {
 		this.instance?.deregisterAllShortcuts(this);
 		// eslint-disable-next-line unicorn/no-null -- matches Pagefind's PagefindComponent interface
 		this.instance = null;
-		this.#commitSearch = undefined;
+		this.#searchTracker = undefined;
 		this.#controller?.abort();
 		this.#controller = undefined;
 	}
 
 	// Invoked by <pagefind-modal> on close, never from this file
 	handleModalClose() {
-		this.#commitSearch?.(false);
+		this.#searchTracker?.end(false);
 		this.buttonEl?.setAttribute('aria-expanded', 'false');
 		this.buttonEl?.focus();
 	}
@@ -129,7 +122,7 @@ class SearchToggle extends HTMLElement implements ModalTriggerContract {
 
 		this.instance = instanceManager.getInstance(this.getAttribute('instance') ?? 'default');
 
-		this.#commitSearch = getSearchCommitter(this.instance);
+		this.#searchTracker = getSearchTracker(this.instance);
 
 		this.instance.registerUtility(this, 'modal-trigger', { keyboardNavigation: true });
 
@@ -169,7 +162,7 @@ class SearchToggle extends HTMLElement implements ModalTriggerContract {
 		if (!(event.target instanceof Element)) return;
 		if (!event.target.closest('pagefind-results a[href]')) return;
 
-		this.#commitSearch?.(true);
+		this.#searchTracker?.end(true);
 	};
 
 	#preloadPagefind = () => {
@@ -190,41 +183,22 @@ function isTextMatch({ matchedMetaFields = [], words }: PagefindMatch) {
 	return words.length > 0 || matchedMetaFields.some((field) => !imageMetaFields.has(field));
 }
 
-function getSearchCommitter(instance: Instance) {
-	const existing = searchCommitters.get(instance);
+function getSearchTracker(instance: Instance) {
+	const existing = searchTrackers.get(instance);
 
 	if (existing) return existing;
 
-	let pending: PendingSearch | undefined;
-
-	instance.on('results', (result: unknown) => {
-		const query = instance.searchTerm.replaceAll(/\s+/g, ' ').trim().slice(0, searchQueryMaxLength);
-		const results = getResultCount(result);
-
-		if (results === undefined || query.length < searchQueryMinLength) {
-			pending = undefined;
-			return;
-		}
-
-		pending = { query, results };
+	const tracker = createSearchTracker((event, data) => {
+		window.umami?.track(`search-${event}`, data);
 	});
 
-	const commitSearch: CommitSearch = (isClicked) => {
-		if (!pending) return;
+	instance.on('results', (result: unknown) => {
+		tracker.update(instance.searchTerm, getResultCount(result));
+	});
 
-		const { query, results } = pending;
+	searchTrackers.set(instance, tracker);
 
-		pending = undefined;
-		window.umami?.track('search-query', { clicked: isClicked, query, results });
-
-		if (results > 0) return;
-
-		window.umami?.track('search-empty', { query });
-	};
-
-	searchCommitters.set(instance, commitSearch);
-
-	return commitSearch;
+	return tracker;
 }
 
 // Pagefind components never deregister (Pagefind/pagefind#1230); a fresh instance per page keeps the registry bounded

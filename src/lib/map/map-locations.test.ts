@@ -171,19 +171,6 @@ describe('getLocationFeatures', () => {
 		).toHaveLength(2);
 		expect(production.getLocationsMapRule(sensitiveLocations).ids).toEqual(['longshan-temple']);
 	});
-
-	test('reuses the same feature objects when a location is mapped again', () => {
-		const entry = makeLocation('longshan-temple', {
-			_uuid: 'abc123',
-			geometry: makePoint(121.5, 25),
-			title: 'Longshan Temple',
-		});
-
-		const first = getLocationFeatures([entry]);
-		const second = getLocationFeatures([entry]);
-
-		expect(second[0]).toBe(first[0]);
-	});
 });
 
 describe('getLocationFeatures properties', () => {

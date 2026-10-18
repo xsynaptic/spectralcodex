@@ -187,9 +187,13 @@ test.describe('on a wide viewport', () => {
 		{ tag: '@smoke' },
 		async ({ page }) => {
 			const { canvas, close, root, shell } = getAtlas(page);
+			const atlasStylesheet = shell.locator('link[rel="stylesheet"]');
 
 			await visit(page, paths.regionDetail);
+			await expect(atlasStylesheet).toHaveCount(0);
+
 			await enterAtlas(page);
+			await expect(atlasStylesheet).toHaveCount(1);
 			await expect(shell).toBeFocused();
 			await keepCanvas(canvas);
 
