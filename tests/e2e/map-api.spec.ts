@@ -1,5 +1,9 @@
 import { expect, test } from '@playwright/test';
-import { MapSourceItemSchema, mapSourceKeys } from '@spectralcodex/map-codec';
+import {
+	MapDivisionMaskSchema,
+	MapSourceItemSchema,
+	mapSourceKeys,
+} from '@spectralcodex/map-codec';
 
 const id = mapSourceKeys.id;
 const chunkKey = mapSourceKeys.chunkKey;
@@ -57,5 +61,26 @@ test.describe('map data API', { tag: '@smoke' }, () => {
 
 			expect(chunk.some((item) => item[id] === row[id])).toBe(true);
 		}
+	});
+
+	test('the warm list includes Division masks, and a listed mask decodes', async ({ request }) => {
+		const manifestResponse = await request.get('/api/map/map-manifest.json');
+		const warmUrls = (await manifestResponse.json()) as Array<string>;
+		const maskUrls = warmUrls.filter((url) => url.startsWith('/api/map/divisions/'));
+
+		expect(maskUrls.length).toBeGreaterThan(0);
+		expect(maskUrls.every((url) => url.includes('.json?v='))).toBe(true);
+
+		const maskUrl = maskUrls.at(0);
+
+		expect(maskUrl).toBeDefined();
+		if (!maskUrl) return;
+
+		const response = await request.get(maskUrl);
+
+		expect(response.ok()).toBe(true);
+		const mask: unknown = await response.json();
+
+		expect(() => MapDivisionMaskSchema.parse(mask)).not.toThrow();
 	});
 });

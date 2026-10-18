@@ -223,9 +223,6 @@ export const getMapDirectoryData = pMemoize(async (): Promise<MapDirectoryData> 
 	const mapScopes = await buildMapScopes(atlasRows);
 	const divisionMaskById = await readDivisionMasks(regions);
 
-	for (const [id, body] of divisionMaskById) {
-		shared.payloads.set(getDivisionPayloadId(id), body);
-	}
 	shared.payloads.set(
 		mapPayloadName.scopes,
 		JSON.stringify(mapScopes.flatMap(({ row }) => (row ? [row] : []))),
@@ -235,11 +232,16 @@ export const getMapDirectoryData = pMemoize(async (): Promise<MapDirectoryData> 
 		objectives: withVersion(objectives),
 		shared: withVersion(shared),
 	};
+	const divisionPayloads = new Map(
+		[...divisionMaskById].map(([id, body]) => [getDivisionPayloadId(id), body]),
+	);
 	const divisionUrlById = new Map(
-		[...divisionMaskById.keys()].map((id) => [
-			id,
-			getMapPayloadUrl(datasets.shared.payloadBase, getDivisionPayloadId(id)),
-		]),
+		[...divisionMaskById].map(([id, body]) => {
+			const payloadId = getDivisionPayloadId(id);
+			const version = hashMapPayloads(new Map([[payloadId, body]]));
+
+			return [id, getMapPayloadUrl({ ...datasets.shared.payloadBase, version }, payloadId)];
+		}),
 	);
 	const mapScopeByKey = new Map(
 		mapScopes.map(({ entry, scope }) => {
@@ -249,7 +251,11 @@ export const getMapDirectoryData = pMemoize(async (): Promise<MapDirectoryData> 
 			return [getMapScopeKey(entry), apiDivisionUrl ? { ...scope, apiDivisionUrl } : scope];
 		}),
 	);
-	const payloads = new Map([...datasets.objectives.payloads, ...datasets.shared.payloads]);
+	const payloads = new Map([
+		...datasets.objectives.payloads,
+		...datasets.shared.payloads,
+		...divisionPayloads,
+	]);
 
 	return { atlasRows, atlasRule, datasets, divisionUrlById, mapScopeByKey, payloads };
 });

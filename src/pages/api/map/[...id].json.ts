@@ -7,12 +7,14 @@ import { getMapDirectoryData } from '#lib/map/map-directory.ts';
 export const getStaticPaths = (async () => {
 	const {
 		datasets: { shared },
+		divisionUrlById,
 		payloads,
 	} = await getMapDirectoryData();
 
-	const manifestUrls = [...shared.payloads.keys()].map((id) =>
-		getMapPayloadUrl(shared.payloadBase, id),
-	);
+	const manifestUrls = [
+		...[...shared.payloads.keys()].map((id) => getMapPayloadUrl(shared.payloadBase, id)),
+		...divisionUrlById.values(),
+	];
 
 	return [
 		...[...payloads].map(([id, body]) => ({ params: { id }, props: { body } })),
