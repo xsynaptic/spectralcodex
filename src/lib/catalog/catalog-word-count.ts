@@ -1,17 +1,19 @@
 import type { Cache } from '@spectralcodex/shared/cache';
-import type { CollectionEntry, CollectionKey } from 'astro:content';
+import type { CollectionKey } from 'astro:content';
 
 import { stripTags } from '@xsynaptic/unified-tools';
 import { countWords } from '@xsynaptic/word-count';
 import { hash } from 'ohash';
 import * as R from 'remeda';
 
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
+
 import { mdxComponents } from '#constants.ts';
 import { renderMarkdownInline } from '#lib/utils/text.ts';
 import { stripMdxComponents } from '#lib/utils/text.ts';
 
 export function createWordCountFunction({ cache }: { cache: Cache<number> }) {
-	return function getWordCount(entry: CollectionEntry<CollectionKey>) {
+	return function getWordCount(entry: ComputedEntry<CollectionKey>) {
 		const description = getDescription(entry);
 
 		// Key by entry ID so edits overwrite the old row; the hash validates cached content
@@ -50,6 +52,6 @@ function computeWordCount(body: string): number {
 }
 
 // `''` rather than `undefined` for a missing field, so cached content hashes stay stable
-function getDescription(entry: CollectionEntry<CollectionKey>): string | undefined {
+function getDescription(entry: ComputedEntry<CollectionKey>): string | undefined {
 	return 'description' in entry.data ? entry.data.description : '';
 }

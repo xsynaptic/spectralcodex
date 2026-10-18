@@ -1,5 +1,5 @@
 ---
-import type { CollectionEntry } from 'astro:content';
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 
 import Anchor from '#components/parts/anchor.astro';
 import DividedItem from '#components/parts/divided-item.astro';
@@ -8,7 +8,7 @@ import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getContentPath } from '#lib/utils/routing.ts';
 
 interface Props {
-	entry: CollectionEntry<'regions'>;
+	entry: ComputedEntry<'regions'>;
 	showCurrentLink?: boolean;
 }
 

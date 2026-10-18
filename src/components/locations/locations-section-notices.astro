@@ -1,10 +1,10 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
-import type { CollectionEntry } from 'astro:content';
 
 import { LocationStatusEnum } from '@spectralcodex/shared/map';
 import * as R from 'remeda';
 
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 import type { LanguageCode } from '#lib/i18n/i18n-types.ts';
 
 import ContentSection from '#components/content/content-section.astro';
@@ -13,7 +13,7 @@ import { NoticeBoxSeverityEnum } from '#components/types.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 interface Props extends HTMLAttributes<'div'> {
-	entry: CollectionEntry<'locations'>;
+	entry: ComputedEntry<'locations'>;
 	hideGeometry?: boolean | undefined;
 	langCode?: Extract<LanguageCode, 'ja' | 'ko' | 'zh' | 'zh-Hans'> | undefined;
 }

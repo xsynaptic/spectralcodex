@@ -1,9 +1,10 @@
+import type { MapPopupItem } from '@spectralcodex/map-codec';
 import type { ImagorOperations } from '@xsynaptic/unpic-imagor';
 import type { CollectionEntry } from 'astro:content';
 
-import type { ImageThumbnail } from '#lib/schemas/index.ts';
-
 import { ImageFitOptionEnum } from '#lib/image/image-types.ts';
+
+export type ImageThumbnail = NonNullable<MapPopupItem['image']>;
 
 // Structural signer type; importing image-server would pull astro:env into tests
 export type GetSignedImagePathFunction = (
@@ -11,7 +12,7 @@ export type GetSignedImagePathFunction = (
 	operations: ImagorOperations,
 ) => string;
 
-export function createGenerateLocationPostDataFunction(posts: Array<CollectionEntry<'posts'>>) {
+export function createLocationPostsFunction(posts: Array<CollectionEntry<'posts'>>) {
 	// _posts must preserve posts-collection order
 	const postIdsByLocationId = new Map<string, Array<string>>();
 
@@ -32,9 +33,10 @@ export function createGenerateLocationPostDataFunction(posts: Array<CollectionEn
 		}
 	}
 
-	return function getLocationPostData(entry: CollectionEntry<'locations'>) {
-		entry.data._posts = postIdsByLocationId.get(entry.id) ?? [];
-		entry.data._postCount = entry.data._posts.length;
+	return function getLocationPosts(entry: CollectionEntry<'locations'>) {
+		const postIds = postIdsByLocationId.get(entry.id) ?? [];
+
+		return { _postCount: postIds.length, _posts: postIds };
 	};
 }
 

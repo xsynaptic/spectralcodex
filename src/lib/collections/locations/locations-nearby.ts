@@ -6,11 +6,15 @@ import { centroid } from '@turf/centroid';
 import { distance as getDistance, around as getPointsAround } from 'geokdbush';
 import GeospatialIndex from 'kdbush';
 
-import type { LocationsNearbyItem } from '#lib/collections/locations/locations-schemas.ts';
-
 import { locationsNearbyCountLimit, locationsNearbyDistanceLimit } from '#constants.ts';
 
-interface LocationPoint {
+export interface LocationsNearbyItem {
+	distance: number;
+	distanceDisplay: string;
+	locationId: string;
+}
+
+interface NearbyIndexPoint {
 	id: string;
 	lat: number;
 	lng: number;
@@ -21,7 +25,7 @@ interface LocationPoint {
  * Use geokdbush for O(n log n) spatial queries to avoid any sort of O(n²) issues
  * Post-query filtering handles status checks (vanished, etc.)
  */
-export function createGenerateNearbyItemsFunction(locations: Array<CollectionEntry<'locations'>>) {
+export function createLocationNearbyFunction(locations: Array<CollectionEntry<'locations'>>) {
 	const { pointsIndex, pointsMap } = extractPoints(locations);
 
 	// Build spatial index from all points (no pre-filtering)
@@ -33,7 +37,7 @@ export function createGenerateNearbyItemsFunction(locations: Array<CollectionEnt
 
 	index.finish();
 
-	function collectNearbyItems(entryPoint: LocationPoint): Array<LocationsNearbyItem> {
+	function collectNearbyItems(entryPoint: NearbyIndexPoint): Array<LocationsNearbyItem> {
 		// Query for more than we need to account for post-filtering
 		const pointsAroundIds = getPointsAround(
 			index,
@@ -70,26 +74,20 @@ export function createGenerateNearbyItemsFunction(locations: Array<CollectionEnt
 		return nearby;
 	}
 
-	return function generateNearbyItems(entry: CollectionEntry<'locations'>) {
+	return function getLocationNearby(entry: CollectionEntry<'locations'>) {
 		const entryPoint = pointsMap.get(entry.id);
 
-		if (!entryPoint) return;
-
-		const nearby = collectNearbyItems(entryPoint);
-
-		if (nearby.length > 0) {
-			entry.data._nearby = nearby;
-		}
+		return entryPoint ? collectNearbyItems(entryPoint) : [];
 	};
 }
 
 // Extract coordinates from location entries; handles both single Point and MultiPoint geometries
 function extractPoints(locations: Array<CollectionEntry<'locations'>>): {
-	pointsIndex: Array<LocationPoint>;
-	pointsMap: Map<string, LocationPoint>;
+	pointsIndex: Array<NearbyIndexPoint>;
+	pointsMap: Map<string, NearbyIndexPoint>;
 } {
-	const pointsMap = new Map<string, LocationPoint>();
-	const pointsIndex: Array<LocationPoint> = [];
+	const pointsMap = new Map<string, NearbyIndexPoint>();
+	const pointsIndex: Array<NearbyIndexPoint> = [];
 
 	for (const entry of locations) {
 		const coordinates = getEntryCoordinates(entry.data.geometry);
@@ -99,7 +97,7 @@ function extractPoints(locations: Array<CollectionEntry<'locations'>>): {
 
 		if (lng === undefined || lat === undefined) continue;
 
-		const point: LocationPoint = {
+		const point: NearbyIndexPoint = {
 			id: entry.id,
 			lat,
 			lng,

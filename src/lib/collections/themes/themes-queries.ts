@@ -1,6 +1,6 @@
-import type { CollectionEntry } from 'astro:content';
-
 import * as R from 'remeda';
+
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { buildEntryCatalogItems } from '#lib/catalog/catalog-utils.ts';
@@ -19,7 +19,7 @@ export async function createQueryThemesEntryFunction() {
 	const catalog = await getCatalog();
 	const getEntryMapData = await createEntryMapDataFunction();
 
-	return function queryThemesEntry(entry: CollectionEntry<'themes'>) {
+	return function queryThemesEntry(entry: ComputedEntry<'themes'>) {
 		const locationsFiltered = getLocationsByTheme(entry);
 		const locationsListed = locationsFiltered.filter(({ data }) => isListed(data));
 
@@ -80,18 +80,16 @@ async function createLocationsByThemeFunction() {
 	const getLocationsByIds = await createLocationsByIdsFunction();
 
 	return function getLocationsByTheme(
-		entry: CollectionEntry<'themes'>,
-	): Array<CollectionEntry<'locations'>> {
-		return getLocationsByIds(entry.data._locations ?? []);
+		entry: ComputedEntry<'themes'>,
+	): Array<ComputedEntry<'locations'>> {
+		return getLocationsByIds(entry.data._locations);
 	};
 }
 
 async function createPostsByThemeFunction() {
 	const getPostsByIds = await createPostsByIdsFunction();
 
-	return function getPostsByTheme(
-		entry: CollectionEntry<'themes'>,
-	): Array<CollectionEntry<'posts'>> {
-		return getPostsByIds(entry.data._posts ?? []);
+	return function getPostsByTheme(entry: ComputedEntry<'themes'>): Array<ComputedEntry<'posts'>> {
+		return getPostsByIds(entry.data._posts);
 	};
 }

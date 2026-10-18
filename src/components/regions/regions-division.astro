@@ -1,11 +1,12 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
-import type { CollectionEntry } from 'astro:content';
+
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 
 import { getRegionsDivisionSvgContent } from '#components/regions/regions-division.ts';
 
 interface Props extends HTMLAttributes<'div'> {
-	entry: CollectionEntry<'regions'>;
+	entry: ComputedEntry<'regions'>;
 }
 
 const { class: className, entry, ...props } = Astro.props;

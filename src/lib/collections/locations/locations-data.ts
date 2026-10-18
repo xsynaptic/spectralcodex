@@ -3,15 +3,16 @@ import type { CollectionEntry } from 'astro:content';
 import { getPublicId } from '@spectralcodex/shared/entries';
 import { IMAGE_SERVER_SECRET } from 'astro:env/server';
 
-import type { ImageThumbnail } from '#lib/schemas/index.ts';
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
+import type { ImageThumbnail } from '#lib/collections/locations/locations-factory.ts';
 
 import { imageLowQualityFormat, imageLowQualityValue } from '#constants.ts';
 import { getImageByIdFunction } from '#lib/collections/images/images-data.ts';
 import {
-	createGenerateLocationPostDataFunction,
+	createLocationPostsFunction,
 	getLocationThumbnailProps,
 } from '#lib/collections/locations/locations-factory.ts';
-import { createGenerateNearbyItemsFunction } from '#lib/collections/locations/locations-nearby.ts';
+import { createLocationNearbyFunction } from '#lib/collections/locations/locations-nearby.ts';
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { createSignedImagePathFunction } from '#lib/image/image-server.ts';
@@ -21,7 +22,11 @@ import {
 	createCollectionLookupByIds,
 	getRawCollection,
 } from '#lib/utils/collections.ts';
-import { contentPolicy, isGeometryHidden } from '#lib/utils/content-policy.ts';
+import {
+	contentPolicy,
+	getEffectiveLocationData,
+	isGeometryHidden,
+} from '#lib/utils/content-policy.ts';
 import { getDescriptionRendered } from '#lib/utils/description-data.ts';
 import { getContentPath } from '#lib/utils/routing.ts';
 
@@ -34,101 +39,81 @@ const getSignedImagePath = createSignedImagePathFunction({
 
 type GetThumbnailFunction = (imageId: string | undefined) => ImageThumbnail | undefined;
 
-async function generateLocationImageData(locations: Array<CollectionEntry<'locations'>>) {
+export type LocationPoint = Exclude<
+	CollectionEntry<'locations'>['data']['geometry'],
+	Array<unknown>
+> & { _imageThumbnail?: ImageThumbnail | null };
+
+async function createThumbnailFunction(): Promise<GetThumbnailFunction> {
 	const getImageById = await getImageByIdFunction();
 
-	const getThumbnail: GetThumbnailFunction = (imageId) => {
+	return function getThumbnail(imageId) {
 		const imageEntry = getImageById(imageId);
 
 		return imageEntry
 			? getLocationThumbnailProps(imageEntry.id, imageEntry.data.width, getSignedImagePath)
 			: undefined;
 	};
-
-	for (const entry of locations) {
-		setEntryThumbnail(entry, getThumbnail);
-		setGeometryThumbnails(entry, getThumbnail);
-	}
 }
 
-function generateLocationMapData(entry: CollectionEntry<'locations'>) {
-	entry.data._url = getContentPath('locations', getPublicId(entry));
-	entry.data._googleMapsUrl = getMatchingLinkUrl('maps.app.goo.gl', entry.data.links);
-	entry.data._wikipediaUrl = getMatchingLinkUrl('wikipedia.org', entry.data.links);
-
-	const rendered = getDescriptionRendered(entry);
-
-	if (rendered) {
-		entry.data._descriptionHtml = rendered.html;
-	}
-}
-
-function setEntryThumbnail(
-	entry: CollectionEntry<'locations'>,
+function getEntryThumbnail(
+	data: CollectionEntry<'locations'>['data'],
 	getThumbnail: GetThumbnailFunction,
 ) {
-	if (!entry.data.imageFeatured) return;
+	if (!data.imageFeatured) return;
 
-	const thumbnail = getThumbnail(getImageFeaturedId({ imageFeatured: entry.data.imageFeatured }));
-
-	if (thumbnail) {
-		entry.data._imageThumbnail = thumbnail;
-	}
+	return getThumbnail(getImageFeaturedId({ imageFeatured: data.imageFeatured }));
 }
 
-function setGeometryThumbnails(
-	entry: CollectionEntry<'locations'>,
+function getPointThumbnail(point: LocationPoint, getThumbnail: GetThumbnailFunction) {
+	// eslint-disable-next-line unicorn/no-null -- overrides the entry `imageFeatured` to render no thumbnail
+	if (point.imageFeatured === null) return null;
+
+	return point.imageFeatured ? getThumbnail(point.imageFeatured) : undefined;
+}
+
+function getGeometryWithThumbnails(
+	geometry: CollectionEntry<'locations'>['data']['geometry'],
 	getThumbnail: GetThumbnailFunction,
-) {
-	if (!Array.isArray(entry.data.geometry)) return;
+): Array<LocationPoint> | LocationPoint {
+	if (!Array.isArray(geometry)) return geometry;
 
-	for (const geometry of entry.data.geometry) {
-		if (geometry.imageFeatured === null) {
-			// eslint-disable-next-line unicorn/no-null -- overrides the entry `imageFeatured` to render no thumbnail
-			geometry._imageThumbnail = null;
-			continue;
-		}
+	return geometry.map((point) => {
+		const thumbnail = getPointThumbnail(point, getThumbnail);
 
-		if (!geometry.imageFeatured) continue;
-
-		const thumbnail = getThumbnail(geometry.imageFeatured);
-
-		if (thumbnail) {
-			geometry._imageThumbnail = thumbnail;
-		}
-	}
+		return thumbnail === undefined ? { ...point } : { ...point, _imageThumbnail: thumbnail };
+	});
 }
 
 export const getLocationsCollection = createCollectionData({
 	collection: 'locations',
-	label: 'Locations',
-	async mutate(entries) {
-		if (contentPolicy.applyOverrides) {
-			for (const entry of entries) {
-				if (!entry.data.override) continue;
-
-				const { id: _, ...overrideFields } = entry.data.override;
-
-				Object.assign(entry.data, overrideFields);
-			}
-		}
-
+	async compute(entries) {
 		const nearbyCandidates = contentPolicy.hideSensitiveLocations
 			? entries.filter((location) => !isGeometryHidden(location))
 			: entries;
 
 		const posts = await getRawCollection('posts');
-		const generateLocationPostData = createGenerateLocationPostDataFunction(posts);
-		const generateNearbyItems = createGenerateNearbyItemsFunction(nearbyCandidates);
+		const getThumbnail = await createThumbnailFunction();
+		const getLocationPosts = createLocationPostsFunction(posts);
+		const getLocationNearby = createLocationNearbyFunction(nearbyCandidates);
 
-		for (const entry of entries) {
-			generateLocationPostData(entry);
-			generateLocationMapData(entry);
-			generateNearbyItems(entry);
-		}
+		return function computeLocation(entry: CollectionEntry<'locations'>) {
+			const data = getEffectiveLocationData(entry.data);
 
-		await generateLocationImageData(entries);
+			return {
+				...data,
+				...getLocationPosts(entry),
+				_descriptionHtml: getDescriptionRendered({ body: entry.body, data, id: entry.id })?.html,
+				_googleMapsUrl: getMatchingLinkUrl('maps.app.goo.gl', data.links),
+				_imageThumbnail: getEntryThumbnail(data, getThumbnail),
+				_nearby: getLocationNearby(entry),
+				_url: getContentPath('locations', getPublicId(entry)),
+				_wikipediaUrl: getMatchingLinkUrl('wikipedia.org', data.links),
+				geometry: getGeometryWithThumbnails(data.geometry, getThumbnail),
+			};
+		};
 	},
+	label: 'Locations',
 });
 
 export const createLocationsByIdsFunction = createCollectionLookupByIds(
@@ -141,14 +126,14 @@ export async function createLocationsByPostsFunction() {
 
 	return function getLocationsByPosts(
 		...posts: Array<CollectionEntry<'posts'>>
-	): Array<CollectionEntry<'locations'>> {
+	): Array<ComputedEntry<'locations'>> {
 		const ids = [
 			...new Set(posts.flatMap((post) => post.data.locations?.map((entry) => entry.id) ?? [])),
 		];
 
 		return ids
 			.map((id) => locationsMap.get(id))
-			.filter((entry): entry is CollectionEntry<'locations'> => !!entry);
+			.filter((entry): entry is ComputedEntry<'locations'> => !!entry);
 	};
 }
 
@@ -160,10 +145,10 @@ export async function createLocationsBySeriesFunction() {
 
 	return function getLocationsBySeries(
 		seriesItemIds: Array<string> | undefined,
-	): Array<CollectionEntry<'locations'>> {
+	): Array<ComputedEntry<'locations'>> {
 		if (!seriesItemIds || seriesItemIds.length === 0) return [];
 
-		const seriesLocationsMap = new Map<string, CollectionEntry<'locations'>>();
+		const seriesLocationsMap = new Map<string, ComputedEntry<'locations'>>();
 
 		for (const seriesItemId of seriesItemIds) {
 			const location = locationsMap.get(seriesItemId);

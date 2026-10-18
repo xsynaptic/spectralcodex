@@ -1,17 +1,18 @@
 import type { MapFeaturesRule } from '@spectralcodex/map-codec';
-import type { CollectionEntry } from 'astro:content';
 
 import pMemoize from 'p-memoize';
+
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 
 import {
 	createLocationsByPostsFunction,
 	createLocationsBySeriesFunction,
 } from '#lib/collections/locations/locations-data.ts';
-import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';
+import { getRegionsTree } from '#lib/collections/regions/regions-data.ts';
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { getLocationsMapRule, getRegionMapRule, getThemeMapRule } from '#lib/map/map-locations.ts';
 
-export type MapScopeEntry = CollectionEntry<'posts' | 'regions' | 'series' | 'themes'>;
+export type MapScopeEntry = ComputedEntry<'posts' | 'regions' | 'series' | 'themes'>;
 
 export const getMapThemeIndexById = pMemoize(async () => {
 	const { entries: themes } = await getThemesCollection();
@@ -25,7 +26,7 @@ export const getMapThemeIndexById = pMemoize(async () => {
 });
 
 export async function createEntryMapRuleFunction() {
-	const { regionsTree } = await getRegionsCollection();
+	const regionsTree = await getRegionsTree();
 	const themeIndexById = await getMapThemeIndexById();
 	const getLocationsByPosts = await createLocationsByPostsFunction();
 	const getLocationsBySeries = await createLocationsBySeriesFunction();

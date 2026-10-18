@@ -1,8 +1,8 @@
 ---
 import type { Page } from 'astro';
-import type { CollectionEntry } from 'astro:content';
 
 import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 import type { MapComponentData } from '#lib/map/map-data.ts';
 
 import ContentEntryDetail from '#components/content/content-entry-detail.astro';
@@ -20,7 +20,7 @@ import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { formatNumber } from '#lib/utils/text.ts';
 
 interface Props {
-	entry: CollectionEntry<'resources'>;
+	entry: ComputedEntry<'resources'>;
 	mapData: MapComponentData;
 	page: Page<CatalogItem>;
 }

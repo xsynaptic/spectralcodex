@@ -17,9 +17,6 @@ export const series = defineCollection({
 		.object({
 			title: TitleSchema,
 			...titleMultilingualSchema,
-			_entryCount: z.number().int().optional(),
-			_locationCount: z.number().int().optional(),
-			_postCount: z.number().int().optional(),
 			dateCreated: DateSchema,
 			dateRecorded: DateRecordedSchema.optional(),
 			dateUpdated: DateSchema.optional(),

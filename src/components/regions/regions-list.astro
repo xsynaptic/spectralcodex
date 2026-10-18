@@ -1,7 +1,6 @@
 ---
-import type { CollectionEntry } from 'astro:content';
-
 import type { DividerContent } from '#components/types.ts';
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 
 import Anchor from '#components/parts/anchor.astro';
 import DividedItem from '#components/parts/divided-item.astro';
@@ -17,7 +16,7 @@ interface Props {
 	showMicroformats?: boolean;
 	showSingleRegionAncestors?: boolean;
 	showTitleMultilingual?: boolean;
-	terms: Array<CollectionEntry<'regions'>> | undefined;
+	terms: Array<ComputedEntry<'regions'>> | undefined;
 }
 
 const {

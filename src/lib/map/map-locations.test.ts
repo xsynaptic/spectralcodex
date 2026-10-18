@@ -1,7 +1,7 @@
-import type { CollectionEntry } from 'astro:content';
-
 import { MapPopupOwnField } from '@spectralcodex/map-codec';
 import { describe, expect, test, vi } from 'vitest';
+
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 
 import {
 	getLocationFeatureIds,
@@ -13,7 +13,7 @@ import {
 function makeLocation(
 	id: string,
 	data: Record<string, unknown> & { title: string },
-): CollectionEntry<'locations'> {
+): ComputedEntry<'locations'> {
 	return {
 		collection: 'locations',
 		data: {
@@ -24,7 +24,7 @@ function makeLocation(
 			...data,
 		},
 		id,
-	} as unknown as CollectionEntry<'locations'>;
+	} as unknown as ComputedEntry<'locations'>;
 }
 
 function makePoint(longitude: number, latitude: number, extra: Record<string, unknown> = {}) {

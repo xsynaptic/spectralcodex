@@ -35,10 +35,3 @@ export const DateRecordedSchema = z
 
 // Numeric scale schema, from 1 to 5; used by locations and chronology
 export const NumericScaleSchema = z.number().int().min(1).max(5);
-
-// Image thumbnail schema
-export const ImageThumbnailSchema = z.object({
-	srcSet: z.string(),
-});
-
-export type ImageThumbnail = z.infer<typeof ImageThumbnailSchema>;

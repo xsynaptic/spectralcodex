@@ -1,8 +1,8 @@
 ---
 import type { Page } from 'astro';
-import type { CollectionEntry } from 'astro:content';
 
 import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 import type { MapComponentData } from '#lib/map/map-data.ts';
 
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
@@ -18,7 +18,7 @@ import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { formatNumber } from '#lib/utils/text.ts';
 
 interface Props {
-	entry: CollectionEntry<'series'>;
+	entry: ComputedEntry<'series'>;
 	mapData: MapComponentData;
 	page: Page<CatalogItem>;
 	wordCount?: number | undefined;
@@ -26,7 +26,7 @@ interface Props {
 
 const { entry, mapData, page, wordCount } = Astro.props;
 
-const entryCount = entry.data._entryCount ?? 0;
+const entryCount = entry.data._entryCount;
 
 const t = getTranslations();
 

@@ -1,8 +1,8 @@
 ---
 import type { Page } from 'astro';
-import type { CollectionEntry } from 'astro:content';
 
 import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 import type { RegionsOption } from '#lib/collections/regions/regions-options.ts';
 import type { MapComponentData } from '#lib/map/map-data.ts';
 
@@ -27,7 +27,7 @@ interface Props {
 	backlinksCount: number;
 	catalogItems: Array<CatalogItem>;
 	catalogItemsCount: number;
-	entry: CollectionEntry<'regions'>;
+	entry: ComputedEntry<'regions'>;
 	mapData: MapComponentData;
 	page: Page<CatalogItem>;
 	regionsOption?: RegionsOption;
@@ -78,6 +78,6 @@ const atlas = await getAtlasScopePage(entry);
 	{page.currentPage === 1 && catalogItems.length > 0 ? (
 		<SectionPreviewList count={catalogItemsCount} items={catalogItems} />
 	) : undefined}
-	<SectionStats backlinksCount={backlinksCount} entryCount={entry.data._entryCount ?? 0} />
+	<SectionStats backlinksCount={backlinksCount} entryCount={entry.data._entryCount} />
 	<RegionsDivision entry={entry} />
 </ContentEntryDetail>

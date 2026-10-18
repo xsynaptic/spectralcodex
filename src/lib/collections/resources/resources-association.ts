@@ -23,7 +23,7 @@ interface ResourceLike {
 	id: string;
 }
 
-// Entry identity across raw and enriched reads is not guaranteed; IDs resolve via entriesMap
+// Entry identity across raw and computed reads is not guaranteed; IDs resolve via entriesMap
 // Array order follows content-collection order, which the per-resource scans this replaced produced
 export function buildResourceAssociation(
 	resources: ReadonlyArray<ResourceLike>,

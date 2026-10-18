@@ -1,6 +1,6 @@
-import type { CollectionEntry } from 'astro:content';
-
 import * as R from 'remeda';
+
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { buildEntryCatalogItems } from '#lib/catalog/catalog-utils.ts';
@@ -23,10 +23,10 @@ export async function createQueryRegionsEntryFunction() {
 	const catalog = await getCatalog();
 	const getEntryMapData = await createEntryMapDataFunction();
 
-	return function queryRegionsEntry(entry: CollectionEntry<'regions'>) {
+	return function queryRegionsEntry(entry: ComputedEntry<'regions'>) {
 		const ancestors = getRegionAncestors(entry);
 
-		const entryLocations = entry.data._locations ? getLocationsByIds(entry.data._locations) : [];
+		const entryLocations = getLocationsByIds(entry.data._locations);
 		const entryLocationsListed = entryLocations.filter(({ data }) => isListed(data));
 
 		const featuredCandidates = [
@@ -35,7 +35,7 @@ export async function createQueryRegionsEntryFunction() {
 				R.filter((location) => isListedQuality(location.data)),
 				catalog.resolve,
 			),
-			...R.pipe(entry.data._posts ?? [], getPostsByIds, catalog.resolve),
+			...R.pipe(entry.data._posts, getPostsByIds, catalog.resolve),
 		];
 
 		const restCandidates = catalog.resolve(entryLocationsListed);
@@ -65,10 +65,14 @@ export async function createQueryRegionsEntryFunction() {
 export async function createRegionsRelatedFunction() {
 	const getRegionsByIds = await createRegionsByIdsFunction();
 
-	return function getRegionsRelated(ids: Array<string> | undefined, limit: number) {
-		return ids
-			? R.pipe(ids, getRegionsByIds, R.filter(hasEntries), R.sort(sortByEntryCount), R.take(limit))
-			: [];
+	return function getRegionsRelated(ids: Array<string>, limit: number) {
+		return R.pipe(
+			ids,
+			getRegionsByIds,
+			R.filter(hasEntries),
+			R.sort(sortByEntryCount),
+			R.take(limit),
+		);
 	};
 }
 

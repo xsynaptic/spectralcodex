@@ -6,8 +6,8 @@ import type { Hierarchy } from '#lib/utils/hierarchy.ts';
 import { RegionLanguageMap } from '#lib/collections/regions/regions-types.ts';
 import {
 	collectUnlistedLocationIds,
-	contentPolicy,
-	populateContentCounts,
+	countContent,
+	getEffectiveLocationData,
 } from '#lib/utils/content-policy.ts';
 import { createHierarchy } from '#lib/utils/hierarchy.ts';
 
@@ -31,77 +31,53 @@ export function createRegionsTree(entries: Array<CollectionEntry<'regions'>>): H
 	);
 }
 
-export function populateRegionsContent({
-	entries,
+export function createRegionContentFunction({
 	locations,
 	posts,
 	regionsTree,
 }: {
-	entries: Array<CollectionEntry<'regions'>>;
 	locations: Array<CollectionEntry<'locations'>>;
 	posts: Array<CollectionEntry<'posts'>>;
 	regionsTree: Hierarchy;
 }) {
-	// Generate content by region maps; this will make subsequent calculations faster
-	const locationsByRegionMap = mapEntriesByRegion(locations, resolveLocationRegions);
+	const locationsByRegionMap = mapEntriesByRegion(
+		locations,
+		(entry) => getEffectiveLocationData(entry.data).regions,
+	);
 	const postsByRegionMap = mapEntriesByRegion(posts, (entry) => entry.data.regions);
 
 	const unlistedLocationIds = collectUnlistedLocationIds(locations);
 
-	// Calculate cumulative content counts, rolled up through descendants
-	for (const entry of entries) {
-		const regionIds = [entry.id, ...regionsTree.descendantsOf(entry.id)];
+	return function getRegionContent(regionId: string) {
+		const regionIds = [regionId, ...regionsTree.descendantsOf(regionId)];
 
-		entry.data._locations = collectByRegion(regionIds, locationsByRegionMap);
-		entry.data._posts = collectByRegion(regionIds, postsByRegionMap);
+		const regionLocations = collectByRegion(regionIds, locationsByRegionMap);
+		const regionPosts = collectByRegion(regionIds, postsByRegionMap);
 
-		populateContentCounts(entry.data, {
-			locations: entry.data._locations,
-			posts: entry.data._posts,
-			unlistedLocationIds,
-		});
-	}
+		return {
+			_locations: regionLocations,
+			_posts: regionPosts,
+			...countContent({ locations: regionLocations, posts: regionPosts, unlistedLocationIds }),
+		};
+	};
 }
 
-/**
- * Computed data functions; populate the materialized closure fields onto entries from the hierarchy
- */
-export function populateRegionsHierarchy(
-	regions: Array<CollectionEntry<'regions'>>,
-	regionsTree: Hierarchy,
-) {
-	for (const entry of regions) {
-		const ancestors = regionsTree.ancestorsOf(entry.id);
-
-		if (ancestors.length > 0) entry.data._ancestors = [...ancestors];
-
-		const children = regionsTree.childrenOf(entry.id);
-
-		if (children.length > 0) entry.data._children = [...children];
-
-		const siblings = regionsTree.siblingsOf(entry.id);
-
-		if (siblings.length > 0) entry.data._siblings = [...siblings];
-	}
+export function getRegionHierarchy(regionsTree: Hierarchy, regionId: string) {
+	return {
+		_ancestors: [...regionsTree.ancestorsOf(regionId)],
+		_children: [...regionsTree.childrenOf(regionId)],
+		_siblings: [...regionsTree.siblingsOf(regionId)],
+	};
 }
 
-// Assign language code, where applicable
-export function populateRegionsLangCode(regions: Array<CollectionEntry<'regions'>>) {
-	// Assign language code, where applicable
-	for (const entry of regions) {
-		if (entry.data._ancestors && entry.data._ancestors.length > 0) {
-			entry.data._langCode = getRegionLanguageById(entry.data._ancestors.at(-1));
-		} else if (!entry.data.parent) {
-			entry.data._langCode = getRegionLanguageById(entry.id);
-		}
-	}
-}
+export function getRegionLangCode(
+	entry: CollectionEntry<'regions'>,
+	ancestors: Array<string>,
+): RegionLanguage | undefined {
+	if (ancestors.length > 0) return getRegionLanguageById(ancestors.at(-1));
+	if (!entry.data.parent) return getRegionLanguageById(entry.id);
 
-export function resolveLocationRegions(entry: CollectionEntry<'locations'>) {
-	if (contentPolicy.applyOverrides && entry.data.override?.regions) {
-		return entry.data.override.regions;
-	}
-	return entry.data.regions;
+	return undefined;
 }
 
 function collectByRegion(regionIds: Array<string>, map: Map<string, Array<string>>): Array<string> {

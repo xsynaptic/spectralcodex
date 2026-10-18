@@ -1,12 +1,14 @@
 import type { CollectionEntry, ReferenceDataEntry } from 'astro:content';
 
-import { performance } from 'node:perf_hooks';
+import pMemoize from 'p-memoize';
+
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 
 import {
+	createRegionContentFunction,
 	createRegionsTree,
-	populateRegionsContent,
-	populateRegionsHierarchy,
-	populateRegionsLangCode,
+	getRegionHierarchy,
+	getRegionLangCode,
 } from '#lib/collections/regions/regions-factory.ts';
 import {
 	createCollectionData,
@@ -14,31 +16,36 @@ import {
 	getRawCollection,
 } from '#lib/utils/collections.ts';
 
+export const getRegionsTree = pMemoize(async () =>
+	createRegionsTree(await getRawCollection('regions')),
+);
+
 export const getRegionsCollection = createCollectionData({
 	collection: 'regions',
-	async extend(entries) {
-		const extendStart = performance.now();
+	async compute() {
+		const [locations, posts, regionsTree] = await Promise.all([
+			getRawCollection('locations'),
+			getRawCollection('posts'),
+			getRegionsTree(),
+		]);
 
-		const locations = await getRawCollection('locations');
-		const posts = await getRawCollection('posts');
+		const getRegionContent = createRegionContentFunction({ locations, posts, regionsTree });
 
-		const regionsTree = createRegionsTree(entries);
+		return function computeRegion(entry: CollectionEntry<'regions'>) {
+			const hierarchy = getRegionHierarchy(regionsTree, entry.id);
 
-		populateRegionsHierarchy(entries, regionsTree);
-		populateRegionsLangCode(entries);
-		populateRegionsContent({ entries, locations, posts, regionsTree });
-
-		console.log(
-			`[Regions] Hierarchy computed in ${(performance.now() - extendStart).toFixed(5)}ms`,
-		);
-
-		return { regionsTree };
+			return {
+				...hierarchy,
+				_langCode: getRegionLangCode(entry, hierarchy._ancestors),
+				...getRegionContent(entry.id),
+			};
+		};
 	},
 	label: 'Regions',
 });
 
 // Transform an array of strings into collection entries
-export const createRegionsByIdsFunction = createCollectionLookupByIds<'regions'>(
+export const createRegionsByIdsFunction = createCollectionLookupByIds(
 	'Regions',
 	getRegionsCollection,
 );
@@ -49,7 +56,7 @@ export async function createFirstRegionByReferenceFunction() {
 
 	return function getFirstRegionByReference(
 		regions: Array<ReferenceDataEntry<'regions'>> | undefined,
-	): CollectionEntry<'regions'> | undefined {
+	): ComputedEntry<'regions'> | undefined {
 		if (!regions) return;
 
 		const regionId = regions.at(0)?.id;
@@ -69,16 +76,16 @@ export async function createRegionAncestorsByIdFunction() {
 		if (!region)
 			throw new Error(`Error: could not find "${regionId}" in the "regions" collection.`);
 
-		return getRegionAncestors(region) satisfies Array<CollectionEntry<'regions'>>;
+		return getRegionAncestors(region) satisfies Array<ComputedEntry<'regions'>>;
 	};
 }
 
 export async function createRegionAncestorsFunction() {
 	const getRegionsById = await createRegionsByIdsFunction();
 
-	return function getRegionAncestors(region: CollectionEntry<'regions'>) {
-		const ancestors = region.data._ancestors ? getRegionsById(region.data._ancestors) : [];
-
-		return [region, ...ancestors] satisfies Array<CollectionEntry<'regions'>>;
+	return function getRegionAncestors(region: ComputedEntry<'regions'>) {
+		return [region, ...getRegionsById(region.data._ancestors)] satisfies Array<
+			ComputedEntry<'regions'>
+		>;
 	};
 }

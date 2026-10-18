@@ -1,7 +1,6 @@
 ---
-import type { CollectionEntry } from 'astro:content';
-
 import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 import type { MapComponentData } from '#lib/map/map-data.ts';
 
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
@@ -35,7 +34,7 @@ import { isGeometryHidden } from '#lib/utils/content-policy.ts';
 interface Props {
 	backlinks: Array<CatalogItem> | undefined;
 	catalogItems: Array<CatalogItem>;
-	entry: CollectionEntry<'locations'>;
+	entry: ComputedEntry<'locations'>;
 	mapData: MapComponentData;
 }
 

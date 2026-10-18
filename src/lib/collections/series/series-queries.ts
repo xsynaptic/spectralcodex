@@ -1,8 +1,9 @@
-import type { CollectionEntry, CollectionKey } from 'astro:content';
+import type { CollectionKey } from 'astro:content';
 
 import * as R from 'remeda';
 
 import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { hasFeaturedImage } from '#lib/catalog/catalog-utils.ts';
@@ -19,7 +20,7 @@ export async function createQuerySeriesEntryFunction() {
 
 	const seriesCatalogItems = catalog.resolve(series);
 
-	return function querySeriesEntry(entry: CollectionEntry<'series'>) {
+	return function querySeriesEntry(entry: ComputedEntry<'series'>) {
 		const catalogItems = getSeriesCatalogItems(entry.data.seriesItems);
 
 		if (!catalogItems) return;
@@ -45,15 +46,15 @@ export async function createSeriesByEntryFunction() {
 		id: string;
 	}): Array<{
 		catalogItems: Array<CatalogItem>;
-		entry: CollectionEntry<'series'>;
+		entry: ComputedEntry<'series'>;
 	}> {
-		const entries = series.filter((entry: CollectionEntry<'series'>) =>
+		const entries = series.filter((entry: ComputedEntry<'series'>) =>
 			entry.data.seriesItems?.includes(id),
 		);
 
 		const results: Array<{
 			catalogItems: Array<CatalogItem>;
-			entry: CollectionEntry<'series'>;
+			entry: ComputedEntry<'series'>;
 		}> = [];
 
 		for (const entry of entries) {

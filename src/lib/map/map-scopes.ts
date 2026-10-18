@@ -4,14 +4,14 @@ import type {
 	MapScopeRow,
 	MapSourceItem,
 } from '@spectralcodex/map-codec';
-import type { CollectionEntry } from 'astro:content';
 
 import { selectMapRows } from '@spectralcodex/map-codec';
 
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 import type { MapScopeEntry } from '#lib/map/map-entry-rules.ts';
 
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
-import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';
+import { getRegionsCollection, getRegionsTree } from '#lib/collections/regions/regions-data.ts';
 import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
@@ -20,14 +20,15 @@ import { createEntryMapRuleFunction } from '#lib/map/map-entry-rules.ts';
 import { isEntryMapEnabled } from '#lib/map/map-locations.ts';
 import { getContentPath } from '#lib/utils/routing.ts';
 
-type ScopeRowEntry = Exclude<MapScopeEntry, CollectionEntry<'posts'>>;
+type ScopeRowEntry = Exclude<MapScopeEntry, ComputedEntry<'posts'>>;
 
 const scopeKindByCollection = { regions: 'region', series: 'series', themes: 'theme' } as const;
 
 async function getRegionFields(entry: ScopeRowEntry) {
 	if (entry.collection !== 'regions') return {};
 
-	const { entriesMap, regionsTree } = await getRegionsCollection();
+	const { entriesMap } = await getRegionsCollection();
+	const regionsTree = await getRegionsTree();
 	const parentId = regionsTree.parentOf(entry.id);
 	const parentTitle = parentId ? entriesMap.get(parentId)?.data.title : undefined;
 

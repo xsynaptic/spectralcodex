@@ -1,5 +1,4 @@
-import type { CollectionEntry } from 'astro:content';
-
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 import type { Thing } from '#lib/utils/seo-structured-data.ts';
 
 import {
@@ -11,7 +10,7 @@ import { getDescriptionRenderedText } from '#lib/utils/description-data.ts';
 import { buildEntryBreadcrumbSchema, buildPlaceSchema } from '#lib/utils/seo-structured-data.ts';
 
 export async function getLocationStructuredData(
-	entry: CollectionEntry<'locations'>,
+	entry: ComputedEntry<'locations'>,
 	props: { url: string },
 ): Promise<Array<Thing>> {
 	if (entry.data.override || isGeometryHidden(entry)) {
@@ -40,7 +39,7 @@ export async function getLocationStructuredData(
 	];
 }
 
-function getFirstCoordinates(entry: CollectionEntry<'locations'>): [number, number] | undefined {
+function getFirstCoordinates(entry: ComputedEntry<'locations'>): [number, number] | undefined {
 	const geometry = entry.data.geometry;
 	const point = Array.isArray(geometry) ? geometry[0] : geometry;
 

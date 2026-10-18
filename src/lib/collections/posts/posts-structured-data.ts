@@ -1,5 +1,4 @@
-import type { CollectionEntry } from 'astro:content';
-
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 import type { Thing } from '#lib/utils/seo-structured-data.ts';
 
 import { getDescriptionRenderedText } from '#lib/utils/description-data.ts';
@@ -10,7 +9,7 @@ import {
 } from '#lib/utils/seo-structured-data.ts';
 
 export function getPostStructuredData(
-	entry: CollectionEntry<'posts'>,
+	entry: ComputedEntry<'posts'>,
 	props: { imageUrl: string | undefined; url: string },
 ): Array<Thing> {
 	return [

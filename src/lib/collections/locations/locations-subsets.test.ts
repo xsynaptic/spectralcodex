@@ -1,7 +1,7 @@
-import type { CollectionEntry } from 'astro:content';
-
 import { LocationStatusEnum } from '@spectralcodex/shared/map';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
+
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 
 const { getLocationsCollectionMock, getRegionsByIdsMock } = vi.hoisted(() => ({
 	getLocationsCollectionMock: vi.fn(),
@@ -18,10 +18,7 @@ vi.mock('#lib/collections/regions/regions-data.ts', () => ({
 const { getObjectiveLocations, getTheaterLocations } =
 	await import('#lib/collections/locations/locations-subsets.ts');
 
-function makeLocation(
-	id: string,
-	data: Record<string, unknown> = {},
-): CollectionEntry<'locations'> {
+function makeLocation(id: string, data: Record<string, unknown> = {}): ComputedEntry<'locations'> {
 	return {
 		collection: 'locations',
 		data: {
@@ -33,21 +30,21 @@ function makeLocation(
 			...data,
 		},
 		id,
-	} as unknown as CollectionEntry<'locations'>;
+	} as unknown as ComputedEntry<'locations'>;
 }
 
-function setLocations(entries: Array<CollectionEntry<'locations'>>) {
+function setLocations(entries: Array<ComputedEntry<'locations'>>) {
 	getLocationsCollectionMock.mockResolvedValue({ entries });
 }
 
-const ids = (entries: Array<CollectionEntry<'locations'>>) => entries.map((entry) => entry.id);
+const ids = (entries: Array<ComputedEntry<'locations'>>) => entries.map((entry) => entry.id);
 
 const theaters = { id: 'taiwan-theaters' };
 const colonial = { id: 'taiwan-japanese-colonial-era' };
 
 beforeEach(() => {
 	getRegionsByIdsMock.mockImplementation((regionIds: Array<string>) =>
-		regionIds.map((id) => ({ data: { _ancestors: id === 'taipei' ? ['taiwan'] : undefined }, id })),
+		regionIds.map((id) => ({ data: { _ancestors: id === 'taipei' ? ['taiwan'] : [] }, id })),
 	);
 });
 

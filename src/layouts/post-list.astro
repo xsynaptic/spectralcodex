@@ -1,9 +1,10 @@
 ---
 // fallow-ignore-file code-duplication -- Feed sits outside the section that collection-list slots into
 import type { Page } from 'astro';
-import type { CollectionEntry } from 'astro:content';
 
 import { render } from 'astro:content';
+
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 
 import ContentDate from '#components/content/content-date.astro';
 import ContentExcerpt from '#components/content/content-excerpt.astro';
@@ -21,7 +22,7 @@ import { getSeoImageProps } from '#lib/utils/seo.ts';
 import { renderMarkdownInline } from '#lib/utils/text.ts';
 
 interface Props {
-	page: Page<CollectionEntry<'posts'>>;
+	page: Page<ComputedEntry<'posts'>>;
 }
 
 const { page } = Astro.props;

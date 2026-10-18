@@ -5,7 +5,7 @@ import { describe, expect, test } from 'vitest';
 import type { GetSignedImagePathFunction } from '#lib/collections/locations/locations-factory.ts';
 
 import {
-	createGenerateLocationPostDataFunction,
+	createLocationPostsFunction,
 	getLocationThumbnailProps,
 } from '#lib/collections/locations/locations-factory.ts';
 
@@ -53,7 +53,7 @@ describe('getLocationThumbnailProps', () => {
 	});
 });
 
-describe('createGenerateLocationPostDataFunction', () => {
+describe('createLocationPostsFunction', () => {
 	test('links posts to locations preserving posts-collection order', () => {
 		const posts = [
 			makePost('post-early', ['temple']),
@@ -61,25 +61,18 @@ describe('createGenerateLocationPostDataFunction', () => {
 			makePost('post-late', ['fort', 'temple']),
 			makePost('post-no-locations'),
 		];
-		const generateLocationPostData = createGenerateLocationPostDataFunction(posts);
-		const temple = makeLocation('temple');
-
-		generateLocationPostData(temple);
+		const getLocationPosts = createLocationPostsFunction(posts);
 
 		// _posts must follow posts-collection order
-		expect(temple.data._posts).toEqual(['post-early', 'post-late']);
-		expect(temple.data._postCount).toBe(2);
+		expect(getLocationPosts(makeLocation('temple'))).toEqual({
+			_postCount: 2,
+			_posts: ['post-early', 'post-late'],
+		});
 	});
 
 	test('unreferenced locations get an empty list', () => {
-		const generateLocationPostData = createGenerateLocationPostDataFunction([
-			makePost('post-early', ['temple']),
-		]);
-		const ruin = makeLocation('ruin');
+		const getLocationPosts = createLocationPostsFunction([makePost('post-early', ['temple'])]);
 
-		generateLocationPostData(ruin);
-
-		expect(ruin.data._posts).toEqual([]);
-		expect(ruin.data._postCount).toBe(0);
+		expect(getLocationPosts(makeLocation('ruin'))).toEqual({ _postCount: 0, _posts: [] });
 	});
 });

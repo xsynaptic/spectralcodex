@@ -9,9 +9,6 @@ import { ResourceSchema } from '#lib/schemas/resources.ts';
 export const resources = defineCollection({
 	loader: createEntryGlobLoader('resources'),
 	schema: ResourceSchema.extend({
-		_entryCount: z.number().optional(),
-		_locationCount: z.number().optional(),
-		_postCount: z.number().optional(),
 		dateCreated: DateSchema,
 		dateUpdated: DateSchema.optional(),
 		entryQuality: NumericScaleSchema,

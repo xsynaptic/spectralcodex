@@ -1,10 +1,9 @@
 ---
-import type { CollectionEntry } from 'astro:content';
-
 import { getPublicId } from '@spectralcodex/shared/entries';
 
 import type { MetaProps } from '#components/types.ts';
 import type { AtlasPageProps } from '#lib/atlas/atlas-data.ts';
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 import type { MultilingualContent } from '#lib/i18n/i18n-types.ts';
 import type { Thing } from '#lib/utils/seo-structured-data.ts';
 
@@ -22,7 +21,7 @@ import { getSeoImageProps } from '#lib/utils/seo.ts';
 
 interface Props {
 	atlas?: AtlasPageProps | undefined;
-	entry: CollectionEntry<'locations' | 'pages' | 'posts'>;
+	entry: ComputedEntry<'locations' | 'pages' | 'posts'>;
 	meta?: MetaProps;
 	schemas: Array<Thing>;
 	titleMultilingual: MultilingualContent | undefined;

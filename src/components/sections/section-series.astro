@@ -1,15 +1,16 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
-import type { CollectionEntry } from 'astro:content';
 
 import { render } from 'astro:content';
+
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 
 import SeriesSection from '#components/series/series-section.astro';
 import { createSeriesByEntryFunction } from '#lib/collections/series/series-queries.ts';
 import { getContentPath } from '#lib/utils/routing.ts';
 
 interface Props extends HTMLAttributes<'div'> {
-	entry: CollectionEntry<'locations' | 'posts'>;
+	entry: ComputedEntry<'locations' | 'posts'>;
 }
 
 const { entry, ...props } = Astro.props;

@@ -1,6 +1,5 @@
 import type { RSSFeedItem } from '@astrojs/rss';
 import type { ContainerRenderOptions } from 'astro/container';
-import type { CollectionEntry } from 'astro:content';
 
 import mdxRenderer from '@astrojs/mdx/server.js';
 import { getPublicId } from '@spectralcodex/shared/entries';
@@ -9,6 +8,8 @@ import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import { render } from 'astro:content';
 import { performance } from 'node:perf_hooks';
 import * as R from 'remeda';
+
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 
 import { millisecondsPerHour, siteTimezoneOffsetHours } from '#constants.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
@@ -33,7 +34,7 @@ async function createRenderMdxFunction() {
 	container.addServerRenderer({ name: 'mdx', renderer: mdxRenderer });
 
 	return async function (
-		entry: CollectionEntry<'locations' | 'pages' | 'posts'>,
+		entry: ComputedEntry<'locations' | 'pages' | 'posts'>,
 		options?: ContainerRenderOptions,
 	) {
 		const { Content } = await render(entry);
@@ -64,7 +65,7 @@ const generateFeedItem = async ({
 	shouldExcludeFootnotes,
 }: {
 	debug: boolean;
-	entry: CollectionEntry<'locations' | 'posts'>;
+	entry: ComputedEntry<'locations' | 'posts'>;
 	renderMdx: RenderMdx;
 	shouldExcludeFootnotes: boolean;
 }) => {

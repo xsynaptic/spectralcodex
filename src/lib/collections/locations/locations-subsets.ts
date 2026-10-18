@@ -16,7 +16,7 @@ export async function getObjectiveLocations() {
 		R.filter((entry) => !!entry.data.objective && entry.data.objective >= 1),
 		R.filter((entry) =>
 			getRegionsByIds(entry.data.regions.map(({ id }) => id)).some(
-				(region) => region.id === atlasRegionId || region.data._ancestors?.includes(atlasRegionId),
+				(region) => region.id === atlasRegionId || region.data._ancestors.includes(atlasRegionId),
 			),
 		),
 	);

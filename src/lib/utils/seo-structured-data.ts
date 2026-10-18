@@ -1,4 +1,4 @@
-import type { CollectionEntry } from 'astro:content';
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getAbsoluteUrl, getContentPath, getSitePath } from '#lib/utils/routing.ts';
@@ -120,7 +120,7 @@ export function buildAuthorSchema(options?: { sameAs?: ReadonlyArray<string> }):
 // `regions` must be ordered root first; breadcrumb positions follow array order
 export function buildEntryBreadcrumbSchema(props: {
 	collection: 'locations' | 'posts' | 'regions' | 'resources' | 'series' | 'themes';
-	regions?: ReadonlyArray<CollectionEntry<'regions'>> | undefined;
+	regions?: ReadonlyArray<ComputedEntry<'regions'>> | undefined;
 	title: string;
 	url: string;
 }): BreadcrumbList {

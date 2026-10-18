@@ -1,6 +1,5 @@
 import type { OpenGraphMetadataItem } from '@spectralcodex/scripts/og-image';
 import type { Page } from 'astro';
-import type { CollectionEntry } from 'astro:content';
 
 import { probeLuminanceTop, toOpenGraphEntryItem } from '@spectralcodex/scripts/og-image';
 import path from 'node:path';
@@ -8,6 +7,7 @@ import path from 'node:path';
 import type { WebmentionReply } from '#components/webmentions/webmentions-data.ts';
 import type { CatalogItem, ImageFeaturedWithCaption } from '#lib/catalog/catalog-types.ts';
 import type { ChronologyDailyCounts } from '#lib/collections/chronology/chronology-types.ts';
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 import type { Citation } from '#lib/collections/resources/resources-citation.ts';
 import type { ResourceLink, ResourceSource } from '#lib/collections/resources/resources-data.ts';
 import type { MultilingualContent } from '#lib/i18n/i18n-types.ts';
@@ -66,7 +66,7 @@ export async function getSampleLocations() {
 export async function getSampleNearbyLocations() {
 	const { entries } = await getLocationsCollection();
 
-	const entry = entries.find((entry) => (entry.data._nearby?.length ?? 0) > 1);
+	const entry = entries.find((entry) => entry.data._nearby.length > 1);
 
 	if (!entry) return [];
 
@@ -78,11 +78,10 @@ export async function getSampleNearbyLocations() {
 export async function getSampleRegions() {
 	const { entries } = await getRegionsCollection();
 
-	const nested = entries.filter((entry) => (entry.data._ancestors?.length ?? 0) > 0);
+	const nested = entries.filter((entry) => entry.data._ancestors.length > 0);
 
 	const deepest = [...nested].toSorted(
-		(regionA, regionB) =>
-			(regionB.data._ancestors?.length ?? 0) - (regionA.data._ancestors?.length ?? 0),
+		(regionA, regionB) => regionB.data._ancestors.length - regionA.data._ancestors.length,
 	)[0];
 
 	return { deepest, nested: nested.slice(0, 3) };
@@ -92,7 +91,7 @@ export async function getSampleRelatedRegion() {
 	const { entries } = await getRegionsCollection();
 
 	return entries.find(
-		(entry) => (entry.data._children?.length ?? 0) > 0 && (entry.data._siblings?.length ?? 0) > 0,
+		(entry) => entry.data._children.length > 0 && entry.data._siblings.length > 0,
 	);
 }
 
@@ -118,7 +117,7 @@ function getSampleUrl(fragment: string) {
 	return `${sampleUrl}#${fragment}`;
 }
 
-export function createSampleImageProps(entry: CollectionEntry<'images'>) {
+export function createSampleImageProps(entry: ComputedEntry<'images'>) {
 	const aspectRatio = entry.data.width / entry.data.height;
 
 	return {
@@ -169,7 +168,7 @@ const sampleCaptions = [
 	'Terminus platform, Beigang',
 ];
 
-export function createSampleImageFeaturedGroup(entries: Array<CollectionEntry<'images'>>) {
+export function createSampleImageFeaturedGroup(entries: Array<ComputedEntry<'images'>>) {
 	return entries.map((entry, index) => ({
 		caption: {
 			title: sampleCaptions[index] ?? entry.data.title,

@@ -1,6 +1,7 @@
 ---
 import type { Page } from 'astro';
-import type { CollectionEntry } from 'astro:content';
+
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 
 import Anchor from '#components/parts/anchor.astro';
 import CollectionList from '#components/parts/collection-list.astro';
@@ -10,7 +11,7 @@ import { getContentPath } from '#lib/utils/routing.ts';
 import { formatNumber } from '#lib/utils/text.ts';
 
 interface Props {
-	page: Page<CollectionEntry<'resources'>>;
+	page: Page<ComputedEntry<'resources'>>;
 }
 
 const { page } = Astro.props;

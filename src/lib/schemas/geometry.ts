@@ -6,7 +6,6 @@ import { z } from 'zod';
 import { LocationTwHeritageSchema } from '#lib/collections/locations/locations-schemas.ts';
 import { createMultilingualSchemas, titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
 import { getTruncatedLngLat } from '#lib/map/map-utils.ts';
-import { ImageThumbnailSchema } from '#lib/schemas/index.ts';
 import { NumericScaleSchema, TitleSchema } from '#lib/schemas/index.ts';
 
 function validateCoordinates(coordinates: [number, number]) {
@@ -55,7 +54,6 @@ export const GeometryPointsSchema = z.strictObject({
 	heritage: LocationTwHeritageSchema.optional(),
 	status: z.enum(LocationStatusEnum).optional(),
 	...createMultilingualSchemas('address'),
-	_imageThumbnail: ImageThumbnailSchema.nullable().optional(),
 	googleMapsUrl: z.url().optional(),
 	imageFeatured: z.string().nullable().optional(),
 	precision: NumericScaleSchema.optional(),

@@ -1,8 +1,9 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
-import type { CollectionEntry } from 'astro:content';
 
 import { IMAGE_SERVER_SECRET, IMAGE_SERVER_URL } from 'astro:env/server';
+
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 
 import ImageMetadataItem from '#components/image-metadata/image-metadata-item.astro';
 import DateDisplay from '#components/parts/date-display.astro';
@@ -18,7 +19,7 @@ import { DatePresetEnum } from '#lib/utils/date.ts';
 import { formatStringTemplate } from '#lib/utils/text.ts';
 
 interface Props extends HTMLAttributes<'div'> {
-	entry: CollectionEntry<'images'>;
+	entry: ComputedEntry<'images'>;
 }
 
 const { entry, ...props } = Astro.props;

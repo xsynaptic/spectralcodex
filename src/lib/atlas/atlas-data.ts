@@ -1,9 +1,9 @@
 import type { MapView } from '@spectralcodex/react-map-component';
-import type { CollectionEntry } from 'astro:content';
 
 import { selectMapRows } from '@spectralcodex/map-codec';
 import pMemoize from 'p-memoize';
 
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 import type { MapComponentData } from '#lib/map/map-data.ts';
 import type { MapScopeEntry } from '#lib/map/map-entry-rules.ts';
 
@@ -20,7 +20,7 @@ export type AtlasPageProps =
 	{ page: typeof atlasPage.map } | { page: typeof atlasPage.pane; view: MapView };
 
 export async function getAtlasLocationPage(
-	entry: CollectionEntry<'locations'>,
+	entry: ComputedEntry<'locations'>,
 	mapData: MapComponentData,
 ): Promise<AtlasPageProps | undefined> {
 	if (!mapData.hasGeodata || isGeometryHidden(entry)) return;

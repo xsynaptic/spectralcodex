@@ -13,11 +13,6 @@ export const themes = defineCollection({
 		.object({
 			title: TitleSchema,
 			...titleMultilingualSchema,
-			_entryCount: z.number().int().optional(),
-			_locationCount: z.number().int().optional(),
-			_locations: z.string().array().optional(),
-			_postCount: z.number().int().optional(),
-			_posts: z.string().array().optional(),
 			dateCreated: DateSchema,
 			dateUpdated: DateSchema.optional(),
 			description: z.string().optional(),

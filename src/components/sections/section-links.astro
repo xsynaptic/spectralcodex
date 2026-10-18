@@ -1,6 +1,7 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
-import type { CollectionEntry } from 'astro:content';
+
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 
 import ContentSection from '#components/content/content-section.astro';
 import ResourcesLinks from '#components/resources/resources-links.astro';
@@ -8,7 +9,7 @@ import { createResolveResourceLinksFunction } from '#lib/collections/resources/r
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 interface Props extends HTMLAttributes<'div'> {
-	entry: CollectionEntry<'locations' | 'posts' | 'regions' | 'resources' | 'themes'>;
+	entry: ComputedEntry<'locations' | 'posts' | 'regions' | 'resources' | 'themes'>;
 }
 
 const { entry, ...props } = Astro.props;

@@ -7,7 +7,7 @@ import type { ResourceAssociation } from '#lib/collections/resources/resources-a
 
 import { buildResourceAssociation } from '#lib/collections/resources/resources-association.ts';
 import { createCollectionData, getRawCollection } from '#lib/utils/collections.ts';
-import { collectUnlistedLocationIds, populateContentCounts } from '#lib/utils/content-policy.ts';
+import { collectUnlistedLocationIds, countContent } from '#lib/utils/content-policy.ts';
 
 export type ResourceLink = NonNullable<ReturnType<ResolveResourceLinks>>[number];
 
@@ -30,19 +30,19 @@ export const getResourceAssociation = pMemoize(async (): Promise<ResourceAssocia
 
 export const getResourcesCollection = createCollectionData({
 	collection: 'resources',
-	label: 'Resources',
-	async mutate(entries) {
+	async compute() {
 		const { locationIdsByResourceId, postIdsByResourceId } = await getResourceAssociation();
 		const unlistedLocationIds = collectUnlistedLocationIds(await getRawCollection('locations'));
 
-		for (const entry of entries) {
-			populateContentCounts(entry.data, {
+		return function computeResource(entry: CollectionEntry<'resources'>) {
+			return countContent({
 				locations: locationIdsByResourceId.get(entry.id) ?? [],
 				posts: postIdsByResourceId.get(entry.id) ?? [],
 				unlistedLocationIds,
 			});
-		}
+		};
 	},
+	label: 'Resources',
 });
 
 export async function createResolveResourceLinksFunction() {

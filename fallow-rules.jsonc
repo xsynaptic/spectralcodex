@@ -13,7 +13,7 @@
 				"astro:content.getEntries",
 			],
 			"exclude": ["src/lib/utils/collections.ts"],
-			"message": "Read collections through the enriched wrappers from createCollectionData, or getRawCollection on the read path; both live in src/lib/utils/collections.ts and own the load order.",
+			"message": "Read collections through the collection wrappers from createCollectionData, or getRawCollection on the read path; both live in src/lib/utils/collections.ts and own the load order.",
 		},
 		{
 			"id": "raw-read-path",
@@ -24,7 +24,7 @@
 				"src/lib/utils/collections.ts",
 				"**/*.test.ts",
 			],
-			"message": "Raw reads return pristine frontmatter without computed `_` fields; they exist for cross-collection assembly in *-data.ts that must dodge circular init. Use the enriched collection data instead.",
+			"message": "Raw reads return pristine frontmatter without computed `_` fields; they exist for cross-collection assembly in *-data.ts that must dodge circular init. Use the wrapper's collection data instead.",
 		},
 	],
 }

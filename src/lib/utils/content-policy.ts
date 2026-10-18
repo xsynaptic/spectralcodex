@@ -35,21 +35,35 @@ export function collectUnlistedLocationIds(
 	return new Set(locations.filter(({ data }) => !isListed(data)).map(({ id }) => id));
 }
 
-interface EntryCountData {
-	_entryCount?: number | undefined;
-	_locationCount?: number | undefined;
-	_postCount?: number | undefined;
+export function getEffectiveLocationData(
+	data: CollectionEntry<'locations'>['data'],
+): CollectionEntry<'locations'>['data'] {
+	if (!contentPolicy.applyOverrides || !data.override) return data;
+
+	const { id: _, ...overrideFields } = data.override;
+
+	return {
+		...data,
+		...overrideFields,
+		regions: overrideFields.regions ?? data.regions,
+		title: overrideFields.title ?? data.title,
+	};
 }
 
-export function populateContentCounts(
-	data: EntryCountData,
-	{
-		locations,
-		posts,
-		unlistedLocationIds,
-	}: { locations: Array<string>; posts: Array<string>; unlistedLocationIds: Set<string> },
-) {
-	data._locationCount = locations.filter((id) => !unlistedLocationIds.has(id)).length;
-	data._postCount = posts.length;
-	data._entryCount = data._locationCount + data._postCount;
+export function countContent({
+	locations,
+	posts,
+	unlistedLocationIds,
+}: {
+	locations: Array<string>;
+	posts: Array<string>;
+	unlistedLocationIds: Set<string>;
+}) {
+	const locationCount = locations.filter((id) => !unlistedLocationIds.has(id)).length;
+
+	return {
+		_entryCount: locationCount + posts.length,
+		_locationCount: locationCount,
+		_postCount: posts.length,
+	};
 }

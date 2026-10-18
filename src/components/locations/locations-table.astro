@@ -1,7 +1,7 @@
 ---
-import type { CollectionEntry } from 'astro:content';
-
 import { getPublicId } from '@spectralcodex/shared/entries';
+
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 
 import Anchor from '#components/parts/anchor.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
@@ -16,7 +16,7 @@ interface Column {
 }
 
 interface Props {
-	locations: Array<CollectionEntry<'locations'>>;
+	locations: Array<ComputedEntry<'locations'>>;
 }
 
 const { locations } = Astro.props;

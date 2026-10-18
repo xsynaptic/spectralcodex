@@ -1,8 +1,7 @@
-import type { CollectionEntry } from 'astro:content';
-
 import pMemoize from 'p-memoize';
 
 import type { NavigationItem } from '#components/navigation/navigation-types.ts';
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 
 import { getNavigationItemUrls } from '#components/navigation/navigation-utils.ts';
 import { getChronologyData } from '#lib/collections/chronology/chronology-data.ts';
@@ -40,7 +39,7 @@ async function createNavigationHeaderItems(): Promise<Array<NavigationItem>> {
 		.slice(0, 12)
 		.map((entry) => ({
 			...getNavigationItemData({ collection: 'regions', entry }),
-			...(entry.data._children && maxDepth > 1
+			...(entry.data._children.length > 0 && maxDepth > 1
 				? {
 						children: getRegionsByIds(entry.data._children)
 							.filter(filterNavigationItemEntryCount(2))
@@ -48,7 +47,7 @@ async function createNavigationHeaderItems(): Promise<Array<NavigationItem>> {
 							.slice(0, 15)
 							.map((entry) => ({
 								...getNavigationItemData({ collection: 'regions', entry }),
-								...(entry.data._children && maxDepth > 2
+								...(entry.data._children.length > 0 && maxDepth > 2
 									? {
 											children: getRegionsByIds(entry.data._children)
 												.filter(filterNavigationItemEntryCount(3))
@@ -130,8 +129,8 @@ function filterNavigationItemEntryCount(depth: 1 | 2 | 3) {
 		minEntryCount = 8;
 	}
 
-	return (entry: CollectionEntry<'regions' | 'series' | 'themes'>) =>
-		(entry.data._entryCount ?? 0) >= minEntryCount;
+	return (entry: ComputedEntry<'regions' | 'series' | 'themes'>) =>
+		entry.data._entryCount >= minEntryCount;
 }
 
 function getNavigationCollectionMenu({
@@ -139,7 +138,7 @@ function getNavigationCollectionMenu({
 	entries,
 }: {
 	collection: 'series' | 'themes';
-	entries: Array<CollectionEntry<'series' | 'themes'>>;
+	entries: Array<ComputedEntry<'series' | 'themes'>>;
 }) {
 	return entries
 		.filter((entry) => isListedQuality(entry.data))
@@ -154,9 +153,9 @@ function getNavigationItemData({
 	entry,
 }: {
 	collection: 'regions' | 'series' | 'themes';
-	entry: CollectionEntry<'regions' | 'series' | 'themes'>;
+	entry: ComputedEntry<'regions' | 'series' | 'themes'>;
 }) {
-	const ancestor = entry.collection === 'regions' ? entry.data._ancestors?.at(-1) : undefined;
+	const ancestor = entry.collection === 'regions' ? entry.data._ancestors.at(-1) : undefined;
 
 	return {
 		collection: entry.collection,

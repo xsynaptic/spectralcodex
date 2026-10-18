@@ -1,6 +1,6 @@
-import type { CollectionEntry } from 'astro:content';
-
 import * as R from 'remeda';
+
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { isEditorialEntry } from '#lib/catalog/catalog-utils.ts';
@@ -13,7 +13,7 @@ export async function createQueryPostsEntryFunction() {
 	const catalog = await getCatalog();
 	const getEntryMapData = await createEntryMapDataFunction();
 
-	return function queryPostsEntry(entry: CollectionEntry<'posts'>) {
+	return function queryPostsEntry(entry: ComputedEntry<'posts'>) {
 		const mapData = getEntryMapData(entry);
 
 		const backlinks = catalog.backlinksOf(entry.id).filter(isEditorialEntry);

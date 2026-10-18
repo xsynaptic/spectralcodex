@@ -1,4 +1,4 @@
-import type { CollectionEntry, CollectionKey } from 'astro:content';
+import type { CollectionKey } from 'astro:content';
 
 import { createSqliteCache } from '@spectralcodex/shared/cache';
 import { mkdtempSync } from 'node:fs';
@@ -6,10 +6,12 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { describe, expect, test, vi } from 'vitest';
 
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
+
 import { createWordCountFunction } from '#lib/catalog/catalog-word-count.ts';
 
 function buildEntry(id: string, body: string) {
-	return { body, collection: 'posts', data: {}, id } as unknown as CollectionEntry<CollectionKey>;
+	return { body, collection: 'posts', data: {}, id } as unknown as ComputedEntry<CollectionKey>;
 }
 
 function setup() {

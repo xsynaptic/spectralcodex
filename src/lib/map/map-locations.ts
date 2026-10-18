@@ -4,7 +4,6 @@ import type {
 	MapPopupItem,
 	MapSourceItem,
 } from '@spectralcodex/map-codec';
-import type { CollectionEntry } from 'astro:content';
 import type { Feature, Position } from 'geojson';
 
 import {
@@ -16,14 +15,14 @@ import { getPublicId } from '@spectralcodex/shared/entries';
 import { GeometryTypeEnum } from '@spectralcodex/shared/map';
 import { stripDiacritics } from '@spectralcodex/shared/text';
 
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
+import type { LocationPoint } from '#lib/collections/locations/locations-data.ts';
 import type { MultilingualContent } from '#lib/i18n/i18n-types.ts';
 
 import { mapDisplayRegionIds, mapPointIdSeparator } from '#constants.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getTruncatedLngLat } from '#lib/map/map-utils.ts';
 import { isGeometryHidden } from '#lib/utils/content-policy.ts';
-
-type LocationGeometry = Exclude<CollectionEntry<'locations'>['data']['geometry'], Array<unknown>>;
 
 export type MapLocationFeature = Feature<MapSourceItem['geometry'], MapFeatureProperties> & {
 	id: string;
@@ -33,7 +32,7 @@ interface LocationFeaturesOptions {
 	includeHidden?: boolean | undefined;
 }
 
-export function getLocationFeatureIds(entry: CollectionEntry<'locations'>): Array<string> {
+export function getLocationFeatureIds(entry: ComputedEntry<'locations'>): Array<string> {
 	const publicId = getPublicId(entry);
 	const geometryArray = Array.isArray(entry.data.geometry)
 		? entry.data.geometry
@@ -61,13 +60,10 @@ function getRelativePath(url: string | undefined): string | undefined {
 }
 
 // Shared across every region and theme map; safe only because output depends on nothing but the entry
-const locationFeaturesCache = new WeakMap<
-	CollectionEntry<'locations'>,
-	Array<MapLocationFeature>
->();
+const locationFeaturesCache = new WeakMap<ComputedEntry<'locations'>, Array<MapLocationFeature>>();
 
 export function getLocationFeatures(
-	locations: Array<CollectionEntry<'locations'>>,
+	locations: Array<ComputedEntry<'locations'>>,
 	options?: LocationFeaturesOptions,
 ): Array<MapLocationFeature> {
 	const shown = options?.includeHidden ? locations : filterHiddenLocations(locations);
@@ -77,16 +73,14 @@ export function getLocationFeatures(
 		.toSorted((a, b) => a.id.localeCompare(b.id));
 }
 
-export function getLocationsMapRule(locations: Array<CollectionEntry<'locations'>>) {
+export function getLocationsMapRule(locations: Array<ComputedEntry<'locations'>>) {
 	return {
 		ids: filterHiddenLocations(locations).flatMap((entry) => getLocationFeatureIds(entry)),
 		type: 'ids',
 	} satisfies MapFeaturesRule;
 }
 
-export function isEntryMapEnabled(
-	entry: CollectionEntry<'posts' | 'regions' | 'series' | 'themes'>,
-) {
+export function isEntryMapEnabled(entry: ComputedEntry<'posts' | 'regions' | 'series' | 'themes'>) {
 	switch (entry.collection) {
 		// Posts and Series cannot turn their map off; one still appears only when their Locations are mapped
 		case 'posts':
@@ -96,7 +90,7 @@ export function isEntryMapEnabled(
 		case 'regions': {
 			return (
 				mapDisplayRegionIds.has(entry.id) ||
-				(entry.data._ancestors?.some((ancestor) => mapDisplayRegionIds.has(ancestor)) ?? false)
+				entry.data._ancestors.some((ancestor) => mapDisplayRegionIds.has(ancestor))
 			);
 		}
 		case 'themes': {
@@ -127,7 +121,7 @@ export function getThemeMapRule(
 	return { index, type: 'theme' };
 }
 
-function filterHiddenLocations(locations: Array<CollectionEntry<'locations'>>) {
+function filterHiddenLocations(locations: Array<ComputedEntry<'locations'>>) {
 	return locations.filter((entry) => !isGeometryHidden(entry));
 }
 
@@ -174,7 +168,7 @@ export function getLocationsMapSourceData(
 	});
 }
 
-function buildLocationFeatures(entry: CollectionEntry<'locations'>): Array<MapLocationFeature> {
+function buildLocationFeatures(entry: ComputedEntry<'locations'>): Array<MapLocationFeature> {
 	const cached = locationFeaturesCache.get(entry);
 
 	if (cached) return cached;
@@ -213,7 +207,7 @@ function buildLocationFeatures(entry: CollectionEntry<'locations'>): Array<MapLo
 	return features;
 }
 
-function getEntryFeatureProperties(entry: CollectionEntry<'locations'>) {
+function getEntryFeatureProperties(entry: ComputedEntry<'locations'>) {
 	return {
 		entryQuality: entry.data.entryQuality,
 		objective: entry.data.objective,
@@ -229,9 +223,9 @@ function getFeatureTitleProperties({
 	geometry,
 	isMultiPoint,
 }: {
-	entry: CollectionEntry<'locations'>;
+	entry: ComputedEntry<'locations'>;
 	entryTitleMultilingual: MultilingualContent | undefined;
-	geometry: LocationGeometry;
+	geometry: LocationPoint;
 	isMultiPoint: boolean;
 }) {
 	const geometryTitleMultilingual = getMultilingualContent({
@@ -257,8 +251,8 @@ function getPointTitle(title: string | undefined, multilingual: MultilingualCont
 }
 
 function getGeometryFeatureProperties(
-	entry: CollectionEntry<'locations'>,
-	geometry: LocationGeometry,
+	entry: ComputedEntry<'locations'>,
+	geometry: LocationPoint,
 	isMultiPoint: boolean,
 ) {
 	const image = (geometry._imageThumbnail === undefined ? entry.data : geometry)._imageThumbnail;
@@ -274,8 +268,8 @@ function getGeometryFeatureProperties(
 }
 
 function getGeometryLinkProperties(
-	entry: CollectionEntry<'locations'>,
-	geometry: LocationGeometry,
+	entry: ComputedEntry<'locations'>,
+	geometry: LocationPoint,
 	isMultiPoint: boolean,
 ) {
 	const googleMapsUrl = isMultiPoint
@@ -302,7 +296,7 @@ function getMultilingualTitleProperties(
 	};
 }
 
-function getOwnProperties(geometry: LocationGeometry) {
+function getOwnProperties(geometry: LocationPoint) {
 	const own =
 		(geometry.description ? MapPopupOwnField.Description : 0) |
 		(geometry._imageThumbnail ? MapPopupOwnField.Image : 0) |

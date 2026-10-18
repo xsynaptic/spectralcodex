@@ -4,66 +4,62 @@ import { getCollection } from 'astro:content';
 import { performance } from 'node:perf_hooks';
 import pMemoize, { pMemoizeClear } from 'p-memoize';
 
-// Stamped during collection provisioning; each collection decides what belongs to it
 interface CollectionEntryWithEntryCount {
 	data: {
-		_entryCount?: number | undefined;
+		_entryCount: number;
 	};
 }
 
-// Collection-level derivation; its return is merged into the result so consumers can read the artifact
-type CollectionExtendFunction<K extends CollectionKey, A extends object> = (
-	entries: Array<CollectionEntry<K>>,
-	entriesMap: Map<string, CollectionEntry<K>>,
-) => A | Promise<A>;
-
-// Per-entry mutation over the loaded entries; stamps computed fields onto entry.data in place
-type CollectionMutateFunction<K extends CollectionKey> = (
-	entries: Array<CollectionEntry<K>>,
-	entriesMap: Map<string, CollectionEntry<K>>,
-) => Promise<void> | void;
-
-// Collection data factory utilities
-interface CollectionResult<K extends CollectionKey> {
-	entries: Array<CollectionEntry<K>>;
-	entriesMap: Map<string, CollectionEntry<K>>;
+interface CollectionResult<E extends { id: string }> {
+	entries: Array<E>;
+	entriesMap: Map<string, E>;
 }
 
-// Factory for memoized, enriched collection data
-// mutate() stamps computed `_` fields onto entry.data in place; extend() derives collection-level artifacts
-// Ordering contract: raw reads via getRawCollection() see pristine frontmatter, never computed `_` fields
-// A bypass that observes a computed field depends on which wrapper ran first; that order is not guaranteed
-export function createCollectionData<K extends CollectionKey, A extends object = object>(config: {
+type CollectionComputeFunction<K extends CollectionKey, C extends object> = (
+	entries: Array<CollectionEntry<K>>,
+) => ((entry: CollectionEntry<K>) => C) | Promise<(entry: CollectionEntry<K>) => C>;
+
+type ComputedCollectionEntry<K extends CollectionKey, C extends object> = Omit<
+	CollectionEntry<K>,
+	'data'
+> & {
+	data: C & Omit<CollectionEntry<K>['data'], keyof C>;
+};
+
+// Factory for memoized collection data with computed fields
+export function createCollectionData<K extends CollectionKey, C extends object>(config: {
 	collection: K;
-	extend?: CollectionExtendFunction<K, A>;
+	compute: CollectionComputeFunction<K, C>;
 	label?: string;
-	mutate?: CollectionMutateFunction<K>;
-}) {
-	const getData = pMemoize(async (): Promise<A & CollectionResult<K>> => {
+}): () => Promise<CollectionResult<ComputedCollectionEntry<K, C>>>;
+export function createCollectionData<K extends CollectionKey>(config: {
+	collection: K;
+	label?: string;
+}): () => Promise<CollectionResult<CollectionEntry<K>>>;
+export function createCollectionData<K extends CollectionKey, C extends object>(config: {
+	collection: K;
+	compute?: CollectionComputeFunction<K, C>;
+	label?: string;
+}): () => Promise<CollectionResult<CollectionEntry<K> | ComputedCollectionEntry<K, C>>> {
+	const getData = pMemoize(async () => {
 		const startTime = performance.now();
 
-		const entries = await getCollection(config.collection);
+		const rawEntries = await getCollection(config.collection);
 
-		const entriesMap = new Map<string, CollectionEntry<K>>();
+		const entries = config.compute ? await computeEntries(rawEntries, config.compute) : rawEntries;
 
-		for (const entry of entries) {
-			entriesMap.set(entry.id, entry);
-		}
-
-		await config.mutate?.(entries, entriesMap);
-
-		const extra = (await config.extend?.(entries, entriesMap)) ?? ({} as A);
+		const entriesMap = new Map(entries.map((entry) => [entry.id, entry]));
 
 		console.log(
 			`[${config.label ?? config.collection}] Collection data generated in ${(performance.now() - startTime).toFixed(4)}ms`,
 		);
 
-		return { entries, entriesMap, ...extra };
+		return { entries, entriesMap };
 	});
 
 	// In dev the content store can load empty if Astro's data-store module fails to parse
 	// Memoizing that empty result would strand it for the whole session; evict empties to allow for recovery
-	return async function (): Promise<A & CollectionResult<K>> {
+	return async function () {
 		const result = await getData();
 
 		if (import.meta.env.DEV && result.entries.length === 0) {
@@ -74,26 +70,37 @@ export function createCollectionData<K extends CollectionKey, A extends object =
 	};
 }
 
+async function computeEntries<K extends CollectionKey, C extends object>(
+	entries: Array<CollectionEntry<K>>,
+	compute: CollectionComputeFunction<K, C>,
+) {
+	const computeEntry = await compute(entries);
+
+	return entries.map((entry) => ({
+		...entry,
+		data: { ...entry.data, ...computeEntry(entry) },
+	}));
+}
+
 export function hasEntries(entry: CollectionEntryWithEntryCount) {
-	return (entry.data._entryCount ?? 0) > 0;
+	return entry.data._entryCount > 0;
 }
 
 // Sort a collection by entry count, from most to least
 export function sortByEntryCount<T extends CollectionEntryWithEntryCount>(entryA: T, entryB: T) {
-	return (entryB.data._entryCount ?? 0) - (entryA.data._entryCount ?? 0);
+	return entryB.data._entryCount - entryA.data._entryCount;
 }
 
-// Explicit raw read for cross-collection assembly; bypasses the enriched wrappers to avoid circular init
-// Per the ordering contract above: use for pristine frontmatter only, never computed `_` fields
+// Explicit raw read for cross-collection assembly; bypasses the collection wrappers to avoid circular init
 const rawCollectionPromises = new Map<
 	CollectionKey,
 	Promise<Array<CollectionEntry<CollectionKey>>>
 >();
 
 // Factory function to create a lookup function for collection entries by ID
-export function createCollectionLookupByIds<K extends CollectionKey>(
+export function createCollectionLookupByIds<E extends { id: string }>(
 	label: string,
-	getData: () => Promise<CollectionResult<K>>,
+	getData: () => Promise<CollectionResult<E>>,
 ) {
 	return async function () {
 		const { entriesMap } = await getData();
@@ -108,7 +115,7 @@ export function createCollectionLookupByIds<K extends CollectionKey>(
 					}
 					return entry;
 				})
-				.filter((entry): entry is CollectionEntry<K> => !!entry);
+				.filter((entry): entry is E => !!entry);
 		};
 	};
 }

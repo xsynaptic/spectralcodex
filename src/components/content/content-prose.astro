@@ -1,8 +1,9 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
-import type { CollectionEntry } from 'astro:content';
 
 import { render } from 'astro:content';
+
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 
 import ContentSection from '#components/content/content-section.astro';
 import Prose from '#components/parts/prose.astro';
@@ -10,7 +11,7 @@ import { hasEntryContent } from '#lib/utils/astro.ts';
 import { renderMarkdownInline } from '#lib/utils/text.ts';
 
 interface Props extends HTMLAttributes<'div'> {
-	entry: CollectionEntry<'locations' | 'regions' | 'resources' | 'series' | 'themes'>;
+	entry: ComputedEntry<'locations' | 'regions' | 'resources' | 'series' | 'themes'>;
 }
 
 const { class: className, entry, ...props } = Astro.props;

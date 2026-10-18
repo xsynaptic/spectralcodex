@@ -1,6 +1,6 @@
-import type { CollectionEntry } from 'astro:content';
-
 import * as R from 'remeda';
+
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { hasFeaturedImage, sortCatalogByDate } from '#lib/catalog/catalog-utils.ts';
@@ -24,7 +24,7 @@ export async function createQueryResourcesEntryFunction() {
 	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
 	const getMapData = await createMapDataFunction();
 
-	return function queryResourcesEntry(entry: CollectionEntry<'resources'>) {
+	return function queryResourcesEntry(entry: ComputedEntry<'resources'>) {
 		const regionPrimary = getFirstRegionByReference(entry.data.regions);
 
 		const locationsFiltered = getLocationsByResource(entry);
@@ -70,8 +70,8 @@ async function createLocationsByResourceFunction() {
 	const { locationIdsByResourceId } = await getResourceAssociation();
 
 	return function getLocationsByResource(
-		resource: CollectionEntry<'resources'>,
-	): Array<CollectionEntry<'locations'>> {
+		resource: ComputedEntry<'resources'>,
+	): Array<ComputedEntry<'locations'>> {
 		const locationIds = locationIdsByResourceId.get(resource.id) ?? [];
 
 		return locationIds.map((locationId) => entriesMap.get(locationId)).filter((entry) => !!entry);
@@ -83,8 +83,8 @@ async function createPostsByResourceFunction() {
 	const { postIdsByResourceId } = await getResourceAssociation();
 
 	return function getPostsByResource(
-		resource: CollectionEntry<'resources'>,
-	): Array<CollectionEntry<'posts'>> {
+		resource: ComputedEntry<'resources'>,
+	): Array<ComputedEntry<'posts'>> {
 		const postIds = postIdsByResourceId.get(resource.id) ?? [];
 
 		return postIds.map((postId) => entriesMap.get(postId)).filter((entry) => !!entry);

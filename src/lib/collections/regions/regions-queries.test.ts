@@ -1,8 +1,7 @@
-import type { CollectionEntry } from 'astro:content';
-
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 
 import { createCatalog } from '#lib/catalog/catalog-factory.ts';
 import {
@@ -30,7 +29,7 @@ vi.mock('#lib/collections/posts/posts-data.ts', () => ({
 }));
 vi.mock('#lib/collections/regions/regions-data.ts', () => ({
 	createRegionAncestorsFunction: () =>
-		Promise.resolve((region: CollectionEntry<'regions'>) => [region]),
+		Promise.resolve((region: ComputedEntry<'regions'>) => [region]),
 	createRegionsByIdsFunction: () => Promise.resolve(() => []),
 	getRegionsCollection: getRegionsCollectionMock,
 }));
@@ -48,11 +47,8 @@ function makeRegion(id: string, data: Record<string, unknown> = {}) {
 	return makeEntry('regions', id, data);
 }
 
-function setRegions(regions: Array<CollectionEntry<'regions'>>) {
-	getRegionsCollectionMock.mockResolvedValue({
-		entries: regions,
-		regionsTree: { intervalById: new Map() },
-	});
+function setRegions(regions: Array<ComputedEntry<'regions'>>) {
+	getRegionsCollectionMock.mockResolvedValue({ entries: regions });
 	getCatalogMock.mockResolvedValue(
 		createCatalog([...locations, ...posts, ...regions].map((entry) => makeCatalogItemFor(entry))),
 	);

@@ -1,8 +1,9 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
-import type { CollectionEntry } from 'astro:content';
 
 import { WEBMENTIONS_SHOW } from 'astro:env/server';
+
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 
 import ContentSection from '#components/content/content-section.astro';
 import { getWebmentionsFunction } from '#components/webmentions/webmentions-data.ts';
@@ -10,7 +11,7 @@ import WebmentionsList from '#components/webmentions/webmentions-list.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 interface Props extends HTMLAttributes<'div'> {
-	entry: CollectionEntry<'locations' | 'posts' | 'regions' | 'series' | 'themes'> | undefined;
+	entry: ComputedEntry<'locations' | 'posts' | 'regions' | 'series' | 'themes'> | undefined;
 }
 
 const { entry, ...props } = Astro.props;

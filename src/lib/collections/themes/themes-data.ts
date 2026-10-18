@@ -5,7 +5,7 @@ import {
 	createCollectionLookupByIds,
 	getRawCollection,
 } from '#lib/utils/collections.ts';
-import { collectUnlistedLocationIds, populateContentCounts } from '#lib/utils/content-policy.ts';
+import { collectUnlistedLocationIds, countContent } from '#lib/utils/content-policy.ts';
 
 // Direct membership only; unlike regions, themes do not roll up their children
 function mapByTheme(
@@ -27,8 +27,7 @@ function mapByTheme(
 
 export const getThemesCollection = createCollectionData({
 	collection: 'themes',
-	label: 'Themes',
-	async mutate(entries) {
+	async compute() {
 		const locations = await getRawCollection('locations');
 		const posts = await getRawCollection('posts');
 
@@ -37,17 +36,18 @@ export const getThemesCollection = createCollectionData({
 
 		const unlistedLocationIds = collectUnlistedLocationIds(locations);
 
-		for (const entry of entries) {
-			entry.data._locations = locationsByThemeMap.get(entry.id) ?? [];
-			entry.data._posts = postsByThemeMap.get(entry.id) ?? [];
+		return function computeTheme(entry: CollectionEntry<'themes'>) {
+			const themeLocations = locationsByThemeMap.get(entry.id) ?? [];
+			const themePosts = postsByThemeMap.get(entry.id) ?? [];
 
-			populateContentCounts(entry.data, {
-				locations: entry.data._locations,
-				posts: entry.data._posts,
-				unlistedLocationIds,
-			});
-		}
+			return {
+				_locations: themeLocations,
+				_posts: themePosts,
+				...countContent({ locations: themeLocations, posts: themePosts, unlistedLocationIds }),
+			};
+		};
 	},
+	label: 'Themes',
 });
 
 export const createThemesByIdsFunction = createCollectionLookupByIds('Themes', getThemesCollection);

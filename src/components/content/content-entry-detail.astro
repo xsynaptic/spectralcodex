@@ -1,9 +1,8 @@
 ---
-import type { CollectionEntry } from 'astro:content';
-
 import { stripDiacritics } from '@spectralcodex/shared/text';
 
 import type { AtlasPageProps } from '#lib/atlas/atlas-data.ts';
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 
 import ContentArticle from '#components/content/content-article.astro';
 import ContentHeader from '#components/content/content-header.astro';
@@ -19,8 +18,8 @@ import { getSeoImageProps } from '#lib/utils/seo.ts';
 
 interface Props {
 	atlas?: AtlasPageProps | undefined;
-	breadcrumbRegions?: Array<CollectionEntry<'regions'>> | undefined;
-	entry: CollectionEntry<'regions' | 'resources' | 'series' | 'themes'>;
+	breadcrumbRegions?: Array<ComputedEntry<'regions'>> | undefined;
+	entry: ComputedEntry<'regions' | 'resources' | 'series' | 'themes'>;
 }
 
 const { atlas, breadcrumbRegions, entry } = Astro.props;

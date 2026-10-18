@@ -1,6 +1,7 @@
-import type { CollectionEntry, CollectionKey } from 'astro:content';
+import type { CollectionKey } from 'astro:content';
 
 import type { CatalogCollectionKey, CatalogItem } from '#lib/catalog/catalog-types.ts';
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 
 import { makeCatalogItem } from '#lib/catalog/catalog-test-utils.ts';
 
@@ -15,15 +16,15 @@ export function makeEntry<T extends CollectionKey>(
 	collection: T,
 	id: string,
 	data: FixtureData & Record<string, unknown> = {},
-): CollectionEntry<T> {
+): ComputedEntry<T> {
 	return {
 		collection,
 		data: { dateCreated: new Date(2020, 0, 1), entryQuality: 3, title: id, ...data },
 		id,
-	} as unknown as CollectionEntry<T>;
+	} as unknown as ComputedEntry<T>;
 }
 
-export function makeCatalogItemFor(entry: CollectionEntry<CatalogCollectionKey>): CatalogItem {
+export function makeCatalogItemFor(entry: ComputedEntry<CatalogCollectionKey>): CatalogItem {
 	const data = entry.data as FixtureData;
 
 	return makeCatalogItem({
@@ -64,7 +65,7 @@ export function makeListingLocations() {
 	];
 }
 
-export function createLookupByIds<T extends CollectionKey>(entries: Array<CollectionEntry<T>>) {
+export function createLookupByIds<T extends CollectionKey>(entries: Array<ComputedEntry<T>>) {
 	const entriesById = new Map(entries.map((entry) => [entry.id, entry] as const));
 
 	return (ids: Array<string>) =>

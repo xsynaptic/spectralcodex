@@ -3,10 +3,10 @@ import type { CollectionEntry } from 'astro:content';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 
 import {
+	createRegionContentFunction,
 	createRegionsTree,
-	populateRegionsContent,
-	populateRegionsHierarchy,
-	populateRegionsLangCode,
+	getRegionHierarchy,
+	getRegionLangCode,
 } from '#lib/collections/regions/regions-factory.ts';
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 
@@ -59,37 +59,33 @@ describe('createRegionsTree', () => {
 	});
 });
 
-describe('populateRegionsHierarchy', () => {
+describe('getRegionHierarchy', () => {
 	test('ancestors are nearest-first with the root last', () => {
-		const regions = makeRegionsFixture();
+		const regionsTree = createRegionsTree(makeRegionsFixture());
 
-		populateRegionsHierarchy(regions, createRegionsTree(regions));
-
-		const taipei = regions.find((entry) => entry.id === 'taipei')!;
-
-		expect(taipei.data._ancestors).toEqual(['north-taiwan', 'taiwan']);
+		expect(getRegionHierarchy(regionsTree, 'taipei')._ancestors).toEqual([
+			'north-taiwan',
+			'taiwan',
+		]);
 	});
 
-	test('children and siblings are id-sorted; empty groups stay unset', () => {
-		const regions = makeRegionsFixture();
+	test('children and siblings are id-sorted; empty groups are empty arrays', () => {
+		const regionsTree = createRegionsTree(makeRegionsFixture());
 
-		populateRegionsHierarchy(regions, createRegionsTree(regions));
-
-		const taiwan = regions.find((entry) => entry.id === 'taiwan')!;
-		const northTaiwan = regions.find((entry) => entry.id === 'north-taiwan')!;
-		const taipei = regions.find((entry) => entry.id === 'taipei')!;
-
-		expect(taiwan.data._children).toEqual(['north-taiwan', 'tainan']);
-		expect(northTaiwan.data._siblings).toEqual(['tainan']);
-		expect(taipei.data._siblings).toEqual(['keelung']);
-		// Empty groups remain undefined, not []
-		expect(taipei.data._children).toBeUndefined();
-		expect(taiwan.data._ancestors).toBeUndefined();
-		expect(taiwan.data._siblings).toBeUndefined();
+		expect(getRegionHierarchy(regionsTree, 'taiwan')).toEqual({
+			_ancestors: [],
+			_children: ['north-taiwan', 'tainan'],
+			_siblings: [],
+		});
+		expect(getRegionHierarchy(regionsTree, 'north-taiwan')._siblings).toEqual(['tainan']);
+		expect(getRegionHierarchy(regionsTree, 'taipei')).toMatchObject({
+			_children: [],
+			_siblings: ['keelung'],
+		});
 	});
 });
 
-describe('populateRegionsLangCode', () => {
+describe('getRegionLangCode', () => {
 	test('a deep descendant takes the root language, not an intermediate ancestor', () => {
 		const regions = [
 			makeRegion('taiwan'),
@@ -97,73 +93,53 @@ describe('populateRegionsLangCode', () => {
 			makeRegion('taipei', 'north-taiwan'),
 			makeRegion('daan', 'taipei'),
 		];
-
-		populateRegionsHierarchy(regions, createRegionsTree(regions));
-		populateRegionsLangCode(regions);
-
-		const daan = regions.find((entry) => entry.id === 'daan')!;
+		const { _ancestors } = getRegionHierarchy(createRegionsTree(regions), 'daan');
 
 		// Only 'taiwan' carries a language; an ancestor one step in would answer undefined
-		expect(daan.data._ancestors).toEqual(['taipei', 'north-taiwan', 'taiwan']);
-		expect(daan.data._langCode).toBe(LanguageCodeEnum.ChineseTraditional);
+		expect(_ancestors).toEqual(['taipei', 'north-taiwan', 'taiwan']);
+		expect(getRegionLangCode(regions[3]!, _ancestors)).toBe(LanguageCodeEnum.ChineseTraditional);
 	});
 
 	test('roots use their own id; unmapped roots get no code', () => {
-		const regions = [makeRegion('taiwan'), makeRegion('atlantis')];
-
-		populateRegionsHierarchy(regions, createRegionsTree(regions));
-		populateRegionsLangCode(regions);
-
-		expect(regions[0]!.data._langCode).toBe(LanguageCodeEnum.ChineseTraditional);
-		expect(regions[1]!.data._langCode).toBeUndefined();
+		expect(getRegionLangCode(makeRegion('taiwan'), [])).toBe(LanguageCodeEnum.ChineseTraditional);
+		expect(getRegionLangCode(makeRegion('atlantis'), [])).toBeUndefined();
 	});
 });
 
-describe('populateRegionsContent', () => {
+describe('createRegionContentFunction', () => {
 	test('rolls up locations and posts through descendants with dedupe', () => {
-		const regions = makeRegionsFixture();
-		const regionsTree = createRegionsTree(regions);
-		const locations = [
-			makeLocation('temple', ['taipei', 'tainan']),
-			makeLocation('fort', ['taipei']),
-		];
-		const posts = [makePost('post-taipei', ['taipei']), makePost('post-taiwan', ['taiwan'])];
+		const getRegionContent = createRegionContentFunction({
+			locations: [makeLocation('temple', ['taipei', 'tainan']), makeLocation('fort', ['taipei'])],
+			posts: [makePost('post-taipei', ['taipei']), makePost('post-taiwan', ['taiwan'])],
+			regionsTree: createRegionsTree(makeRegionsFixture()),
+		});
 
-		populateRegionsContent({ entries: regions, locations, posts, regionsTree });
-
-		const taiwan = regions.find((entry) => entry.id === 'taiwan')!;
-		const taipei = regions.find((entry) => entry.id === 'taipei')!;
-		const tainan = regions.find((entry) => entry.id === 'tainan')!;
+		const taiwan = getRegionContent('taiwan');
+		const taipei = getRegionContent('taipei');
+		const tainan = getRegionContent('tainan');
 
 		// The temple sits in two subtrees of taiwan but is counted once
-		expect(taiwan.data._locations).toEqual(['temple', 'fort']);
-		expect(taiwan.data._locationCount).toBe(2);
-		expect(taipei.data._locations).toEqual(['temple', 'fort']);
-		expect(tainan.data._locations).toEqual(['temple']);
+		expect(taiwan._locations).toEqual(['temple', 'fort']);
+		expect(taiwan._locationCount).toBe(2);
+		expect(taipei._locations).toEqual(['temple', 'fort']);
+		expect(tainan._locations).toEqual(['temple']);
 
-		expect(taiwan.data._posts).toEqual(['post-taiwan', 'post-taipei']);
-		expect(taiwan.data._postCount).toBe(2);
-		expect(taipei.data._posts).toEqual(['post-taipei']);
-		expect(tainan.data._posts).toEqual([]);
-		expect(tainan.data._postCount).toBe(0);
+		expect(taiwan._posts).toEqual(['post-taiwan', 'post-taipei']);
+		expect(taiwan._postCount).toBe(2);
+		expect(taipei._posts).toEqual(['post-taipei']);
+		expect(tainan._posts).toEqual([]);
+		expect(tainan._postCount).toBe(0);
 	});
 
 	test('_entryCount totals every gathered collection', () => {
-		const regions = makeRegionsFixture();
-		const regionsTree = createRegionsTree(regions);
-
-		populateRegionsContent({
-			entries: regions,
+		const getRegionContent = createRegionContentFunction({
 			locations: [makeLocation('temple', ['taipei'])],
 			posts: [makePost('post-taipei', ['taipei'])],
-			regionsTree,
+			regionsTree: createRegionsTree(makeRegionsFixture()),
 		});
 
-		const taiwan = regions.find((entry) => entry.id === 'taiwan')!;
-		const tainan = regions.find((entry) => entry.id === 'tainan')!;
-
-		expect(taiwan.data._entryCount).toBe(2);
-		expect(tainan.data._entryCount).toBe(0);
+		expect(getRegionContent('taiwan')._entryCount).toBe(2);
+		expect(getRegionContent('tainan')._entryCount).toBe(0);
 	});
 });
 
@@ -214,24 +190,22 @@ afterEach(() => {
 });
 
 async function taipeiCountsFor(isDev: boolean) {
-	const { createRegionsTree, populateRegionsContent } = await loadFactory(isDev);
-	const regions = makeRegionsFixture();
+	const { createRegionContentFunction, createRegionsTree } = await loadFactory(isDev);
 
-	populateRegionsContent({
-		entries: regions,
+	const getRegionContent = createRegionContentFunction({
 		locations: [
 			makeLocation('temple', ['taipei']),
 			makeFlaggedLocation('bunker', ['taipei'], { hideGeometry: true }),
 			makeFlaggedLocation('theater', ['taipei'], { hideFromLists: true }),
 		],
 		posts: [],
-		regionsTree: createRegionsTree(regions),
+		regionsTree: createRegionsTree(makeRegionsFixture()),
 	});
 
-	return regions.find((entry) => entry.id === 'taipei')!.data;
+	return getRegionContent('taipei');
 }
 
-describe('populateRegionsContent counts follow listings', () => {
+describe('createRegionContentFunction counts follow listings', () => {
 	test('an unlisted Location is gathered but not counted; a geometry-hidden one counts', async () => {
 		const taipei = await taipeiCountsFor(false);
 
@@ -248,18 +222,27 @@ describe('populateRegionsContent counts follow listings', () => {
 	});
 });
 
-const overriddenLocation = () => makeOverrideLocation('temple', ['taipei'], ['tainan']);
+async function overriddenLocationRegionsFor(isDev: boolean) {
+	const { createRegionContentFunction, createRegionsTree } = await loadFactory(isDev);
 
-describe('resolveLocationRegions under the production content policy', () => {
-	test('an override replaces the authored regions', async () => {
-		const { resolveLocationRegions } = await loadFactory(false);
+	const getRegionContent = createRegionContentFunction({
+		locations: [makeOverrideLocation('temple', ['taipei'], ['tainan'])],
+		posts: [],
+		regionsTree: createRegionsTree(makeRegionsFixture()),
+	});
 
-		expect(resolveLocationRegions(overriddenLocation())).toEqual([{ id: 'tainan' }]);
+	return {
+		tainan: getRegionContent('tainan')._locations,
+		taipei: getRegionContent('taipei')._locations,
+	};
+}
+
+describe('Override regions under the content policy', () => {
+	test('in production an override files the Location under its override regions', async () => {
+		expect(await overriddenLocationRegionsFor(false)).toEqual({ tainan: ['temple'], taipei: [] });
 	});
 
 	test('in development the authored regions stand', async () => {
-		const { resolveLocationRegions } = await loadFactory(true);
-
-		expect(resolveLocationRegions(overriddenLocation())).toEqual([{ id: 'taipei' }]);
+		expect(await overriddenLocationRegionsFor(true)).toEqual({ tainan: [], taipei: ['temple'] });
 	});
 });

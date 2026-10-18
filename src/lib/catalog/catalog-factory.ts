@@ -1,10 +1,9 @@
-import type { CollectionEntry } from 'astro:content';
-
 import type {
 	CatalogCaption,
 	CatalogCollectionKey,
 	CatalogItem,
 } from '#lib/catalog/catalog-types.ts';
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 
 import { sortCatalogByDate } from '#lib/catalog/catalog-utils.ts';
 
@@ -15,7 +14,7 @@ export interface Catalog {
 	getById: (id: string) => CatalogItem | undefined;
 	getCaption: (id: string) => CatalogCaption | undefined;
 	resolve: <T extends CatalogCollectionKey = CatalogCollectionKey>(
-		entries: Array<CollectionEntry<T>>,
+		entries: Array<ComputedEntry<T>>,
 	) => Array<CatalogItem<T>>;
 }
 
@@ -57,7 +56,7 @@ export function createCatalog(items: ReadonlyArray<CatalogItem>): Catalog {
 	}
 
 	function resolve<T extends CatalogCollectionKey = CatalogCollectionKey>(
-		entries: Array<CollectionEntry<T>>,
+		entries: Array<ComputedEntry<T>>,
 	): Array<CatalogItem<T>> {
 		return entries.map(({ collection, id }) => {
 			const item = itemsById.get(id);

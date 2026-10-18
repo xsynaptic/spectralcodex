@@ -1,6 +1,8 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
-import type { CollectionEntry, CollectionKey } from 'astro:content';
+import type { CollectionKey } from 'astro:content';
+
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 
 import ContentSection from '#components/content/content-section.astro';
 import PreviewColumn from '#components/parts/preview-column.astro';
@@ -9,7 +11,7 @@ import { getSimilarContentFunction } from '#components/sections/section-similar.
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 interface Props extends HTMLAttributes<'div'> {
-	entry: CollectionEntry<CollectionKey>;
+	entry: ComputedEntry<CollectionKey>;
 	limit?: number | undefined;
 	showPreviews?: boolean | undefined;
 	threshold?: number;

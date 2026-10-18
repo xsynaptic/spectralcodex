@@ -1,13 +1,13 @@
-import type { CollectionEntry } from 'astro:content';
 import type { Position } from 'geojson';
 
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 import type { LocationTwHeritage } from '#lib/collections/locations/locations-schemas.ts';
 
 import { mapGeometryCoordinatesPrecision } from '#constants.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { renderMarkdownInline } from '#lib/utils/text.ts';
 
-function getPoints(entry: CollectionEntry<'locations'>) {
+function getPoints(entry: ComputedEntry<'locations'>) {
 	const { geometry } = entry.data;
 
 	return Array.isArray(geometry) ? geometry : [geometry];
@@ -20,7 +20,7 @@ function getCoordinatesText(coordinates: Position) {
 }
 
 // Union the top-level heritage with any per-point heritage, deduped
-function getLocationHeritage(entry: CollectionEntry<'locations'>): Array<LocationTwHeritage> {
+function getLocationHeritage(entry: ComputedEntry<'locations'>): Array<LocationTwHeritage> {
 	const { heritage } = entry.data;
 	const values = [
 		...(heritage ? [heritage] : []),
@@ -29,7 +29,7 @@ function getLocationHeritage(entry: CollectionEntry<'locations'>): Array<Locatio
 	return [...new Set(values)];
 }
 
-export function getLocationPoints(entry: CollectionEntry<'locations'>) {
+export function getLocationPoints(entry: ComputedEntry<'locations'>) {
 	const points = getPoints(entry);
 
 	if (points.length < 2) return;
@@ -45,7 +45,7 @@ export function getLocationPoints(entry: CollectionEntry<'locations'>) {
 	}));
 }
 
-export function getLocationDetails(entry: CollectionEntry<'locations'>) {
+export function getLocationDetails(entry: ComputedEntry<'locations'>) {
 	const points = getPoints(entry);
 	const [point] = points;
 
@@ -57,10 +57,10 @@ export function getLocationDetails(entry: CollectionEntry<'locations'>) {
 }
 
 export function sortLocationsByLatitude(
-	a: CollectionEntry<'locations'>,
-	b: CollectionEntry<'locations'>,
+	a: ComputedEntry<'locations'>,
+	b: ComputedEntry<'locations'>,
 ) {
-	function getLatitudeCoordinate(entry: CollectionEntry<'locations'>): number {
+	function getLatitudeCoordinate(entry: ComputedEntry<'locations'>): number {
 		return Array.isArray(entry.data.geometry)
 			? Math.max(...entry.data.geometry.map(({ coordinates }) => coordinates[1]))
 			: entry.data.geometry.coordinates[1];

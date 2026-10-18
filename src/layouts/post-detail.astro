@@ -1,10 +1,9 @@
 ---
-// fallow-ignore-file code-duplication -- Same run of sections as region-detail, same id one-liners as resources-detail
-import type { CollectionEntry } from 'astro:content';
-
 import { render } from 'astro:content';
 
 import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
+// fallow-ignore-file code-duplication -- Same run of sections as region-detail, same id one-liners as resources-detail
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 import type { MapComponentData } from '#lib/map/map-data.ts';
 
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
@@ -29,7 +28,7 @@ import { getSeoArticleProps, getSeoImageProps } from '#lib/utils/seo.ts';
 
 interface Props {
 	backlinks: Array<CatalogItem> | undefined;
-	entry: CollectionEntry<'posts'>;
+	entry: ComputedEntry<'posts'>;
 	mapData: MapComponentData;
 }
 

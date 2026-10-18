@@ -1,20 +1,22 @@
-import type { CollectionEntry, CollectionKey, ReferenceDataEntry } from 'astro:content';
+import type { CollectionKey, ReferenceDataEntry } from 'astro:content';
 
 import { createSqliteCache } from '@spectralcodex/shared/cache';
 import { getPublicId } from '@spectralcodex/shared/entries';
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { performance } from 'node:perf_hooks';
+import pMemoize from 'p-memoize';
 import * as R from 'remeda';
 
 import type { Catalog } from '#lib/catalog/catalog-factory.ts';
 import type { CatalogCollectionKey, CatalogItem } from '#lib/catalog/catalog-types.ts';
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 
 import { createCatalog } from '#lib/catalog/catalog-factory.ts';
 import { createWordCountFunction } from '#lib/catalog/catalog-word-count.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import { getPagesCollection } from '#lib/collections/pages/pages-data.ts';
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
-import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';
+import { getRegionsCollection, getRegionsTree } from '#lib/collections/regions/regions-data.ts';
 import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
@@ -24,13 +26,13 @@ import { getContentPath } from '#lib/utils/routing.ts';
 
 let wordCountFunction: ReturnType<typeof createWordCountFunction> | undefined;
 
-type CatalogEntry = CollectionEntry<CatalogCollectionKey>;
+type CatalogEntry = ComputedEntry<CatalogCollectionKey>;
 
 type RegionPrimaryIdFunction = Awaited<ReturnType<typeof getRegionPrimaryIdFunction>>;
 
 // Counts only; check-links owns the URL-capturing twin and the two agree on every entry
 // Escaped parens truncate a match without splitting it, so a truncated URL cannot skew the count
-function getLinksExternalCount(entry: CollectionEntry<CollectionKey>): number {
+function getLinksExternalCount(entry: ComputedEntry<CollectionKey>): number {
 	let linksExternalCount = 0;
 
 	if ('links' in entry.data) {
@@ -44,7 +46,7 @@ function getLinksExternalCount(entry: CollectionEntry<CollectionKey>): number {
 
 // Find the common ancestor of a set of regions so there's only one in the catalog
 async function getRegionPrimaryIdFunction() {
-	const { regionsTree } = await getRegionsCollection();
+	const regionsTree = await getRegionsTree();
 
 	return function getRegionPrimaryId(regions: Array<ReferenceDataEntry<'regions'>> | undefined) {
 		if (regions && regions.length > 0) {
@@ -60,7 +62,7 @@ function isUnlisted(entry: CatalogEntry) {
 	return entry.collection === 'locations' && entry.data.hideFromLists === true;
 }
 
-function getWordCount(entry: CollectionEntry<CollectionKey>) {
+function getWordCount(entry: ComputedEntry<CollectionKey>) {
 	if (!wordCountFunction) {
 		wordCountFunction = createWordCountFunction({
 			cache: createSqliteCache(CUSTOM_CACHE_PATH, 'word-counts'),
@@ -73,7 +75,7 @@ function getWordCount(entry: CollectionEntry<CollectionKey>) {
 const backlinkLinkPattern = /<Link id="([^"]+)"/g;
 
 function aggregateSeriesWordCounts(
-	series: Array<CollectionEntry<'series'>>,
+	series: Array<ComputedEntry<'series'>>,
 	catalogItemsById: Map<string, CatalogItem>,
 ) {
 	for (const entry of series) {
@@ -172,7 +174,7 @@ function createCatalogItem(
 }
 
 function generateContentBacklinksFromMdxComponents(
-	entry: CollectionEntry<CollectionKey>,
+	entry: ComputedEntry<CollectionKey>,
 	catalogItemsById: Map<string, CatalogItem>,
 ) {
 	if (!entry.body?.includes('<Link ')) return;
@@ -187,16 +189,7 @@ function generateContentBacklinksFromMdxComponents(
 	}
 }
 
-let catalogInstance: Promise<Catalog> | undefined;
-
-export async function getCatalog(): Promise<Catalog> {
-	if (!catalogInstance) {
-		catalogInstance = loadCatalog();
-	}
-	return catalogInstance;
-}
-
-async function loadCatalog(): Promise<Catalog> {
+export const getCatalog = pMemoize(async (): Promise<Catalog> => {
 	const items = await buildCatalogItems();
 	return createCatalog(items);
-}
+});

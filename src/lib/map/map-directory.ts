@@ -4,7 +4,6 @@ import type {
 	MapScope,
 	MapSourceItem,
 } from '@spectralcodex/map-codec';
-import type { CollectionEntry } from 'astro:content';
 
 import {
 	encodeMapPopupData,
@@ -21,11 +20,12 @@ import path from 'node:path';
 import pMemoize from 'p-memoize';
 import * as R from 'remeda';
 
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
+
 import { atlasRegionId } from '#constants.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import { getObjectiveLocations } from '#lib/collections/locations/locations-subsets.ts';
-import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';
-import { resolveLocationRegions } from '#lib/collections/regions/regions-factory.ts';
+import { getRegionsCollection, getRegionsTree } from '#lib/collections/regions/regions-data.ts';
 import { assignChunks } from '#lib/map/map-chunks.ts';
 import { hashMapPayloads } from '#lib/map/map-directory-hash.ts';
 import { getMapThemeIndexById } from '#lib/map/map-entry-rules.ts';
@@ -65,9 +65,9 @@ interface MapDirectoryData {
 
 // No hidden-location filtering needed: only ids present in the (already filtered) source data are looked up
 function buildLocationByFeatureId(
-	locations: Array<CollectionEntry<'locations'>>,
-): Map<string, CollectionEntry<'locations'>> {
-	const locationByFeatureId = new Map<string, CollectionEntry<'locations'>>();
+	locations: Array<ComputedEntry<'locations'>>,
+): Map<string, ComputedEntry<'locations'>> {
+	const locationByFeatureId = new Map<string, ComputedEntry<'locations'>>();
 
 	for (const entry of locations) {
 		for (const featureId of getLocationFeatureIds(entry)) {
@@ -92,7 +92,7 @@ function getMembershipIndices(
 }
 
 function buildMapDataset(
-	locations: Array<CollectionEntry<'locations'>>,
+	locations: Array<ComputedEntry<'locations'>>,
 	{ isPrivate, ordinalById, prefix, themeIndexById }: MapDatasetContext,
 ) {
 	const features = getLocationFeatures(locations, { includeHidden: isPrivate });
@@ -119,9 +119,7 @@ function buildMapDataset(
 		const id = sourceItem.properties.id;
 		const location = locationByFeatureId.get(id);
 
-		const regionOrdinals = location
-			? getMembershipIndices(resolveLocationRegions(location), ordinalById)
-			: [];
+		const regionOrdinals = location ? getMembershipIndices(location.data.regions, ordinalById) : [];
 		const themeIndices = location
 			? getMembershipIndices(location.data.themes ?? [], themeIndexById)
 			: [];
@@ -165,7 +163,7 @@ async function readDivisionMask(regionId: string, divisionsPath: string) {
 	}
 }
 
-async function readDivisionMasks(regions: Array<CollectionEntry<'regions'>>) {
+async function readDivisionMasks(regions: Array<ComputedEntry<'regions'>>) {
 	const divisionsPath = path.join(process.cwd(), CUSTOM_CACHE_PATH, 'divisions');
 	const shownRegions = regions.filter((entry) => entry.data.divisionId && !entry.data.hideDivision);
 
@@ -206,7 +204,8 @@ function withVersion({
 
 export const getMapDirectoryData = pMemoize(async (): Promise<MapDirectoryData> => {
 	const { entries: locations } = await getLocationsCollection();
-	const { entries: regions, regionsTree } = await getRegionsCollection();
+	const { entries: regions } = await getRegionsCollection();
+	const regionsTree = await getRegionsTree();
 	const themeIndexById = await getMapThemeIndexById();
 	const objectiveLocations = await getObjectiveLocations();
 

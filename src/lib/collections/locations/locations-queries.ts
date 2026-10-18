@@ -1,9 +1,8 @@
-import type { CollectionEntry } from 'astro:content';
-
 import { getPublicId } from '@spectralcodex/shared/entries';
 import * as R from 'remeda';
 
-import type { LocationsNearbyItem } from '#lib/collections/locations/locations-schemas.ts';
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
+import type { LocationsNearbyItem } from '#lib/collections/locations/locations-nearby.ts';
 
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { isEditorialEntry, sortCatalogByDate } from '#lib/catalog/catalog-utils.ts';
@@ -27,7 +26,7 @@ const locationNearbyRadiusNeighborCount = 5;
 export async function createLocationEntryDisplayFunction() {
 	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
 
-	return function getLocationEntryDisplay(entry: CollectionEntry<'locations'>) {
+	return function getLocationEntryDisplay(entry: ComputedEntry<'locations'>) {
 		const regionPrimary = getFirstRegionByReference(entry.data.regions);
 		const regionLangCode = regionPrimary?.data._langCode;
 
@@ -62,10 +61,10 @@ export async function createQueryLocationsEntryFunction() {
 	const catalog = await getCatalog();
 	const getMapData = await createMapDataFunction();
 
-	return function queryLocationsEntry(entry: CollectionEntry<'locations'>) {
+	return function queryLocationsEntry(entry: ComputedEntry<'locations'>) {
 		const regionPrimary = getFirstRegionByReference(entry.data.regions);
 
-		const nearbyIds = entry.data._nearby?.map(({ locationId }) => locationId) ?? [];
+		const nearbyIds = entry.data._nearby.map(({ locationId }) => locationId);
 
 		const mapData = getMapData({
 			boundsBuffer: getLocationNearbyRadius(entry.data._nearby),
@@ -76,7 +75,7 @@ export async function createQueryLocationsEntryFunction() {
 		});
 
 		const catalogItems = R.pipe(
-			entry.data._posts ?? [],
+			entry.data._posts,
 			getPostsByIds,
 			catalog.resolve,
 			R.sort(sortCatalogByDate),
@@ -88,10 +87,10 @@ export async function createQueryLocationsEntryFunction() {
 	};
 }
 
-export async function getLocationsNearbyList(entry: CollectionEntry<'locations'>, limit: number) {
+export async function getLocationsNearbyList(entry: ComputedEntry<'locations'>, limit: number) {
 	const { entriesMap } = await getLocationsCollection();
 
-	return (entry.data._nearby?.slice(0, limit) ?? []).flatMap(({ distanceDisplay, locationId }) => {
+	return entry.data._nearby.slice(0, limit).flatMap(({ distanceDisplay, locationId }) => {
 		const location = entriesMap.get(locationId);
 
 		if (!location) return [];
@@ -123,16 +122,16 @@ export async function queryLocationsIndex() {
 }
 
 // Some entries in Taiwan also have Japanese titles; we'd like to display this as well
-function getLangCodeAdditional(regionPrimary: CollectionEntry<'regions'> | undefined) {
+function getLangCodeAdditional(regionPrimary: ComputedEntry<'regions'> | undefined) {
 	const isTaiwan =
-		regionPrimary?.id === 'taiwan' || regionPrimary?.data._ancestors?.includes('taiwan');
+		regionPrimary?.id === 'taiwan' || regionPrimary?.data._ancestors.includes('taiwan');
 
 	return isTaiwan ? { langCodeAdditional: LanguageCodeEnum.Japanese } : {};
 }
 
 // Dense areas keep the minimum radius, remote ones widen toward the maximum
-function getLocationNearbyRadius(nearby: Array<LocationsNearbyItem> | undefined): number {
-	if (!nearby || nearby.length === 0) return locationNearbyRadiusKmMin;
+function getLocationNearbyRadius(nearby: Array<LocationsNearbyItem>): number {
+	if (nearby.length === 0) return locationNearbyRadiusKmMin;
 
 	const index = Math.min(locationNearbyRadiusNeighborCount, nearby.length) - 1;
 	const neighborDistance = nearby[index]?.distance ?? locationNearbyRadiusKmMin;

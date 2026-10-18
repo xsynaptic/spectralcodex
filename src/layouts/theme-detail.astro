@@ -1,9 +1,9 @@
 ---
 // fallow-ignore-file code-duplication -- Ends with the same section sequence as region-detail; the frontmatter overlap with resources-detail is adjacent one-liners
 import type { Page } from 'astro';
-import type { CollectionEntry } from 'astro:content';
 
 import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 import type { MapComponentData } from '#lib/map/map-data.ts';
 
 import ContentCollectionLink from '#components/content/content-collection-link.astro';
@@ -25,7 +25,7 @@ interface Props {
 	backlinksCount: number;
 	catalogItems: Array<CatalogItem>;
 	catalogItemsCount: number;
-	entry: CollectionEntry<'themes'>;
+	entry: ComputedEntry<'themes'>;
 	mapData: MapComponentData;
 	page: Page<CatalogItem>;
 	relatedThemeIds: Array<string>;
@@ -63,5 +63,5 @@ const atlas = await getAtlasScopePage(entry);
 	{page.currentPage === 1 && catalogItems.length > 0 ? (
 		<SectionPreviewList count={catalogItemsCount} items={catalogItems} />
 	) : undefined}
-	<SectionStats backlinksCount={backlinksCount} entryCount={entry.data._entryCount ?? 0} />
+	<SectionStats backlinksCount={backlinksCount} entryCount={entry.data._entryCount} />
 </ContentEntryDetail>

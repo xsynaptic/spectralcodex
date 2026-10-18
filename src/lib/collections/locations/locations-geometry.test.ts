@@ -1,14 +1,14 @@
-import type { CollectionEntry } from 'astro:content';
-
 import { LocationStatusEnum } from '@spectralcodex/shared/map';
 import { describe, expect, test } from 'vitest';
+
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 
 import {
 	getLocationDetails,
 	getLocationPoints,
 } from '#lib/collections/locations/locations-geometry.ts';
 
-function makeLocation(data: Record<string, unknown>): CollectionEntry<'locations'> {
+function makeLocation(data: Record<string, unknown>): ComputedEntry<'locations'> {
 	return {
 		collection: 'locations',
 		data: {
@@ -18,7 +18,7 @@ function makeLocation(data: Record<string, unknown>): CollectionEntry<'locations
 			...data,
 		},
 		id: 'saltworks',
-	} as unknown as CollectionEntry<'locations'>;
+	} as unknown as ComputedEntry<'locations'>;
 }
 
 function makePoint(longitude: number, latitude: number, extra: Record<string, unknown> = {}) {

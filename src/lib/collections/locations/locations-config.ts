@@ -4,13 +4,9 @@ import { defineCollection, reference } from 'astro:content';
 import { z } from 'zod';
 
 import { createEntryGlobLoader } from '#lib/collections/collections-loader.ts';
-import {
-	LocationsNearbyItemSchema,
-	LocationTwHeritageSchema,
-} from '#lib/collections/locations/locations-schemas.ts';
+import { LocationTwHeritageSchema } from '#lib/collections/locations/locations-schemas.ts';
 import { createMultilingualSchemas, titleMultilingualSchema } from '#lib/i18n/i18n-schemas.ts';
 import { GeometryPointsSchema } from '#lib/schemas/geometry.ts';
-import { ImageThumbnailSchema } from '#lib/schemas/index.ts';
 import {
 	DateRecordedSchema,
 	DateSchema,
@@ -37,14 +33,6 @@ export const locations = defineCollection({
 			status: z.enum(LocationStatusEnum),
 			themes: reference('themes').array().optional(),
 			...createMultilingualSchemas('address'),
-			_descriptionHtml: z.string().optional(),
-			_googleMapsUrl: z.url().optional(),
-			_imageThumbnail: ImageThumbnailSchema.optional(),
-			_nearby: LocationsNearbyItemSchema.array().optional(),
-			_postCount: z.number().int().optional(),
-			_posts: z.string().array().optional(),
-			_url: z.url().optional(),
-			_wikipediaUrl: z.url().optional(),
 			dateCreated: DateSchema,
 			dateRecorded: DateRecordedSchema.optional(),
 			dateUpdated: DateSchema.optional(),

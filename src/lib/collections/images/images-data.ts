@@ -1,8 +1,10 @@
+import pMemoize from 'p-memoize';
+
 import { createCollectionData } from '#lib/utils/collections.ts';
 
 export const getImagesCollection = createCollectionData({ collection: 'images', label: 'Images' });
 
-async function createImageByIdFunction() {
+export const getImageByIdFunction = pMemoize(async () => {
 	const { entriesMap: imagesMap } = await getImagesCollection();
 
 	return function getImageById(id: string | undefined) {
@@ -24,13 +26,4 @@ async function createImageByIdFunction() {
 
 		return entry;
 	};
-}
-
-let imageByIdFunction: ReturnType<typeof createImageByIdFunction> | undefined;
-
-export async function getImageByIdFunction() {
-	if (!imageByIdFunction) {
-		imageByIdFunction = createImageByIdFunction();
-	}
-	return imageByIdFunction;
-}
+});

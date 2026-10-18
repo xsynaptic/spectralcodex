@@ -1,7 +1,7 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
-import type { CollectionEntry } from 'astro:content';
 
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 import type { ImageContext, ImageLayout } from '#lib/image/image-types.ts';
 import type { ImageComponentProps, ImagePlaceholderProps } from '#lib/image/image-types.ts';
 
@@ -68,7 +68,7 @@ function getImageAlt(title: string) {
 
 async function getImageProps(): Promise<{
 	aspectRatioString: string | undefined;
-	imageEntry: CollectionEntry<'images'> | undefined;
+	imageEntry: ComputedEntry<'images'> | undefined;
 	imageProps: ImageComponentProps | undefined;
 	placeholderProps: ImagePlaceholderProps | undefined;
 }> {

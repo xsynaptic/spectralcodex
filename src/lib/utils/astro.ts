@@ -1,8 +1,9 @@
 import type { AstroGlobal } from 'astro';
-import type { CollectionEntry } from 'astro:content';
+
+import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 
 export function hasEntryContent(
-	entry: CollectionEntry<'locations' | 'regions' | 'resources' | 'series' | 'themes'>,
+	entry: ComputedEntry<'locations' | 'regions' | 'resources' | 'series' | 'themes'>,
 ) {
 	return 'body' in entry && typeof entry.body === 'string' && entry.body.trim().length > 0;
 }

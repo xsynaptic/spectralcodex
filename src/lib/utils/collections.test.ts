@@ -20,6 +20,10 @@ function makePost(id: string): CollectionEntry<'posts'> {
 	} as unknown as CollectionEntry<'posts'>;
 }
 
+function computeReplacedTitle(entry: CollectionEntry<'posts'>) {
+	return { _flag: `computed-${entry.id}`, title: 'Replaced' };
+}
+
 function noop() {
 	// Intentionally empty
 }
@@ -61,8 +65,7 @@ describe('createCollectionData', () => {
 		expect(getCollectionMock).toHaveBeenCalledTimes(1);
 	});
 
-	// A failure after an Astro upgrade means getCollection started cloning entries, which silently breaks in-place enrichment
-	test('keys entriesMap by id and shares entry objects with mutate', async () => {
+	test('returns the store objects uncopied when there is no compute', async () => {
 		const { createCollectionData } = await importCollections();
 
 		const alpha = makePost('alpha');
@@ -70,51 +73,32 @@ describe('createCollectionData', () => {
 
 		getCollectionMock.mockResolvedValue([alpha, beta]);
 
-		const mutateCalls: Array<
-			[Array<CollectionEntry<'posts'>>, Map<string, CollectionEntry<'posts'>>]
-		> = [];
+		const result = await createCollectionData({ collection: 'posts' })();
 
-		const getPostsCollection = createCollectionData({
-			collection: 'posts',
-			mutate: (entries, entriesMap) => {
-				mutateCalls.push([entries, entriesMap]);
-			},
-		});
-
-		const result = await getPostsCollection();
-
-		expect(mutateCalls).toHaveLength(1);
-
-		const [mutatedEntries, mutatedEntriesMap] = mutateCalls[0]!;
-
-		expect(mutatedEntries[0]).toBe(alpha);
-		expect(mutatedEntriesMap.get('alpha')).toBe(alpha);
-		expect(mutatedEntriesMap.get('beta')).toBe(beta);
 		expect(result.entries[0]).toBe(alpha);
-		expect(result.entriesMap.get('alpha')).toBe(alpha);
+		expect(result.entriesMap.get('beta')).toBe(beta);
 		expect([...result.entriesMap.keys()]).toEqual(['alpha', 'beta']);
 	});
 
-	test('runs mutate before extend and merges the extend artifact top level', async () => {
+	test('merges computed fields onto copies and leaves the store untouched', async () => {
 		const { createCollectionData } = await importCollections();
 
-		getCollectionMock.mockResolvedValue([makePost('alpha')]);
+		const alpha = makePost('alpha');
+		const snapshot = structuredClone(alpha);
+
+		getCollectionMock.mockResolvedValue([alpha]);
 
 		const getPostsCollection = createCollectionData({
 			collection: 'posts',
-			extend: (entries) => ({
-				flagSeenByExtend: (entries[0]?.data as undefined | { _flag?: string })?._flag,
-			}),
-			mutate: (entries) => {
-				for (const entry of entries) {
-					Object.assign(entry.data, { _flag: 'mutated' });
-				}
-			},
+			compute: () => computeReplacedTitle,
 		});
 
 		const result = await getPostsCollection();
+		const computed = result.entriesMap.get('alpha');
 
-		expect(result.flagSeenByExtend).toBe('mutated');
+		expect(computed?.data).toEqual({ _flag: 'computed-alpha', title: 'Replaced' });
+		expect(computed).not.toBe(alpha);
+		expect(alpha).toEqual(snapshot);
 	});
 
 	test('evicts an empty result in dev so the next call refetches', async () => {
