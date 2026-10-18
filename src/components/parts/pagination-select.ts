@@ -45,7 +45,7 @@ class PaginationSelect extends HTMLElement {
 		if (!form || !select) return;
 
 		// Restored form state can disagree with `select.value`, so the baseline comes from markup
-		this.#currentUrl = select.querySelector<HTMLOptionElement>('option[data-current]')?.value ?? '';
+		this.#currentUrl = select.querySelector<HTMLOptionElement>('option[selected]')?.value ?? '';
 
 		const counter = this.querySelector<HTMLElement>('[data-pagination-counter]');
 		const navigation = this.querySelector('nav');

@@ -26,6 +26,8 @@ const {
 
 const hasCurrent = options.some((option) => option.isCurrent);
 
+const placeholderLabel = placeholder ?? selectLabel;
+
 const middleContent = await renderSlot(Astro.slots, 'default');
 
 const isEmptyWithoutScript = !counter && !previous && !next && !middleContent;
@@ -59,15 +61,11 @@ const isEmptyWithoutScript = !counter && !previous && !next && !middleContent;
 						>
 							{hasCurrent ? undefined : (
 								<option disabled={true} hidden={true} selected={true} value="">
-									{placeholder ?? selectLabel}
+									{placeholderLabel}
 								</option>
 							)}
 							{options.map((option) => (
-								<option
-									data-current={option.isCurrent ? '' : undefined}
-									selected={option.isCurrent}
-									value={option.url}
-								>
+								<option selected={option.isCurrent} value={option.url}>
 									{option.label}
 								</option>
 							))}

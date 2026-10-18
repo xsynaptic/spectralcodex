@@ -53,7 +53,7 @@
 		display: none;
 	}
 
-	.pagination-control option[data-current]::after {
+	.pagination-control option[selected]::after {
 		order: 1;
 		margin-inline-start: calc(var(--spacing) * 2);
 		color: var(--color-accent-400);
