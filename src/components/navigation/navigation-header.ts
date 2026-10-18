@@ -21,8 +21,6 @@ import { getSitePath } from '#lib/utils/routing.ts';
 // Increase this to 3 to show subregions in the header navigation
 const maxDepth = 2 as number;
 
-const aboutMenuPageIds = ['faq', 'tech-stack', 'links', 'privacy', 'contact'];
-
 const t = getTranslations();
 
 async function createNavigationHeaderItems(): Promise<Array<NavigationItem>> {
@@ -68,7 +66,7 @@ async function createNavigationHeaderItems(): Promise<Array<NavigationItem>> {
 
 	const { entriesMap: pagesMap } = await getPagesCollection();
 
-	const aboutMenu = aboutMenuPageIds.flatMap((id) => {
+	const aboutMenu = ['faq', 'tech-stack', 'links', 'privacy', 'contact'].flatMap((id) => {
 		const entry = pagesMap.get(id);
 
 		return entry ? [{ title: entry.data.title, url: getSitePath(entry.id) }] : [];
