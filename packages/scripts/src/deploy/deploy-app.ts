@@ -30,7 +30,7 @@ export async function deployApp(options: DeployAppOptions): Promise<void> {
 		config,
 		dryRun,
 		excludes: [`/${openGraphBasePath}/`],
-		extraFlags: skipDelete ? [] : ['--delete-after'],
+		extraFlags: skipDelete ? ['--delay-updates'] : ['--delay-updates', '--delete-after'],
 	});
 
 	console.log(chalk.green(`Done in ${((Date.now() - start) / 1000).toFixed(1)}s`));

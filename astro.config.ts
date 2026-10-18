@@ -12,8 +12,11 @@ import { autoImport } from '@xsynaptic/satteri-auto-import';
 import { imgGroupSatteriPlugin } from '@xsynaptic/satteri-img-group';
 import { trailingSlash as trailingSlashPlugin } from '@xsynaptic/satteri-trailing-slash';
 import { wrapCjk } from '@xsynaptic/satteri-wrap-cjk';
+import compressor from 'astro-compressor';
 import pagefind from 'astro-pagefind';
 import { defineConfig, envField, fontProviders } from 'astro/config';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { loadEnv } from 'vite';
 
 import { mdxComponentFiles } from '#constants.ts';
@@ -44,6 +47,17 @@ if (
 const isSsr = process.env.BUILD_OUTPUT_PATH === './dist/server';
 
 const trailingSlash = 'always';
+
+const outDirPath = fileURLToPath(new URL('dist/', import.meta.url));
+const assetsPath = BUILD_ASSETS_PATH ?? '_astro';
+
+function isPrecompressed(filePath: string) {
+	const distFilePath = path.relative(outDirPath, filePath);
+
+	if (/^api\/map\/[^/]+\.json$/.test(distFilePath)) return true;
+
+	return distFilePath.startsWith(`${assetsPath}/`) && /\.(?:css|js)$/.test(distFilePath);
+}
 
 // Git-derived per-URL dates, written by the sitemap-lastmod deploy step before the build
 // Read on first use, so loading this config never depends on a file a content script writes
@@ -191,6 +205,11 @@ export default defineConfig({
 			},
 		}),
 		atlas(),
+		compressor({
+			gzip: false,
+			hooks: { fileFilter: ({ filePath }) => isPrecompressed(filePath) },
+			zstd: false,
+		}),
 		buildLogger(),
 		devInventory(),
 	],
