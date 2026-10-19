@@ -6,7 +6,6 @@ export const GET = (() => {
 	const sitemapUrl = getAbsoluteUrl(getBasePath('sitemap-index.xml'));
 
 	return new Response(`User-agent: *
-Disallow: /_x/
 Disallow: /pagefind/
 Disallow: /api/
 

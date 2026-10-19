@@ -49,13 +49,20 @@ function isBounds(value: unknown) {
 	);
 }
 
+const ruleGuards = {
+	ids: (rule) => isStrings(rule.ids),
+	region: (rule) => isNumbers(rule.interval, 2),
+	theme: (rule) => typeof rule.index === 'number',
+} satisfies Record<MapFeaturesRule['type'], (rule: Record<string, unknown>) => boolean>;
+
+function isRuleType(type: unknown): type is MapFeaturesRule['type'] {
+	return typeof type === 'string' && Object.hasOwn(ruleGuards, type);
+}
+
 function isRule(value: unknown) {
-	if (!isRecord(value)) return false;
+	if (!isRecord(value) || !isRuleType(value.type)) return false;
 
-	if (value.type === 'ids') return isStrings(value.ids);
-	if (value.type === 'region') return isNumbers(value.interval, 2);
-
-	return value.type === 'theme' && typeof value.index === 'number';
+	return ruleGuards[value.type](value);
 }
 
 function isScope(value: unknown) {

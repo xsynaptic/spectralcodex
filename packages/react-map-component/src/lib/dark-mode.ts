@@ -7,5 +7,9 @@ function isDocumentDark() {
 }
 
 export function useIsDarkMode() {
-	return useDocumentEventValue(modeChangedEventName, isDocumentDark, false);
+	return useDocumentEventValue(
+		modeChangedEventName,
+		isDocumentDark,
+		typeof document !== 'undefined' && isDocumentDark(),
+	);
 }

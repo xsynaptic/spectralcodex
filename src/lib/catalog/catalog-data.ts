@@ -21,6 +21,7 @@ import { getSeriesCollection } from '#lib/collections/series/series-data.ts';
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedId, getImageHeroId } from '#lib/image/image-featured.ts';
+import { isListed } from '#lib/utils/content-policy.ts';
 import { getDescription } from '#lib/utils/description.ts';
 import { getContentPath } from '#lib/utils/routing.ts';
 
@@ -59,7 +60,7 @@ async function getRegionPrimaryIdFunction() {
 }
 
 function isUnlisted(entry: CatalogEntry) {
-	return entry.collection === 'locations' && entry.data.hideFromLists === true;
+	return entry.collection === 'locations' && !isListed(entry.data);
 }
 
 function getWordCount(entry: ComputedEntry<CollectionKey>) {

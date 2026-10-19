@@ -1,7 +1,7 @@
 import type { CollectionEntry } from 'astro:content';
 
 import { createCollectionData, getRawCollection } from '#lib/utils/collections.ts';
-import { countContent } from '#lib/utils/content-policy.ts';
+import { collectUnlistedLocationIds, countContent } from '#lib/utils/content-policy.ts';
 
 export const getSeriesCollection = createCollectionData({
 	collection: 'series',
@@ -9,13 +9,15 @@ export const getSeriesCollection = createCollectionData({
 		const locations = await getRawCollection('locations');
 		const posts = await getRawCollection('posts');
 
+		const unlistedLocationIds = collectUnlistedLocationIds(locations);
+
 		return function computeSeries(entry: CollectionEntry<'series'>) {
 			const seriesItems = new Set(entry.data.seriesItems);
 
 			return countContent({
 				locations: locations.filter(({ id }) => seriesItems.has(id)).map(({ id }) => id),
 				posts: posts.filter(({ id }) => seriesItems.has(id)).map(({ id }) => id),
-				unlistedLocationIds: new Set(),
+				unlistedLocationIds,
 			});
 		};
 	},

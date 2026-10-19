@@ -14,7 +14,6 @@ import { createMapDataFunction } from '#lib/map/map-data.ts';
 import { getMapDirectoryData } from '#lib/map/map-directory.ts';
 import { getLocationFeatureIds } from '#lib/map/map-locations.ts';
 import { isListed, isListedQuality } from '#lib/utils/content-policy.ts';
-import { getContentPath } from '#lib/utils/routing.ts';
 
 const locationNearbyRadiusKmMin = 1;
 const locationNearbyRadiusKmMax = 3;
@@ -99,7 +98,7 @@ export async function getLocationsNearbyList(entry: ComputedEntry<'locations'>) 
 				status: location.data.status,
 				title: location.data.title,
 				titleMultilingual: getMultilingualContent({ data: location.data, prop: 'title' })?.primary,
-				url: getContentPath('locations', location.id),
+				url: location.data._url,
 			},
 		];
 	});
