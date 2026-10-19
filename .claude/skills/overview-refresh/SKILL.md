@@ -15,7 +15,7 @@ The standing hazard is **recency bias**: a refresh starts from what moved, so re
 
 Record `git rev-parse --short HEAD` as the new anchor, today's date, and whether the tree is dirty. Read `git log --oneline <anchor>..HEAD` and `git diff --stat <anchor>`; the uncommitted tree is in scope, and when another session is changing it, leave its files alone. Measure each area of the coverage inventory (below) for the report: `git diff --shortstat <anchor> -- <path>` and its current source and test LOC.
 
-Write fallow's output to the scratchpad: `pnpm exec fallow health --hotspots --targets`, `fallow architecture`, `fallow dupes`, and `fallow audit --base <anchor>`. Fallow sees file-level structure only; directory cycles and rules written twice are the readers' to find.
+Write fallow's output to the scratchpad: `pnpm exec fallow health --hotspots --targets`, `fallow architecture`, `fallow dupes`, and `fallow audit --base <anchor> --gate all` (the gate skips the base-snapshot pass, which loads today's config into the anchor checkout and fails when the anchor predates a file it names). Fallow sees file-level structure only; directory cycles and rules written twice are the readers' to find.
 
 ## 2. Read in parallel
 

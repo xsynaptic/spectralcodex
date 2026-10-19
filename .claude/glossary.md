@@ -84,7 +84,7 @@ Map Scope, Map Filter, Map Target and Map View keep the prefix everywhere outsid
 
 **Map Directory**: The dataset a map selects its Features from. _Avoid_: index (index means a numeric position or a listing route), catalog (Catalog is content-side), registry.
 
-**Map Features**: The Features a map holds, selected from the Map Directory. The selection is made at build time and does not change in the browser.
+**Map Features**: The Features a map holds, selected from the Map Directory. The rule is fixed at build time; the browser applies it to the fetched Map Directory and never changes it.
 
 **Map Scope**: The set of Features the Atlas map is currently limited to, named after the Entry that set it. A Region, Theme, Series or Post sets the Map Scope when it opens in the Pane; a Location inside it keeps it; a Location outside it clears it. The user can switch it off to see every Feature, then back on, without clearing it. A map has at most one, and while it is on, Features outside it are not displayed. In map search, a Scope row is a result that sets a Map Scope rather than opening a Location. _Avoid_: page features, highlight, selection, filter (a Map Filter is set by the user, a Map Scope by a page).
 
