@@ -16,24 +16,21 @@ interface Props {
 
 const { count, countThreshold = 10, items, url, ...props } = Astro.props;
 
-const shouldShowCount = count ? Math.abs(items.length - count) > countThreshold : false;
-
 const t = getTranslations();
 
 function getCountText() {
-	if (shouldShowCount && count) {
-		return {
-			title: formatStringTemplate(t('parts.textSeparatedList.more'), {
-				count: formatNumber({
-					number: count - items.length,
-					options: { maximumFractionDigits: 0 },
-				}),
+	if (!count || Math.abs(items.length - count) <= countThreshold) return;
+
+	return {
+		title: formatStringTemplate(t('parts.textSeparatedList.more'), {
+			count: formatNumber({
+				number: count - items.length,
+				options: { maximumFractionDigits: 0 },
 			}),
-			titleMultilingual: undefined,
-			url,
-		};
-	}
-	return;
+		}),
+		titleMultilingual: undefined,
+		url,
+	};
 }
 
 const countText = getCountText();
