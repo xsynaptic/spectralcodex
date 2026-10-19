@@ -29,11 +29,21 @@
 		{
 			"id": "client-zod",
 			"kind": "banned-import",
-			"specifiers": ["zod", "@spectralcodex/map-codec/schemas", "@spectralcodex/shared/schemas"],
+			"specifiers": [
+				"zod",
+				"@spectralcodex/map-codec/schemas",
+				"@spectralcodex/shared/schemas",
+				"#schemas",
+			],
+			"ignoreTypeOnly": true,
 			"files": [
 				"packages/react-map-component/src/**",
 				"packages/map-codec/src/**",
 				"packages/shared/src/map/**",
+				"packages/shared/src/constants.ts",
+				"packages/shared/src/i18n.ts",
+				"packages/shared/src/search-tracker.ts",
+				"packages/shared/src/text.ts",
 			],
 			"exclude": ["packages/map-codec/src/schemas/**", "**/*.test.ts"],
 			"message": "The map island ships without Zod; classic schemas never tree-shake. Put schemas in packages/map-codec/src/schemas or @spectralcodex/shared/schemas, and keep both out of client code.",
