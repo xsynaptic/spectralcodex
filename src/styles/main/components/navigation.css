@@ -1,5 +1,5 @@
 /* Header navigation; hook prefix: nav-, styling only; navigation-site.ts selects by data attributes */
-.nav-menu {
+.nav-items {
 	position: relative;
 	padding-inline: calc(var(--spacing) * 4);
 
@@ -57,7 +57,7 @@
 	transition: transform 100ms var(--default-transition-timing-function) allow-discrete;
 }
 
-.nav-sub-menu {
+.nav-group {
 	position: absolute;
 	visibility: hidden;
 	width: 100%;
@@ -78,12 +78,12 @@
 	}
 }
 
-.nav-sub-menu-d1 {
+.nav-group-d1 {
 	--nav-divide: light-dark(var(--color-primary-100), var(--color-primary-800));
 
 	top: 100%;
 	left: 0;
-	z-index: var(--z-index-submenu);
+	z-index: var(--z-index-nav-group);
 	margin-bottom: -1px;
 	background-color: light-dark(var(--color-primary-50), var(--color-primary-900));
 	box-shadow: var(--shadow-md);
@@ -97,29 +97,29 @@
 	}
 }
 
-.nav-no-hero .nav-sub-menu-d1 {
+.nav-no-hero .nav-group-d1 {
 	margin-top: 1px;
 }
 
-.nav-sub-menu-d2 {
+.nav-group-d2 {
 	--nav-divide: light-dark(var(--color-primary-200), var(--color-primary-700));
 
-	z-index: calc(var(--z-index-submenu) + 1);
+	z-index: calc(var(--z-index-nav-group) + 1);
 	background-color: light-dark(var(--color-primary-100), var(--color-primary-800));
 	box-shadow: var(--shadow-md);
 	transition-duration: 50ms;
 }
 
-.nav-sub-menu-d3 {
+.nav-group-d3 {
 	--nav-divide: light-dark(var(--color-primary-300), var(--color-primary-600));
 
-	z-index: calc(var(--z-index-submenu) + 2);
+	z-index: calc(var(--z-index-nav-group) + 2);
 	background-color: light-dark(var(--color-primary-200), var(--color-primary-700));
 	transition-duration: 50ms;
 }
 
-.nav-sub-menu-d2,
-.nav-sub-menu-d3 {
+.nav-group-d2,
+.nav-group-d3 {
 	left: 0;
 
 	@media (width >= 40rem) {
@@ -182,9 +182,9 @@
 }
 
 /* Open state is owned by navigation-site.ts so aria-expanded always matches what is shown */
-[data-open] > .nav-sub-menu-d1,
-[data-open] > .nav-sub-menu-d2,
-[data-open] > .nav-sub-menu-d3 {
+[data-open] > .nav-group-d1,
+[data-open] > .nav-group-d2,
+[data-open] > .nav-group-d3 {
 	visibility: visible;
 	pointer-events: auto;
 	opacity: 1;
@@ -195,16 +195,16 @@
 	transform: scaleY(-1);
 }
 
-.nav-item:last-child > .nav-sub-menu-d1 {
+.nav-item:last-child > .nav-group-d1 {
 	@media (width >= 40rem) {
 		right: -0.5rem;
 		left: auto;
 	}
 }
 
-/* Submenus still open on hover and focus before the element upgrades or if its script fails */
+/* Groups still open on hover and focus before the element upgrades or if its script fails */
 site-navigation:not(:defined) {
-	.nav-item:focus-within > .nav-sub-menu-d1 {
+	.nav-item:focus-within > .nav-group-d1 {
 		visibility: visible;
 		pointer-events: auto;
 		opacity: 1;
@@ -215,7 +215,7 @@ site-navigation:not(:defined) {
 	}
 
 	@media (hover: hover) {
-		.nav-item:hover > .nav-sub-menu-d1 {
+		.nav-item:hover > .nav-group-d1 {
 			visibility: visible;
 			pointer-events: auto;
 			opacity: 1;
@@ -227,14 +227,14 @@ site-navigation:not(:defined) {
 	}
 
 	@media (width >= 40rem) {
-		.nav-sub-item:focus-within > :is(.nav-sub-menu-d2, .nav-sub-menu-d3) {
+		.nav-sub-item:focus-within > :is(.nav-group-d2, .nav-group-d3) {
 			visibility: visible;
 			pointer-events: auto;
 			opacity: 1;
 		}
 
 		@media (hover: hover) {
-			.nav-sub-item:hover > :is(.nav-sub-menu-d2, .nav-sub-menu-d3) {
+			.nav-sub-item:hover > :is(.nav-group-d2, .nav-group-d3) {
 				visibility: visible;
 				pointer-events: auto;
 				opacity: 1;

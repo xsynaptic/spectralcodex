@@ -136,7 +136,7 @@ Map Scope, Map Filter, Map Target and Map View keep the prefix everywhere outsid
 
 **Preview**: A Catalog Entry rendered as a summary for listing. _Avoid_: teaser, snippet, summary card, tile.
 
-**Navigation**: The site's own link structure, in the header and the footer. _Avoid_: menu, menubar, nav bar.
+**Navigation**: The site's own link structure, in the header and the footer. It is made of items; the items nested under one form a group, which its trigger reveals. _Avoid_: menu, submenu, dropdown, menubar, nav bar.
 
 **Notice**: A derived advisory on a Location page, computed from its Safety, Status, and Entry Quality rather than authored (see `noticeKeys` in `locations-section-notices.astro`). Its severity is a separate axis and never a Status. _Avoid_: alert, warning, callout, banner.
 

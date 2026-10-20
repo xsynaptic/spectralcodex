@@ -1,7 +1,7 @@
 ---
 import type { NavigationItem } from '#components/navigation/navigation-types.ts';
 
-import NavigationHeaderSubmenu from '#components/navigation/navigation-header-submenu.astro';
+import NavigationHeaderGroup from '#components/navigation/navigation-header-group.astro';
 import NavigationHeaderTrigger from '#components/navigation/navigation-header-trigger.astro';
 import { getNavigationItemAriaLabel } from '#components/navigation/navigation-utils.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
@@ -18,7 +18,7 @@ const t = getTranslations();
 ---
 
 <site-navigation>
-	<nav aria-label={t('site.navigation.header.label')} class="nav-menu" data-nosnippet>
+	<nav aria-label={t('site.navigation.header.label')} class="nav-items" data-nosnippet>
 		<ul class:list={['nav-ul', hasHeroImage ? 'nav-hero' : 'nav-no-hero']}>
 			{navigationItems.map((item) => {
 				const children = item.children ?? [];
@@ -35,7 +35,7 @@ const t = getTranslations();
 							<Fragment set:html={item.title} />
 						</NavigationHeaderTrigger>
 						{hasChildren ? (
-							<NavigationHeaderSubmenu
+							<NavigationHeaderGroup
 								ariaLabel={getNavigationItemAriaLabel(item)}
 								currentPath={currentPath}
 								depth={1}

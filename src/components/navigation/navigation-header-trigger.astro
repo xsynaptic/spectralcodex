@@ -9,17 +9,17 @@ import {
 import Anchor from '#components/parts/anchor.astro';
 
 const triggerVariants = {
+	group: {
+		icon: 'nav-sub-icon',
+		iconHref: '#icon:chevron-right',
+		link: 'nav-sub-link',
+		trigger: 'nav-sub-trigger',
+	},
 	item: {
 		icon: 'nav-icon',
 		iconHref: '#icon:chevron-down',
 		link: 'nav-item-link',
 		trigger: 'nav-item-trigger',
-	},
-	submenu: {
-		icon: 'nav-sub-icon',
-		iconHref: '#icon:chevron-right',
-		link: 'nav-sub-link',
-		trigger: 'nav-sub-trigger',
 	},
 } as const;
 

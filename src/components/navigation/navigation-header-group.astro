@@ -29,17 +29,17 @@ const {
 
 const hasNestedMenu = navigationItems.some((item) => (item.children ?? []).length > 0);
 
-const submenuClasses = [
-	'nav-sub-menu',
-	depth === 1 ? 'nav-sub-menu-d1' : undefined,
+const groupClasses = [
+	'nav-group',
+	depth === 1 ? 'nav-group-d1' : undefined,
 	depth === 1 && !hasNestedMenu ? 'sm:rounded-br-md' : undefined,
-	depth === 2 ? 'nav-sub-menu-d2' : undefined,
-	depth > 2 ? 'nav-sub-menu-d3' : undefined,
+	depth === 2 ? 'nav-group-d2' : undefined,
+	depth > 2 ? 'nav-group-d3' : undefined,
 	!isFirstNavigationItem && depth > 1 ? 'sm:rounded-tr-md' : undefined,
 ];
 ---
 
-<ul aria-label={ariaLabel} class:list={submenuClasses} {...props}>
+<ul aria-label={ariaLabel} class:list={groupClasses} {...props}>
 	{navigationItems.map((item, index) => {
 		const children = item.children ?? [];
 		const hasChildren = children.length > 0;
@@ -50,7 +50,7 @@ const submenuClasses = [
 					currentPath={currentPath}
 					hasChildren={hasChildren}
 					item={item}
-					variant="submenu"
+					variant="group"
 				>
 					<Fragment set:html={item.title} />
 					{shouldShowNavigationItemMultilingual(item, depth) ? (

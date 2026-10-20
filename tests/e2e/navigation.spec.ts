@@ -7,7 +7,7 @@ const t = getTranslations();
 const regionAncestorTitle = 'Taiwan';
 const regionTitle = 'Tainan';
 
-test('a submenu reveals on hover, two levels deep', async ({ page }) => {
+test('a group reveals on hover, two levels deep', async ({ page }) => {
 	await visit(page, '/');
 
 	const nav = page.getByRole('navigation', { name: t('site.navigation.header.label') });
@@ -27,9 +27,7 @@ test('a submenu reveals on hover, two levels deep', async ({ page }) => {
 	await expect(regionLink).toHaveAttribute('href', paths.regionDetail);
 });
 
-test('the keyboard opens a submenu and Escape hands focus back to its trigger', async ({
-	page,
-}) => {
+test('the keyboard opens a group and Escape hands focus back to its trigger', async ({ page }) => {
 	await visit(page, '/');
 
 	const nav = page.getByRole('navigation', { name: t('site.navigation.header.label') });
@@ -41,16 +39,16 @@ test('the keyboard opens a submenu and Escape hands focus back to its trigger', 
 	await trigger.focus();
 	await page.keyboard.press('ArrowDown');
 
-	const submenu = nav.locator(`[id="${(await trigger.getAttribute('aria-controls')) ?? ''}"]`);
+	const group = nav.locator(`[id="${(await trigger.getAttribute('aria-controls')) ?? ''}"]`);
 
 	await expect(trigger).toHaveAttribute('aria-expanded', 'true');
-	await expect(submenu.getByRole('link').first()).toBeFocused();
+	await expect(group.getByRole('link').first()).toBeFocused();
 
 	await page.keyboard.press('Escape');
 
 	await expect(trigger).toHaveAttribute('aria-expanded', 'false');
 	await expect(trigger).toBeFocused();
-	await expect(submenu).toBeHidden();
+	await expect(group).toBeHidden();
 });
 
 test('the current page is the only one marked', async ({ page }) => {

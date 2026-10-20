@@ -1,5 +1,5 @@
 ---
-import NavigationHeaderMenu from '#components/navigation/navigation-header-menu.astro';
+import NavigationHeaderItems from '#components/navigation/navigation-header-items.astro';
 import {
 	getNavigationHeaderItems,
 	getNavigationHeaderUrls,
@@ -19,7 +19,7 @@ const currentPath = navigationUrls.has(Astro.url.pathname) ? Astro.url.pathname 
 ---
 
 <RenderCache cacheKey={`navigation-header:${String(hasHeroImage)}:${currentPath ?? ''}`}>
-	<NavigationHeaderMenu
+	<NavigationHeaderItems
 		currentPath={currentPath}
 		hasHeroImage={hasHeroImage}
 		navigationItems={navigationItems}

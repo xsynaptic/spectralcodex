@@ -6,10 +6,10 @@ import { formatStringTemplate } from '#lib/utils/text.ts';
 export function getNavigationItemAriaLabel(item: NavigationItem) {
 	const t = getTranslations();
 
-	return formatStringTemplate(t('site.navigation.header.submenu.label'), { title: item.title });
+	return formatStringTemplate(t('site.navigation.header.group.label'), { title: item.title });
 }
 
-// Anchors are navigable, buttons open a submenu, spans are plain labels
+// Anchors are navigable, buttons open a group, spans are plain labels
 export function getNavigationItemTriggerType(item: NavigationItem) {
 	if (item.url) return 'anchor';
 	if (item.children?.length) return 'button';

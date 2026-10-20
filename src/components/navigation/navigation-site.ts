@@ -5,8 +5,8 @@
  *   <nav>
  *     <ul>                  <-- the root list
  *       <li>                <-- a navigation item
- *         <a|button|span>   <-- first element in the <li> that is NOT inside the submenu
- *         <ul>...</ul>      <-- optional submenu; must be a direct child of the <li>
+ *         <a|button|span>   <-- first element in the <li> that is NOT inside the group
+ *         <ul>...</ul>      <-- optional group; must be a direct child of the <li>
  *       </li>
  *     </ul>
  *   </nav>
@@ -15,8 +15,8 @@
  * Note: use <a> for navigable triggers, <button> for text-only labels with children, <span> for text-only
  *
  * State exposed for CSS:
- *   data-has-submenu  on every <li> that has a submenu
- *   data-open         on every currently-open <li>
+ *   data-has-group  on every <li> that has a group
+ *   data-open       on every currently-open <li>
  */
 let instanceCount = 0;
 
@@ -45,7 +45,7 @@ class SiteNavigation extends HTMLElement {
 		document.addEventListener('click', this.#handleClickOutside, { signal });
 		document.addEventListener('keydown', this.#handleDocumentKeydown, { signal });
 
-		for (const li of this.querySelectorAll<HTMLElement>('li[data-has-submenu]')) {
+		for (const li of this.querySelectorAll<HTMLElement>('li[data-has-group]')) {
 			li.addEventListener('pointerenter', this.#handlePointerEnter, { signal });
 			li.addEventListener('pointerleave', this.#handlePointerLeave, { signal });
 		}
@@ -71,7 +71,7 @@ class SiteNavigation extends HTMLElement {
 	}
 
 	#closeAndFocusTrigger(li: HTMLElement) {
-		// A submenu <ul> is a child of the <li> that opens it, so the root list has no ancestor <li>
+		// A group <ul> is a child of the <li> that opens it, so the root list has no ancestor <li>
 		const triggerLi = li.parentElement?.closest<HTMLElement>('li');
 
 		if (!triggerLi) {
@@ -110,11 +110,11 @@ class SiteNavigation extends HTMLElement {
 	}
 
 	#focusFirstItem(li: HTMLElement) {
-		const submenu = this.#getSubmenu(li);
+		const group = this.#getGroup(li);
 
-		if (!submenu) return;
+		if (!group) return;
 
-		const firstTrigger = this.#getTriggers(submenu)[0];
+		const firstTrigger = this.#getTriggers(group)[0];
 
 		if (firstTrigger) firstTrigger.focus();
 	}
@@ -134,6 +134,10 @@ class SiteNavigation extends HTMLElement {
 		if (nextTrigger) nextTrigger.focus();
 	}
 
+	#getGroup(li: HTMLElement): HTMLElement | undefined {
+		return li.querySelector<HTMLElement>(':scope > ul') ?? undefined;
+	}
+
 	#getSiblingItems(li: HTMLElement) {
 		const parentUl = li.closest<HTMLElement>('ul');
 
@@ -142,15 +146,11 @@ class SiteNavigation extends HTMLElement {
 		return [...parentUl.querySelectorAll<HTMLElement>(':scope > li')];
 	}
 
-	#getSubmenu(li: HTMLElement): HTMLElement | undefined {
-		return li.querySelector<HTMLElement>(':scope > ul') ?? undefined;
-	}
-
 	#getTrigger(li: HTMLElement): HTMLElement | undefined {
-		const submenu = this.#getSubmenu(li);
+		const group = this.#getGroup(li);
 
 		for (const trigger of li.querySelectorAll<HTMLElement>('a, button')) {
-			if (!submenu?.contains(trigger)) return trigger;
+			if (!group?.contains(trigger)) return trigger;
 		}
 
 		return undefined;
@@ -168,7 +168,7 @@ class SiteNavigation extends HTMLElement {
 	}
 
 	#handleActivate(event: KeyboardEvent, li: HTMLElement) {
-		if (li.dataset.hasSubmenu === undefined) return;
+		if (li.dataset.hasGroup === undefined) return;
 
 		if (event.key === 'Enter' && this.#getTrigger(li)?.matches('a[href]')) return;
 
@@ -191,7 +191,7 @@ class SiteNavigation extends HTMLElement {
 			return;
 		}
 
-		if (li.dataset.hasSubmenu === undefined) return;
+		if (li.dataset.hasGroup === undefined) return;
 
 		this.#open(li);
 		this.#focusFirstItem(li);
@@ -215,7 +215,7 @@ class SiteNavigation extends HTMLElement {
 			return;
 		}
 
-		if (li.dataset.hasSubmenu === undefined) return;
+		if (li.dataset.hasGroup === undefined) return;
 
 		event.preventDefault();
 		this.#open(li);
@@ -237,7 +237,7 @@ class SiteNavigation extends HTMLElement {
 
 	#handleClick = (event: Event) => {
 		const target = event.target as Element;
-		const li = target.closest<HTMLElement>('li[data-has-submenu]');
+		const li = target.closest<HTMLElement>('li[data-has-group]');
 
 		if (!li) {
 			this.#closeAll();
@@ -391,18 +391,18 @@ class SiteNavigation extends HTMLElement {
 	}
 
 	#injectAria() {
-		let submenuId = 0;
+		let groupId = 0;
 
 		for (const li of this.querySelectorAll<HTMLElement>('li')) {
-			const submenu = this.#getSubmenu(li);
+			const group = this.#getGroup(li);
 
-			if (!submenu) continue;
+			if (!group) continue;
 
-			li.dataset.hasSubmenu = '';
+			li.dataset.hasGroup = '';
 
-			const id = `${this.#instanceId}-sub-menu-${String(submenuId++)}`;
+			const id = `${this.#instanceId}-group-${String(groupId++)}`;
 
-			submenu.id = id;
+			group.id = id;
 
 			const trigger = this.#getTrigger(li);
 
@@ -438,8 +438,8 @@ class SiteNavigation extends HTMLElement {
 	}
 
 	#triggerContains(li: HTMLElement, target: Node): boolean {
-		const submenu = this.#getSubmenu(li);
-		return !submenu?.contains(target);
+		const group = this.#getGroup(li);
+		return !group?.contains(target);
 	}
 }
 
