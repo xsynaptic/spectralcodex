@@ -17,14 +17,46 @@ async function readSensitiveLocations() {
 		getCollectionEntries(content, ['locations']),
 	);
 
+	const hiddenLocations = locations
+		.filter((entry) => entry.data.hideGeometry)
+		.map((entry) => {
+			const points = [entry.data.geometry].flat();
+
+			return {
+				addresses: [entry.data, ...points].flatMap((source) => getAddresses(source)),
+				path: `/${getPublicId(entry)}/`,
+				positions: points.map((point) => point.coordinates),
+			};
+		});
+
 	return {
 		anonymizedPaths: locations
 			.filter((entry) => getPublicId(entry) !== entry.id)
 			.map((entry) => `/${entry.id}/`),
-		hiddenPaths: locations
-			.filter((entry) => entry.data.hideGeometry)
-			.map((entry) => `/${getPublicId(entry)}/`),
+		hiddenLocations,
+		hiddenPaths: hiddenLocations.map((location) => location.path),
 	};
+}
+
+function getAddresses(source: object) {
+	return Object.entries(source)
+		.filter(([key, value]) => (key === 'address' || key.startsWith('address_')) && value)
+		.map(([, value]) => String(value));
+}
+
+function escapeHtml(text: string) {
+	return text
+		.replaceAll('&', '&amp;')
+		.replaceAll('<', '&lt;')
+		.replaceAll('>', '&gt;')
+		.replaceAll('"', '&quot;')
+		.replaceAll("'", '&#39;');
+}
+
+function hasPosition(numbers: Array<number>, [longitude = 0, latitude = 0]: Array<number>) {
+	const isNear = (target: number) => numbers.some((value) => Math.abs(value - target) < 0.001);
+
+	return isNear(latitude) && isNear(longitude);
 }
 
 // Root-level paths only, so a Region or Theme sharing a slug is not mistaken for the Location
@@ -104,4 +136,34 @@ test('sensitive Locations stay out of the build output', { tag: '@smoke' }, asyn
 			.soft(countNamed(hiddenPaths, rootPaths), `hidden Locations placed in ${surface}`)
 			.toBe(0);
 	}
+});
+
+test('hidden Location pages show no coordinates or address', async ({ request }) => {
+	const { hiddenLocations } = await readSensitiveLocations();
+
+	test.skip(hiddenLocations.length === 0, 'this content set has no hidden Locations');
+
+	const pages = await Promise.all(
+		hiddenLocations.map(async (location) => {
+			const response = await request.get(location.path);
+			const body = await response.text();
+			const numbers = [...body.matchAll(/-?\d{1,3}\.\d{3,}/g)].map(([match]) => Number(match));
+
+			return {
+				hasAddress: location.addresses.some(
+					(address) => body.includes(address) || body.includes(escapeHtml(address)),
+				),
+				hasPosition: location.positions.some((position) => hasPosition(numbers, position)),
+				isServed: response.ok(),
+			};
+		}),
+	);
+
+	expect(pages.filter((page) => !page.isServed).length, 'hidden Locations not served').toBe(0);
+	expect
+		.soft(pages.filter((page) => page.hasPosition).length, 'hidden Locations showing coordinates')
+		.toBe(0);
+	expect
+		.soft(pages.filter((page) => page.hasAddress).length, 'hidden Locations showing an address')
+		.toBe(0);
 });

@@ -13,6 +13,8 @@ interface EdgeExpectation {
 // Node's fetch never times out on its own, so a hung connection would stall the deploy
 const requestTimeoutMs = 10_000;
 
+const objectivesSessionCookie = 'scx-objectives-session';
+
 export async function verifyEdge(): Promise<void> {
 	const config = loadDeployConfig();
 
@@ -26,32 +28,16 @@ export async function verifyEdge(): Promise<void> {
 	const failures: Array<string> = [];
 
 	function check(expectation: EdgeExpectation, response: Response) {
-		const { cacheControl, cfCacheStatus, label, path, status } = expectation;
+		const failure = response.headers.get('set-cookie')?.includes(objectivesSessionCookie)
+			? `response sets ${objectivesSessionCookie}`
+			: getEdgeFailure(expectation, response);
 
-		if (response.status !== status) {
-			failures.push(
-				`${label} (${path}): expected status ${String(status)}, got ${String(response.status)}`,
-			);
+		if (failure) {
+			failures.push(`${expectation.label} (${expectation.path}): ${failure}`);
 			return;
 		}
 
-		const actual = response.headers.get('cache-control') ?? '(absent)';
-
-		if (actual !== cacheControl) {
-			failures.push(`${label} (${path}): expected "${cacheControl}", got "${actual}"`);
-			return;
-		}
-
-		const actualCfCacheStatus = response.headers.get('cf-cache-status') ?? '(absent)';
-
-		if (cfCacheStatus && actualCfCacheStatus !== cfCacheStatus) {
-			failures.push(
-				`${label} (${path}): expected cf-cache-status "${cfCacheStatus}", got "${actualCfCacheStatus}"`,
-			);
-			return;
-		}
-
-		console.log(chalk.gray(`  ok  ${label}: ${path}`));
+		console.log(chalk.gray(`  ok  ${expectation.label}: ${expectation.path}`));
 	}
 
 	const documentResponse = await request(`${baseUrl}/?${cacheBust}`, 'GET', 'document (/)');
@@ -119,6 +105,26 @@ function fetchWithTimeout(url: string, method: 'GET' | 'HEAD') {
 		redirect: 'manual',
 		signal: AbortSignal.timeout(requestTimeoutMs),
 	});
+}
+
+function getEdgeFailure(expectation: EdgeExpectation, response: Response) {
+	const { cacheControl, cfCacheStatus, status } = expectation;
+
+	if (response.status !== status) {
+		return `expected status ${String(status)}, got ${String(response.status)}`;
+	}
+
+	const actual = response.headers.get('cache-control') ?? '(absent)';
+
+	if (actual !== cacheControl) return `expected "${cacheControl}", got "${actual}"`;
+
+	const actualCfCacheStatus = response.headers.get('cf-cache-status') ?? '(absent)';
+
+	if (cfCacheStatus && actualCfCacheStatus !== cfCacheStatus) {
+		return `expected cf-cache-status "${cfCacheStatus}", got "${actualCfCacheStatus}"`;
+	}
+
+	return;
 }
 
 function getExpectations(token: string): Array<EdgeExpectation> {
