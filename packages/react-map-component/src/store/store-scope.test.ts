@@ -1,36 +1,17 @@
-import type { MapSourceItem } from '@spectralcodex/map-codec';
-
-import { GeometryTypeEnum, LocationStatusEnum } from '@spectralcodex/shared/map';
 import { describe, expect, test } from 'vitest';
 
 import type { MapScope, MapView } from '#types.ts';
 
+import { makeMapSourceItem } from '#lib/map-test-utils.ts';
 import { createMapStore } from '#store/store-factory.ts';
 import { reduceMapScope } from '#store/store-scope.ts';
 
-function makeItem(properties: Partial<MapSourceItem['properties']>): MapSourceItem {
-	return {
-		geometry: { coordinates: [0, 0], type: GeometryTypeEnum.Point },
-		properties: {
-			entryQuality: 1,
-			hasImage: false,
-			id: 'location-id',
-			precision: 3,
-			rating: 3,
-			status: LocationStatusEnum.Abandoned,
-			title: 'Location',
-			...properties,
-		},
-		type: 'Feature',
-	};
-}
-
 const items = [
-	makeItem({ id: 'theater', regionOrdinals: [12], themeIndices: [3] }),
-	makeItem({ id: 'theater-1', regionOrdinals: [12], themeIndices: [3] }),
-	makeItem({ id: 'cinema', regionOrdinals: [40], themeIndices: [3] }),
-	makeItem({ id: 'temple', regionOrdinals: [14] }),
-	makeItem({ id: 'mine', regionOrdinals: [40] }),
+	makeMapSourceItem({ id: 'theater', regionOrdinals: [12], themeIndices: [3] }),
+	makeMapSourceItem({ id: 'theater-1', regionOrdinals: [12], themeIndices: [3] }),
+	makeMapSourceItem({ id: 'cinema', regionOrdinals: [40], themeIndices: [3] }),
+	makeMapSourceItem({ id: 'temple', regionOrdinals: [14] }),
+	makeMapSourceItem({ id: 'mine', regionOrdinals: [40] }),
 ];
 
 const theme: MapScope = {

@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 
+import { makeEntry, makePoint } from '#lib/collections/collections-test-utils.ts';
+
 const { getLocationsCollectionMock, getRegionsByIdsMock } = vi.hoisted(() => ({
 	getLocationsCollectionMock: vi.fn(),
 	getRegionsByIdsMock: vi.fn(),
@@ -18,19 +20,14 @@ vi.mock('#lib/collections/regions/regions-data.ts', () => ({
 const { getObjectiveLocations, getTheaterLocations } =
 	await import('#lib/collections/locations/locations-subsets.ts');
 
-function makeLocation(id: string, data: Record<string, unknown> = {}): ComputedEntry<'locations'> {
-	return {
-		collection: 'locations',
-		data: {
-			geometry: { coordinates: [121, 25], type: 'Point' },
-			precision: 4,
-			regions: [{ id: 'taipei' }],
-			status: LocationStatusEnum.Active,
-			title: id,
-			...data,
-		},
-		id,
-	} as unknown as ComputedEntry<'locations'>;
+function makeLocation(id: string, data: Record<string, unknown> = {}) {
+	return makeEntry('locations', id, {
+		geometry: makePoint(121, 25),
+		precision: 4,
+		regions: [{ id: 'taipei' }],
+		status: LocationStatusEnum.Active,
+		...data,
+	});
 }
 
 function setLocations(entries: Array<ComputedEntry<'locations'>>) {

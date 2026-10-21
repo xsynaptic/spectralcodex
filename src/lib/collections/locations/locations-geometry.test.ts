@@ -1,28 +1,19 @@
 import { LocationStatusEnum } from '@spectralcodex/shared/map';
 import { describe, expect, test } from 'vitest';
 
-import type { ComputedEntry } from '#lib/collections/collections-types.ts';
-
+import { makeEntry, makePoint } from '#lib/collections/collections-test-utils.ts';
 import {
 	getLocationDetails,
 	getLocationPoints,
 } from '#lib/collections/locations/locations-geometry.ts';
 
-function makeLocation(data: Record<string, unknown>): ComputedEntry<'locations'> {
-	return {
-		collection: 'locations',
-		data: {
-			precision: 4,
-			status: LocationStatusEnum.Idle,
-			title: 'Saltworks',
-			...data,
-		},
-		id: 'saltworks',
-	} as unknown as ComputedEntry<'locations'>;
-}
-
-function makePoint(longitude: number, latitude: number, extra: Record<string, unknown> = {}) {
-	return { coordinates: [longitude, latitude], ...extra };
+function makeLocation(data: Record<string, unknown>) {
+	return makeEntry('locations', 'saltworks', {
+		precision: 4,
+		status: LocationStatusEnum.Idle,
+		title: 'Saltworks',
+		...data,
+	});
 }
 
 describe('getLocationPoints', () => {

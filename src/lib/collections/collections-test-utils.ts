@@ -24,6 +24,14 @@ export function makeEntry<T extends CollectionKey>(
 	} as unknown as ComputedEntry<T>;
 }
 
+export function makePoint(
+	longitude: number,
+	latitude: number,
+	extra: Record<string, unknown> = {},
+) {
+	return { coordinates: [longitude, latitude], type: 'Point', ...extra };
+}
+
 export function makeCatalogItemFor(entry: ComputedEntry<CatalogCollectionKey>): CatalogItem {
 	const data = entry.data as FixtureData;
 

@@ -1,10 +1,9 @@
-import type { MapSourceItem } from '@spectralcodex/map-codec';
-
-import { GeometryTypeEnum, LocationStatusEnum } from '@spectralcodex/shared/map';
+import { LocationStatusEnum } from '@spectralcodex/shared/map';
 import { describe, expect, test } from 'vitest';
 
 import type { MapScope } from '#types.ts';
 
+import { makeMapSourceItem } from '#lib/map-test-utils.ts';
 import { createMapStore, hasActiveFilter } from '#store/store-factory.ts';
 
 function popupOf(pointId: string) {
@@ -134,22 +133,7 @@ describe('syncView', () => {
 		title: 'Tainan',
 		url: '/regions/tainan/',
 	};
-	const items: Array<MapSourceItem> = [
-		{
-			geometry: { coordinates: [0, 0], type: GeometryTypeEnum.Point },
-			properties: {
-				entryQuality: 1,
-				hasImage: false,
-				id: 'mine',
-				precision: 3,
-				rating: 3,
-				regionOrdinals: [40],
-				status: LocationStatusEnum.Abandoned,
-				title: 'Mine',
-			},
-			type: 'Feature',
-		},
-	];
+	const items = [makeMapSourceItem({ id: 'mine', regionOrdinals: [40], title: 'Mine' })];
 	const regionPage = { view: { scope: region }, viewKey: 'region' };
 	const minePage = { view: { targetIds: ['mine'] }, viewKey: 'mine' };
 

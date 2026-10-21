@@ -1,34 +1,21 @@
 import { MapPopupOwnField } from '@spectralcodex/map-codec';
 import { describe, expect, test, vi } from 'vitest';
 
-import type { ComputedEntry } from '#lib/collections/collections-types.ts';
-
+import { makeEntry, makePoint } from '#lib/collections/collections-test-utils.ts';
 import {
 	getLocationFeatureIds,
 	getLocationFeatures,
 	getLocationsMapSourceData,
 } from '#lib/map/map-locations.ts';
 
-// Minimal fixtures; only the fields the feature builder reads, cast to the collection entry type
-function makeLocation(
-	id: string,
-	data: Record<string, unknown> & { title: string },
-): ComputedEntry<'locations'> {
-	return {
-		collection: 'locations',
-		data: {
-			category: 'temple',
-			precision: 4,
-			rating: 3,
-			status: 'operational',
-			...data,
-		},
-		id,
-	} as unknown as ComputedEntry<'locations'>;
-}
-
-function makePoint(longitude: number, latitude: number, extra: Record<string, unknown> = {}) {
-	return { coordinates: [longitude, latitude], type: 'Point', ...extra };
+function makeLocation(id: string, data: Record<string, unknown> & { title: string }) {
+	return makeEntry('locations', id, {
+		category: 'temple',
+		precision: 4,
+		rating: 3,
+		status: 'operational',
+		...data,
+	});
 }
 
 describe('getLocationFeatureIds', () => {

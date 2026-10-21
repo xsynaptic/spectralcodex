@@ -1,7 +1,6 @@
-import type { CollectionEntry } from 'astro:content';
-
 import { afterEach, describe, expect, test, vi } from 'vitest';
 
+import { makeEntry } from '#lib/collections/collections-test-utils.ts';
 import {
 	createRegionContentFunction,
 	createRegionsTree,
@@ -10,34 +9,23 @@ import {
 } from '#lib/collections/regions/regions-factory.ts';
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 
-function makeLocation(id: string, regionIds: Array<string>): CollectionEntry<'locations'> {
-	return {
-		collection: 'locations',
-		data: { regions: regionIds.map((regionId) => ({ id: regionId })), title: id },
-		id,
-	} as unknown as CollectionEntry<'locations'>;
+function makeLocation(id: string, regionIds: Array<string>, data: Record<string, unknown> = {}) {
+	return makeEntry('locations', id, {
+		regions: regionIds.map((regionId) => ({ id: regionId })),
+		...data,
+	});
 }
 
-function makePost(id: string, regionIds?: Array<string>): CollectionEntry<'posts'> {
-	return {
-		collection: 'posts',
-		data: {
-			title: id,
-			...(regionIds === undefined
-				? {}
-				: { regions: regionIds.map((regionId) => ({ id: regionId })) }),
-		},
+function makePost(id: string, regionIds?: Array<string>) {
+	return makeEntry(
+		'posts',
 		id,
-	} as unknown as CollectionEntry<'posts'>;
+		regionIds === undefined ? {} : { regions: regionIds.map((regionId) => ({ id: regionId })) },
+	);
 }
 
-// Minimal fixtures; only the fields the factory reads, cast to the collection entry type
-function makeRegion(id: string, parent?: string): CollectionEntry<'regions'> {
-	return {
-		collection: 'regions',
-		data: { title: id, ...(parent === undefined ? {} : { parent }) },
-		id,
-	} as unknown as CollectionEntry<'regions'>;
+function makeRegion(id: string, parent?: string) {
+	return makeEntry('regions', id, parent === undefined ? {} : { parent });
 }
 
 // taiwan > north-taiwan > (keelung, taipei); tainan directly under taiwan
@@ -152,38 +140,6 @@ async function loadFactory(isDev: boolean) {
 	return import('#lib/collections/regions/regions-factory.ts');
 }
 
-function makeOverrideLocation(
-	id: string,
-	regionIds: Array<string>,
-	overrideRegionIds: Array<string>,
-) {
-	return {
-		collection: 'locations',
-		data: {
-			override: { regions: overrideRegionIds.map((regionId) => ({ id: regionId })) },
-			regions: regionIds.map((regionId) => ({ id: regionId })),
-			title: id,
-		},
-		id,
-	} as unknown as CollectionEntry<'locations'>;
-}
-
-function makeFlaggedLocation(
-	id: string,
-	regionIds: Array<string>,
-	flags: { hideFromLists?: boolean; hideGeometry?: boolean },
-) {
-	return {
-		collection: 'locations',
-		data: {
-			...flags,
-			regions: regionIds.map((regionId) => ({ id: regionId })),
-			title: id,
-		},
-		id,
-	} as unknown as CollectionEntry<'locations'>;
-}
-
 afterEach(() => {
 	vi.unstubAllEnvs();
 	vi.resetModules();
@@ -195,8 +151,8 @@ async function taipeiCountsFor(isDev: boolean) {
 	const getRegionContent = createRegionContentFunction({
 		locations: [
 			makeLocation('temple', ['taipei']),
-			makeFlaggedLocation('bunker', ['taipei'], { hideGeometry: true }),
-			makeFlaggedLocation('theater', ['taipei'], { hideFromLists: true }),
+			makeLocation('bunker', ['taipei'], { hideGeometry: true }),
+			makeLocation('theater', ['taipei'], { hideFromLists: true }),
 		],
 		posts: [],
 		regionsTree: createRegionsTree(makeRegionsFixture()),
@@ -226,7 +182,7 @@ async function overriddenLocationRegionsFor(isDev: boolean) {
 	const { createRegionContentFunction, createRegionsTree } = await loadFactory(isDev);
 
 	const getRegionContent = createRegionContentFunction({
-		locations: [makeOverrideLocation('temple', ['taipei'], ['tainan'])],
+		locations: [makeLocation('temple', ['taipei'], { override: { regions: [{ id: 'tainan' }] } })],
 		posts: [],
 		regionsTree: createRegionsTree(makeRegionsFixture()),
 	});

@@ -45,6 +45,7 @@ class BuildStatsChart extends HTMLElement {
 
 	disconnectedCallback() {
 		this.#abortController?.abort();
+		this.#abortController = undefined;
 	}
 
 	#getNearest(x: number): TooltipPoint | undefined {

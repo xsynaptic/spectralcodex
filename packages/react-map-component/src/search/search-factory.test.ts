@@ -1,8 +1,8 @@
 import type { MapScopeRow, MapSourceItem } from '@spectralcodex/map-codec';
 
-import { GeometryTypeEnum, LocationStatusEnum } from '@spectralcodex/shared/map';
 import { describe, expect, test } from 'vitest';
 
+import { makeMapSourceItem } from '#lib/map-test-utils.ts';
 import { createSearchIndex, searchMap } from '#search/search-factory.ts';
 
 function makeRow(
@@ -10,21 +10,7 @@ function makeRow(
 	title: string,
 	properties: Partial<MapSourceItem['properties']> = {},
 ): MapSourceItem {
-	return {
-		geometry: { coordinates: [120, 23], type: GeometryTypeEnum.Point },
-		properties: {
-			entryQuality: 1,
-			hasImage: false,
-			id,
-			precision: 3,
-			rating: 1,
-			status: LocationStatusEnum.Abandoned,
-			title,
-			url: `/${id}/`,
-			...properties,
-		},
-		type: 'Feature',
-	};
+	return makeMapSourceItem({ id, rating: 1, title, url: `/${id}/`, ...properties });
 }
 
 function makeScope(id: string, title: string, row: Partial<MapScopeRow> = {}): MapScopeRow {

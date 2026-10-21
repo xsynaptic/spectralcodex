@@ -1,36 +1,19 @@
 import type { MapSourceItem } from '@spectralcodex/map-codec';
 
-import { GeometryTypeEnum, LocationStatusEnum } from '@spectralcodex/shared/map';
+import { LocationStatusEnum } from '@spectralcodex/shared/map';
 import { describe, expect, test } from 'vitest';
 
 import type { MapFilterState } from '#data/data-filter.ts';
 import type { MapFeaturesRule } from '#types.ts';
 
 import { getHiddenTargetIds, getMapCanvasData } from '#data/data-filter.ts';
+import { makeMapSourceItem } from '#lib/map-test-utils.ts';
 
 const passAll: MapFilterState = {
 	objective: 1,
 	rating: 1,
 	status: [],
 };
-
-function makeItem(properties: Partial<MapSourceItem['properties']> = {}): MapSourceItem {
-	return {
-		geometry: { coordinates: [0, 0], type: GeometryTypeEnum.Point },
-		properties: {
-			entryQuality: 1,
-			hasImage: false,
-			id: 'location-id',
-			outlier: false,
-			precision: 3,
-			rating: 3,
-			status: LocationStatusEnum.Abandoned,
-			title: 'Location',
-			...properties,
-		},
-		type: 'Feature',
-	};
-}
 
 function getDrawnIds(result: ReturnType<typeof getMapCanvasData>) {
 	return result.pointCollection.features.map(({ properties }) => properties.id);
@@ -42,29 +25,29 @@ function isDrawn(item: MapSourceItem, filter: MapFilterState) {
 
 describe('getMapCanvasData visibility', () => {
 	test('status is an exclude-list', () => {
-		const item = makeItem({ status: LocationStatusEnum.Abandoned });
+		const item = makeMapSourceItem({ status: LocationStatusEnum.Abandoned });
 
 		expect(isDrawn(item, { ...passAll, status: [LocationStatusEnum.Abandoned] })).toBe(false);
 		expect(isDrawn(item, { ...passAll, status: [LocationStatusEnum.Active] })).toBe(true);
 	});
 
 	test('a missing objective is never hidden by the objective threshold', () => {
-		expect(isDrawn(makeItem(), { ...passAll, objective: 5 })).toBe(true);
+		expect(isDrawn(makeMapSourceItem(), { ...passAll, objective: 5 })).toBe(true);
 	});
 
 	test('every threshold is an inclusive minimum', () => {
 		const atThreshold: MapFilterState = { objective: 3, rating: 3, status: [] };
 		const onTheLine = { objective: 3, rating: 3 };
 
-		expect(isDrawn(makeItem(onTheLine), atThreshold)).toBe(true);
-		expect(isDrawn(makeItem({ ...onTheLine, rating: 2 }), atThreshold)).toBe(false);
-		expect(isDrawn(makeItem({ ...onTheLine, objective: 2 }), atThreshold)).toBe(false);
+		expect(isDrawn(makeMapSourceItem(onTheLine), atThreshold)).toBe(true);
+		expect(isDrawn(makeMapSourceItem({ ...onTheLine, rating: 2 }), atThreshold)).toBe(false);
+		expect(isDrawn(makeMapSourceItem({ ...onTheLine, objective: 2 }), atThreshold)).toBe(false);
 	});
 });
 
 describe('getMapCanvasData', () => {
 	test('a hidden item is neither drawn nor counted as filtered', () => {
-		const result = getMapCanvasData([makeItem({ rating: 1 }), makeItem()], {
+		const result = getMapCanvasData([makeMapSourceItem({ rating: 1 }), makeMapSourceItem()], {
 			...passAll,
 			rating: 3,
 		});
@@ -75,7 +58,10 @@ describe('getMapCanvasData', () => {
 
 	test('a pinned item is drawn whatever the filter hides', () => {
 		const result = getMapCanvasData(
-			[makeItem({ id: 'target', rating: 1 }), makeItem({ id: 'other', rating: 1 })],
+			[
+				makeMapSourceItem({ id: 'target', rating: 1 }),
+				makeMapSourceItem({ id: 'other', rating: 1 }),
+			],
 			{ ...passAll, pinnedIds: ['target'], rating: 3 },
 		);
 
@@ -84,7 +70,7 @@ describe('getMapCanvasData', () => {
 
 	test('a pinned item outside the Scope stays out', () => {
 		const result = getMapCanvasData(
-			[makeItem({ id: 'target', themeIndices: [1] })],
+			[makeMapSourceItem({ id: 'target', themeIndices: [1] })],
 			{ ...passAll, pinnedIds: ['target'] },
 			{ index: 2, type: 'theme' },
 		);
@@ -102,7 +88,10 @@ describe('getMapCanvasData', () => {
 });
 
 describe('getHiddenTargetIds', () => {
-	const items = [makeItem({ id: 'hidden', rating: 1 }), makeItem({ id: 'visible', rating: 5 })];
+	const items = [
+		makeMapSourceItem({ id: 'hidden', rating: 1 }),
+		makeMapSourceItem({ id: 'visible', rating: 5 }),
+	];
 	const filter = { ...passAll, rating: 3 };
 
 	test('only Targets the filter hides are returned', () => {
@@ -115,8 +104,8 @@ describe('getHiddenTargetIds', () => {
 });
 
 describe('getMapCanvasData scope', () => {
-	const inside = makeItem({ id: 'inside', regionOrdinals: [5] });
-	const outside = makeItem({ id: 'outside', regionOrdinals: [99] });
+	const inside = makeMapSourceItem({ id: 'inside', regionOrdinals: [5] });
+	const outside = makeMapSourceItem({ id: 'outside', regionOrdinals: [99] });
 
 	const scopeRule: MapFeaturesRule = { interval: [4, 10], type: 'region' };
 

@@ -1,6 +1,6 @@
 // Carousel slider element; this requires a container and some navigation buttons to work properly
 class ImageCarousel extends HTMLElement {
-	#controller: AbortController | undefined;
+	#abortController: AbortController | undefined;
 	#currentIndex = 0;
 	#initialized = false;
 	#liveRegion: HTMLElement | undefined;
@@ -11,9 +11,9 @@ class ImageCarousel extends HTMLElement {
 			this.#initialized = true;
 		}
 
-		this.#controller = new AbortController();
+		this.#abortController = new AbortController();
 
-		const { signal } = this.#controller;
+		const { signal } = this.#abortController;
 
 		this.addEventListener('click', this.#handleClick, { signal });
 		this.#getContainer()?.addEventListener('scrollend', this.#handleScrollEnd, {
@@ -23,8 +23,8 @@ class ImageCarousel extends HTMLElement {
 	}
 
 	disconnectedCallback() {
-		this.#controller?.abort();
-		this.#controller = undefined;
+		this.#abortController?.abort();
+		this.#abortController = undefined;
 	}
 
 	#announce(index: number) {

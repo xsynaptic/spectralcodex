@@ -1,7 +1,7 @@
 const copiedDurationMs = 2000;
 
 class CopyCoordinates extends HTMLElement {
-	#controller: AbortController | undefined;
+	#abortController: AbortController | undefined;
 	#resetTimeout: ReturnType<typeof setTimeout> | undefined;
 
 	connectedCallback() {
@@ -9,14 +9,14 @@ class CopyCoordinates extends HTMLElement {
 
 		if (!button || !('clipboard' in navigator)) return;
 
-		this.#controller = new AbortController();
-		button.addEventListener('click', this.#handleClick, { signal: this.#controller.signal });
+		this.#abortController = new AbortController();
+		button.addEventListener('click', this.#handleClick, { signal: this.#abortController.signal });
 		button.disabled = false;
 	}
 
 	disconnectedCallback() {
-		this.#controller?.abort();
-		this.#controller = undefined;
+		this.#abortController?.abort();
+		this.#abortController = undefined;
 		clearTimeout(this.#resetTimeout);
 		this.#setCopied(false);
 	}

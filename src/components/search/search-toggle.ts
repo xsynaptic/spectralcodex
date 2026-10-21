@@ -32,14 +32,14 @@ class SearchToggle extends HTMLElement implements ModalTriggerContract {
 		return this.querySelector<HTMLButtonElement>('button');
 	}
 
-	#controller: AbortController | undefined;
+	#abortController: AbortController | undefined;
 	#cssReady?: Promise<void>;
 	#searchTracker: SearchTracker | undefined;
 
 	connectedCallback() {
-		this.#controller = new AbortController();
+		this.#abortController = new AbortController();
 
-		const { signal } = this.#controller;
+		const { signal } = this.#abortController;
 
 		// Static props in markup; only the OS-dependent keyboard hint has to be set client-side
 		this.buttonEl?.setAttribute('aria-keyshortcuts', isMac ? 'Meta+K' : 'Control+K');
@@ -59,8 +59,8 @@ class SearchToggle extends HTMLElement implements ModalTriggerContract {
 		// eslint-disable-next-line unicorn/no-null -- matches Pagefind's PagefindComponent interface
 		this.instance = null;
 		this.#searchTracker = undefined;
-		this.#controller?.abort();
-		this.#controller = undefined;
+		this.#abortController?.abort();
+		this.#abortController = undefined;
 	}
 
 	// Invoked by <pagefind-modal> on close, never from this file
@@ -118,7 +118,7 @@ class SearchToggle extends HTMLElement implements ModalTriggerContract {
 
 		instanceManager = pagefind.getInstanceManager();
 
-		if (this.instance || !this.#controller) return;
+		if (this.instance || !this.#abortController) return;
 
 		this.instance = instanceManager.getInstance(this.getAttribute('instance') ?? 'default');
 

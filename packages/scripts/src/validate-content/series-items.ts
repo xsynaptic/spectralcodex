@@ -1,4 +1,5 @@
 import type { ContentEntry } from '#shared/astro-content.ts';
+import type { ValidationIssue } from '#validate-content/validation-result.ts';
 
 import { toValidationResult } from '#validate-content/validation-result.ts';
 
@@ -12,7 +13,7 @@ export function validateSeriesItems(
 ) {
 	const validIds = new Set(validTargets.map((entry) => entry.id));
 
-	const issues: Array<{ id: string; location: string }> = [];
+	const issues: Array<ValidationIssue> = [];
 
 	for (const entry of entries) {
 		const seriesItems = entry.data.seriesItems as Array<string> | undefined;
@@ -20,15 +21,14 @@ export function validateSeriesItems(
 		if (!seriesItems) continue;
 
 		for (const id of seriesItems) {
-			if (!validIds.has(id)) issues.push({ id, location: entry.filePath ?? entry.id });
+			if (validIds.has(id)) continue;
+
+			issues.push({ message: `${entry.filePath ?? entry.id}: unknown series item "${id}"` });
 		}
 	}
 
-	return toValidationResult(
-		issues.map(({ id, location }) => ({ message: `${location}: unknown series item "${id}"` })),
-		{
-			fail: `Found ${issues.length.toString()} unknown series item(s)`,
-			pass: 'Series items valid',
-		},
-	);
+	return toValidationResult(issues, {
+		fail: `Found ${issues.length.toString()} unknown series item(s)`,
+		pass: 'Series items valid',
+	});
 }

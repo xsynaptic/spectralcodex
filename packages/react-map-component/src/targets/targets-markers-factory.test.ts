@@ -1,26 +1,17 @@
-import type { MapSourceItem } from '@spectralcodex/map-codec';
-
-import { GeometryTypeEnum } from '@spectralcodex/shared/map';
 import { describe, expect, test } from 'vitest';
 
+import { makeMapSourceItem } from '#lib/map-test-utils.ts';
 import {
 	findTargetClusters,
 	getClusterCandidates,
 	getTargetPoints,
 } from '#targets/targets-markers-factory.ts';
 
-function makeItem(id: string, coordinates: [number, number]) {
-	return {
-		geometry: { coordinates, type: GeometryTypeEnum.Point },
-		properties: { id },
-	} as MapSourceItem;
-}
-
 describe('getTargetPoints', () => {
 	const items = [
-		makeItem('theater', [121.8, 24.6]),
-		makeItem('railway', [121, 24]),
-		makeItem('temple', [120.2, 23]),
+		makeMapSourceItem({ id: 'theater' }, [121.8, 24.6]),
+		makeMapSourceItem({ id: 'railway' }, [121, 24]),
+		makeMapSourceItem({ id: 'temple' }, [120.2, 23]),
 	];
 
 	test('yields the Targets only, in Target order', () => {

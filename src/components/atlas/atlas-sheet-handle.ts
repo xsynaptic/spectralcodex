@@ -34,7 +34,7 @@ function getTapRest() {
 }
 
 class AtlasSheetHandle extends HTMLElement {
-	#controller: AbortController | undefined;
+	#abortController: AbortController | undefined;
 	#drag: ReturnType<typeof grabSheet>;
 	#fromX = 0;
 	#fromY = 0;
@@ -46,9 +46,9 @@ class AtlasSheetHandle extends HTMLElement {
 
 		if (!button) return;
 
-		this.#controller = new AbortController();
+		this.#abortController = new AbortController();
 
-		const { signal } = this.#controller;
+		const { signal } = this.#abortController;
 
 		const stuckObserver = new IntersectionObserver(
 			([entry]) => {
@@ -89,8 +89,8 @@ class AtlasSheetHandle extends HTMLElement {
 	}
 
 	disconnectedCallback() {
-		this.#controller?.abort();
-		this.#controller = undefined;
+		this.#abortController?.abort();
+		this.#abortController = undefined;
 	}
 
 	#handleClick = (event: MouseEvent) => {

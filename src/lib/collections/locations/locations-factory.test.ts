@@ -1,33 +1,21 @@
-import type { CollectionEntry } from 'astro:content';
-
 import { describe, expect, test } from 'vitest';
 
 import type { GetSignedImagePathFunction } from '#lib/collections/locations/locations-factory.ts';
 
+import { makeEntry } from '#lib/collections/collections-test-utils.ts';
 import {
 	createLocationPostsFunction,
 	getLocationThumbnailProps,
 } from '#lib/collections/locations/locations-factory.ts';
 
-function makeLocation(id: string): CollectionEntry<'locations'> {
-	return {
-		collection: 'locations',
-		data: { title: id },
+function makePost(id: string, locationIds?: Array<string>) {
+	return makeEntry(
+		'posts',
 		id,
-	} as unknown as CollectionEntry<'locations'>;
-}
-
-function makePost(id: string, locationIds?: Array<string>): CollectionEntry<'posts'> {
-	return {
-		collection: 'posts',
-		data: {
-			title: id,
-			...(locationIds === undefined
-				? {}
-				: { locations: locationIds.map((locationId) => ({ id: locationId })) }),
-		},
-		id,
-	} as unknown as CollectionEntry<'posts'>;
+		locationIds === undefined
+			? {}
+			: { locations: locationIds.map((locationId) => ({ id: locationId })) },
+	);
 }
 
 const stubSigner: GetSignedImagePathFunction = (src, operations) =>
@@ -64,7 +52,7 @@ describe('createLocationPostsFunction', () => {
 		const getLocationPosts = createLocationPostsFunction(posts);
 
 		// _posts must follow posts-collection order
-		expect(getLocationPosts(makeLocation('temple'))).toEqual({
+		expect(getLocationPosts(makeEntry('locations', 'temple'))).toEqual({
 			_postCount: 2,
 			_posts: ['post-early', 'post-late'],
 		});
@@ -73,6 +61,6 @@ describe('createLocationPostsFunction', () => {
 	test('unreferenced locations get an empty list', () => {
 		const getLocationPosts = createLocationPostsFunction([makePost('post-early', ['temple'])]);
 
-		expect(getLocationPosts(makeLocation('ruin'))).toEqual({ _postCount: 0, _posts: [] });
+		expect(getLocationPosts(makeEntry('locations', 'ruin'))).toEqual({ _postCount: 0, _posts: [] });
 	});
 });

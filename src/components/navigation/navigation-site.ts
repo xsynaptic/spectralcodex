@@ -21,7 +21,7 @@
 let instanceCount = 0;
 
 class SiteNavigation extends HTMLElement {
-	#controller: AbortController | undefined;
+	#abortController: AbortController | undefined;
 	#hoverOpened: HTMLElement | undefined;
 	#initialized = false;
 	#instanceId = `nav-${String(instanceCount++)}`;
@@ -34,9 +34,9 @@ class SiteNavigation extends HTMLElement {
 			this.#initialized = true;
 		}
 
-		this.#controller = new AbortController();
+		this.#abortController = new AbortController();
 
-		const { signal } = this.#controller;
+		const { signal } = this.#abortController;
 
 		this.addEventListener('pointerdown', this.#handlePointerDown, { signal });
 		this.addEventListener('click', this.#handleClick, { signal });
@@ -52,8 +52,8 @@ class SiteNavigation extends HTMLElement {
 	}
 
 	disconnectedCallback() {
-		this.#controller?.abort();
-		this.#controller = undefined;
+		this.#abortController?.abort();
+		this.#abortController = undefined;
 	}
 
 	#close(li: HTMLElement) {

@@ -6,7 +6,7 @@ class ProgressReading extends HTMLElement {
 	#fadeOutTimer: number | undefined;
 	#frame: number | undefined;
 	#observer: IntersectionObserver | undefined;
-	#scrollController: AbortController | undefined;
+	#scrollAbortController: AbortController | undefined;
 	#target: Element | undefined;
 
 	connectedCallback() {
@@ -57,11 +57,11 @@ class ProgressReading extends HTMLElement {
 	};
 
 	#trackScroll() {
-		if (this.#scrollController) return;
+		if (this.#scrollAbortController) return;
 
-		this.#scrollController = new AbortController();
+		this.#scrollAbortController = new AbortController();
 
-		const { signal } = this.#scrollController;
+		const { signal } = this.#scrollAbortController;
 
 		window.addEventListener('resize', this.#onScroll, { passive: true, signal });
 		window.addEventListener('scroll', this.#onScroll, { passive: true, signal });
@@ -69,8 +69,8 @@ class ProgressReading extends HTMLElement {
 	}
 
 	#untrackScroll() {
-		this.#scrollController?.abort();
-		this.#scrollController = undefined;
+		this.#scrollAbortController?.abort();
+		this.#scrollAbortController = undefined;
 	}
 
 	#updateProgress = () => {

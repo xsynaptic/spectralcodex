@@ -9,17 +9,17 @@ const minPageFraction = 0.2;
 const desktopMediaQuery = '(min-width: 640px)';
 
 class TopButton extends HTMLElement {
+	#abortController: AbortController | undefined;
 	#animationFrameId: number | undefined;
-	#controller: AbortController | undefined;
 	#desktopQuery: MediaQueryList | undefined;
 	#lastScrollY = 0;
+	#scrollAbortController: AbortController | undefined;
 	#scrollAccumulator = 0;
-	#scrollController: AbortController | undefined;
 
 	connectedCallback() {
-		this.#controller = new AbortController();
+		this.#abortController = new AbortController();
 
-		const { signal } = this.#controller;
+		const { signal } = this.#abortController;
 
 		this.#setHidden(true);
 		this.addEventListener('click', this.#handleClick, { signal });
@@ -30,27 +30,27 @@ class TopButton extends HTMLElement {
 	}
 
 	disconnectedCallback() {
-		this.#controller?.abort();
-		this.#controller = undefined;
+		this.#abortController?.abort();
+		this.#abortController = undefined;
 		this.#detachScroll();
 	}
 
 	#attachScroll() {
-		if (this.#scrollController) return;
+		if (this.#scrollAbortController) return;
 
-		this.#scrollController = new AbortController();
+		this.#scrollAbortController = new AbortController();
 		this.#lastScrollY = window.scrollY;
 		this.#scrollAccumulator = 0;
 
 		window.addEventListener('scroll', this.#handleScroll, {
 			passive: true,
-			signal: this.#scrollController.signal,
+			signal: this.#scrollAbortController.signal,
 		});
 	}
 
 	#detachScroll() {
-		this.#scrollController?.abort();
-		this.#scrollController = undefined;
+		this.#scrollAbortController?.abort();
+		this.#scrollAbortController = undefined;
 
 		if (this.#animationFrameId !== undefined) {
 			cancelAnimationFrame(this.#animationFrameId);
