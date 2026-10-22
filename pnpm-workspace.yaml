@@ -35,3 +35,7 @@ allowBuilds:
   sharp: true
   sqlite3: true
   usearch: true
+
+permissions:
+  fallow:
+    skills: false
