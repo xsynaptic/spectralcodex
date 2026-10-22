@@ -23,7 +23,7 @@ import {
 	resetSheet,
 	startColdSheetArrival,
 } from '#lib/atlas/atlas-sheet.ts';
-import { writeStorage } from '#lib/utils/storage.ts';
+import { readStorage, writeStorage } from '#lib/utils/storage.ts';
 
 const paneAnchorSelector = `${atlasPaneSelector} a[href]`;
 
@@ -122,6 +122,14 @@ export function startAtlasMode() {
 	});
 
 	document.addEventListener('click', handleLinkClick);
+
+	window.addEventListener('pageshow', (event) => {
+		if (!event.persisted) return;
+
+		const isMap = readAtlasFlags(document.documentElement).page === atlasPage.map;
+
+		setFlag(isMap || readStorage('sessionStorage', atlasFlagStorageKey) === '1');
+	});
 
 	// The swap copies the incoming root's attributes and inline style as they are, so the mode state is stamped here
 	document.addEventListener('astro:before-swap', (event) => {

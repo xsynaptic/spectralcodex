@@ -94,7 +94,13 @@ function leaveMap() {
 }
 
 async function closeAtlas() {
-	if (readSheetRest() === atlasSheetRest.lowered) await moveSheet(atlasSheetRest.raised);
+	if (readSheetRest() === atlasSheetRest.lowered) {
+		const pane = document.querySelector(atlasPaneSelector);
+
+		await moveSheet(atlasSheetRest.raised);
+
+		if (pane?.isConnected === false) return;
+	}
 
 	const hasShellFocus = document
 		.querySelector(atlasShellSelector)

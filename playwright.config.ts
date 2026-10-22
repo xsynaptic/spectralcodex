@@ -14,8 +14,22 @@ export default defineConfig({
 	outputDir: './temp/playwright-results',
 	projects: [
 		{
+			grepInvert: /@bfcache/,
 			name: 'chromium',
 			use: { ...devices['Desktop Chrome'], launchOptions: { args: ['--enable-gpu'] } },
+		},
+		{
+			grep: /@bfcache/,
+			name: 'chromium-bfcache',
+			use: {
+				...devices['Desktop Chrome'],
+				channel: 'chromium',
+				launchOptions: {
+					args: ['--enable-gpu'],
+					ignoreDefaultArgs: ['--disable-back-forward-cache'],
+				},
+			},
+			workers: 1,
 		},
 		{
 			grep: [/@firefox/, ...engineGrep],
