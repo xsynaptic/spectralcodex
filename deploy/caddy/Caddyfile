@@ -10,6 +10,16 @@
 	tls /certs/spectralcodex.com.pem /certs/spectralcodex.com.private.pem
 }
 
+(umami) {
+	handle /robots.txt {
+		respond "User-agent: *
+Disallow: /"
+	}
+	import umami-origins.conf
+	respond @foreign_beacon 403
+	reverse_proxy umami:3000
+}
+
 www.spectralcodex.com {
 	import spectralcodex-tls
 	redir https://spectralcodex.com{uri} permanent
@@ -100,20 +110,7 @@ spectralcodex.com {
 
 u.spectralcodex.com {
 	import spectralcodex-tls
-	handle /robots.txt {
-		respond "User-agent: *
-Disallow: /"
-	}
-	@foreign_beacon {
-		path /api/send*
-		not {
-			header Origin https://spectralcodex.com
-			header Origin https://synapticism.com
-			header Origin https://djbasilisk.com
-		}
-	}
-	respond @foreign_beacon 403
-	reverse_proxy umami:3000
+	import umami
 }
 
 img.spectralcodex.com {

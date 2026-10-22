@@ -1,0 +1,6 @@
+@foreign_beacon {
+	path /api/send*
+	not {
+		header Origin https://spectralcodex.com
+	}
+}

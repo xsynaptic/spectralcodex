@@ -33,6 +33,7 @@ deploy/.env
 
 # caddy config
 deploy/caddy/spectralcodex-auth.conf
+deploy/caddy/umami-origins.conf
 deploy/caddy/spectralcodex-redirects-generated.conf
 
 # certificates
