@@ -11,7 +11,7 @@ services:
         condition: service_started
 
   image-server:
-    image: ghcr.io/cshum/imagor-mozjpeg:1.9.11
+    image: ghcr.io/cshum/imagor-mozjpeg:1.9.13
     container_name: dev-image-server
     volumes:
       - ${CONTENT_MEDIA_PATH_HOST}:/media:ro

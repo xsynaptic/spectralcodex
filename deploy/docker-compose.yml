@@ -3,7 +3,7 @@
 services:
   # One-shot sidecar: chowns named volumes so non-root caddy can use them; only used once
   caddy-init:
-    image: alpine:3.24.2
+    image: alpine:3.24.3
     command: chown -R 1000:1000 /data /config
     # no network needed; keeps compose from creating an unused default network
     network_mode: none
@@ -213,7 +213,7 @@ services:
         max-file: '3'
 
   image-server:
-    image: ghcr.io/cshum/imagor-mozjpeg:1.9.11
+    image: ghcr.io/cshum/imagor-mozjpeg:1.9.13
     container_name: image-server
     init: true
     read_only: true
