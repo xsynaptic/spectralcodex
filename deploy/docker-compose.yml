@@ -53,7 +53,7 @@ services:
 
   # Umami analytics
   umami:
-    image: ghcr.io/umami-software/umami:3.4.0
+    image: ghcr.io/umami-software/umami:3.4.1
     container_name: umami
     init: true
     mem_limit: 512m
