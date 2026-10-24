@@ -10,6 +10,16 @@
 	tls /certs/spectralcodex.com.pem /certs/spectralcodex.com.private.pem
 }
 
+(access-log) {
+	log {
+		output file /var/log/caddy/access.log {
+			roll_size 50MiB
+			roll_keep 20
+			roll_keep_for 2160h
+		}
+	}
+}
+
 # Stable names overwritten in place: the deploy purges the edge on change, browsers recheck after 30 days
 (derivative-cache-control) {
 	header {args[0]} Cache-Control "public, max-age=2592000, stale-while-revalidate=604800, s-maxage=31536000, no-transform"
@@ -31,17 +41,11 @@ Disallow: /"
 	reverse_proxy umami:3000
 }
 
-# Legacy imagor paths: a signature segment, then optional `WxH/`, then the filters
-# Inside `route` the order is literal, so the exceptions win over the two regexes
 (images-legacy) {
-	@legacy path_regexp ^/[A-Za-z0-9_-]{20}/([0-9]+x[0-9]+/)?filters:
 	@legacy_width path_regexp legacy_width ^/[A-Za-z0-9_-]{20}/([1-9][0-9]*)x0/filters:quality\([0-9]+\):format\((jpg|webp)\)/(.+)\.[a-z]+$
 	@legacy_crop path_regexp legacy_crop ^/[A-Za-z0-9_-]{20}/([1-9][0-9]*)x([1-9][0-9]*)/filters:quality\([0-9]+\):format\((jpg|webp)\)/(.+)\.[a-z]+$
-	route @legacy {
-		import images-legacy-exceptions.conf
-		redir @legacy_width /{re.legacy_width.3}-{re.legacy_width.1}.{re.legacy_width.2} 301
-		redir @legacy_crop /{re.legacy_crop.4}-{re.legacy_crop.1}x{re.legacy_crop.2}.{re.legacy_crop.3} 301
-	}
+	redir @legacy_width /{re.legacy_width.3}-{re.legacy_width.1}.{re.legacy_width.2} 301
+	redir @legacy_crop /{re.legacy_crop.4}-{re.legacy_crop.1}x{re.legacy_crop.2}.{re.legacy_crop.3} 301
 }
 
 www.spectralcodex.com {
@@ -51,6 +55,7 @@ www.spectralcodex.com {
 
 spectralcodex.com {
 	import spectralcodex-tls
+	import access-log
 	root * /var/www/spectralcodex
 	file_server {
 		precompressed br
@@ -148,6 +153,7 @@ u.spectralcodex.com {
 
 img.spectralcodex.com {
 	import spectralcodex-tls
+	import access-log
 	root * /srv/img
 
 	header X-Content-Type-Options nosniff

@@ -4,12 +4,13 @@ services:
   # One-shot sidecar: chowns named volumes so non-root caddy can use them; only used once
   caddy-init:
     image: alpine:3.24.3
-    command: chown -R 1000:1000 /data /config
+    command: chown -R 1000:1000 /data /config /logs
     # no network needed; keeps compose from creating an unused default network
     network_mode: none
     volumes:
       - caddy_data:/data
       - caddy_config:/config
+      - ./logs:/logs
     restart: 'no'
 
   caddy:
@@ -41,6 +42,7 @@ services:
       - ./certs:/certs:ro
       - /var/www:/var/www:ro
       - ${DEPLOY_MEDIA_PATH}/img:/srv/img:ro
+      - ./logs:/var/log/caddy
       - caddy_data:/data
       - caddy_config:/config
     networks:
