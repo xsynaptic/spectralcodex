@@ -4,7 +4,7 @@ import path from 'node:path';
 import type { DeployConfig } from '#deploy/deploy-config.ts';
 
 import { validateCaddyConfig } from '#deploy/deploy-caddy.ts';
-import { loadDeployConfig } from '#deploy/deploy-config.ts';
+import { loadDeployConfig, requireEnv } from '#deploy/deploy-config.ts';
 import { rsyncTo, sshCapture, sshExec, sshExecWithInput } from '#deploy/rsync-exec.ts';
 
 interface DeployInfraOptions {
@@ -19,20 +19,15 @@ interface InfraSyncTarget {
 	source: string;
 }
 
-// Builds the single server-side .env consumed by deploy/docker-compose.yml (umami, image, cache-warmer)
+// Builds the single server-side .env consumed by deploy/docker-compose.yml (caddy, umami, cache-warmer)
 function buildServerEnv(config: DeployConfig): string {
-	const signatureLength = process.env.IMAGE_SERVER_SIGNATURE_LENGTH ?? '20';
-
 	const lines = [
 		`UMAMI_DATA_PATH=${requireEnv('UMAMI_DATA_PATH')}`,
 		`UMAMI_BACKUP_PATH=${requireEnv('UMAMI_BACKUP_PATH')}`,
 		`UMAMI_DB_PASSWORD=${requireEnv('UMAMI_DB_PASSWORD')}`,
 		`UMAMI_APP_SECRET=${requireEnv('UMAMI_APP_SECRET')}`,
 		`DEPLOY_MEDIA_PATH=${config.mediaPath}`,
-		`IMAGE_SERVER_SECRET=${requireEnv('IMAGE_SERVER_SECRET')}`,
-		`IMAGE_SERVER_SIGNATURE_LENGTH=${signatureLength}`,
 		`SITE_URL=${config.siteUrl}`,
-		`IMAGE_SERVER_URL=${config.imageServerUrl}`,
 		`CLOUDFLARE_ZONE_ID=${requireEnv('CLOUDFLARE_ZONE_ID')}`,
 		`CLOUDFLARE_API_TOKEN=${requireEnv('CLOUDFLARE_API_TOKEN')}`,
 		`CACHE_WARM_CONCURRENCY=${process.env.CACHE_WARM_CONCURRENCY ?? '8'}`,
@@ -52,17 +47,8 @@ function buildServerEnv(config: DeployConfig): string {
 	return lines.join('\n');
 }
 
-function requireEnv(name: string): string {
-	const value = process.env[name];
-	if (!value) {
-		throw new Error(`Missing required environment variable: ${name}`);
-	}
-	return value;
-}
-
 const infraSyncTargets: Array<InfraSyncTarget> = [
 	{ extraFlags: ['--mkpath'], source: 'docker-compose.yml' },
-	{ source: 'nginx.conf.template' },
 	{ destination: 'caddy/', extraFlags: ['--mkpath', '--delete'], source: 'caddy/' },
 	{ destination: 'certs/', extraFlags: ['--mkpath'], source: 'certs/' },
 	{
@@ -148,10 +134,6 @@ async function updateRemoteServices(config: DeployConfig, serverEnv: string): Pr
 
 	console.log(chalk.gray('Recreating containers...'));
 	await sshExec(config, `${composeCmd} up -d --remove-orphans --wait --wait-timeout 120`);
-
-	// compose won't recreate image-cache when only its bind-mounted nginx template changes, so force it
-	console.log(chalk.gray('Applying image-cache config...'));
-	await sshExec(config, `${composeCmd} up -d --force-recreate --no-deps --wait image-cache`);
 
 	console.log(chalk.gray('Verifying service state...'));
 	const psOutput = await sshCapture(config, `${composeCmd} ps`);

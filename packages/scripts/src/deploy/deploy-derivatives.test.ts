@@ -4,7 +4,11 @@ import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { $ } from 'zx';
 
-import { getDeletedPaths, imagePruneOptions, imageUploadOptions } from '#deploy/deploy-images.ts';
+import {
+	derivativePruneOptions,
+	derivativeUploadOptions,
+	getDeletedPaths,
+} from '#deploy/deploy-derivatives.ts';
 import { buildRsyncArgs } from '#deploy/rsync-exec.ts';
 
 let rootPath: string;
@@ -26,15 +30,15 @@ async function runRsync(options: Omit<Parameters<typeof buildRsyncArgs>[2], 'con
 
 async function syncOutputs() {
 	const output = await runRsync({
-		...imageUploadOptions,
-		extraFlags: [...imageUploadOptions.extraFlags, '--itemize-changes'],
+		...derivativeUploadOptions,
+		extraFlags: [...derivativeUploadOptions.extraFlags, '--itemize-changes'],
 	});
 
 	return output.split('\n');
 }
 
 beforeEach(() => {
-	rootPath = mkdtempSync(path.join(os.tmpdir(), 'deploy-images-test-'));
+	rootPath = mkdtempSync(path.join(os.tmpdir(), 'deploy-derivatives-test-'));
 	mkdirSync(path.join(rootPath, 'media/a'), { recursive: true });
 	writeFileSync(path.join(rootPath, 'media/a/b-1-450.jpg'), 'jpeg bytes');
 	writeFileSync(path.join(rootPath, 'media/a/b-1-450x300.webp'), 'webp bytes');
@@ -69,7 +73,7 @@ describe('the remote prune', () => {
 		writeFileSync(path.join(rootPath, 'remote/a/renamed-1-450.jpg'), 'old bytes');
 		writeFileSync(path.join(rootPath, 'remote/a/.rsync-partial/b-1-900.jpg'), 'in flight');
 
-		const deleted = getDeletedPaths(await runRsync(imagePruneOptions));
+		const deleted = getDeletedPaths(await runRsync(derivativePruneOptions));
 
 		expect(deleted).toStrictEqual(['a/renamed-1-450.jpg']);
 		expect(() => statSync(path.join(rootPath, 'remote/a/b-1-450x300.webp'))).toThrow();

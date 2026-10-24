@@ -5,8 +5,9 @@ interface RsyncOptions {
 	archive?: 'av' | 'avz';
 	config: SshTarget;
 	dryRun?: boolean;
-	excludes?: Array<string>;
-	extraFlags?: Array<string>;
+	excludes?: ReadonlyArray<string>;
+	extraFlags?: ReadonlyArray<string>;
+	isProgressShown?: boolean;
 	quiet?: boolean;
 }
 
@@ -86,6 +87,8 @@ export async function sshExecWithInput(
 }
 
 // Callers that parse the returned file list need `-v`; a quiet pull prints nothing on success
-function getArchiveFlags({ archive = 'avz', quiet = false }: RsyncOptions) {
-	return quiet ? [`-${archive.replace('v', '')}`] : [`-${archive}`, '--progress'];
+function getArchiveFlags({ archive = 'avz', isProgressShown = true, quiet = false }: RsyncOptions) {
+	if (quiet) return [`-${archive.replace('v', '')}`];
+
+	return isProgressShown ? [`-${archive}`, '--progress'] : [`-${archive}`];
 }

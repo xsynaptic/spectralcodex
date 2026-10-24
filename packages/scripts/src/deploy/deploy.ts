@@ -8,8 +8,7 @@ import { deployApp } from '#deploy/deploy-app.ts';
 import { invokeCacheRefresh } from '#deploy/deploy-cache-refresh.ts';
 import { deployCaddy } from '#deploy/deploy-caddy.ts';
 import { loadDeployConfig, printDeployConfig } from '#deploy/deploy-config.ts';
-import { deployMedia, MediaPathMissingError } from '#deploy/deploy-media.ts';
-import { deployOg } from '#deploy/deploy-og.ts';
+import { getImageSet, getOpenGraphSet, uploadDerivatives } from '#deploy/deploy-derivatives.ts';
 import { verifyEdge } from '#deploy/verify-edge.ts';
 import { ensureSshKeychain, findWorkspaceRoot } from '#shared/utils.ts';
 import { generateSitemapLastmod } from '#sitemap-lastmod/index.ts';
@@ -64,16 +63,9 @@ async function generateRedirects() {
 	await $({ cwd: rootPath, stdio: 'inherit' })`pnpm generate-redirects`;
 }
 
-async function media() {
-	try {
-		await deployMedia({ dryRun: isDryRun, rootPath });
-	} catch (error) {
-		if (error instanceof MediaPathMissingError) {
-			console.log(chalk.yellow('Media path not found, skipping'));
-			return;
-		}
-		throw error;
-	}
+async function images() {
+	console.log(chalk.blue('Building image derivatives...'));
+	await $({ cwd: rootPath, stdio: 'inherit' })`pnpm images --dist-path=${distPath}`;
 }
 
 async function similar() {
@@ -103,8 +95,12 @@ async function transfer() {
 	await deployApp({ dryRun: isDryRun, rootPath });
 }
 
+async function transferImages() {
+	await uploadDerivatives(getImageSet(rootPath, config), { config, dryRun: isDryRun });
+}
+
 async function transferOpenGraph() {
-	await deployOg({ dryRun: isDryRun, rootPath });
+	await uploadDerivatives(getOpenGraphSet(rootPath, config), { config, dryRun: isDryRun });
 }
 
 async function validate() {
@@ -141,13 +137,14 @@ try {
 
 	// Build & verify
 	await build();
+	await images();
 	await generateOpenGraph();
 	await test();
 
 	// Transfer to server
-	await media();
-	await transfer();
+	await transferImages();
 	await transferOpenGraph();
+	await transfer();
 	await caddy();
 
 	// Verify & refresh caches

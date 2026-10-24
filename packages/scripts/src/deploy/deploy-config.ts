@@ -1,7 +1,8 @@
 import chalk from 'chalk';
 
 export interface DeployConfig {
-	imageServerUrl: string;
+	imageBaseUrl: string;
+	imagesPath: string;
 	mediaPath: string;
 	remoteHost: string;
 	remotePath: string;
@@ -16,7 +17,7 @@ const requiredEnvVars = [
 	'DEPLOY_SITE_PATH',
 	'PROD_SERVER_URL',
 	'DEPLOY_MEDIA_PATH',
-	'IMAGE_SERVER_URL',
+	'IMAGE_BASE_URL',
 ] as const;
 
 type RequiredEnvVar = (typeof requiredEnvVars)[number];
@@ -28,14 +29,15 @@ const exampleEnvLines = [
 	'  DEPLOY_SITE_PATH=/var/www/spectralcodex',
 	'  PROD_SERVER_URL=https://example.com/',
 	'  DEPLOY_MEDIA_PATH=/mnt/storage/spectralcodex',
-	'  IMAGE_SERVER_URL=https://example.com/_img',
+	'  IMAGE_BASE_URL=https://img.example.com',
 ];
 
 export function loadDeployConfig(): DeployConfig {
 	const env = readRequiredEnvVars();
 
 	return {
-		imageServerUrl: env.IMAGE_SERVER_URL,
+		imageBaseUrl: env.IMAGE_BASE_URL.replace(/\/+$/, ''),
+		imagesPath: `${env.DEPLOY_MEDIA_PATH}/img`,
 		mediaPath: env.DEPLOY_MEDIA_PATH,
 		remoteHost: env.DEPLOY_REMOTE_HOST,
 		remotePath: env.DEPLOY_REMOTE_PATH,
@@ -52,8 +54,17 @@ export function printDeployConfig(config: DeployConfig) {
 	console.log(chalk.gray(`  Site path:   ${config.sitePath}`));
 	console.log(chalk.gray(`  Site URL:    ${config.siteUrl}`));
 	console.log(chalk.gray(`  Media path:  ${config.mediaPath}`));
-	console.log(chalk.gray(`  Image URL:   ${config.imageServerUrl}`));
+	console.log(chalk.gray(`  Images path: ${config.imagesPath}`));
+	console.log(chalk.gray(`  Image URL:   ${config.imageBaseUrl}`));
 	console.log('');
+}
+
+export function requireEnv(name: string): string {
+	const value = process.env[name];
+	if (!value) {
+		throw new Error(`Missing required environment variable: ${name}`);
+	}
+	return value;
 }
 
 function readRequiredEnvVars(): Record<RequiredEnvVar, string> {
