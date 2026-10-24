@@ -1,3 +1,5 @@
+import { ImageSizeEnum } from '@spectralcodex/shared/images';
+
 import type { ImageContext, ImageLayout, ImageOrientation } from '#lib/image/image-types.ts';
 
 import {
@@ -7,34 +9,7 @@ import {
 	tailwindContentPaddingMd,
 	tailwindContentPaddingSm,
 } from '#constants.ts';
-import {
-	ImageContextEnum,
-	ImageLayoutEnum,
-	ImageOrientationEnum,
-	ImageSizeEnum,
-} from '#lib/image/image-types.ts';
-
-// Simple utility to remove any widths over the size of the original image
-// This also adds the original max width and returns only unique values
-// Without this it's easy to end up with a bunch of non-usable widths polluting the markup
-export function getImageBreakpoints({
-	maxWidth,
-	// These are the widths we're building for in almost all scenarios
-	widths = [
-		ImageSizeEnum.ExtraSmall,
-		ImageSizeEnum.Small,
-		ImageSizeEnum.Medium,
-		ImageSizeEnum.Large,
-		ImageSizeEnum.ExtraLarge,
-		ImageSizeEnum.ExtraExtraLarge,
-		ImageSizeEnum.ExtraExtraExtraLarge,
-	],
-}: {
-	maxWidth: number;
-	widths?: Array<number>;
-}) {
-	return widths.filter((width) => width <= maxWidth);
-}
+import { ImageContextEnum, ImageLayoutEnum, ImageOrientationEnum } from '#lib/image/image-types.ts';
 
 export function getImageInferredWidth({
 	context = ImageContextEnum.Single,

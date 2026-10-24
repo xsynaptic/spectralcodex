@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import type { GetSignedImagePathFunction } from '#lib/collections/locations/locations-factory.ts';
+import type { GetImagePathFunction } from '#lib/collections/locations/locations-factory.ts';
 
 import { makeEntry } from '#lib/collections/collections-test-utils.ts';
 import {
@@ -18,26 +18,23 @@ function makePost(id: string, locationIds?: Array<string>) {
 	);
 }
 
-const stubSigner: GetSignedImagePathFunction = (src, operations) =>
-	`/signed/${String(src)}-${String(operations.width)}x${String(operations.height)}`;
+const stubPath: GetImagePathFunction = (width) => `/img-${String(width)}`;
 
 describe('getLocationThumbnailProps', () => {
-	test('wide sources get both 350w and 700w candidates at 3:2', () => {
-		expect(getLocationThumbnailProps('img.jpg', 1200, stubSigner)).toEqual({
-			srcSet: '/signed/img.jpg-350x233 350w, /signed/img.jpg-700x467 700w',
+	test('wide sources get both 350w and 700w candidates', () => {
+		expect(getLocationThumbnailProps({ height: 800, width: 1200 }, stubPath)).toEqual({
+			srcSet: '/img-350 350w, /img-700 700w',
 		});
 	});
 
-	test('candidates above the source width are dropped, never upscaled', () => {
-		expect(getLocationThumbnailProps('img.jpg', 500, stubSigner)).toEqual({
-			srcSet: '/signed/img.jpg-350x233 350w',
+	test('candidates the source cannot fill are dropped, never upscaled', () => {
+		expect(getLocationThumbnailProps({ height: 400, width: 1200 }, stubPath)).toEqual({
+			srcSet: '/img-350 350w',
 		});
 	});
 
-	test('sub-350px sources fall back to a single candidate at the source width', () => {
-		expect(getLocationThumbnailProps('img.jpg', 300, stubSigner)).toEqual({
-			srcSet: '/signed/img.jpg-300x200 300w',
-		});
+	test('a source too small for the smallest candidate gets no thumbnail', () => {
+		expect(getLocationThumbnailProps({ height: 200, width: 300 }, stubPath)).toBeUndefined();
 	});
 });
 
