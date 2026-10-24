@@ -1,4 +1,5 @@
 export const imageManifestFile = 'manifest.json';
+export const imageConsumedManifestFile = 'manifest-consumed.json';
 export const imageBuildIdFile = 'image-build-id.txt';
 
 export function getImageCachePaths(cachePath: string) {
@@ -36,10 +37,6 @@ export const imageQualityByFormat = {
 } as const;
 
 export type ImageFormat = keyof typeof imageQualityByFormat;
-
-function isImageFormat(value: string): value is ImageFormat {
-	return Object.hasOwn(imageQualityByFormat, value);
-}
 
 interface ImagePresetCover {
 	aspectRatio: number;
@@ -269,38 +266,4 @@ export function getImageDerivatives(source: ImageSource): Array<ImageDerivative>
 			};
 		}),
 	);
-}
-
-const legacyImagorPathPattern =
-	/^\/[\w-]+\/(?:(?<width>\d+)x(?<height>\d+)\/)?filters:quality\(\d+\):format\((?<format>jpg|webp)\)\/(?<id>.+)$/;
-
-// An original re-encode maps to the widest width-only preset of its format
-function getLegacyOriginalWidth(format: ImageFormat) {
-	const widths = Object.values(imagePresets)
-		.filter((preset) => preset.fit === 'width' && preset.format === format)
-		.flatMap((preset) => preset.widths);
-
-	return Math.max(...widths);
-}
-
-function getLegacySize(width: string | undefined, height: string | undefined, format: ImageFormat) {
-	if (width === undefined || height === undefined) return { width: getLegacyOriginalWidth(format) };
-
-	if (height === '0') return { width: Number(width) };
-
-	return { height: Number(height), width: Number(width) };
-}
-
-export function getLegacyImagorPathId(legacyPath: string) {
-	return legacyImagorPathPattern.exec(legacyPath)?.groups?.id;
-}
-
-export function legacyImagorPathToImagePath(legacyPath: string, source: ImageDimensions) {
-	const groups = legacyImagorPathPattern.exec(legacyPath)?.groups;
-
-	if (!groups?.id || !groups.format || !isImageFormat(groups.format)) return;
-
-	const size = getLegacySize(groups.width, groups.height, groups.format);
-
-	return getImageName(groups.id, capImageSize(size, source), groups.format);
 }

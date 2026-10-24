@@ -5,7 +5,6 @@ import {
 	getImageManifestRecorder,
 	getImagePresetSize,
 	getImagePresetWidths,
-	legacyImagorPathToImagePath,
 } from '#images.ts';
 
 function makeSource(width: number, height: number, id = 'taiwan/taipei/some-image-1.jpg') {
@@ -98,48 +97,5 @@ describe('getImageDerivative', () => {
 		expect(() =>
 			getImageDerivative(makeSource(1200, 800, 'errata/demo/a.jpg'), 'content', 450),
 		).toThrow('claimed by both');
-	});
-});
-
-describe('legacyImagorPathToImagePath', () => {
-	const signature = 'AbCdEfGhIjKlMnOp-_12';
-
-	test('maps width-only and crop paths without the signature or quality', () => {
-		const source = makeSource(3600, 2400);
-
-		expect(
-			legacyImagorPathToImagePath(
-				`/${signature}/1200x0/filters:quality(85):format(jpg)/a/b-1.jpg`,
-				source,
-			),
-		).toBe('a/b-1-1200.jpg');
-		expect(
-			legacyImagorPathToImagePath(
-				`/${signature}/900x600/filters:quality(70):format(webp)/a/b-1.jpg`,
-				source,
-			),
-		).toBe('a/b-1-900x600.webp');
-	});
-
-	test('an upscaled request lands on the capped name the new build emits', () => {
-		const source = makeSource(960, 514);
-		const legacyPath = `/${signature}/1200x800/filters:quality(85):format(jpg)/a/b-1.jpg`;
-
-		expect(legacyImagorPathToImagePath(legacyPath, source)).toBe(
-			getImageDerivative({ ...source, id: 'a/b-1.jpg' }, 'card-hq', 771).path,
-		);
-	});
-
-	test('an original re-encode lands on the widest width-only file of its format', () => {
-		expect(
-			legacyImagorPathToImagePath(
-				`/${signature}/filters:quality(70):format(webp)/v/a-synaptic-2025-1.jpg`,
-				makeSource(2961, 2961),
-			),
-		).toBe('v/a-synaptic-2025-1-1200.webp');
-	});
-
-	test('anything outside the imagor grammar maps to nothing', () => {
-		expect(legacyImagorPathToImagePath('/a/b-1-1200.jpg', makeSource(3600, 2400))).toBeUndefined();
 	});
 });
