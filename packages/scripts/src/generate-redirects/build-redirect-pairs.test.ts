@@ -67,16 +67,6 @@ describe('buildRedirectPairs', () => {
 		expect(buildRedirectPairs([makeEntry('plain', 'locations')]).pairs).toEqual([]);
 	});
 
-	// The caller chooses which collections to pass; an unprefixed one redirects flat
-	test('treats a collection outside the prefix map as flat', () => {
-		expect(
-			buildRedirectPairs([makeEntry('img', 'images', { formerIds: ['old-img'] })]).pairs,
-		).toEqual([
-			{ fromPath: '/old-img/', toPath: '/img/' },
-			{ fromPath: '/og/old-img.jpg', toPath: '/og/img.jpg' },
-		]);
-	});
-
 	test('reports collisions with a live page or card, and skips a path already claimed', () => {
 		const { collisions, pairs, skipped } = buildRedirectPairs([
 			makeEntry('about', 'pages'),

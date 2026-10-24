@@ -2,7 +2,7 @@ import type { SitemapLastmod } from '@spectralcodex/shared/sitemap';
 
 import { getPublicId } from '@spectralcodex/shared/entries';
 import { getCachePaths } from '@spectralcodex/shared/paths';
-import { joinUrl } from '@spectralcodex/shared/routing';
+import { getCollectionSegment, joinUrl, siteBasePath } from '@spectralcodex/shared/routing';
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { $ } from 'zx';
@@ -20,8 +20,6 @@ interface SitemapLastmodOptions {
 	paths: ScriptPaths;
 	siteUrl: string;
 }
-
-const rootCollections = new Set(['locations', 'pages', 'posts']);
 
 export async function generateSitemapLastmod({ paths, siteUrl }: SitemapLastmodOptions) {
 	const collectionsPath = paths.contentDataPath;
@@ -76,9 +74,7 @@ export async function generateSitemapLastmod({ paths, siteUrl }: SitemapLastmodO
 }
 
 function buildContentUrl(siteUrl: string, collection: string, id: string): string {
-	const collectionSegment = rootCollections.has(collection) ? '' : collection;
-
-	return joinUrl(siteUrl, collectionSegment, id, '/');
+	return joinUrl(siteUrl, siteBasePath, getCollectionSegment(collection), id, '/');
 }
 
 function resolveUrls(

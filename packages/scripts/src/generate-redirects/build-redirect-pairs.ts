@@ -1,5 +1,6 @@
 import { getPublicId } from '@spectralcodex/shared/entries';
 import { getOpenGraphId } from '@spectralcodex/shared/open-graph';
+import { getCollectionSegment, joinUrl, siteBasePath } from '@spectralcodex/shared/routing';
 
 interface RedirectableEntry {
 	collection: string;
@@ -18,14 +19,6 @@ interface RedirectPair {
 	fromPath: string;
 	toPath: string;
 }
-
-// Collections where page URL = /{collection}/{id}/; all others are flat at /{id}/
-const collectionPrefixes: Record<string, string | undefined> = {
-	regions: 'regions',
-	resources: 'resources',
-	series: 'series',
-	themes: 'themes',
-};
 
 // Entries are walked in the order given, so an earlier collection claims a shared path first
 export function buildRedirectPairs(entries: Array<RedirectableEntry>) {
@@ -63,11 +56,11 @@ export function buildRedirectPairs(entries: Array<RedirectableEntry>) {
 
 // Card ids are flat in every collection, so two prefixed pages can share one card path
 function getCardPath(id: string) {
-	return `/og/${getOpenGraphId(id)}.jpg`;
+	return joinUrl(siteBasePath, `og/${getOpenGraphId(id)}.jpg`);
 }
 
-function getEntryPath(prefix: string | undefined, id: string) {
-	return prefix ? `/${prefix}/${id}/` : `/${id}/`;
+function getEntryPath(collection: string, id: string) {
+	return joinUrl(siteBasePath, getCollectionSegment(collection), id, '/');
 }
 
 // Target is the public id, so override (anonymized) locations redirect to the override id, not the real entry id
@@ -77,7 +70,6 @@ function getEntryRedirects(entry: RedirectableEntry) {
 
 	if (!formerIds?.length) return [];
 
-	const prefix = collectionPrefixes[entry.collection];
 	const canonicalId = getPublicId(entry);
 	const redirects: Array<Array<RedirectPair>> = [];
 
@@ -86,7 +78,10 @@ function getEntryRedirects(entry: RedirectableEntry) {
 		if (formerId === canonicalId) continue;
 
 		redirects.push([
-			{ fromPath: getEntryPath(prefix, formerId), toPath: getEntryPath(prefix, canonicalId) },
+			{
+				fromPath: getEntryPath(entry.collection, formerId),
+				toPath: getEntryPath(entry.collection, canonicalId),
+			},
 			{ fromPath: getCardPath(formerId), toPath: getCardPath(canonicalId) },
 		]);
 	}
@@ -97,5 +92,5 @@ function getEntryRedirects(entry: RedirectableEntry) {
 function getLivePaths(entry: RedirectableEntry) {
 	const publicId = getPublicId(entry);
 
-	return [getEntryPath(collectionPrefixes[entry.collection], publicId), getCardPath(publicId)];
+	return [getEntryPath(entry.collection, publicId), getCardPath(publicId)];
 }

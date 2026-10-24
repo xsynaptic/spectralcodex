@@ -11,6 +11,7 @@ import {
 	customCachePathDefault,
 	getCachePaths,
 } from '@spectralcodex/shared/paths';
+import { siteBasePath } from '@spectralcodex/shared/routing';
 import { readSitemapLastmod } from '@spectralcodex/shared/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import buildLogger from '@xsynaptic/astro-build-logger';
@@ -69,6 +70,7 @@ function getSitemapLastmod() {
 }
 
 export default defineConfig({
+	base: siteBasePath,
 	build: {
 		...(BUILD_ASSETS_PATH ? { assets: BUILD_ASSETS_PATH } : {}),
 	},
