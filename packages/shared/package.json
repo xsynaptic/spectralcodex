@@ -7,16 +7,21 @@
 		"./cache": "./src/cache.ts",
 		"./collections": "./src/collections.ts",
 		"./constants": "./src/constants.ts",
+		"./dist-scan": "./src/dist-scan.ts",
 		"./entries": "./src/entries.ts",
 		"./i18n": "./src/i18n.ts",
+		"./images": "./src/images.ts",
+		"./images-dist": "./src/images-dist.ts",
 		"./indexing": "./src/indexing.ts",
 		"./links": "./src/links.ts",
 		"./map": "./src/map/index.ts",
 		"./open-graph": "./src/open-graph.ts",
+		"./paths": "./src/paths.ts",
 		"./routing": "./src/routing.ts",
 		"./schemas": "./src/schemas/index.ts",
 		"./search-tracker": "./src/search-tracker.ts",
 		"./sitemap": "./src/sitemap.ts",
+		"./source-fingerprint": "./src/source-fingerprint.ts",
 		"./text": "./src/text.ts"
 	},
 	"imports": {
@@ -24,6 +29,7 @@
 	},
 	"private": true,
 	"dependencies": {
+		"sharp": "0.35.5",
 		"zod": "^4.6.7"
 	}
 }

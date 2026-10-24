@@ -1,18 +1,21 @@
-#!/usr/bin/env tsx
 import type { CollectionEntry } from 'astro:content';
 
 import chalk from 'chalk';
 import path from 'node:path';
-import { parseArgs } from 'node:util';
 import * as R from 'remeda';
 
 import { checks } from '#improve-content/checks.ts';
 import { withAstroContent } from '#shared/astro-content.ts';
+import { defineCommand, parseNumberOption, Refusal, runCommand } from '#shared/cli-command.ts';
+import { formatCount, log } from '#shared/cli-output.ts';
+import { withSpinner } from '#shared/cli-progress.ts';
 
-const collectionsRoot = path.join('packages', 'content', 'collections');
+const randomDefaultLimit = 50;
 
-function formatEntryLine(entry: CollectionEntry<'locations'>): string {
-	const displayPath = getDisplayPath(entry);
+const checkNames = Object.keys(checks).join(', ');
+
+function formatEntryLine(entry: CollectionEntry<'locations'>, collectionsRoot: string): string {
+	const displayPath = getDisplayPath(entry, collectionsRoot);
 	const directory = path.dirname(displayPath);
 	const filename = path.basename(displayPath);
 
@@ -26,80 +29,86 @@ function formatEntryLine(entry: CollectionEntry<'locations'>): string {
 	return title ? `${formattedPath} ${chalk.dim('-')} ${title}` : formattedPath;
 }
 
-function getDisplayPath(entry: CollectionEntry<'locations'>): string {
+function getDisplayPath(entry: CollectionEntry<'locations'>, collectionsRoot: string): string {
 	return path.relative(collectionsRoot, entry.filePath ?? entry.id);
 }
 
-function printAvailableChecks(stream: 'stderr' | 'stdout') {
-	const log = stream === 'stdout' ? console.log : console.error;
+function selectEntries(
+	matched: Array<CollectionEntry<'locations'>>,
+	{
+		collectionsRoot,
+		isRandom,
+		limit,
+	}: { collectionsRoot: string; isRandom: boolean; limit: number | undefined },
+) {
+	const ordered = isRandom ? R.shuffle(matched) : matched;
+	const effectiveLimit = limit ?? (isRandom ? randomDefaultLimit : undefined);
+	const selected = effectiveLimit === undefined ? ordered : ordered.slice(0, effectiveLimit);
 
-	log(chalk.bold('Available checks:'));
-
-	for (const name of Object.keys(checks)) {
-		log(`  ${chalk.cyan(name)}`);
-	}
-}
-
-const { positionals, values } = parseArgs({
-	allowPositionals: true,
-	args: process.argv.slice(2),
-	options: {
-		limit: {
-			type: 'string',
-		},
-		random: {
-			default: false,
-			type: 'boolean',
-		},
-		threshold: {
-			default: '100',
-			type: 'string',
-		},
-	},
-});
-
-const checkName = positionals[0];
-
-if (!checkName) {
-	printAvailableChecks('stdout');
-	process.exit(0);
-}
-
-const check = checks[checkName];
-
-if (!check) {
-	console.error(chalk.red(`Unknown check: "${checkName}"`));
-	printAvailableChecks('stderr');
-	process.exit(1);
-}
-
-const randomDefaultLimit = 50;
-
-const explicitLimit = values.limit ? Number(values.limit) : undefined;
-const effectiveLimit = explicitLimit ?? (values.random ? randomDefaultLimit : undefined);
-
-const entries = await withAstroContent(({ getCollection }) => getCollection('locations'));
-
-const matched = check(entries, { threshold: Number(values.threshold) });
-
-let selected = values.random ? R.shuffle(matched) : matched;
-
-if (effectiveLimit !== undefined) {
-	selected = selected.slice(0, effectiveLimit);
-}
-
-selected.sort((a, b) => getDisplayPath(a).localeCompare(getDisplayPath(b)));
-
-for (const entry of selected) {
-	console.log(formatEntryLine(entry));
-}
-
-if (matched.length === 0) {
-	console.error(chalk.yellow(`\nNo entries matched (check: ${chalk.cyan(checkName)})`));
-} else {
-	console.error(
-		chalk.dim(
-			`\nShowing ${String(selected.length)} of ${String(matched.length)} matched (check: ${checkName})`,
-		),
+	return selected.toSorted((a, b) =>
+		getDisplayPath(a, collectionsRoot).localeCompare(getDisplayPath(b, collectionsRoot)),
 	);
 }
+
+await runCommand(
+	defineCommand({
+		name: 'improve-content',
+		options: {
+			limit: { description: 'Show at most this many entries', type: 'string' },
+			random: {
+				default: false,
+				description: `Shuffle the matches (shows ${String(randomDefaultLimit)} unless --limit is set)`,
+				type: 'boolean',
+			},
+			threshold: {
+				default: '100',
+				description: 'Body length in characters under which an entry counts as a stub',
+				type: 'string',
+			},
+		},
+		positional: { description: `Check to run: ${checkNames}`, name: 'check' },
+		async run({ paths, positionals, values }) {
+			const [checkName] = positionals;
+
+			if (!checkName) {
+				log.info(`Available checks: ${checkNames}`);
+				return;
+			}
+
+			const check = checks[checkName];
+
+			if (!check) throw new Refusal(`Unknown check "${checkName}"; choose from ${checkNames}`);
+
+			const limit =
+				values.limit === undefined ? undefined : parseNumberOption(values.limit, 'limit');
+			const collectionsRoot = path.relative(paths.rootPath, paths.contentDataPath);
+
+			const entries = await withSpinner('Loading content', () =>
+				withAstroContent(({ getCollection }) => getCollection('locations')),
+			);
+
+			const matched = check(entries, {
+				threshold: parseNumberOption(values.threshold, 'threshold'),
+			});
+
+			const selected = selectEntries(matched, {
+				collectionsRoot,
+				isRandom: values.random,
+				limit,
+			});
+
+			for (const entry of selected) log.data(formatEntryLine(entry, collectionsRoot));
+
+			if (matched.length === 0) {
+				log.warn(`No entries matched (check: ${checkName})`);
+				return;
+			}
+
+			log.info(
+				`Showing ${formatCount(selected.length)} of ${formatCount(matched.length)} matched (check: ${checkName})`,
+			);
+		},
+		summary: 'List Locations a content check flags for improvement, one per line on stdout',
+		title: 'Improve content',
+	}),
+);

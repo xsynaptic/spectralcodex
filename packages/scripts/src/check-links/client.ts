@@ -12,8 +12,7 @@ const requestHeaders: Record<string, string> = {
 	'User-Agent': userAgent,
 };
 
-// 403 = bot blocking (page likely exists but server might reject us)
-// 429 = rate limited (definitely exists, we're just hitting too fast)
+// 403 and 429 mean the page exists but the server refuses or throttles us
 const blockedStatusCodes = new Set([403, 429]);
 
 // The server blocks HEAD (403) or does not allow it (405); retry with GET
@@ -30,9 +29,9 @@ interface CheckResult {
 }
 
 // Redirects are handled manually so the real 301/302 status code survives
-export async function checkUrl(row: UrlRow): Promise<CheckResult> {
+export async function checkUrl(row: UrlRow, signal: AbortSignal): Promise<CheckResult> {
 	try {
-		const response = await fetchStatus(row.url);
+		const response = await fetchStatus(row.url, signal);
 
 		// Status and headers are all we read; cancel the body so undici releases the connection
 		void response.body?.cancel();
@@ -49,22 +48,22 @@ export async function checkUrl(row: UrlRow): Promise<CheckResult> {
 	}
 }
 
-async function fetchStatus(url: string): Promise<Response> {
-	const response = await fetchWithTimeout(url, 'HEAD');
+async function fetchStatus(url: string, signal: AbortSignal): Promise<Response> {
+	const response = await fetchWithTimeout(url, 'HEAD', signal);
 
 	if (!headRetryStatusCodes.has(response.status)) return response;
 
 	void response.body?.cancel();
 
-	return fetchWithTimeout(url, 'GET');
+	return fetchWithTimeout(url, 'GET', signal);
 }
 
-function fetchWithTimeout(url: string, method: string): Promise<Response> {
+function fetchWithTimeout(url: string, method: string, signal: AbortSignal): Promise<Response> {
 	return fetch(url, {
 		headers: requestHeaders,
 		method,
 		redirect: 'manual',
-		signal: AbortSignal.timeout(timeoutMs),
+		signal: AbortSignal.any([signal, AbortSignal.timeout(timeoutMs)]),
 	});
 }
 
@@ -75,7 +74,6 @@ function getOutcome(response: Response, url: string): CheckOutcome {
 
 	if (response.ok) return { ...base, errorMessage: undefined, status: UrlStatusEnum.Healthy };
 
-	// Bot blocking; server rejects us but page likely exists
 	if (blockedStatusCodes.has(response.status)) {
 		return {
 			...base,
@@ -84,7 +82,6 @@ function getOutcome(response: Response, url: string): CheckOutcome {
 		};
 	}
 
-	// Other 4xx: actually missing (404, 410, etc.)
 	if (response.status >= 400 && response.status < 500) {
 		return { ...base, errorMessage: undefined, status: UrlStatusEnum.Missing };
 	}

@@ -8,7 +8,6 @@ import CardFrame from '#components/parts/card-frame.astro';
 import Prose from '#components/parts/prose.astro';
 import { MicroformatClassNames } from '#components/types.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { ImageFitOptionEnum } from '#lib/image/image-types.ts';
 import { renderMarkdownInline } from '#lib/utils/text.ts';
 
 type Props = HTMLAttributes<'div'> & {
@@ -35,10 +34,7 @@ const t = getTranslations();
 >
 	<div class="flex items-start gap-4">
 		<CardFrame class:list={['w-[90px] shrink-0 sm:w-[150px] md:w-[200px]']}>
-			<AuthorPhoto
-				operations={{ fit: ImageFitOptionEnum.Cover }}
-				sizes="auto, (max-width: 640px) 150px, 150px"
-			/>
+			<AuthorPhoto sizes="auto, (max-width: 640px) 150px, 150px" />
 			<AuthorCard />
 		</CardFrame>
 		<Prose>

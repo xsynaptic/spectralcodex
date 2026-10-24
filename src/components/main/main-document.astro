@@ -5,7 +5,6 @@ import { Font } from 'astro:assets';
 import { UMAMI_DOMAIN, UMAMI_ID, WEBMENTION_DOMAIN } from 'astro:env/client';
 
 import '#styles/main.css';
-import { IMAGE_SERVER_URL } from 'astro:env/server';
 import { ClientRouter } from 'astro:transitions';
 
 import type { MetaProps } from '#components/types.ts';
@@ -24,6 +23,7 @@ import ProgressLoading from '#components/progress/progress-loading.astro';
 import ProgressReading from '#components/progress/progress-reading.astro';
 import { atlasPage, atlasPageAttribute, atlasRootId } from '#lib/atlas/atlas-constants.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { imageBaseUrl } from '#lib/image/image-url.ts';
 import { getBasePath } from '#lib/utils/routing.ts';
 import { serializeGraph } from '#lib/utils/seo-structured-data.ts';
 
@@ -64,9 +64,7 @@ const t = getTranslations();
 			rel="icon"
 			type="image/svg+xml"
 		/>
-		{IMAGE_SERVER_URL.startsWith('http') ? (
-			<link crossorigin href={IMAGE_SERVER_URL} rel="preconnect" />
-		) : undefined}
+		{imageBaseUrl.startsWith('http') ? <link href={imageBaseUrl} rel="preconnect" /> : undefined}
 		<Stylesheet />
 		<Font cssVariable="--font-commissioner" preload={[{ subset: 'latin' }]} />
 		<Font cssVariable="--font-geologica" preload={[{ subset: 'latin' }]} />

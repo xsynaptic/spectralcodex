@@ -17,6 +17,7 @@ import {
 	encodeMapPopupData,
 	MapDivisionMaskSchema,
 } from '@spectralcodex/map-codec/schemas';
+import { getCachePaths } from '@spectralcodex/shared/paths';
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -182,7 +183,7 @@ async function readDivisionMask(regionId: string, divisionsPath: string) {
 }
 
 async function readDivisionMasks(regions: Array<ComputedEntry<'regions'>>) {
-	const divisionsPath = path.join(process.cwd(), CUSTOM_CACHE_PATH, 'divisions');
+	const { divisionsPath } = getCachePaths(path.resolve(CUSTOM_CACHE_PATH));
 	const shownRegions = regions.filter((entry) => entry.data.divisionId && !entry.data.hideDivision);
 
 	const bodies = await Promise.all(

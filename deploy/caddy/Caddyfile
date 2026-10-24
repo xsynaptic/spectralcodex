@@ -10,6 +10,27 @@
 	tls /certs/spectralcodex.com.pem /certs/spectralcodex.com.private.pem
 }
 
+(access-log) {
+	log {
+		output file /var/log/caddy/access.log {
+			roll_size 50MiB
+			roll_keep 20
+			roll_keep_for 2160h
+		}
+	}
+}
+
+# Stable names overwritten in place: the deploy purges the edge on change, browsers recheck after 30 days
+(derivative-cache-control) {
+	header {args[0]} Cache-Control "public, max-age=2592000, stale-while-revalidate=604800, s-maxage=31536000, no-transform"
+}
+
+# A missing file may land with the next deploy, so the edge holds the 404 only briefly
+(derivative-not-found) {
+	header Cache-Control "public, max-age=60"
+	respond 404
+}
+
 (umami) {
 	handle /robots.txt {
 		respond "User-agent: *
@@ -20,6 +41,13 @@ Disallow: /"
 	reverse_proxy umami:3000
 }
 
+(images-legacy) {
+	@legacy_width path_regexp legacy_width ^/[A-Za-z0-9_-]{20}/([1-9][0-9]*)x0/filters:quality\([0-9]+\):format\((jpg|webp)\)/(.+)\.[a-z]+$
+	@legacy_crop path_regexp legacy_crop ^/[A-Za-z0-9_-]{20}/([1-9][0-9]*)x([1-9][0-9]*)/filters:quality\([0-9]+\):format\((jpg|webp)\)/(.+)\.[a-z]+$
+	redir @legacy_width /{re.legacy_width.3}-{re.legacy_width.1}.{re.legacy_width.2} 301
+	redir @legacy_crop /{re.legacy_crop.4}-{re.legacy_crop.1}x{re.legacy_crop.2}.{re.legacy_crop.3} 301
+}
+
 www.spectralcodex.com {
 	import spectralcodex-tls
 	redir https://spectralcodex.com{uri} permanent
@@ -27,6 +55,7 @@ www.spectralcodex.com {
 
 spectralcodex.com {
 	import spectralcodex-tls
+	import access-log
 	root * /var/www/spectralcodex
 	file_server {
 		precompressed br
@@ -35,9 +64,15 @@ spectralcodex.com {
 
 	# Scoped to 404: basic_auth fails as a Caddy error, and an unscoped block serves /404.html as a publicly cacheable 401
 	handle_errors 404 {
-		rewrite * /404.html
-		header Cache-Control "public, max-age=0, s-maxage=600"
-		file_server
+		@open_graph_missing path /og/*
+		handle @open_graph_missing {
+			import derivative-not-found
+		}
+		handle {
+			rewrite * /404.html
+			header Cache-Control "public, max-age=0, s-maxage=600"
+			file_server
+		}
 	}
 
 	# Split by query presence so the no-query redirect never emits a bare trailing "?"
@@ -71,9 +106,12 @@ spectralcodex.com {
 	# Caddy sorts single-path matchers by specificity and keeps the rest in file order, so the tiers must not overlap
 	@static {
 		path *.css *.js *.jpg *.jpeg *.png *.gif *.svg *.webp *.avif *.woff2 *.woff
-		not path /_x/*
+		not path /_x/* /og/*
 	}
 	header @static Cache-Control "public, max-age=31536000"
+
+	@open_graph path /og/*
+	import derivative-cache-control @open_graph
 
 	@data {
 		path *.json
@@ -115,13 +153,27 @@ u.spectralcodex.com {
 
 img.spectralcodex.com {
 	import spectralcodex-tls
-	handle /robots.txt {
-		respond "User-agent: *
-Disallow: /"
+	import access-log
+	root * /srv/img
+
+	header X-Content-Type-Options nosniff
+	import derivative-cache-control *
+
+	handle_errors 404 {
+		import derivative-not-found
 	}
-	reverse_proxy image-cache:80 {
-		header_up X-Real-IP {client_ip}
-		header_down -X-Cache-Status
+
+	import images-legacy
+
+	handle /robots.txt {
+		header Cache-Control "public, max-age=3600, s-maxage=86400"
+		respond "User-agent: *
+Allow: /"
+	}
+
+	# rsync stages partial and delayed files in dot-directories beside the served ones
+	file_server {
+		hide .*
 	}
 }
 

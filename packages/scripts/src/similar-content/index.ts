@@ -1,66 +1,25 @@
-#!/usr/bin/env tsx
 import { pipeline } from '@huggingface/transformers';
 import { createSqliteCache } from '@spectralcodex/shared/cache';
 import { ContentCollectionsEnum } from '@spectralcodex/shared/collections';
 import { entryQualityFloor } from '@spectralcodex/shared/entries';
+import { getCachePaths } from '@spectralcodex/shared/paths';
 import { sanitizeMdx } from '@xsynaptic/unified-tools';
-import chalk from 'chalk';
 import { readdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { parseArgs } from 'node:util';
 import { Index, MetricKind, ScalarKind } from 'usearch';
 
 import type { ContentEntry } from '#shared/astro-content.ts';
 import type { SimilarContentMetadata } from '#similar-content/metadata.ts';
 
 import { getCollectionEntries, withAstroContent } from '#shared/astro-content.ts';
+import { defineCommand, parseNumberOption, Refusal, runCommand } from '#shared/cli-command.ts';
+import { formatCount, formatError, log } from '#shared/cli-output.ts';
+import { createProgress, withSpinner } from '#shared/cli-progress.ts';
 import { toReferenceIds } from '#shared/entries.ts';
-import { findWorkspaceRoot, safelyCreateDirectory } from '#shared/utils.ts';
+import { safelyCreateDirectory } from '#shared/utils.ts';
 import { calculateMetadataBoost } from '#similar-content/metadata.ts';
 
-const rootPath = findWorkspaceRoot();
-
-const { values } = parseArgs({
-	args: process.argv.slice(2),
-	options: {
-		'cache-name': {
-			default: 'similar-content-cache',
-			type: 'string',
-		},
-		'cache-path': {
-			default: './.cache',
-			type: 'string',
-		},
-		'character-limit': {
-			default: '2500',
-			type: 'string',
-		},
-		'clear-cache': {
-			default: false,
-			type: 'boolean',
-		},
-		'min-score': {
-			default: '0.4',
-			type: 'string',
-		},
-		'output-name': {
-			default: 'similar-content.json',
-			type: 'string',
-		},
-		'output-path': {
-			default: './.cache',
-			type: 'string',
-		},
-		'progress-count': {
-			default: '50',
-			type: 'string',
-		},
-		'result-count': {
-			default: '20',
-			type: 'string',
-		},
-	},
-});
+const cacheName = 'similar-content-cache';
 
 // Entries are filtered to those carrying a digest, which keys the embedding cache
 type EmbeddableEntry = ContentEntry & { digest: string };
@@ -80,11 +39,6 @@ interface SimilarContentItem {
 
 type SimilarContentResult = Record<string, Array<SimilarContentItem>>;
 
-/**
- * Models; a small sampling of some options; more complex models are more accurate but slower
- * Note 1: changing models will regenerate all embeddings (cache is namespaced by model and character limit)
- * Note 2: different models have different dimensionalities and input limitations
- */
 const ModelsEnum = {
 	bge: 'Xenova/bge-m3', // 1024 dimensional, multilingual
 	gte: 'onnx-community/gte-multilingual-base', // 768 dimensional, multilingual, v4-optimized
@@ -135,16 +89,15 @@ function buildSimilarContentIndex(
 	return { index, keyToEmbedding };
 }
 
-// Calculate similarities using usearch ANN index
-function calculateSimilarities(embeddings: Array<SimilarContentEmbedding>): SimilarContentResult {
+function calculateSimilarities(
+	embeddings: Array<SimilarContentEmbedding>,
+	{ minScore, resultCount }: { minScore: number; resultCount: number },
+): SimilarContentResult {
 	const firstVector = embeddings[0]?.vector;
 
 	if (!firstVector) {
 		throw new Error('No embeddings to process');
 	}
-
-	const resultCount = Number(values['result-count']);
-	const minScore = Number(values['min-score']);
 
 	// Over-fetch candidates for re-ranking
 	// expansion_search must be >= candidateCount or usearch silently loses recall
@@ -154,8 +107,6 @@ function calculateSimilarities(embeddings: Array<SimilarContentEmbedding>): Simi
 		candidateCount,
 		dimensions: firstVector.length,
 	});
-
-	console.log(chalk.blue('Querying for similar content...'));
 
 	const queryStart = performance.now();
 	const result: SimilarContentResult = {};
@@ -170,40 +121,41 @@ function calculateSimilarities(embeddings: Array<SimilarContentEmbedding>): Simi
 		});
 	}
 
-	console.log(
-		chalk.green(
-			`✅ Queried ${chalk.cyan(String(embeddings.length))} items in ${chalk.cyan((performance.now() - queryStart).toFixed(2))}ms`,
-		),
+	log.success(
+		`Queried ${formatCount(embeddings.length)} items in ${(performance.now() - queryStart).toFixed(0)}ms`,
 	);
 
 	return result;
 }
 
-// Clean content for embedding using unified tools
-function cleanContent(body: string, data: Record<string, unknown>): string {
+function cleanContent(body: string, data: Record<string, unknown>, characterLimit: number) {
 	const title = typeof data.title === 'string' ? data.title : '';
 	const description = typeof data.description === 'string' ? data.description : '';
 	const content = body && body.length > 0 ? sanitizeMdx(body) : '';
 
-	return `${title} ${description} ${content}`.slice(0, Number(values['character-limit']));
+	return `${title} ${description} ${content}`.slice(0, characterLimit);
 }
 
-function clearCache() {
-	const cacheDir = path.join(rootPath, values['cache-path']);
-	const cacheName = values['cache-name'];
-	const cacheFiles = readdirSync(cacheDir).filter((file) => file.startsWith(`${cacheName}-`));
+function clearCache(cachePath: string) {
+	const cacheFiles = readdirSync(cachePath).filter((file) => file.startsWith(`${cacheName}-`));
+
 	for (const file of cacheFiles) {
-		rmSync(path.join(cacheDir, file));
+		rmSync(path.join(cachePath, file));
 	}
+
 	if (cacheFiles.length > 0) {
-		console.log(chalk.yellow(`🗑️  Cleared ${String(cacheFiles.length)} cache file(s)`));
+		log.warn(`Cleared ${String(cacheFiles.length)} cache file(s)`);
 	} else {
-		console.log(chalk.green('🗑️  No cache files to clear'));
+		log.success('No cache files to clear');
 	}
 }
 
-async function createVector(embedder: FeatureExtractor, entry: EmbeddableEntry) {
-	const plainTextContent = cleanContent(entry.body ?? '', entry.data);
+async function createVector(
+	embedder: FeatureExtractor,
+	entry: EmbeddableEntry,
+	characterLimit: number,
+) {
+	const plainTextContent = cleanContent(entry.body ?? '', entry.data, characterLimit);
 	const output = await embedder(plainTextContent, { normalize: true, pooling: 'mean' });
 
 	return output.data as Float32Array;
@@ -223,32 +175,42 @@ function encodeVector(vector: Float32Array) {
 	return Buffer.from(vector.buffer, vector.byteOffset, vector.byteLength).toString('base64');
 }
 
-// Generate embeddings for all content entries
 async function generateEmbeddings(
 	entries: Array<EmbeddableEntry>,
+	{
+		cachePath,
+		characterLimit,
+		signal,
+	}: { cachePath: string; characterLimit: number; signal: AbortSignal },
 ): Promise<Array<SimilarContentEmbedding>> {
-	const cachePath = path.join(rootPath, values['cache-path']);
-	const cacheNamespace = getCacheNamespace();
-	const cache = createSqliteCache<string>(cachePath, cacheNamespace);
+	const cache = createSqliteCache<string>(cachePath, getCacheNamespace(characterLimit));
 
 	const modelId = ModelsEnum[modelKey];
-	const embedder = await pipeline('feature-extraction', modelId, { dtype: 'fp32' });
-
-	console.log(chalk.green(`✅ Loaded embedding model ${chalk.cyan(modelId)}`));
+	const embedder = await withSpinner(
+		`Loading embedding model ${modelId}`,
+		() => pipeline('feature-extraction', modelId, { dtype: 'fp32' }),
+		() => `Loaded embedding model ${modelId}`,
+	);
 
 	const embeddings: Array<SimilarContentEmbedding> = [];
 
 	let cacheHits = 0;
 	let generated = 0;
 
-	for (const [index, entry] of entries.entries()) {
-		if (!entry.digest) continue;
+	const progress = createProgress({
+		label: 'Embedding',
+		note: () => `${formatCount(cacheHits)} cached, ${formatCount(generated)} generated`,
+		total: entries.length,
+	});
+
+	for (const entry of entries) {
+		signal.throwIfAborted();
 
 		try {
 			const cachedVector = cache.get(entry.id, entry.digest);
 			const vector = cachedVector
 				? decodeVector(cachedVector)
-				: await createVector(embedder, entry);
+				: await createVector(embedder, entry, characterLimit);
 
 			if (cachedVector) {
 				cacheHits++;
@@ -266,31 +228,21 @@ async function generateEmbeddings(
 				},
 				vector,
 			});
-
-			if ((index + 1) % Number(values['progress-count']) === 0) {
-				console.log(
-					chalk.blue(
-						`Processed ${chalk.cyan(String(index + 1))}/${chalk.cyan(String(entries.length))} embeddings (${chalk.gray(String(cacheHits))} cached, ${chalk.yellow(String(generated))} generated)`,
-					),
-				);
-			}
 		} catch (error) {
-			console.error(chalk.red(`Error processing embedding for ${chalk.cyan(entry.id)}:`), error);
+			log.error(`Embedding failed for ${entry.id}: ${formatError(error)}`);
 		}
+
+		progress.tick();
 	}
 
-	console.log(
-		chalk.green(
-			`✅ Generated ${chalk.cyan(String(embeddings.length))} embeddings (${chalk.gray(String(cacheHits))} from cache, ${chalk.yellow(String(generated))} newly generated)`,
-		),
-	);
+	progress.succeed();
 
 	return embeddings;
 }
 
 // Cache is keyed by model and character limit so changing either invalidates it
-function getCacheNamespace(): string {
-	return `${values['cache-name']}-${modelKey}-c${values['character-limit']}-v2`;
+function getCacheNamespace(characterLimit: number): string {
+	return `${cacheName}-${modelKey}-c${String(characterLimit)}-v2`;
 }
 
 async function getContentEntries(): Promise<Array<EmbeddableEntry>> {
@@ -312,10 +264,7 @@ async function getContentEntries(): Promise<Array<EmbeddableEntry>> {
 		entries.push({ ...entry, digest: String(entry.digest) });
 	}
 
-	if (entries.length === 0) {
-		console.error(chalk.red('❌ No content found!'));
-		process.exit(1);
-	}
+	if (entries.length === 0) throw new Refusal('No content found');
 
 	return entries;
 }
@@ -336,7 +285,6 @@ function querySimilarItems(
 
 		if (!other || other.id === current.id) continue;
 
-		// Convert usearch's cosine distance to a similarity score
 		const similarity = Math.max(0, distance === undefined ? 0 : 1 - distance);
 
 		// Blend the boost into the headroom below 1.0 so strong matches never saturate
@@ -356,47 +304,67 @@ function querySimilarItems(
 	return candidates.filter((candidate) => candidate.score >= minScore).slice(0, resultCount);
 }
 
-async function similarContent() {
-	try {
-		console.log(chalk.magenta('=== Similar Content Generator ==='));
+await runCommand(
+	defineCommand({
+		interrupted: 'embeddings generated so far are cached',
+		name: 'similar-content',
+		options: {
+			'character-limit': {
+				default: '2500',
+				description: 'Characters of each entry fed to the model',
+				type: 'string',
+			},
+			'clear-cache': {
+				default: false,
+				description: 'Delete the embedding cache and exit',
+				type: 'boolean',
+			},
+			'min-score': {
+				default: '0.4',
+				description: 'Lowest similarity score kept',
+				type: 'string',
+			},
+			'result-count': {
+				default: '20',
+				description: 'Similar items kept per entry',
+				type: 'string',
+			},
+		},
+		async run({ paths, signal, values }) {
+			safelyCreateDirectory(paths.cachePath);
 
-		safelyCreateDirectory(path.join(rootPath, values['cache-path']));
+			if (values['clear-cache']) {
+				clearCache(paths.cachePath);
+				return;
+			}
 
-		if (values['clear-cache']) {
-			clearCache();
-			process.exit(0);
-		}
+			const entries = await withSpinner(
+				'Loading content',
+				getContentEntries,
+				(loaded) => `Loaded ${formatCount(loaded.length)} entries`,
+			);
 
-		const entries = await getContentEntries();
+			const embeddings = await generateEmbeddings(entries, {
+				cachePath: paths.cachePath,
+				characterLimit: parseNumberOption(values['character-limit'], 'character-limit'),
+				signal,
+			});
 
-		console.log(chalk.gray(`Processing ${String(entries.length)} entries`));
+			if (embeddings.length === 0) throw new Refusal('No embeddings generated');
 
-		const totalStart = performance.now();
+			const similarContentItems = calculateSimilarities(embeddings, {
+				minScore: parseNumberOption(values['min-score'], 'min-score'),
+				resultCount: parseNumberOption(values['result-count'], 'result-count'),
+			});
+			const outputPath = getCachePaths(paths.cachePath).similarContentPath;
 
-		const embeddings = await generateEmbeddings(entries);
+			writeFileSync(outputPath, JSON.stringify(similarContentItems));
 
-		if (embeddings.length === 0) {
-			console.error(chalk.red('❌ No embeddings generated!'));
-			process.exit(1);
-		}
-
-		const similarContentItems = calculateSimilarities(embeddings);
-		const outputPath = path.join(rootPath, values['output-path'], values['output-name']);
-
-		writeFileSync(outputPath, JSON.stringify(similarContentItems));
-
-		const totalTime = ((performance.now() - totalStart) / 1000).toFixed(2);
-
-		console.log(
-			chalk.green(
-				`✅ Similar content data for ${chalk.cyan(String(Object.keys(similarContentItems).length))} items written to ${chalk.cyan(outputPath)}`,
-			),
-		);
-		console.log(chalk.magenta(`Total time: ${chalk.cyan(totalTime)}s`));
-	} catch (error) {
-		console.error(chalk.red('❌ Error:'), error);
-		process.exit(1);
-	}
-}
-
-await similarContent();
+			log.success(
+				`Similar content for ${formatCount(Object.keys(similarContentItems).length)} items → ${outputPath}`,
+			);
+		},
+		summary: 'Embed Posts and Locations and write each one’s most similar entries',
+		title: 'Similar content',
+	}),
+);

@@ -1,45 +1,33 @@
-#!/usr/bin/env tsx
-import chalk from 'chalk';
 import { copyFileSync, mkdirSync, readdirSync } from 'node:fs';
 import path from 'node:path';
-import { parseArgs } from 'node:util';
 
-import { findWorkspaceRoot } from '#shared/utils.ts';
+import { defineCommand, Refusal, runCommand } from '#shared/cli-command.ts';
+import { log } from '#shared/cli-output.ts';
 
-const rootPath = findWorkspaceRoot();
-
-const { values } = parseArgs({
-	args: process.argv.slice(2),
-	options: {
-		'output-path': {
-			default: 'content',
-			type: 'string',
-		},
-	},
-});
-
-if (!values['output-path']) {
-	console.error('Usage: pnpm run content-schemas --output-path=<output-path>');
-	process.exit(1);
-}
-
-// Written by `astro sync`, one JSON schema per collection
 const schemaDir = '.astro/collections';
 
-const sourcePath = path.resolve(rootPath, schemaDir);
-const targetPath = path.resolve(rootPath, values['output-path'], 'schemas');
+await runCommand(
+	defineCommand({
+		name: 'content-schemas',
+		run({ paths }) {
+			const sourcePath = path.resolve(paths.rootPath, schemaDir);
+			const targetPath = path.join(path.dirname(paths.contentDataPath), 'schemas');
 
-const schemaFiles = readdirSync(sourcePath).filter((file) => file.endsWith('.schema.json'));
+			const schemaFiles = readdirSync(sourcePath).filter((file) => file.endsWith('.schema.json'));
 
-if (schemaFiles.length === 0) {
-	console.error(chalk.red(`✗ no schemas in ${schemaDir}; run \`astro sync\` first`));
-	process.exit(1);
-}
+			if (schemaFiles.length === 0) {
+				throw new Refusal(`No schemas in ${schemaDir}; run \`astro sync\` first`);
+			}
 
-mkdirSync(targetPath, { recursive: true });
+			mkdirSync(targetPath, { recursive: true });
 
-for (const file of schemaFiles) {
-	copyFileSync(path.join(sourcePath, file), path.join(targetPath, file));
-}
+			for (const file of schemaFiles) {
+				copyFileSync(path.join(sourcePath, file), path.join(targetPath, file));
+			}
 
-console.log(chalk.green(`✓ ${schemaFiles.length.toString()} schemas → ${targetPath}`));
+			log.success(`${String(schemaFiles.length)} schemas → ${targetPath}`);
+		},
+		summary: 'Copy the collection JSON schemas `astro sync` writes into the content repository',
+		title: 'Content schemas',
+	}),
+);

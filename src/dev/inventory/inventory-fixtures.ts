@@ -2,6 +2,7 @@ import type { OpenGraphMetadataItem } from '@spectralcodex/scripts/og-image';
 import type { Page } from 'astro';
 
 import { probeLuminanceTop, toOpenGraphEntryItem } from '@spectralcodex/scripts/og-image';
+import { ImageSizeEnum } from '@spectralcodex/shared/images';
 import path from 'node:path';
 
 import type { WebmentionReply } from '#components/webmentions/webmentions-data.ts';
@@ -14,7 +15,7 @@ import type { MultilingualContent } from '#lib/i18n/i18n-types.ts';
 import type { ImageComponentProps, ImagePlaceholderProps } from '#lib/image/image-types.ts';
 import type { DateRecordedEntry } from '#lib/utils/date.ts';
 
-import { getImagesCollection } from '#lib/collections/images/images-data.ts';
+import { getImagesCollection, getImageSource } from '#lib/collections/images/images-data.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import { getLocationsNearbyList } from '#lib/collections/locations/locations-queries.ts';
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
@@ -22,8 +23,8 @@ import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';
 import { getResourcesCollection } from '#lib/collections/resources/resources-data.ts';
 import { getThemesCollection } from '#lib/collections/themes/themes-data.ts';
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
-import { getImageBreakpoints, getImageLayoutSizesProp } from '#lib/image/image-layout.ts';
-import { ImageLayoutEnum, ImageSizeEnum } from '#lib/image/image-types.ts';
+import { getImageLayoutSizesProp } from '#lib/image/image-layout.ts';
+import { ImageLayoutEnum } from '#lib/image/image-types.ts';
 import { createMapDataFunction } from '#lib/map/map-data.ts';
 import { getLocationsMapRule } from '#lib/map/map-locations.ts';
 import { getDayKey } from '#lib/utils/date.ts';
@@ -125,11 +126,9 @@ export function createSampleImageProps(entry: ComputedEntry<'images'>) {
 	return {
 		imageProps: {
 			alt: sanitizeImageAltAttribute(entry.data.title),
-			breakpoints: getImageBreakpoints({ maxWidth: entry.data.width }),
-			height: Math.round(ImageSizeEnum.Medium / aspectRatio),
+			imageSource: getImageSource(entry),
+			preset: 'content',
 			sizes: getImageLayoutSizesProp(ImageLayoutEnum.Default),
-			src: entry.id,
-			unstyled: true,
 			width: ImageSizeEnum.Medium,
 		} satisfies ImageComponentProps,
 		placeholderProps: { aspectRatio, imageId: entry.id } satisfies ImagePlaceholderProps,

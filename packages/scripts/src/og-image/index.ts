@@ -1,78 +1,25 @@
-#!/usr/bin/env tsx
-import { openGraphOutputPath } from '@spectralcodex/shared/open-graph';
-import chalk from 'chalk';
+import { getCachePaths } from '@spectralcodex/shared/paths';
+import { createSourceFingerprints } from '@spectralcodex/shared/source-fingerprint';
 import { rmSync } from 'node:fs';
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
-import { parseArgs } from 'node:util';
 import pLimit from 'p-limit';
 
 import type { ImageBatch } from '#og-image/batch.ts';
 import type { OpenGraphContentEntry } from '#og-image/types.ts';
+import type { ScriptPaths } from '#shared/cli-command.ts';
 
 import { batchEntriesBySourceImage } from '#og-image/batch.ts';
 import { getBuiltEntries } from '#og-image/built-entries.ts';
 import { loadOpenGraphFonts } from '#og-image/fonts.ts';
 import { createRenderer, processImage } from '#og-image/generate.ts';
 import { createOutputCache, getOutputCacheKey } from '#og-image/output-cache.ts';
-import { findWorkspaceRoot, safelyCreateDirectory } from '#shared/utils.ts';
+import { defineCommand, Refusal, runCommand } from '#shared/cli-command.ts';
+import { formatCount, formatError, log } from '#shared/cli-output.ts';
+import { createProgress, withSpinner } from '#shared/cli-progress.ts';
+import { safelyCreateDirectory } from '#shared/utils.ts';
 
-const rootPath = findWorkspaceRoot();
-
-const { values } = parseArgs({
-	args: process.argv.slice(2),
-	options: {
-		'clear-cache': {
-			default: false,
-			type: 'boolean',
-		},
-		'dist-path': {
-			default: './dist',
-			type: 'string',
-		},
-		'media-path': {
-			default: 'packages/content/media',
-			type: 'string',
-		},
-		'output-path': {
-			default: openGraphOutputPath,
-			type: 'string',
-		},
-	},
-});
-
-function exitOnUnresolvedEntries(unresolved: Array<string>) {
-	if (unresolved.length === 0) return;
-
-	console.log(chalk.red(`\n=== Unresolved OG image IDs ===`));
-
-	for (const filename of unresolved) {
-		console.log(chalk.red(`✗ ${filename}`));
-	}
-	console.log(
-		chalk.red(
-			`\n${String(unresolved.length)} filename(s) referenced by dist could not be resolved to a content entry, index page, or chronology pattern.`,
-		),
-	);
-	process.exit(1);
-}
-
-async function getImageModifiedTime(imageId: string): Promise<number | undefined> {
-	const imagePath = path.join(rootPath, values['media-path'], imageId);
-
-	try {
-		const stats = await fs.stat(imagePath);
-
-		return stats.mtimeMs;
-	} catch {
-		return undefined;
-	}
-}
-
-// Resolve the readable source image path from the media path
-async function getSourceImagePath(imageId: string): Promise<string | undefined> {
-	const imagePath = path.join(rootPath, values['media-path'], imageId);
-
+async function getSourceImagePath(imagePath: string): Promise<string | undefined> {
 	try {
 		await fs.access(imagePath, fs.constants.R_OK);
 
@@ -82,78 +29,99 @@ async function getSourceImagePath(imageId: string): Promise<string | undefined> 
 	}
 }
 
-async function loadRenderer() {
-	console.log(chalk.blue('Loading fonts...'));
+function assertResolvedEntries(unresolved: Array<string>) {
+	if (unresolved.length === 0) return;
 
-	const fonts = await loadOpenGraphFonts();
+	for (const filename of unresolved) log.error(`Unresolved OG image ID: ${filename}`);
 
-	console.log(chalk.green(`Loaded ${String(fonts.length)} font variants\n`));
-
-	return createRenderer({ fonts });
+	throw new Refusal(
+		`${formatCount(unresolved.length)} filename(s) referenced by dist could not be resolved to a content entry, index page, or chronology pattern`,
+	);
 }
 
-function logSummary(counts: {
-	errors: number;
-	generated: number;
-	pruned: number;
-	skipped: number;
+async function prepareCards({
+	isClearCache,
+	isMassPruneAllowed,
+	paths,
+}: {
+	isClearCache: boolean;
+	isMassPruneAllowed: boolean;
+	paths: ScriptPaths;
 }) {
-	console.log(chalk.magenta(`\n=== Summary ===`));
-	console.log(chalk.green(`Generated: ${String(counts.generated)} images`));
-	if (counts.skipped > 0) {
-		console.log(chalk.blue(`Skipped: ${String(counts.skipped)} (cached)`));
-	}
-	if (counts.pruned > 0) {
-		console.log(chalk.yellow(`Pruned: ${String(counts.pruned)} orphaned images`));
-	}
-	if (counts.errors > 0) {
-		console.log(chalk.red(`Errors: ${String(counts.errors)}`));
-	}
-}
+	const { openGraphPath: outputPath, openGraphStatePath } = getCachePaths(paths.cachePath);
 
-async function main() {
-	console.log(chalk.magenta('=== OpenGraph Image Generator ===\n'));
-
-	const outputPath = path.resolve(rootPath, values['output-path']);
-
-	if (values['clear-cache']) {
+	if (isClearCache) {
 		rmSync(outputPath, { force: true, recursive: true });
-		console.log(chalk.yellow(`🗑️  Cleared OG image output and manifest\n`));
+		log.warn('Cleared OG image output');
 	}
 
-	const renderCard = await loadRenderer();
+	const fonts = await withSpinner(
+		'Loading fonts',
+		loadOpenGraphFonts,
+		(loaded) => `Loaded ${String(loaded.length)} font variants`,
+	);
 
-	const { entries, unresolved } = await getBuiltEntries({
-		distPath: path.resolve(rootPath, values['dist-path']),
-	});
+	const { entries, unresolved } = await withSpinner('Reading built pages', () =>
+		getBuiltEntries({ distPath: paths.distPath }),
+	);
 
-	exitOnUnresolvedEntries(unresolved);
-
-	console.log(chalk.blue(`Processing ${String(entries.length)} entries...\n`));
+	assertResolvedEntries(unresolved);
 
 	safelyCreateDirectory(outputPath);
 
-	const outputCache = await createOutputCache(outputPath);
+	const outputCache = await createOutputCache({
+		directory: outputPath,
+		statePath: openGraphStatePath,
+	});
+	const prune = await outputCache.planPrune(new Set(entries.map((entry) => entry.id)), {
+		isMassPruneAllowed,
+	});
+
+	return { entries, outputCache, outputPath, prune, renderCard: createRenderer({ fonts }) };
+}
+
+async function generateCards({
+	paths,
+	signal,
+	...options
+}: {
+	isClearCache: boolean;
+	isMassPruneAllowed: boolean;
+	paths: ScriptPaths;
+	signal: AbortSignal;
+}) {
+	const { entries, outputCache, outputPath, prune, renderCard } = await prepareCards({
+		...options,
+		paths,
+	});
+	const fingerprints = createSourceFingerprints(paths.cachePath);
 
 	// Decoding is bounded by memory (a 3 MB buffer per slot), rendering by CPU
 	const decodeLimit = pLimit(10);
 	const renderLimit = pLimit(16);
 
 	const counts = { errors: 0, generated: 0, skipped: 0 };
+	const progress = createProgress({
+		label: 'Rendering',
+		note: () => `${formatCount(counts.generated)} rendered, ${formatCount(counts.skipped)} cached`,
+		total: entries.length,
+	});
 
 	async function selectStaleEntries(batch: ImageBatch) {
-		const imageModifiedTime = await getImageModifiedTime(batch.imageId);
+		const fingerprint = await fingerprints.get(path.join(paths.mediaPath, batch.imageId));
+		const imageDigest = fingerprint?.sha256;
 		const stale: Array<{ entry: OpenGraphContentEntry; key: string }> = [];
 
 		for (const entry of batch.entries) {
 			const key = getOutputCacheKey({
 				digest: entry.digest,
+				imageDigest,
 				imageId: batch.imageId,
-				imageModifiedTime,
 			});
 
 			if (outputCache.isFresh(entry.id, key)) {
 				counts.skipped++;
+				progress.tick();
 				continue;
 			}
 
@@ -164,19 +132,20 @@ async function main() {
 	}
 
 	async function renderBatch(batch: ImageBatch) {
+		if (signal.aborted) return;
+
 		const stale = await selectStaleEntries(batch);
 
 		// Nothing to draw, so the source image is never decoded
 		if (stale.length === 0) return;
 
-		const imagePath = await getSourceImagePath(batch.imageId);
+		const imagePath = await getSourceImagePath(path.join(paths.mediaPath, batch.imageId));
 
 		if (!imagePath) {
 			for (const { entry } of stale) {
-				console.log(
-					chalk.red(`✗ Missing image: ${batch.imageId} (used by ${entry.collection}/${entry.id})`),
-				);
+				log.error(`Missing image: ${batch.imageId} (used by ${entry.collection}/${entry.id})`);
 				counts.errors++;
+				progress.tick();
 			}
 			return;
 		}
@@ -188,14 +157,13 @@ async function main() {
 				renderLimit(async () => {
 					try {
 						await outputCache.write(entry.id, key, await renderCard(entry, image));
-
-						console.log(chalk.green(`✓ ${entry.collection}/${entry.id}`));
 						counts.generated++;
 					} catch (error) {
-						console.log(chalk.red(`✗ ${entry.collection}/${entry.id}`));
-						console.log(chalk.red(`  ${error instanceof Error ? error.message : String(error)}`));
+						log.error(`${entry.collection}/${entry.id}: ${formatError(error)}`);
 						counts.errors++;
 					}
+
+					progress.tick();
 				}),
 			),
 		);
@@ -203,18 +171,60 @@ async function main() {
 
 	const batches = batchEntriesBySourceImage(entries);
 
-	console.log(chalk.blue(`Batched into ${String(batches.length)} source images\n`));
-
 	await Promise.all(batches.map((batch) => decodeLimit(() => renderBatch(batch))));
 
-	const prunedCount = await outputCache.prune(new Set(entries.map((entry) => entry.id)));
+	if (signal.aborted) {
+		await outputCache.save();
+		signal.throwIfAborted();
+	}
 
+	await prune.apply();
 	await outputCache.save();
 
-	logSummary({ ...counts, pruned: prunedCount });
-	console.log(chalk.gray(`Output: ${outputPath}`));
+	if (counts.errors > 0) {
+		progress.warn();
+	} else {
+		progress.succeed();
+	}
 
-	if (counts.errors > 0) process.exit(1);
+	log.summary([
+		['Entries', entries.length],
+		['Source images', batches.length],
+		['Rendered', counts.generated],
+		['Cached', counts.skipped],
+		['Pruned', prune.orphans.length],
+		['Errors', counts.errors],
+	]);
+	log.detail(`Output: ${outputPath}`);
+
+	if (counts.errors > 0) throw new Refusal(`${formatCount(counts.errors)} card(s) failed`);
 }
 
-await main();
+await runCommand(
+	defineCommand({
+		interrupted: 'finished cards are saved and the next run resumes',
+		name: 'og-image',
+		options: {
+			'allow-mass-prune': {
+				default: false,
+				description: 'Prune more cards than the safety limit allows',
+				type: 'boolean',
+			},
+			'clear-cache': {
+				default: false,
+				description: 'Delete every card and render from scratch',
+				type: 'boolean',
+			},
+		},
+		async run({ paths, signal, values }) {
+			await generateCards({
+				isClearCache: values['clear-cache'],
+				isMassPruneAllowed: values['allow-mass-prune'],
+				paths,
+				signal,
+			});
+		},
+		summary: 'Render an OpenGraph card for every page in dist, incrementally',
+		title: 'OpenGraph images',
+	}),
+);

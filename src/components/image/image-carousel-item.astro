@@ -1,13 +1,14 @@
 ---
+import { ImageSizeEnum } from '@spectralcodex/shared/images';
+
 import type { ImageFeaturedWithCaption } from '#lib/catalog/catalog-types.ts';
 
 import ImageCarouselCaption from '#components/image/image-carousel-caption.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import Image from '#components/parts/image.astro';
-import { imageHighQualityFormat, imageHighQualityValue } from '#constants.ts';
 import { getImageFeaturedProps } from '#lib/image/image-featured-props.ts';
 import { getImageLayoutSizesProp } from '#lib/image/image-layout.ts';
-import { ImageLayoutEnum, ImageSizeEnum } from '#lib/image/image-types.ts';
+import { ImageLayoutEnum } from '#lib/image/image-types.ts';
 
 type Props = ImageFeaturedWithCaption;
 
@@ -15,18 +16,10 @@ const { caption, id: imageId, title: alt = '' } = Astro.props;
 
 const { imageProps, placeholderProps } = await getImageFeaturedProps({
 	alt,
-	imageFormat: imageHighQualityFormat,
 	imageId,
-	imageQuality: imageHighQualityValue,
+	preset: 'card-hq',
 	sizes: getImageLayoutSizesProp(ImageLayoutEnum.Default),
 	width: ImageSizeEnum.Large,
-	widths: [
-		ImageSizeEnum.ExtraSmall,
-		ImageSizeEnum.Small,
-		ImageSizeEnum.Medium,
-		ImageSizeEnum.Large,
-		ImageSizeEnum.ExtraLarge,
-	],
 });
 ---
 

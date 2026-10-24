@@ -1,31 +1,43 @@
 ---
-import { Image as UnpicImage } from '@unpic/astro/base';
-import { IMAGE_SERVER_SECRET, IMAGE_SERVER_URL } from 'astro:env/server';
+import { getImagePresetSize, getImagePresetWidths } from '@spectralcodex/shared/images';
 
 import type { ImageComponentProps } from '#lib/image/image-types.ts';
 
-import { imageLowQualityFormat, imageLowQualityValue } from '#constants.ts';
-import { createImageUrlFunction } from '#lib/image/image-server.ts';
+import { createImageUrlFunction } from '#lib/image/image-url.ts';
 
 type Props = ImageComponentProps;
 
 const {
+	alt,
 	class: className,
-	imageFormat = imageLowQualityFormat,
-	imageQuality = imageLowQualityValue,
+	imageSource,
+	preset,
+	priority = false,
+	width,
 	...props
 } = Astro.props;
 
-const transformer = createImageUrlFunction({
-	imageFormat,
-	imageQuality,
-	serverSecret: IMAGE_SERVER_SECRET,
-	serverUrl: IMAGE_SERVER_URL,
-});
+const getImageUrl = createImageUrlFunction({ imageSource, preset });
+const size = getImagePresetSize(preset, width, imageSource);
+
+// Feed readers strip srcset, so the feed ships one file with dimensions that reserve its space
+const isFixed = preset === 'feed';
+const candidateWidths = isFixed ? [] : getImagePresetWidths(preset, imageSource);
+const srcset = candidateWidths
+	.map((candidateWidth) => `${getImageUrl(candidateWidth)} ${String(candidateWidth)}w`)
+	.join(', ');
 ---
 
-<UnpicImage
+<img
 	{...props}
+	alt={alt}
 	class:list={['image-element', 'w-full object-cover', className]}
-	transformer={transformer}
+	decoding={priority ? undefined : 'async'}
+	fetchpriority={priority ? 'high' : undefined}
+	height={isFixed ? size.height : undefined}
+	loading={priority ? 'eager' : 'lazy'}
+	role={alt === '' ? 'presentation' : undefined}
+	src={getImageUrl(size.width)}
+	srcset={srcset === '' ? undefined : srcset}
+	width={isFixed ? size.width : undefined}
 />

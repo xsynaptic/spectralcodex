@@ -157,7 +157,7 @@ const MapPopupTitleText: FC<{ title: string; url: string | undefined }> =
 const MapPopupContent: FC<{ popupItem: MapPopupItemExtended }> = function MapPopupContent({
 	popupItem,
 }) {
-	const { imageServerUrl, messages } = useMapConfig();
+	const { imageBaseUrl, messages } = useMapConfig();
 	const { maxWidthPx } = useMapPopupLayout();
 
 	const {
@@ -181,8 +181,8 @@ const MapPopupContent: FC<{ popupItem: MapPopupItemExtended }> = function MapPop
 						className="map-popup-image"
 						loading="eager"
 						sizes={getPopupImageSizes(maxWidthPx)}
-						src={getPopupImageSrc(image.srcSet, imageServerUrl)}
-						srcSet={getPopupImageSrcSet(image.srcSet, imageServerUrl)}
+						src={getPopupImageSrc(image.srcSet, imageBaseUrl)}
+						srcSet={getPopupImageSrcSet(image.srcSet, imageBaseUrl)}
 					/>
 				</div>
 			) : undefined}

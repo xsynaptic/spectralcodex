@@ -115,6 +115,14 @@
 	padding: 0.25rem 0.5rem 0.5rem;
 }
 
+.map-popup-body:first-child > :first-child {
+	padding-right: 20px;
+
+	.map-popup-narrow & {
+		padding-right: 25px;
+	}
+}
+
 .map-popup-title-alt {
 	font-size: 0.875rem;
 	font-weight: 500;
@@ -161,7 +169,6 @@
 .map-popup-description {
 	max-height: 119px;
 	margin-top: 0.25rem;
-	margin-bottom: 0.5rem;
 	overflow-x: auto;
 	font-size: 0.875rem;
 	line-height: 1.25rem;
@@ -173,7 +180,7 @@
 .map-popup-footer {
 	display: flex;
 	justify-content: space-between;
-	margin: 0;
+	margin-top: 0.5rem;
 	font-size: 0.75rem;
 	line-height: 1rem;
 	color: var(--map-text-muted);

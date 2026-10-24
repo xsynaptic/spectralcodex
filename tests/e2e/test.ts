@@ -18,8 +18,8 @@ const allowedHost = new URL(getBaseUrl()).host;
 // Cloudflare injects a beacon at the edge, and the empty off-host answer fails Chromium's SRI check and WebKit's MIME check
 const blockedResourcePattern = /static\.cloudflareinsights\.com/;
 
-// Under dev, Vite logs to the console, a dependency re-optimization returns a 504 once, and `/_img` fails while Docker is down
-const devPatterns = isDev ? [/\[vite\]/, /Outdated Optimize Dep/, /\/_img\//] : [];
+// Under dev, Vite logs to the console and a dependency re-optimization returns a 504 once
+const devPatterns = isDev ? [/\[vite\]/, /Outdated Optimize Dep/] : [];
 
 export const test = base.extend<{ consoleGuard: ConsoleGuard; site: SitePaths }>({
 	// Automatic so no spec can forget it, and since it costs a page, specs that only make requests use the base test

@@ -24,15 +24,15 @@ This repository contains the working [Astro](https://astro.build) project used t
 - Satteri plugin for advanced image layout (groups, carousels, aspect ratio handling)
 - Hero image support with optional CSS-only image carousels
 
-**External Image Server**
+**Images**
 
-Astro's built-in image optimization works well for smaller sites, but this project has 8,000+ high-resolution source images. Processing them all during build leads to memory exhaustion and long build times. The solution: delegate image processing to an external service, and reference images by URL rather than importing them.
+Astro's built-in image optimization works well for smaller sites, but this project has 8,000+ high-resolution source images. Processing them all during the build leads to memory exhaustion and long build times. Images are referenced by URL instead, and their resized copies are built in a separate, incremental step.
 
-- [imagor](https://github.com/cshum/imagor) image server (MozJPEG build) handles on-demand resizing, format conversion, and quality adjustment
-- Nginx reverse proxy with aggressive caching ensures images are only processed once
-- URL-based transformations (_e.g._, `/{signature}/fit-in/1200x800/filters:format(webp):quality(80)/path/to/image.jpg`) allow flexible sizing without pre-generating variants
-- Purpose-built typed imagor URL builder and HMAC-SHA256 signer (the `unpic-imagor` package) generates signed URLs at build time; signing plus rate limiting protects against cache-busting attacks
-- Incremental cache warming service with optional email alerts
+- A closed set of presets (content, card, hero, popup, search, feed, author) names every derivative with a stable URL: `/<folder>/<name>-1200.jpg` for width-only sizes, `/<folder>/<name>-900x600.webp` for crops; sizes never exceed the source
+- The image build generates a manifest and fails if a published image is missing
+- `pnpm render-images` encodes the manifest with [sharp](https://sharp.pixelplumbing.com/), skipping anything whose source and settings are unchanged, and refuses to run against a stale build, a source that changed size, or a mass deletion
+- Caddy serves the files as plain static files behind Cloudflare; overwritten or deleted files are purged from the edge
+- In development, a middleware renders images on demand, so no image server is needed
 
 ### Interactive Maps
 
@@ -89,7 +89,7 @@ Astro's built-in image optimization works well for smaller sites, but this proje
 
 ## Development
 
-Requirements: current Node LTS, pnpm 11 (see the `packageManager` field in `package.json`), and Docker Desktop (`pnpm dev` boots an imagor/nginx image stack alongside the Astro dev server).
+Requirements: current Node LTS and pnpm 11 (see the `packageManager` field in `package.json`).
 
 ```sh
 pnpm install
@@ -115,16 +115,17 @@ Deployment is handled by custom TypeScript scripts. These are specific to this p
 4. Related content generation (semantic similarity)
 5. Sitemap `lastmod` generation from git commit history
 6. Astro production build
-7. OG image generation with Takumi and Sharp (reads built HTML)
-8. E2E smoke tests
-9. Media sync to remote storage
-10. Static file transfer via rsync
-11. OG image deployment
-12. Caddy config and TLS cert sync with reload
-13. Edge verification: one URL per cache tier checked against its expected `Cache-Control` header, cache-busted so requests reach Caddy instead of the CDN
-14. CDN cache purge and cache warming (detached run on the server)
+7. Image build (incremental, from the image build's manifest)
+8. OG image generation with Takumi and Sharp (reads built HTML)
+9. E2E smoke tests
+10. Image sync, then an edge purge of any overwritten files
+11. Static file transfer via rsync
+12. OG image deployment
+13. Caddy config and TLS cert sync with reload
+14. Edge verification: one URL per cache tier checked against its expected `Cache-Control` header, cache-busted so requests reach Caddy instead of the CDN, plus the image host's headers and legacy redirects
+15. CDN cache purge and cache warming (detached run on the server)
 
-The server side runs from one Docker Compose file (`deploy/docker-compose.yml`): Caddy, imagor behind its Nginx cache, the cache warmer, and Umami with scheduled database backups. The image server is deployed separately and manually; it is only needed when image server code or Docker config changes.
+The server side runs from one Docker Compose file (`deploy/docker-compose.yml`): Caddy, the cache warmer, and Umami with scheduled database backups.
 
 ## License
 

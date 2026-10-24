@@ -7,7 +7,6 @@ import { featureCollection } from '@turf/helpers';
 import { coordAll } from '@turf/meta';
 import { rewind } from '@turf/rewind';
 import { simplify } from '@turf/simplify';
-import chalk from 'chalk';
 import { geoAzimuthalEqualArea, geoCentroid, geoPath } from 'd3-geo';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -15,6 +14,7 @@ import { optimize } from 'svgo';
 
 import type { DivisionFeatureCollection, DivisionGeometry } from '#map-divisions/types.ts';
 
+import { formatCount, log } from '#shared/cli-output.ts';
 import { safelyCreateDirectory } from '#shared/utils.ts';
 
 interface SvgOptions {
@@ -40,40 +40,33 @@ export async function saveSvg({
 
 	const filePath = path.join(outputDir, `${id}.svg`);
 
-	try {
-		const { pointCount, svg: rawSvg, tolerance } = generateSvg(geojsonData, options);
+	const { pointCount, svg: rawSvg, tolerance } = generateSvg(geojsonData, options);
 
-		const optimized = optimize(rawSvg, {
-			path: filePath,
-			plugins: [
-				{
-					name: 'preset-default',
-					params: {
-						overrides: {
-							convertColors: false,
-						},
+	const optimized = optimize(rawSvg, {
+		path: filePath,
+		plugins: [
+			{
+				name: 'preset-default',
+				params: {
+					overrides: {
+						convertColors: false,
 					},
 				},
-				{
-					name: 'convertPathData',
-					params: {
-						floatPrecision: 1,
-					},
+			},
+			{
+				name: 'convertPathData',
+				params: {
+					floatPrecision: 1,
 				},
-			],
-		});
+			},
+		],
+	});
 
-		await fs.writeFile(filePath, optimized.data, 'utf8');
+	await fs.writeFile(filePath, optimized.data, 'utf8');
 
-		console.log(
-			chalk.gray(
-				`Saved SVG file to: ${chalk.cyan(filePath)} (${chalk.green(`${String(rawSvg.length)} → ${String(optimized.data.length)} bytes`)})  points: ${chalk.yellow(String(pointCount))}  tolerance: ${chalk.yellow(String(tolerance))}`,
-			),
-		);
-	} catch (error) {
-		console.error(chalk.red(`Failed to generate SVG for ${chalk.cyan(id)}:`), error);
-		throw error;
-	}
+	log.detail(
+		`Saved ${id}.svg (${formatCount(rawSvg.length)} → ${formatCount(optimized.data.length)} bytes, ${formatCount(pointCount)} points, tolerance ${String(tolerance)})`,
+	);
 }
 
 function clipToBoundingBox(

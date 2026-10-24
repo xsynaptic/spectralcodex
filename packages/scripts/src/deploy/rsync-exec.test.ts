@@ -40,6 +40,16 @@ describe('buildRsyncArgs', () => {
 		).toEqual(['-az', 'host:/path/', 'backups/']);
 	});
 
+	test('keeps the file list but drops progress when asked', () => {
+		expect(
+			buildRsyncArgs('media/', 'host:/path/', {
+				archive: 'av',
+				config: makeConfig(),
+				isProgressShown: false,
+			}),
+		).toEqual(['-av', 'media/', 'host:/path/']);
+	});
+
 	test('emits excludes in order, ahead of extra flags', () => {
 		const args = buildRsyncArgs('dist/', 'host:/path', {
 			config: makeConfig(),

@@ -1,161 +1,117 @@
-#!/usr/bin/env tsx
-import chalk from 'chalk';
-import path from 'node:path';
-import { parseArgs } from 'node:util';
 import { $ } from 'zx';
 
 import { deployApp } from '#deploy/deploy-app.ts';
 import { invokeCacheRefresh } from '#deploy/deploy-cache-refresh.ts';
 import { deployCaddy } from '#deploy/deploy-caddy.ts';
 import { loadDeployConfig, printDeployConfig } from '#deploy/deploy-config.ts';
-import { deployMedia, MediaPathMissingError } from '#deploy/deploy-media.ts';
-import { deployOg } from '#deploy/deploy-og.ts';
+import { getImageSet, getOpenGraphSet, uploadDerivatives } from '#deploy/deploy-derivatives.ts';
 import { verifyEdge } from '#deploy/verify-edge.ts';
-import { ensureSshKeychain, findWorkspaceRoot } from '#shared/utils.ts';
+import { defineCommand, runCommand } from '#shared/cli-command.ts';
+import { log } from '#shared/cli-output.ts';
+import { ensureSshKeychain } from '#shared/utils.ts';
 import { generateSitemapLastmod } from '#sitemap-lastmod/index.ts';
 
-const rootPath = findWorkspaceRoot();
+await runCommand(
+	defineCommand({
+		name: 'deploy-site',
+		options: {
+			'dry-run': {
+				default: false,
+				description: 'Run every local step; rsync and ssh only report what they would do',
+				type: 'boolean',
+			},
+			'skip-build': { default: false, description: 'Deploy the existing dist', type: 'boolean' },
+			'skip-smoke': { default: false, description: 'Skip the E2E smoke suite', type: 'boolean' },
+		},
+		async run({ paths, signal, values }) {
+			const isDryRun = values['dry-run'];
+			const { rootPath } = paths;
+			const config = loadDeployConfig();
 
-const { values } = parseArgs({
-	args: process.argv.slice(2),
-	options: {
-		'dry-run': { default: false, type: 'boolean' },
-		'skip-build': { default: false, type: 'boolean' },
-		'skip-smoke': { default: false, type: 'boolean' },
-	},
-});
+			printDeployConfig(config);
 
-const isDryRun = values['dry-run'];
-const isSkipBuild = values['skip-build'];
-const isSkipSmoke = values['skip-smoke'];
+			await ensureSshKeychain();
 
-// Load and validate deploy configuration
-const config = loadDeployConfig();
+			async function runRoot(label: string, args: Array<string>) {
+				log.step(label);
+				await $({ cwd: rootPath, stdio: 'inherit' })`pnpm ${args}`;
+			}
 
-printDeployConfig(config);
+			async function runScript(name: string) {
+				await $({ cwd: rootPath, stdio: 'inherit' })`pnpm -F @spectralcodex/scripts ${name}`;
+			}
 
-const distPath = path.join(rootPath, 'dist');
+			// Content scripts read the store `astro sync` writes, so it has to run first
+			async function sync() {
+				await runRoot('Syncing content...', ['astro', 'sync', '--mode', 'production']);
+			}
 
-await ensureSshKeychain();
+			// A webmention.io outage must not block a deploy; the build falls back to the committed data
+			async function webmentions() {
+				if (process.env.WEBMENTIONS_SHOW !== 'true') {
+					log.detail('Skipping webmentions; `WEBMENTIONS_SHOW` is off');
+					return;
+				}
 
-async function build() {
-	if (isSkipBuild) {
-		console.log(chalk.yellow('Skipping build'));
-		return;
-	}
-	console.log(chalk.blue('Building...'));
-	await $({ cwd: rootPath, stdio: 'inherit' })`pnpm astro build`;
-}
+				try {
+					await runScript('webmentions');
+				} catch (error) {
+					if (signal.aborted) throw error;
 
-async function caddy() {
-	await deployCaddy({ dryRun: isDryRun, rootPath });
-}
+					log.warn('Webmention fetch failed, continuing with existing data');
+				}
+			}
 
-async function generateOpenGraph() {
-	console.log(chalk.blue('Generating OpenGraph images...'));
-	await $({
-		cwd: rootPath,
-		stdio: 'inherit',
-	})`pnpm og-image --dist-path=${distPath}`;
-}
+			async function build() {
+				if (values['skip-build']) {
+					log.warn('Skipping build');
+					return;
+				}
 
-async function generateRedirects() {
-	console.log(chalk.blue('Generating redirects...'));
-	await $({ cwd: rootPath, stdio: 'inherit' })`pnpm generate-redirects`;
-}
+				await runRoot('Building...', ['astro', 'build']);
+			}
 
-async function media() {
-	try {
-		await deployMedia({ dryRun: isDryRun, rootPath });
-	} catch (error) {
-		if (error instanceof MediaPathMissingError) {
-			console.log(chalk.yellow('Media path not found, skipping'));
-			return;
-		}
-		throw error;
-	}
-}
+			async function test() {
+				if (values['skip-smoke']) {
+					log.warn('Skipping smoke suite');
+					return;
+				}
 
-async function similar() {
-	console.log(chalk.blue('Generating similar content...'));
-	await $({
-		cwd: rootPath,
-		stdio: 'inherit',
-	})`pnpm similar-content`;
-}
+				await runRoot('Running E2E smoke tests...', ['test-e2e-smoke']);
+			}
 
-// Content scripts read the store `astro sync` writes, so it has to run first
-async function sync() {
-	console.log(chalk.blue('Syncing content...'));
-	await $({ cwd: rootPath, stdio: 'inherit' })`pnpm astro sync --mode production`;
-}
+			const steps: Array<() => Promise<void>> = [
+				sync,
+				() => runScript('validate-content'),
+				() => runScript('generate-redirects'),
+				() => runScript('similar-content'),
+				webmentions,
+				async () => {
+					log.step('Sitemap lastmod');
+					await generateSitemapLastmod({ paths, siteUrl: config.siteUrl });
+				},
+				build,
+				() => runScript('render-images'),
+				() => runScript('og-image'),
+				test,
+				() => uploadDerivatives(getImageSet(paths, config), { config, dryRun: isDryRun }),
+				() => uploadDerivatives(getOpenGraphSet(paths, config), { config, dryRun: isDryRun }),
+				() => deployApp({ dryRun: isDryRun, rootPath }),
+				() => deployCaddy({ dryRun: isDryRun, rootPath }),
+				async () => {
+					if (!isDryRun) await verifyEdge({ cachePath: paths.cachePath, config });
+				},
+				() => invokeCacheRefresh({ dryRun: isDryRun }),
+			];
 
-async function test() {
-	if (isSkipSmoke) {
-		console.log(chalk.yellow('Skipping smoke suite'));
-		return;
-	}
-	console.log(chalk.blue('Running E2E smoke tests...'));
-	await $({ cwd: rootPath, stdio: 'inherit' })`pnpm test-e2e-smoke`;
-}
+			for (const step of steps) {
+				signal.throwIfAborted();
+				await step();
+			}
 
-async function transfer() {
-	await deployApp({ dryRun: isDryRun, rootPath });
-}
-
-async function transferOpenGraph() {
-	await deployOg({ dryRun: isDryRun, rootPath });
-}
-
-async function validate() {
-	console.log(chalk.blue('Validating content...'));
-	await $({ cwd: rootPath, stdio: 'inherit' })`pnpm -F @spectralcodex/scripts validate-content`;
-}
-
-// A webmention.io outage must not block a deploy; the build falls back to the committed data
-async function webmentions() {
-	if (process.env.WEBMENTIONS_SHOW !== 'true') {
-		console.log(chalk.gray('Skipping webmentions; `WEBMENTIONS_SHOW` is off'));
-		return;
-	}
-
-	console.log(chalk.blue('Fetching webmentions...'));
-	try {
-		await $({
-			cwd: rootPath,
-			stdio: 'inherit',
-		})`pnpm webmentions`;
-	} catch {
-		console.log(chalk.yellow('Webmention fetch failed, continuing with existing data'));
-	}
-}
-
-try {
-	// Prepare content
-	await sync();
-	await validate();
-	await generateRedirects();
-	await similar();
-	await webmentions();
-	await generateSitemapLastmod({ rootPath, siteUrl: config.siteUrl });
-
-	// Build & verify
-	await build();
-	await generateOpenGraph();
-	await test();
-
-	// Transfer to server
-	await media();
-	await transfer();
-	await transferOpenGraph();
-	await caddy();
-
-	// Verify & refresh caches
-	if (!isDryRun) await verifyEdge();
-	await invokeCacheRefresh({ dryRun: isDryRun });
-
-	console.log(chalk.green('Deploy complete'));
-} catch (error) {
-	console.error(chalk.red('Deploy failed:'), error);
-	process.exit(1);
-}
+			log.success(isDryRun ? 'Deploy dry run complete' : 'Deploy complete');
+		},
+		summary: 'Prepare content, build, render images, upload, then verify and refresh caches',
+		title: 'Deploy site',
+	}),
+);

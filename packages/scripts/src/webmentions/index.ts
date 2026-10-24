@@ -1,13 +1,15 @@
-#!/usr/bin/env tsx
 import type { Webmention } from '@spectralcodex/shared/schemas';
 
+import { getWebmentionsPath } from '@spectralcodex/shared/paths';
 import { WebmentionSchema } from '@spectralcodex/shared/schemas';
-import chalk from 'chalk';
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import sanitizeHtml from 'sanitize-html';
 
-import { findWorkspaceRoot, isExistingFile, safelyCreateDirectory } from '#shared/utils.ts';
+import { defineCommand, runCommand } from '#shared/cli-command.ts';
+import { formatCount, log } from '#shared/cli-output.ts';
+import { withSpinner } from '#shared/cli-progress.ts';
+import { isExistingFile, safelyCreateDirectory } from '#shared/utils.ts';
 
 const apiUrl = 'https://webmention.io/api/mentions.jf2';
 const userAgent = 'SpectralCodex-Webmentions/1.0 (+https://spectralcodex.com)';
@@ -21,6 +23,12 @@ const sanitizeOptions = {
 	allowedTags: ['a', 'b', 'blockquote', 'br', 'code', 'em', 'i', 'p', 'pre', 'strong'],
 } satisfies sanitizeHtml.IOptions;
 
+interface FetchContext {
+	domain: string;
+	signal: AbortSignal;
+	token: string;
+}
+
 // The feature is env-gated, so absent credentials are a clean skip rather than a failure
 function loadCredentials() {
 	const domain = process.env.WEBMENTION_DOMAIN;
@@ -33,20 +41,15 @@ function loadCredentials() {
 		...(token ? [] : ['WEBMENTION_API_KEY']),
 	];
 
-	console.warn(chalk.yellow(`Skipping webmentions; missing ${missing.join(', ')}`));
-	process.exit(0);
+	log.warn(`Skipping webmentions; missing ${missing.join(', ')}`);
+
+	return;
 }
 
-const { domain, token } = loadCredentials();
-
-const rootPath = findWorkspaceRoot();
-
-// `CONTENT_DATA_PATH` points at `collections/`; webmentions live in the sibling `data/` directory
-const collectionsPath = process.env.CONTENT_DATA_PATH ?? 'packages/content-demo/collections';
-const outputDirectory = path.join(rootPath, collectionsPath, '..', 'data');
-const outputPath = path.join(outputDirectory, 'webmentions.jsonl');
-
-async function fetchMentionsPage({ page, sinceId }: { page: number; sinceId: number | undefined }) {
+async function fetchMentionsPage(
+	{ domain, signal, token }: FetchContext,
+	{ page, sinceId }: { page: number; sinceId: number | undefined },
+) {
 	const url = new URL(apiUrl);
 
 	url.searchParams.set('domain', domain);
@@ -60,7 +63,7 @@ async function fetchMentionsPage({ page, sinceId }: { page: number; sinceId: num
 
 	const response = await fetch(url, {
 		headers: { Accept: 'application/json', 'User-Agent': userAgent },
-		signal: AbortSignal.timeout(timeoutMs),
+		signal: AbortSignal.any([signal, AbortSignal.timeout(timeoutMs)]),
 	});
 
 	if (!response.ok) {
@@ -92,7 +95,7 @@ function parseMention(line: string) {
 	}
 }
 
-async function readExistingMentions() {
+async function readExistingMentions(outputPath: string) {
 	const mentions = new Map<number, Webmention>();
 
 	if (!(await isExistingFile(outputPath))) return mentions;
@@ -105,7 +108,7 @@ async function readExistingMentions() {
 		const result = parseMention(line);
 
 		if (!result) {
-			console.warn(chalk.yellow(`Discarding unreadable line in ${outputPath}`));
+			log.warn(`Discarding unreadable line in ${outputPath}`);
 			continue;
 		}
 
@@ -126,79 +129,103 @@ function sanitizeMention(mention: Webmention): Webmention {
 	};
 }
 
-const existingMentions = await readExistingMentions();
-const sinceId = getMaxMentionId(existingMentions);
+async function fetchNewMentions(context: FetchContext, sinceId: number | undefined) {
+	const mentions: Array<Webmention> = [];
+	let invalidCount = 0;
+	let privateCount = 0;
 
-console.log(
-	chalk.blue(
-		sinceId === undefined
-			? `Fetching all webmentions for ${domain}...`
-			: `Fetching webmentions for ${domain} since ${String(sinceId)}...`,
-	),
-);
+	for (let page = 0; ; page++) {
+		const items = await fetchMentionsPage(context, { page, sinceId });
 
-const mergedMentions = new Map(existingMentions);
+		for (const item of items) {
+			const result = WebmentionSchema.safeParse(item);
 
-let page = 0;
-let addedCount = 0;
-let invalidCount = 0;
-let privateCount = 0;
+			if (!result.success) {
+				invalidCount += 1;
+				continue;
+			}
 
-for (;;) {
-	const items = await fetchMentionsPage({ page, sinceId });
+			if (result.data['wm-private']) {
+				privateCount += 1;
+				continue;
+			}
 
-	for (const item of items) {
-		const result = WebmentionSchema.safeParse(item);
-
-		if (!result.success) {
-			invalidCount += 1;
-			continue;
+			mentions.push(sanitizeMention(result.data));
 		}
 
-		if (result.data['wm-private']) {
-			privateCount += 1;
-			continue;
-		}
-
-		mergedMentions.set(result.data['wm-id'], sanitizeMention(result.data));
-		addedCount += 1;
+		if (items.length < perPage) break;
 	}
 
-	if (items.length < perPage) break;
-
-	page += 1;
+	return { invalidCount, mentions, privateCount };
 }
 
-const sortedMentions = [...mergedMentions.values()].toSorted(
-	(mentionA, mentionB) => mentionA['wm-id'] - mentionB['wm-id'],
+await runCommand(
+	defineCommand({
+		name: 'webmentions',
+		async run({ paths, signal }) {
+			const credentials = loadCredentials();
+
+			if (!credentials) return;
+
+			const outputPath = getWebmentionsPath(paths.contentDataPath);
+			const outputDirectory = path.dirname(outputPath);
+
+			const existingMentions = await readExistingMentions(outputPath);
+			const sinceId = getMaxMentionId(existingMentions);
+
+			const fetched = await withSpinner(
+				sinceId === undefined
+					? `Fetching all webmentions for ${credentials.domain}`
+					: `Fetching webmentions for ${credentials.domain} since ${String(sinceId)}`,
+				() => fetchNewMentions({ ...credentials, signal }, sinceId),
+			);
+
+			const mergedMentions = new Map(existingMentions);
+
+			for (const mention of fetched.mentions) mergedMentions.set(mention['wm-id'], mention);
+
+			const sortedMentions = [...mergedMentions.values()].toSorted(
+				(mentionA, mentionB) => mentionA['wm-id'] - mentionB['wm-id'],
+			);
+
+			safelyCreateDirectory(outputDirectory);
+
+			await writeFile(
+				outputPath,
+				sortedMentions.map((mention) => JSON.stringify(mention)).join('\n') + '\n',
+			);
+
+			const propertyCounts = new Map<string, number>();
+			const targets = new Set<string>();
+
+			for (const mention of sortedMentions) {
+				propertyCounts.set(
+					mention['wm-property'],
+					(propertyCounts.get(mention['wm-property']) ?? 0) + 1,
+				);
+				targets.add(mention['wm-target']);
+			}
+
+			log.success(`Wrote ${formatCount(sortedMentions.length)} webmentions → ${outputPath}`);
+
+			const sortedCounts = [...propertyCounts].toSorted(([propertyA], [propertyB]) =>
+				propertyA.localeCompare(propertyB),
+			);
+
+			log.summary([
+				['New this run', fetched.mentions.length],
+				['Targets', targets.size],
+				...sortedCounts,
+				...(fetched.privateCount > 0
+					? [['Private, dropped', fetched.privateCount] satisfies [string, number]]
+					: []),
+			]);
+
+			if (fetched.invalidCount > 0) {
+				log.warn(`${formatCount(fetched.invalidCount)} unrecognized webmentions skipped`);
+			}
+		},
+		summary: 'Fetch new webmentions from webmention.io into the content data directory',
+		title: 'Webmentions',
+	}),
 );
-
-safelyCreateDirectory(outputDirectory);
-
-await writeFile(
-	outputPath,
-	sortedMentions.map((mention) => JSON.stringify(mention)).join('\n') + '\n',
-);
-
-const propertyCounts = new Map<string, number>();
-const targets = new Set<string>();
-
-for (const mention of sortedMentions) {
-	propertyCounts.set(mention['wm-property'], (propertyCounts.get(mention['wm-property']) ?? 0) + 1);
-	targets.add(mention['wm-target']);
-}
-
-console.log(chalk.green(`Wrote ${String(sortedMentions.length)} webmentions → ${outputPath}`));
-console.log(chalk.gray(`  New this run:  ${String(addedCount)}`));
-console.log(chalk.gray(`  Targets:       ${String(targets.size)}`));
-
-const sortedCounts = [...propertyCounts].toSorted(([propertyA], [propertyB]) =>
-	propertyA.localeCompare(propertyB),
-);
-
-for (const [property, count] of sortedCounts) {
-	console.log(chalk.gray(`  ${property.padEnd(14)} ${String(count)}`));
-}
-
-if (privateCount > 0) console.log(chalk.gray(`  Private, dropped: ${String(privateCount)}`));
-if (invalidCount > 0) console.log(chalk.yellow(`  Unrecognized, skipped: ${String(invalidCount)}`));

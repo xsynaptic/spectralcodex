@@ -1,12 +1,14 @@
-import chalk from 'chalk';
 import { $ } from 'zx';
+
+import { log } from '#shared/cli-output.ts';
 
 interface RsyncOptions {
 	archive?: 'av' | 'avz';
 	config: SshTarget;
 	dryRun?: boolean;
-	excludes?: Array<string>;
-	extraFlags?: Array<string>;
+	excludes?: ReadonlyArray<string>;
+	extraFlags?: ReadonlyArray<string>;
+	isProgressShown?: boolean;
 	quiet?: boolean;
 }
 
@@ -49,7 +51,6 @@ export async function rsyncTo(
 	return result.stdout;
 }
 
-// Like sshExec but captures and returns stdout
 export async function sshCapture(config: SshTarget, command: string): Promise<string> {
 	const sshArgs = [...(config.sshKeyPath ? ['-i', config.sshKeyPath] : []), config.remoteHost];
 
@@ -65,7 +66,7 @@ export async function sshExec(
 	{ dryRun = false }: { dryRun?: boolean } = {},
 ): Promise<void> {
 	if (dryRun) {
-		console.log(chalk.yellow(`DRY RUN ssh: ${command}`));
+		log.warn(`Dry run; ssh: ${command}`);
 		return;
 	}
 
@@ -86,6 +87,8 @@ export async function sshExecWithInput(
 }
 
 // Callers that parse the returned file list need `-v`; a quiet pull prints nothing on success
-function getArchiveFlags({ archive = 'avz', quiet = false }: RsyncOptions) {
-	return quiet ? [`-${archive.replace('v', '')}`] : [`-${archive}`, '--progress'];
+function getArchiveFlags({ archive = 'avz', isProgressShown = true, quiet = false }: RsyncOptions) {
+	if (quiet) return [`-${archive.replace('v', '')}`];
+
+	return isProgressShown ? [`-${archive}`, '--progress'] : [`-${archive}`];
 }

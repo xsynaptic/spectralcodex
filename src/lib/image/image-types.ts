@@ -1,14 +1,8 @@
-import type { CoreImageAttributes, UnpicBaseImageProps } from '@unpic/core';
-import type { ImagorOperations, ImagorOptions } from '@xsynaptic/unpic-imagor';
+import type { ImagePresetName, ImageSource } from '@spectralcodex/shared/images';
 import type { HTMLAttributes } from 'astro/types';
-import type { ImageFormat } from 'unpic';
 
 export const ImageFitOptionEnum = {
-	Contain: 'contain',
 	Cover: 'cover',
-	Fill: 'fill',
-	Inside: 'inside',
-	Outside: 'outside',
 } as const;
 
 export type ImageFitOption = (typeof ImageFitOptionEnum)[keyof typeof ImageFitOptionEnum];
@@ -37,21 +31,17 @@ export const ImageOrientationEnum = {
 
 export type ImageOrientation = (typeof ImageOrientationEnum)[keyof typeof ImageOrientationEnum];
 
-export const ImageSizeEnum = {
-	ExtraExtraExtraLarge: 3600,
-	ExtraExtraLarge: 2400,
-	ExtraLarge: 1800,
-	ExtraSmall: 450,
-	Large: 1200,
-	Medium: 900,
-	Small: 600,
-} as const;
-
-export type ImageComponentProps = HTMLAttributes<'img'> &
-	Omit<UnpicBaseImageProps<ImagorOperations, ImagorOptions, CoreImageAttributes>, 'transformer'> & {
-		imageFormat?: ImageFormat;
-		imageQuality?: number;
-	};
+export interface ImageComponentProps extends Omit<
+	HTMLAttributes<'img'>,
+	'alt' | 'height' | 'sizes' | 'src' | 'srcset' | 'width'
+> {
+	alt: string;
+	imageSource: ImageSource;
+	preset: ImagePresetName;
+	priority?: boolean;
+	sizes: string;
+	width: number;
+}
 
 export interface ImagePlaceholderProps {
 	aspectRatio: number;

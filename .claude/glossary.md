@@ -112,6 +112,8 @@ Map Scope, Map Filter, Map Target and Map View keep the prefix everywhere outsid
 
 **Image**: A photograph in the media library, described by its own embedded metadata (capture settings, date, and sometimes coordinates) rather than by hand-authored frontmatter. _Avoid_: photo, asset, file, media.
 
+**Derivative**: A resized and re-encoded file generated from an Image by a preset, named for its source and dimensions and served from the image host. The Image itself is its source. _Avoid_: rendition, variant, output, thumbnail.
+
 **Featured Image**: An Image chosen to represent an Entry in listings, social previews, and page headers. An Entry may carry several; the first is the most representative and is the one used wherever a single image is needed. _Avoid_: cover, thumbnail, OG image.
 
 **Hero**: The Featured Images promoted to the header display at the top of an Entry's page. Regions, Themes, and Series promote all of their Featured Images; Posts and the other editorial collections opt in per image, in authored order. _Avoid_: banner, splash, masthead.

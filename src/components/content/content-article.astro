@@ -1,13 +1,11 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
+import { getImagePresetWidths, imagePresets } from '@spectralcodex/shared/images';
 import { getUrlPathIndexing } from '@spectralcodex/shared/indexing';
-import { IMAGE_SERVER_SECRET, IMAGE_SERVER_URL } from 'astro:env/server';
 
-import { imageLowQualityFormat, imageLowQualityValue } from '#constants.ts';
-import { getImageByIdFunction } from '#lib/collections/images/images-data.ts';
-import { createImageUrlFunction } from '#lib/image/image-server.ts';
-import { ImageFitOptionEnum } from '#lib/image/image-types.ts';
+import { getImageByIdFunction, getImageSource } from '#lib/collections/images/images-data.ts';
+import { createImageUrlFunction } from '#lib/image/image-url.ts';
 
 interface Props extends HTMLAttributes<'article'> {
 	imageId: string | undefined;
@@ -18,9 +16,7 @@ const { imageId, ...props } = Astro.props;
 const { index } = getUrlPathIndexing(Astro.url.pathname);
 
 // Pagefind renders result thumbnails at 64×48 (4:3) via `--pf-image-width` / `--pf-image-height`
-const searchThumbnailWidth = 64;
-const searchThumbnailWidth2x = searchThumbnailWidth * 2;
-const searchThumbnailAspectRatio = 4 / 3;
+const [searchThumbnailWidth, searchThumbnailWidth2x] = imagePresets.search.widths;
 
 async function getThumbnailUrls() {
 	if (!imageId) return;
@@ -30,26 +26,16 @@ async function getThumbnailUrls() {
 
 	if (!imageEntry) return;
 
-	const getImageUrl = createImageUrlFunction({
-		imageFormat: imageLowQualityFormat,
-		imageQuality: imageLowQualityValue,
-		serverSecret: IMAGE_SERVER_SECRET,
-		serverUrl: IMAGE_SERVER_URL,
-	});
+	const imageSource = getImageSource(imageEntry);
+	const widths = getImagePresetWidths('search', imageSource);
 
-	const fit = ImageFitOptionEnum.Cover;
+	if (!widths.includes(searchThumbnailWidth2x)) return;
+
+	const getImageUrl = createImageUrlFunction({ imageSource, preset: 'search' });
 
 	return {
-		url1x: getImageUrl(imageId, {
-			fit,
-			height: Math.round(searchThumbnailWidth / searchThumbnailAspectRatio),
-			width: searchThumbnailWidth,
-		}),
-		url2x: getImageUrl(imageId, {
-			fit,
-			height: Math.round(searchThumbnailWidth2x / searchThumbnailAspectRatio),
-			width: searchThumbnailWidth2x,
-		}),
+		url1x: getImageUrl(searchThumbnailWidth),
+		url2x: getImageUrl(searchThumbnailWidth2x),
 	};
 }
 

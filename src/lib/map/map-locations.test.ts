@@ -125,6 +125,18 @@ describe('getLocationFeatures', () => {
 			undefined,
 			undefined,
 		]);
+		expect(
+			result.map(({ properties }) => [
+				properties.ownTitle,
+				properties.ownTitleMultilingualLang,
+				properties.ownTitleMultilingualValue,
+			]),
+		).toEqual([
+			['North Block', 'zh', '北街'],
+			['South Block', undefined, undefined],
+			[undefined, undefined, undefined],
+			[undefined, undefined, undefined],
+		]);
 	});
 
 	const sensitiveLocations = [

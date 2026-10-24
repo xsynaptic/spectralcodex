@@ -1,14 +1,12 @@
 import type { CollectionEntry } from 'astro:content';
 
 import { getPublicId } from '@spectralcodex/shared/entries';
-import { IMAGE_SERVER_SECRET } from 'astro:env/server';
 import * as R from 'remeda';
 
 import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 import type { ImageThumbnail } from '#lib/collections/locations/locations-factory.ts';
 
-import { imageLowQualityFormat, imageLowQualityValue } from '#constants.ts';
-import { getImageByIdFunction } from '#lib/collections/images/images-data.ts';
+import { getImageByIdFunction, getImageSource } from '#lib/collections/images/images-data.ts';
 import {
 	createLocationPostsFunction,
 	getLocationThumbnailProps,
@@ -16,7 +14,7 @@ import {
 import { createLocationNearbyFunction } from '#lib/collections/locations/locations-nearby.ts';
 import { getPostsCollection } from '#lib/collections/posts/posts-data.ts';
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
-import { createSignedImagePathFunction } from '#lib/image/image-server.ts';
+import { createImagePathFunction } from '#lib/image/image-url.ts';
 import { getMatchingLinkUrl } from '#lib/schemas/resources.ts';
 import {
 	createCollectionData,
@@ -31,13 +29,6 @@ import {
 import { getDescriptionRendered } from '#lib/utils/description-data.ts';
 import { getContentPath } from '#lib/utils/routing.ts';
 
-// Popup thumbnails are stored as signed paths; the popup prepends the image server URL at render time
-const getSignedImagePath = createSignedImagePathFunction({
-	imageFormat: imageLowQualityFormat,
-	imageQuality: imageLowQualityValue,
-	serverSecret: IMAGE_SERVER_SECRET,
-});
-
 type GetThumbnailFunction = (imageId: string | undefined) => ImageThumbnail | undefined;
 
 export type LocationPoint = Exclude<
@@ -51,9 +42,15 @@ async function createThumbnailFunction(): Promise<GetThumbnailFunction> {
 	return function getThumbnail(imageId) {
 		const imageEntry = getImageById(imageId);
 
-		return imageEntry
-			? getLocationThumbnailProps(imageEntry.id, imageEntry.data.width, getSignedImagePath)
-			: undefined;
+		if (!imageEntry) return;
+
+		const imageSource = getImageSource(imageEntry);
+
+		// Popup thumbnails are stored as paths; the popup prepends the image base URL at render time
+		return getLocationThumbnailProps(
+			imageSource,
+			createImagePathFunction({ imageSource, preset: 'popup' }),
+		);
 	};
 }
 

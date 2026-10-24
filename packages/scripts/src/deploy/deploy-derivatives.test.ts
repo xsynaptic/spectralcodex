@@ -1,0 +1,84 @@
+import { mkdirSync, mkdtempSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { afterEach, beforeEach, describe, expect, test } from 'vitest';
+import { $ } from 'zx';
+
+import {
+	derivativePruneOptions,
+	derivativeUploadOptions,
+	getDeletedPaths,
+} from '#deploy/deploy-derivatives.ts';
+import { buildRsyncArgs } from '#deploy/rsync-exec.ts';
+
+let rootPath: string;
+
+async function runRsync(options: Omit<Parameters<typeof buildRsyncArgs>[2], 'config'>) {
+	const args = buildRsyncArgs(
+		`${path.join(rootPath, 'media')}/`,
+		`${path.join(rootPath, 'remote')}/`,
+		{
+			...options,
+			config: { remoteHost: 'local' },
+		},
+	);
+
+	const result = await $({ quiet: true })`rsync ${args}`;
+
+	return result.stdout;
+}
+
+async function syncOutputs() {
+	const output = await runRsync({
+		...derivativeUploadOptions,
+		extraFlags: [...derivativeUploadOptions.extraFlags, '--itemize-changes'],
+	});
+
+	return output.split('\n');
+}
+
+beforeEach(() => {
+	rootPath = mkdtempSync(path.join(os.tmpdir(), 'deploy-derivatives-test-'));
+	mkdirSync(path.join(rootPath, 'media/a'), { recursive: true });
+	writeFileSync(path.join(rootPath, 'media/a/b-1-450.jpg'), 'jpeg bytes');
+	writeFileSync(path.join(rootPath, 'media/a/b-1-450x300.webp'), 'webp bytes');
+	writeFileSync(path.join(rootPath, 'media/a/b-1-600.jpg.tmp'), 'half an encode');
+});
+
+afterEach(() => {
+	rmSync(rootPath, { force: true, recursive: true });
+});
+
+describe('the derivative upload', () => {
+	test('a second run transfers nothing, so mtimes and ETags stay put', async () => {
+		const first = await syncOutputs();
+
+		expect(first.filter((line) => line.startsWith('>f'))).toHaveLength(2);
+		expect(await syncOutputs()).not.toContainEqual(expect.stringMatching(/^>f/));
+	});
+
+	test('temp files stay behind and served files are world-readable', async () => {
+		await syncOutputs();
+
+		expect(() => statSync(path.join(rootPath, 'remote/a/b-1-600.jpg.tmp'))).toThrow();
+		expect(statSync(path.join(rootPath, 'remote/a/b-1-450.jpg')).mode & 0o777).toBe(0o644);
+		expect(statSync(path.join(rootPath, 'remote/a')).mode & 0o777).toBe(0o755);
+	});
+});
+
+describe('the remote prune', () => {
+	test('deletes remote files the local cache lacks and sends nothing', async () => {
+		mkdirSync(path.join(rootPath, 'remote/a/.rsync-partial'), { recursive: true });
+		writeFileSync(path.join(rootPath, 'remote/a/b-1-450.jpg'), 'jpeg bytes');
+		writeFileSync(path.join(rootPath, 'remote/a/renamed-1-450.jpg'), 'old bytes');
+		writeFileSync(path.join(rootPath, 'remote/a/.rsync-partial/b-1-900.jpg'), 'in flight');
+
+		const deleted = getDeletedPaths(await runRsync(derivativePruneOptions));
+
+		expect(deleted).toStrictEqual(['a/renamed-1-450.jpg']);
+		expect(() => statSync(path.join(rootPath, 'remote/a/b-1-450x300.webp'))).toThrow();
+		expect(statSync(path.join(rootPath, 'remote/a/.rsync-partial/b-1-900.jpg')).isFile()).toBe(
+			true,
+		);
+	});
+});

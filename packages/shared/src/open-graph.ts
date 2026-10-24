@@ -4,8 +4,6 @@ export const openGraphImageHeight = 630;
 export const openGraphImageFormat = 'jpg';
 
 export const openGraphBasePath = 'og';
-export const openGraphOutputPath = '.cache/og-image';
-export const openGraphManifestFile = 'manifest.json';
 
 // The app emits this stem in `og:image` and the generator resolves cards back from it
 export function getOpenGraphId(id: string): string {

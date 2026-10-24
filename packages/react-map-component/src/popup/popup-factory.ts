@@ -4,6 +4,28 @@ import { MapPopupOwnField } from '@spectralcodex/map-codec';
 
 import { isClusterHoverId } from '#lib/cluster-hover.ts';
 
+function getOwnTitleItem({
+	ownTitle,
+	ownTitleMultilingualLang,
+	ownTitleMultilingualValue,
+}: MapPopupItem) {
+	if (ownTitle !== undefined) {
+		return {
+			title: ownTitle,
+			titleMultilingualLang: ownTitleMultilingualLang,
+			titleMultilingualValue: ownTitleMultilingualValue,
+		};
+	}
+
+	if (ownTitleMultilingualValue === undefined) return {};
+
+	return {
+		title: ownTitleMultilingualValue,
+		titleMultilingualLang: undefined,
+		titleMultilingualValue: undefined,
+	};
+}
+
 export function getTargetPopupItem<
 	Item extends MapPopupItem & { precision: number | undefined; url?: string | undefined },
 >(item: Item): Item {
@@ -14,6 +36,7 @@ export function getTargetPopupItem<
 		description: own & MapPopupOwnField.Description ? item.description : undefined,
 		image: own & MapPopupOwnField.Image ? item.image : undefined,
 		precision: own & MapPopupOwnField.Precision ? item.precision : undefined,
+		...getOwnTitleItem(item),
 		url: undefined,
 		wikipediaUrl: own & MapPopupOwnField.Wikipedia ? item.wikipediaUrl : undefined,
 	};
@@ -24,14 +47,14 @@ export function getPopupImageSizes(maxWidthPx: number): string {
 }
 
 // The first srcSet candidate is the smallest one
-export function getPopupImageSrc(srcSet: string, imageServerUrl: string): string {
-	return `${imageServerUrl}${srcSet.split(', ', 1)[0]?.split(' ', 1)[0] ?? srcSet}`;
+export function getPopupImageSrc(srcSet: string, imageBaseUrl: string): string {
+	return `${imageBaseUrl}/${srcSet.split(', ', 1)[0]?.split(' ', 1)[0] ?? srcSet}`;
 }
 
-export function getPopupImageSrcSet(srcSet: string, imageServerUrl: string): string {
+export function getPopupImageSrcSet(srcSet: string, imageBaseUrl: string): string {
 	return srcSet
 		.split(', ')
-		.map((entry) => `${imageServerUrl}${entry}`)
+		.map((entry) => `${imageBaseUrl}/${entry}`)
 		.join(', ');
 }
 

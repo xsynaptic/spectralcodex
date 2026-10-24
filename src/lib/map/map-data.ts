@@ -3,7 +3,6 @@ import type { MapComponentProps } from '@spectralcodex/react-map-component';
 
 import { selectMapRows } from '@spectralcodex/map-codec';
 import { MAP_PROTOMAPS_API_KEY } from 'astro:env/client';
-import { IMAGE_SERVER_URL } from 'astro:env/server';
 
 import type { MapBoundsOptions } from '#lib/map/map-bounds.ts';
 import type { MapDatasetName } from '#lib/map/map-directory.ts';
@@ -11,6 +10,7 @@ import type { MapScopeEntry } from '#lib/map/map-entry-rules.ts';
 
 import { createFirstRegionByReferenceFunction } from '#lib/collections/regions/regions-data.ts';
 import { getMapLanguages } from '#lib/i18n/i18n-utils.ts';
+import { imageBaseUrl } from '#lib/image/image-url.ts';
 import { getMapBounds } from '#lib/map/map-bounds.ts';
 import { getMapDirectoryData } from '#lib/map/map-directory.ts';
 import { createEntryMapRuleFunction } from '#lib/map/map-entry-rules.ts';
@@ -75,7 +75,7 @@ export async function createMapDataFunction() {
 		if (!mapBounds) return { hasGeodata: false };
 
 		const mapProps = {
-			imageServerUrl: IMAGE_SERVER_URL,
+			imageBaseUrl,
 			isDev: import.meta.env.DEV,
 			protomapsApiKey: MAP_PROTOMAPS_API_KEY,
 			...mapBounds,

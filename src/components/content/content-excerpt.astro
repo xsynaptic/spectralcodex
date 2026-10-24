@@ -1,20 +1,18 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
+import { ImageSizeEnum } from '@spectralcodex/shared/images';
+
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import Anchor from '#components/parts/anchor.astro';
 import Image from '#components/parts/image.astro';
 import Prose from '#components/parts/prose.astro';
 import { MicroformatClassNames } from '#components/types.ts';
-import {
-	contentExcerptIdentifier,
-	imageHighQualityFormat,
-	imageHighQualityValue,
-} from '#constants.ts';
+import { contentExcerptIdentifier } from '#constants.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getImageFeaturedProps } from '#lib/image/image-featured-props.ts';
 import { getImageLayoutSizesProp } from '#lib/image/image-layout.ts';
-import { ImageLayoutEnum, ImageSizeEnum } from '#lib/image/image-types.ts';
+import { ImageLayoutEnum } from '#lib/image/image-types.ts';
 import { renderSlot } from '#lib/utils/astro.ts';
 import { stripFootnotes } from '#lib/utils/text.ts';
 
@@ -40,18 +38,10 @@ const hasExcerpt = excerptSplit.length > 1;
 const hasExcerptImage = excerptContent?.includes('<img') ?? false;
 
 const { imageProps, placeholderProps } = await getImageFeaturedProps({
-	imageFormat: imageHighQualityFormat,
 	imageId: hasExcerptImage ? undefined : imageId,
-	imageQuality: imageHighQualityValue,
+	preset: 'card-hq',
 	sizes: getImageLayoutSizesProp(ImageLayoutEnum.Default),
 	width: ImageSizeEnum.Large,
-	widths: [
-		ImageSizeEnum.ExtraSmall,
-		ImageSizeEnum.Small,
-		ImageSizeEnum.Medium,
-		ImageSizeEnum.Large,
-		ImageSizeEnum.ExtraLarge,
-	],
 });
 
 const t = getTranslations();

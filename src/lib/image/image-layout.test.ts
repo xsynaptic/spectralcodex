@@ -1,3 +1,4 @@
+import { ImageSizeEnum } from '@spectralcodex/shared/images';
 import { describe, expect, test } from 'vitest';
 
 import {
@@ -5,32 +6,8 @@ import {
 	tailwindContentPaddingMd,
 	tailwindContentPaddingSm,
 } from '#constants.ts';
-import {
-	getImageBreakpoints,
-	getImageInferredWidth,
-	getImageLayoutSizesProp,
-} from '#lib/image/image-layout.ts';
-import { ImageContextEnum, ImageLayoutEnum, ImageSizeEnum } from '#lib/image/image-types.ts';
-
-describe('getImageBreakpoints', () => {
-	test('keeps a width equal to the original but drops anything larger', () => {
-		expect(getImageBreakpoints({ maxWidth: ImageSizeEnum.Medium })).toStrictEqual([
-			ImageSizeEnum.ExtraSmall,
-			ImageSizeEnum.Small,
-			ImageSizeEnum.Medium,
-		]);
-	});
-
-	test('an original smaller than the smallest breakpoint yields none at all', () => {
-		expect(getImageBreakpoints({ maxWidth: ImageSizeEnum.ExtraSmall - 1 })).toStrictEqual([]);
-	});
-
-	test('custom widths replace the defaults and keep their given order', () => {
-		expect(getImageBreakpoints({ maxWidth: 1000, widths: [800, 200, 1200] })).toStrictEqual([
-			800, 200,
-		]);
-	});
-});
+import { getImageInferredWidth, getImageLayoutSizesProp } from '#lib/image/image-layout.ts';
+import { ImageContextEnum, ImageLayoutEnum } from '#lib/image/image-types.ts';
 
 describe('getImageInferredWidth', () => {
 	test('a grouped image sizes by orientation, ignoring the layout entirely', () => {

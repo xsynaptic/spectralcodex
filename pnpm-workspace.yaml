@@ -15,9 +15,6 @@ minimumReleaseAgeExclude:
 ignoredOptionalDependencies:
   - fallow-type-aware
 
-# This is required for pnpm deploy, which we use in combination with the image-server service
-injectWorkspacePackages: true
-
 peerDependencyRules:
   allowedVersions:
     'astro-pagefind>astro': '7'

@@ -5,10 +5,7 @@ import { makeEntry } from '#lib/collections/collections-test-utils.ts';
 const { getCollectionMock } = vi.hoisted(() => ({ getCollectionMock: vi.fn() }));
 
 vi.mock('astro:content', () => ({ getCollection: getCollectionMock }));
-vi.mock('astro:env/server', () => ({
-	IMAGE_SERVER_SECRET: 'secret',
-	IMAGE_SERVER_SIGNATURE_LENGTH: 16,
-}));
+vi.mock('astro:env/server', () => ({ IMAGE_BASE_URL: 'https://img.example.com' }));
 vi.mock('#lib/utils/description-data.ts', () => ({
 	getDescriptionRendered: (entry: { data: { description?: string } }) =>
 		entry.data.description ? { html: `<p>${entry.data.description}</p>` } : undefined,
@@ -16,7 +13,7 @@ vi.mock('#lib/utils/description-data.ts', () => ({
 
 function makeStore() {
 	return {
-		images: [makeEntry('images', 'image-temple', { width: 1200 })],
+		images: [makeEntry('images', 'image-temple', { height: 800, width: 1200 })],
 		locations: [
 			makeEntry('locations', 'temple', {
 				description: 'Authored description',
@@ -124,7 +121,9 @@ describe('collection wrappers', () => {
 		const [pointHidden, pointFeatured] = Array.isArray(geometry) ? geometry : [];
 
 		expect(pointHidden?._imageThumbnail).toBeNull();
-		expect(pointFeatured?._imageThumbnail?.srcSet).toContain('350w');
+		expect(pointFeatured?._imageThumbnail?.srcSet).toBe(
+			'image-temple-350x233.webp 350w, image-temple-700x467.webp 700w',
+		);
 
 		const storeGeometry = store.locations[1]?.data.geometry;
 

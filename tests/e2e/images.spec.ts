@@ -1,9 +1,6 @@
 import type { Locator, Page } from '@playwright/test';
 
-import { isDev } from '#e2e/constants.ts';
 import { expect, test, visit } from '#e2e/test.ts';
-
-test.skip(isDev, 'images need the image server stack');
 
 const heroWidthMaximum = 1800;
 const contentWidthMaximum = 1400;
@@ -25,9 +22,9 @@ async function getSelectedWidth(image: Locator): Promise<number> {
 		.not.toBe('');
 
 	const currentSrc = await image.evaluate((element: HTMLImageElement) => element.currentSrc);
-	const width = Number(/\/(\d+)x\d+\//.exec(currentSrc)?.[1]);
+	const width = Number(/-(\d+)(?:x\d+)?\.(?:jpg|webp)$/.exec(currentSrc)?.[1]);
 
-	if (!Number.isFinite(width)) throw new TypeError(`No width segment in currentSrc: ${currentSrc}`);
+	if (!Number.isFinite(width)) throw new TypeError(`No width in currentSrc: ${currentSrc}`);
 
 	return width;
 }

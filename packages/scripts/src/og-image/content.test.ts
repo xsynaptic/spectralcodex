@@ -136,13 +136,13 @@ describe('extractBuiltFilenames', () => {
 		writeFileSync(fullPath, body);
 	}
 
-	test('extracts the og image id, stripping the extension', () => {
+	test('extracts the og image id, stripping the extension', async () => {
 		writeHtml('index.html', ogImageMeta('https://example.com/og/homepage.jpg'));
 
-		expect([...extractBuiltFilenames(distPath)]).toEqual(['homepage']);
+		expect([...(await extractBuiltFilenames(distPath))]).toEqual(['homepage']);
 	});
 
-	test('dedupes repeated ids and walks nested directories', () => {
+	test('dedupes repeated ids and walks nested directories', async () => {
 		writeHtml('a/index.html', ogImageMeta('https://example.com/og/shared.jpg'));
 		writeHtml(
 			'b/index.html',
@@ -150,16 +150,15 @@ describe('extractBuiltFilenames', () => {
 				ogImageMeta('https://example.com/og/other.jpg'),
 		);
 
-		expect([...extractBuiltFilenames(distPath)].toSorted((a, b) => a.localeCompare(b))).toEqual([
-			'other',
-			'shared',
-		]);
+		expect(
+			[...(await extractBuiltFilenames(distPath))].toSorted((a, b) => a.localeCompare(b)),
+		).toEqual(['other', 'shared']);
 	});
 
-	test('ignores og images outside the og path and non-html files', () => {
+	test('ignores og images outside the og path and non-html files', async () => {
 		writeHtml('page.html', ogImageMeta('https://cdn.example.com/images/not-og.jpg'));
 		writeHtml('data.json', ogImageMeta('https://example.com/og/ignored.jpg'));
 
-		expect([...extractBuiltFilenames(distPath)]).toEqual([]);
+		expect([...(await extractBuiltFilenames(distPath))]).toEqual([]);
 	});
 });

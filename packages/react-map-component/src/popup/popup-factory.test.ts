@@ -46,4 +46,34 @@ describe('getTargetPopupItem', () => {
 			wikipediaUrl: undefined,
 		});
 	});
+
+	test('a titled Point shows its own titles in place of the Location: Point pair', () => {
+		expect(
+			getTargetPopupItem({
+				...item,
+				ownTitle: 'Point',
+				ownTitleMultilingualLang: 'zh',
+				ownTitleMultilingualValue: '殿',
+			}),
+		).toMatchObject({ title: 'Point', titleMultilingualLang: 'zh', titleMultilingualValue: '殿' });
+		expect(getTargetPopupItem({ ...item, ownTitle: 'Point' })).toMatchObject({
+			title: 'Point',
+			titleMultilingualLang: undefined,
+			titleMultilingualValue: undefined,
+		});
+	});
+
+	test('a Point titled only in another script leads with that title and repeats nothing above it', () => {
+		expect(
+			getTargetPopupItem({
+				...item,
+				ownTitleMultilingualLang: 'zh',
+				ownTitleMultilingualValue: '殿',
+			}),
+		).toMatchObject({
+			title: '殿',
+			titleMultilingualLang: undefined,
+			titleMultilingualValue: undefined,
+		});
+	});
 });

@@ -8,7 +8,6 @@ import { feature, featureCollection } from '@turf/helpers';
 import { simplify } from '@turf/simplify';
 import { truncate } from '@turf/truncate';
 import { union } from '@turf/union';
-import chalk from 'chalk';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
@@ -18,6 +17,7 @@ import type {
 	DivisionItem,
 } from '#map-divisions/types.ts';
 
+import { log } from '#shared/cli-output.ts';
 import { safelyCreateDirectory } from '#shared/utils.ts';
 
 const maskToleranceExponent = 0.6;
@@ -77,11 +77,7 @@ export async function saveDivisionMask(
 
 	await fs.writeFile(filePath, JSON.stringify(rounded.geometry));
 
-	console.log(
-		chalk.gray(
-			`Saved Division mask to: ${chalk.cyan(filePath)}  tolerance: ${chalk.yellow(`${toleranceMetres.toFixed(1)} m`)}`,
-		),
-	);
+	log.detail(`Saved ${id}.json (tolerance ${toleranceMetres.toFixed(1)} m)`);
 }
 
 function getMaskToleranceMetres(division: Feature<DivisionGeometry>) {

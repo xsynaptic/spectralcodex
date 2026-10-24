@@ -1,21 +1,14 @@
+import { ImageSizeEnum } from '@spectralcodex/shared/images';
 import { createJsonlCache, defineImageCollection } from '@xsynaptic/astro-image-loader';
 import { defineCollection } from 'astro:content';
-import {
-	CONTENT_MEDIA_PATH,
-	CUSTOM_CACHE_PATH,
-	IMAGE_SERVER_SECRET,
-	IMAGE_SERVER_URL,
-} from 'astro:env/server';
+import { CONTENT_MEDIA_PATH, CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { ExifTool } from 'exiftool-vendored';
 import path from 'node:path';
 import { hash } from 'ohash';
 import sharp from 'sharp';
 import { z } from 'zod';
 
-import { imageHighQualityFormat, imageHighQualityValue } from '#constants.ts';
 import { extractExifData, ImageExifDataSchema } from '#lib/collections/images/images-exif.ts';
-import { createImageUrlFunction } from '#lib/image/image-server.ts';
-import { ImageSizeEnum } from '#lib/image/image-types.ts';
 
 const ImageMetadataSchema = ImageExifDataSchema.extend({
 	height: z.number(),
@@ -39,40 +32,12 @@ const extractionVersion = hash({
 	schema: z.toJSONSchema(ImageMetadataSchema, { unrepresentable: 'any' }),
 });
 
-// Env feeds the src transform; changes re-derive entries without re-running exiftool
-const derivationVersion = hash({
-	env: {
-		IMAGE_SERVER_SECRET,
-		IMAGE_SERVER_URL,
-		imageHighQualityFormat,
-		imageHighQualityValue,
-	},
-	rev: 1,
-});
-
 // Extract image dimensions from the image object
 async function getImageDimensions(imagePath: string) {
 	const metadata = await sharp(imagePath).metadata();
 
 	return { height: metadata.height, width: metadata.width };
 }
-
-// Images collection stores a full URL in `src` for OG image generation (Satori requires absolute URLs)
-const getImageUrl = createImageUrlFunction({
-	imageFormat: imageHighQualityFormat,
-	imageQuality: imageHighQualityValue,
-	serverSecret: IMAGE_SERVER_SECRET,
-	serverUrl: IMAGE_SERVER_URL,
-});
-
-// Replaces the loader-injected src (root-relative path) with the signed URL
-const ImageCollectionSchema = ImageMetadataSchema.strict().transform((data) => ({
-	...data,
-	src: getImageUrl(path.posix.relative(CONTENT_MEDIA_PATH, data.path), {
-		// Clamp source width to avoid upscaling
-		width: Math.min(1800, data.width),
-	}),
-}));
 
 // Initialize ExifTool instance so it can be reused
 let exiftool: ExifTool;
@@ -110,9 +75,8 @@ export const images = defineCollection(
 				...exif,
 			} satisfies Omit<ImageMetadataInput, 'src'>;
 		},
-		derivationVersion,
 		extractionVersion,
-		schema: ImageCollectionSchema,
+		schema: ImageMetadataSchema.strict(),
 		showProgress: true,
 	}),
 );

@@ -7,7 +7,7 @@ const completeEnv = {
 	DEPLOY_REMOTE_HOST: 'deploy@host',
 	DEPLOY_REMOTE_PATH: '/opt/server',
 	DEPLOY_SITE_PATH: '/var/www/site',
-	IMAGE_SERVER_URL: 'https://example.com/_img',
+	IMAGE_BASE_URL: 'https://img.example.com/',
 	PROD_SERVER_URL: 'https://example.com/',
 };
 
@@ -27,11 +27,12 @@ describe('loadDeployConfig', () => {
 		vi.restoreAllMocks();
 	});
 
-	test('maps every required variable and defaults the ssh key path to an empty string', () => {
+	test('maps every required variable, trims the image base URL, and defaults the ssh key path', () => {
 		stubEnv({ ...completeEnv, DEPLOY_SSH_KEY_PATH: undefined });
 
 		expect(loadDeployConfig()).toEqual({
-			imageServerUrl: 'https://example.com/_img',
+			imageBaseUrl: 'https://img.example.com',
+			imagesPath: '/mnt/media/img',
 			mediaPath: '/mnt/media',
 			remoteHost: 'deploy@host',
 			remotePath: '/opt/server',
@@ -43,10 +44,10 @@ describe('loadDeployConfig', () => {
 
 	test('throws listing every missing variable at once', () => {
 		vi.spyOn(console, 'error').mockImplementation(noop);
-		stubEnv({ ...completeEnv, DEPLOY_REMOTE_HOST: undefined, IMAGE_SERVER_URL: undefined });
+		stubEnv({ ...completeEnv, DEPLOY_REMOTE_HOST: undefined, IMAGE_BASE_URL: undefined });
 
 		expect(() => loadDeployConfig()).toThrow(
-			'Missing required environment variables: DEPLOY_REMOTE_HOST, IMAGE_SERVER_URL',
+			'Missing required environment variables: DEPLOY_REMOTE_HOST, IMAGE_BASE_URL',
 		);
 	});
 });
