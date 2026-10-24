@@ -4,7 +4,6 @@ import type { NavigationItem } from '#components/navigation/navigation-types.ts'
 import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 
 import { getNavigationItemUrls } from '#components/navigation/navigation-utils.ts';
-import { getChronologyData } from '#lib/collections/chronology/chronology-data.ts';
 import { getPagesCollection } from '#lib/collections/pages/pages-data.ts';
 import {
 	createRegionsByIdsFunction,
@@ -62,15 +61,17 @@ async function createNavigationHeaderItems(): Promise<Array<NavigationItem>> {
 	const seriesMenu = getNavigationCollectionMenu({ collection: 'series', entries: series });
 	const themesMenu = getNavigationCollectionMenu({ collection: 'themes', entries: themes });
 
-	const chronologyData = await getChronologyData();
-
 	const { entriesMap: pagesMap } = await getPagesCollection();
 
-	const aboutMenu = ['faq', 'tech-stack', 'links', 'privacy', 'contact'].flatMap((id) => {
+	const aboutPages = ['faq', 'tech-stack', 'links', 'privacy', 'contact'].flatMap((id) => {
 		const entry = pagesMap.get(id);
 
 		return entry ? [{ title: entry.data.title, url: getSitePath(entry.id) }] : [];
 	});
+	const aboutMenu = [
+		{ title: t('navigation.chronology.label'), url: getSitePath('chronology') },
+		...aboutPages,
+	];
 
 	return [
 		{
@@ -99,14 +100,6 @@ async function createNavigationHeaderItems(): Promise<Array<NavigationItem>> {
 			children: seriesMenu,
 			title: t('collection.series.labelPlural'),
 			url: getSitePath('series'),
-		},
-		{
-			children: chronologyData.chronologyYears.slice(0, 12).map((year) => ({
-				title: year,
-				url: getSitePath('chronology', year),
-			})),
-			title: t('navigation.chronology.label'),
-			url: getSitePath('chronology'),
 		},
 		{
 			children: aboutMenu,
