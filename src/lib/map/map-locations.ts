@@ -146,6 +146,9 @@ export function getLocationsMapPopupData(
 			...pickMapPopupProperties(feature.properties),
 			id: feature.id,
 			title: stripDiacritics(feature.properties.title),
+			...(feature.properties.ownTitle === undefined
+				? {}
+				: { ownTitle: stripDiacritics(feature.properties.ownTitle) }),
 			...(feature.properties.image === undefined
 				? {}
 				: { image: { srcSet: feature.properties.image.srcSet } }),
@@ -253,6 +256,22 @@ function getFeatureTitleProperties({
 		title: geometry.title ? `${entry.data.title}: ${geometry.title}` : entry.data.title,
 		...getMultilingualTitleProperties(entryTitleMultilingual, geometryTitleMultilingual),
 		...(pointTitle === undefined ? {} : { pointTitle }),
+		...(isMultiPoint ? getOwnTitleProperties(geometry.title, geometryTitleMultilingual) : {}),
+	};
+}
+
+function getOwnTitleProperties(
+	title: string | undefined,
+	multilingual: MultilingualContent | undefined,
+) {
+	return {
+		...(title === undefined ? {} : { ownTitle: title }),
+		...(multilingual === undefined
+			? {}
+			: {
+					ownTitleMultilingualLang: multilingual.lang,
+					ownTitleMultilingualValue: multilingual.value,
+				}),
 	};
 }
 
