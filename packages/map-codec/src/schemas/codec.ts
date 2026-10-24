@@ -99,18 +99,28 @@ const sourceCodec = createFieldCodec(sourceFields, {
 	titleMultilingual: same(z.string().optional()),
 } satisfies Record<keyof typeof sourceFields, FieldSchemas>);
 
+const MapPopupImagePathSchema = z
+	.string()
+	.refine((path) => !path.startsWith('/') && !path.includes('://'), {
+		message: 'Popup image paths are relative to the image base URL',
+	});
+
 const popupCodec = createFieldCodec(popupFields, {
 	description: same(z.string().optional()),
 	googleMapsUrl: same(z.string().optional()),
 	id: same(z.string()),
-	image: {
-		compressed: z.string().optional(),
-		standard: z.object({ srcSet: z.string() }).optional(),
-	},
 	own: same(z.number().int().optional()),
 	ownTitle: same(z.string().optional()),
 	ownTitleMultilingualLang: same(z.string().optional()),
 	ownTitleMultilingualValue: same(z.string().optional()),
+	popupImageSources: {
+		compressed: z.tuple([MapPopupImagePathSchema, z.number().int()]).array().min(1).optional(),
+		standard: z
+			.object({ path: MapPopupImagePathSchema, width: z.number().int() })
+			.array()
+			.min(1)
+			.optional(),
+	},
 	title: same(z.string()),
 	titleMultilingualLang: same(z.string().optional()),
 	titleMultilingualValue: same(z.string().optional()),

@@ -162,8 +162,8 @@ const MapPopupContent: FC<{ popupItem: MapPopupItemExtended }> = function MapPop
 
 	const {
 		description,
-		image,
 		popupCoordinates,
+		popupImageSources,
 		precision,
 		title,
 		titleMultilingualLang,
@@ -174,15 +174,15 @@ const MapPopupContent: FC<{ popupItem: MapPopupItemExtended }> = function MapPop
 
 	return (
 		<>
-			{image?.srcSet ? (
+			{popupImageSources ? (
 				<div>
 					<img
 						alt={title}
 						className="map-popup-image"
 						loading="eager"
 						sizes={getPopupImageSizes(maxWidthPx)}
-						src={getPopupImageSrc(image.srcSet, imageBaseUrl)}
-						srcSet={getPopupImageSrcSet(image.srcSet, imageBaseUrl)}
+						src={getPopupImageSrc(popupImageSources, imageBaseUrl)}
+						srcSet={getPopupImageSrcSet(popupImageSources, imageBaseUrl)}
 					/>
 				</div>
 			) : undefined}

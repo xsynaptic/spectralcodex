@@ -1,14 +1,14 @@
 import { MapPopupOwnField } from '@spectralcodex/map-codec';
 import { describe, expect, test } from 'vitest';
 
-import { getTargetPopupItem } from '#popup/popup-factory.ts';
+import { getPopupImageSrc, getPopupImageSrcSet, getTargetPopupItem } from '#popup/popup-factory.ts';
 
 describe('getTargetPopupItem', () => {
 	const item = {
 		description: 'desc',
 		googleMapsUrl: 'abc',
 		id: 'a',
-		image: { srcSet: '/a.jpg 1x' },
+		popupImageSources: [{ path: 'a-350x233.webp', width: 350 }],
 		precision: 2,
 		title: 'Location: Point',
 		titleMultilingualLang: 'zh',
@@ -22,7 +22,7 @@ describe('getTargetPopupItem', () => {
 			description: undefined,
 			googleMapsUrl: 'abc',
 			id: 'a',
-			image: undefined,
+			popupImageSources: undefined,
 			precision: undefined,
 			title: 'Location: Point',
 			titleMultilingualLang: 'zh',
@@ -75,5 +75,24 @@ describe('getTargetPopupItem', () => {
 			titleMultilingualLang: undefined,
 			titleMultilingualValue: undefined,
 		});
+	});
+});
+
+describe('popup image', () => {
+	const popupImageSources = [
+		{ path: 'a/b-700x467.webp', width: 700 },
+		{ path: 'a/b-350x233.webp', width: 350 },
+	];
+
+	test('the fallback src is the narrowest source under the image base', () => {
+		expect(getPopupImageSrc(popupImageSources, 'https://img.example.com')).toBe(
+			'https://img.example.com/a/b-350x233.webp',
+		);
+	});
+
+	test('every source rides in the srcset with its width descriptor', () => {
+		expect(getPopupImageSrcSet(popupImageSources, '/_img')).toBe(
+			'/_img/a/b-700x467.webp 700w, /_img/a/b-350x233.webp 350w',
+		);
 	});
 });

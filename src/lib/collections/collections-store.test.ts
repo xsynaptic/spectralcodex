@@ -121,9 +121,10 @@ describe('collection wrappers', () => {
 		const [pointHidden, pointFeatured] = Array.isArray(geometry) ? geometry : [];
 
 		expect(pointHidden?._imageThumbnail).toBeNull();
-		expect(pointFeatured?._imageThumbnail?.srcSet).toBe(
-			'image-temple-350x233.webp 350w, image-temple-700x467.webp 700w',
-		);
+		expect(pointFeatured?._imageThumbnail).toEqual([
+			{ path: 'image-temple-350x233.webp', width: 350 },
+			{ path: 'image-temple-700x467.webp', width: 700 },
+		]);
 
 		const storeGeometry = store.locations[1]?.data.geometry;
 

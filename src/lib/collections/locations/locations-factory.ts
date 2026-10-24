@@ -3,7 +3,7 @@ import type { CollectionEntry } from 'astro:content';
 
 import { getImagePresetWidths } from '@spectralcodex/shared/images';
 
-export type ImageThumbnail = NonNullable<MapPopupItem['image']>;
+export type ImageThumbnail = NonNullable<MapPopupItem['popupImageSources']>;
 
 // Structural type; importing image-url would pull astro:env into tests
 export type GetImagePathFunction = (width: number) => string;
@@ -44,5 +44,5 @@ export function getLocationThumbnailProps(
 
 	if (widths.length === 0) return;
 
-	return { srcSet: widths.map((width) => `${getImagePath(width)} ${String(width)}w`).join(', ') };
+	return widths.map((width) => ({ path: getImagePath(width), width }));
 }

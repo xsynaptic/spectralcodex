@@ -52,11 +52,14 @@ const fullPopupItem: MapPopupItem = {
 	description: 'desc',
 	googleMapsUrl: 'https://maps.app.goo.gl/abc',
 	id: 'a',
-	image: { srcSet: '/a.jpg 1x' },
 	own: 5,
 	ownTitle: 'Point',
 	ownTitleMultilingualLang: 'zh',
 	ownTitleMultilingualValue: '殿',
+	popupImageSources: [
+		{ path: 'a-350x233.webp', width: 350 },
+		{ path: 'a-700x467.webp', width: 700 },
+	],
 	title: 'A',
 	titleMultilingualLang: 'zh',
 	titleMultilingualValue: '寺',
@@ -143,23 +146,23 @@ describe('MapSourceItemSchema decode', () => {
 });
 
 describe('MapPopupItemSchema decode', () => {
-	test('assembles the image object when srcSet is present', () => {
+	test('expands popup image sources into path and width', () => {
 		const result = MapPopupItemSchema.parse({
 			[mapPopupKeys.id]: 'location-1',
-			[mapPopupKeys.image]: '/image.jpg 1x',
+			[mapPopupKeys.popupImageSources]: [['image-350x233.webp', 350]],
 			[mapPopupKeys.title]: 'Location',
 		});
 
-		expect(result.image).toEqual({ srcSet: '/image.jpg 1x' });
+		expect(result.popupImageSources).toEqual([{ path: 'image-350x233.webp', width: 350 }]);
 	});
 
-	test('leaves image undefined when srcSet is absent', () => {
+	test('leaves popupImageSources undefined when none ride', () => {
 		const result = MapPopupItemSchema.parse({
 			[mapPopupKeys.id]: 'location-1',
 			[mapPopupKeys.title]: 'Location',
 		});
 
-		expect(result.image).toBeUndefined();
+		expect(result.popupImageSources).toBeUndefined();
 	});
 });
 
@@ -206,6 +209,18 @@ describe('round trips', () => {
 		expect(MapPopupItemSchema.parse(z.encode(MapPopupItemSchema, fullPopupItem))).toEqual(
 			fullPopupItem,
 		);
+	});
+
+	test('an image path the popup would prefix twice fails to encode', () => {
+		for (const path of ['/a-350x233.webp', 'https://img.example.com/a-350x233.webp']) {
+			expect(() =>
+				z.encode(MapPopupItemSchema, {
+					id: 'a',
+					popupImageSources: [{ path, width: 350 }],
+					title: 'A',
+				}),
+			).toThrow('relative to the image base URL');
+		}
 	});
 
 	test('links ride without their scheme, and a Google Maps short link without its host', () => {

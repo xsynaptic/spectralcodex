@@ -18,19 +18,20 @@ function makePost(id: string, locationIds?: Array<string>) {
 	);
 }
 
-const stubPath: GetImagePathFunction = (width) => `/img-${String(width)}`;
+const stubPath: GetImagePathFunction = (width) => `img-${String(width)}`;
 
 describe('getLocationThumbnailProps', () => {
 	test('wide sources get both 350w and 700w candidates', () => {
-		expect(getLocationThumbnailProps({ height: 800, width: 1200 }, stubPath)).toEqual({
-			srcSet: '/img-350 350w, /img-700 700w',
-		});
+		expect(getLocationThumbnailProps({ height: 800, width: 1200 }, stubPath)).toEqual([
+			{ path: 'img-350', width: 350 },
+			{ path: 'img-700', width: 700 },
+		]);
 	});
 
 	test('candidates the source cannot fill are dropped, never upscaled', () => {
-		expect(getLocationThumbnailProps({ height: 400, width: 1200 }, stubPath)).toEqual({
-			srcSet: '/img-350 350w',
-		});
+		expect(getLocationThumbnailProps({ height: 400, width: 1200 }, stubPath)).toEqual([
+			{ path: 'img-350', width: 350 },
+		]);
 	});
 
 	test('a source too small for the smallest candidate gets no thumbnail', () => {

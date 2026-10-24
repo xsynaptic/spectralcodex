@@ -49,14 +49,16 @@ export const popupFields = {
 	description: plain('d'),
 	googleMapsUrl: url('m', googleMapsHost),
 	id: plain('i'),
-	image: field('y', {
-		decode: (srcSet: string | undefined) => (srcSet ? { srcSet } : undefined),
-		encode: (image: undefined | { srcSet: string }) => image?.srcSet,
-	}),
 	own: plain('z'),
 	ownTitle: plain('o'),
 	ownTitleMultilingualLang: plain('b'),
 	ownTitleMultilingualValue: plain('u'),
+	popupImageSources: field('y', {
+		decode: (sources: Array<[string, number]> | undefined) =>
+			sources?.map(([path, width]) => ({ path, width })),
+		encode: (sources: Array<{ path: string; width: number }> | undefined) =>
+			sources?.map(({ path, width }): [string, number] => [path, width]),
+	}),
 	title: plain('t'),
 	titleMultilingualLang: plain('a'),
 	titleMultilingualValue: plain('v'),

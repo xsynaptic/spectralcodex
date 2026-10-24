@@ -159,9 +159,6 @@ export function getLocationsMapPopupData(
 						),
 					}),
 			...(ownTitle === undefined ? {} : { ownTitle: stripDiacritics(ownTitle) }),
-			...(feature.properties.image === undefined
-				? {}
-				: { image: { srcSet: feature.properties.image.srcSet } }),
 		} satisfies MapPopupItem;
 	});
 }
@@ -179,7 +176,7 @@ export function getLocationsMapSourceData(
 			},
 			properties: {
 				...pickMapSourceProperties(feature.properties),
-				hasImage: feature.properties.image !== undefined,
+				hasImage: feature.properties.popupImageSources !== undefined,
 				id: feature.id,
 				title: stripDiacritics(feature.properties.title),
 				...(titleMultilingualValue === undefined
@@ -292,14 +289,15 @@ function getGeometryFeatureProperties(
 	geometry: LocationPoint,
 	isMultiPoint: boolean,
 ) {
-	const image = (geometry._imageThumbnail === undefined ? entry.data : geometry)._imageThumbnail;
+	const popupImageSources = (geometry._imageThumbnail === undefined ? entry.data : geometry)
+		._imageThumbnail;
 
 	return {
 		description: geometry.description ?? entry.data._descriptionHtml,
 		precision: geometry.precision ?? entry.data.precision,
 		status: geometry.status ?? entry.data.status,
 		...getGeometryLinkProperties(entry, geometry, isMultiPoint),
-		...(image === null ? {} : { image }),
+		...(popupImageSources === null ? {} : { popupImageSources }),
 		...(isMultiPoint ? getOwnProperties(geometry) : {}),
 	};
 }

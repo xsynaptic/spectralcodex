@@ -10,7 +10,7 @@ import { useClickResolver } from '#host/host-click.ts';
 import { useMapConfig } from '#lib/config.tsx';
 import { getPopupCoordinates, getPopupLayout } from '#lib/popup-layout-factory.ts';
 import {
-	findPopupImageSrcSet,
+	findPopupImageSources,
 	getPopupImageSizes,
 	getPopupImageSrcSet,
 } from '#popup/popup-factory.ts';
@@ -87,9 +87,9 @@ export function useMapImagePreload() {
 
 		if (outcome.kind !== 'popup') return;
 
-		const srcSet = findPopupImageSrcSet(hoverChunkData, debouncedHoveredId);
+		const popupImageSources = findPopupImageSources(hoverChunkData, debouncedHoveredId);
 
-		if (!srcSet) return;
+		if (!popupImageSources) return;
 
 		preloadedRef.current.add(debouncedHoveredId);
 
@@ -97,7 +97,7 @@ export function useMapImagePreload() {
 		const preloadImage = new Image();
 
 		preloadImage.sizes = getPopupImageSizes(maxWidthPx);
-		preloadImage.srcset = getPopupImageSrcSet(srcSet, imageBaseUrl);
+		preloadImage.srcset = getPopupImageSrcSet(popupImageSources, imageBaseUrl);
 	}, [debouncedHoveredId, hoverChunkData, imageBaseUrl, map, maxWidthPx, resolve]);
 }
 

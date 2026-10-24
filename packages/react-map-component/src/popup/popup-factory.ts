@@ -1,8 +1,11 @@
 import type { MapPopupItem } from '@spectralcodex/map-codec';
 
 import { MapPopupOwnField } from '@spectralcodex/map-codec';
+import * as R from 'remeda';
 
 import { isClusterHoverId } from '#lib/cluster-hover.ts';
+
+type MapPopupImageSources = NonNullable<MapPopupItem['popupImageSources']>;
 
 function getOwnTitleItem({
 	ownTitle,
@@ -34,7 +37,7 @@ export function getTargetPopupItem<
 	return {
 		...item,
 		description: own & MapPopupOwnField.Description ? item.description : undefined,
-		image: own & MapPopupOwnField.Image ? item.image : undefined,
+		popupImageSources: own & MapPopupOwnField.Image ? item.popupImageSources : undefined,
 		precision: own & MapPopupOwnField.Precision ? item.precision : undefined,
 		...getOwnTitleItem(item),
 		url: undefined,
@@ -46,23 +49,23 @@ export function getPopupImageSizes(maxWidthPx: number): string {
 	return `${String(maxWidthPx)}px`;
 }
 
-// The first srcSet candidate is the smallest one
-export function getPopupImageSrc(srcSet: string, imageBaseUrl: string): string {
-	return `${imageBaseUrl}/${srcSet.split(', ', 1)[0]?.split(' ', 1)[0] ?? srcSet}`;
+export function getPopupImageSrc(popupImageSources: MapPopupImageSources, imageBaseUrl: string) {
+	const smallest = R.firstBy(popupImageSources, ({ width }) => width);
+
+	return smallest ? `${imageBaseUrl}/${smallest.path}` : undefined;
 }
 
-export function getPopupImageSrcSet(srcSet: string, imageBaseUrl: string): string {
-	return srcSet
-		.split(', ')
-		.map((entry) => `${imageBaseUrl}/${entry}`)
+export function getPopupImageSrcSet(popupImageSources: MapPopupImageSources, imageBaseUrl: string) {
+	return popupImageSources
+		.map(({ path, width }) => `${imageBaseUrl}/${path} ${String(width)}w`)
 		.join(', ');
 }
 
-export function findPopupImageSrcSet(
+export function findPopupImageSources(
 	popupSource: Array<MapPopupItem> | undefined,
 	id: string,
-): string | undefined {
+): MapPopupImageSources | undefined {
 	if (isClusterHoverId(id)) return undefined;
 
-	return popupSource?.find((item) => item.id === id)?.image?.srcSet;
+	return popupSource?.find((item) => item.id === id)?.popupImageSources;
 }

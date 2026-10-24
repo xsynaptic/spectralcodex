@@ -193,7 +193,7 @@ describe('getLocationFeatures properties', () => {
 	});
 
 	test('omits the image when a point nulls the entry thumbnail', () => {
-		const thumbnail = { height: 100, src: 'thumb.avif', srcSet: 'thumb.avif 100w', width: 100 };
+		const thumbnail = [{ path: 'thumb-350x233.webp', width: 350 }];
 
 		const result = getLocationFeatures([
 			makeLocation('bopiliao', {
@@ -207,11 +207,11 @@ describe('getLocationFeatures properties', () => {
 			}),
 		]);
 
-		expect(result[0]?.properties.image).toBe(thumbnail);
-		expect(result[1]?.properties).not.toHaveProperty('image');
+		expect(result[0]?.properties.popupImageSources).toBe(thumbnail);
+		expect(result[1]?.properties).not.toHaveProperty('popupImageSources');
 	});
 
-	const thumbnail = { height: 100, src: 'thumb.avif', srcSet: 'thumb.avif 100w', width: 100 };
+	const thumbnail = [{ path: 'thumb-350x233.webp', width: 350 }];
 
 	test('marks what a Point of a multi-Point Location sets itself, and nothing it inherits', () => {
 		const result = getLocationFeatures([
@@ -222,7 +222,7 @@ describe('getLocationFeatures properties', () => {
 				geometry: [
 					makePoint(121.5, 25),
 					makePoint(121.51, 25.01, { description: 'Point description' }),
-					makePoint(121.52, 25.02, { _imageThumbnail: { ...thumbnail, src: 'own.avif' } }),
+					makePoint(121.52, 25.02, { _imageThumbnail: [{ path: 'own-350x233.webp', width: 350 }] }),
 					// eslint-disable-next-line unicorn/no-null -- null deliberately overrides imageFeatured to render no thumbnail
 					makePoint(121.53, 25.03, { _imageThumbnail: null }),
 					makePoint(121.54, 25.04, { precision: 4 }),
@@ -238,7 +238,7 @@ describe('getLocationFeatures properties', () => {
 		const properties = result.map((feature) => feature.properties);
 
 		expect(properties[0]?.description).toBe('<p>Entry description</p>');
-		expect(properties[0]?.image).toBe(thumbnail);
+		expect(properties[0]?.popupImageSources).toBe(thumbnail);
 		expect(properties.map((item) => item.own)).toEqual([
 			undefined,
 			MapPopupOwnField.Description,

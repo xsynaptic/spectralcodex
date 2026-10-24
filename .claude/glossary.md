@@ -58,7 +58,7 @@ Every scale below runs 1 to 5. They measure different things and are not interch
 
 **Geometry**: The shape describing where a Location is: a point, a set of points, a line, or an area. _Avoid_: coordinates, geodata, position.
 
-**Point**: One entry in a Location's Geometry. A Point carries its own coordinates and may carry its own title, description, Category, Status, Heritage, Precision, and Featured Image, each falling back to the Location's when absent. Most Locations have one; a temple complex or a chain of stations along a rail line has several. _Avoid_: sub-location, sub-geometry, marker, node.
+**Point**: One entry in a Location's Geometry. A Point carries its own coordinates and a title, required and unique within the Location when it has several, and may carry its own description, Category, Status, Heritage, Precision, and Featured Image, each falling back to the Location's when absent. Most Locations have one; a temple complex or a chain of stations along a rail line has several. _Avoid_: sub-location, sub-geometry, marker, node.
 
 **Division**: An external administrative polygon that a Region borrows, both to draw its visible edges and to check that Locations filed under it actually fall inside it. A Region is editorial and holds content; a Division is external, administrative, and holds only a shape. _Avoid_: boundary, border, admin region, region.
 
