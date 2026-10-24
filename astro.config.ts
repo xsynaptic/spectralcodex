@@ -20,29 +20,25 @@ import { fileURLToPath } from 'node:url';
 import { loadEnv } from 'vite';
 
 import { mdxComponentFiles } from '#constants.ts';
+import imageDev from '#dev/image/image-integration.ts';
 import devInventory from '#dev/inventory/inventory-integration.ts';
 import atlas from '#lib/atlas/atlas-integration.ts';
+import imageManifest from '#lib/image/image-manifest-integration.ts';
 
-const imageServerSecretPlaceholder = 'dev-secret-do-not-use-in-production';
+const contentMediaPathDefault = 'packages/content-demo/media';
+const customCachePathDefault = './.cache';
+const imageBaseUrlDefault = '/_img';
 
 // Vite's `loadEnv` reintroduced after having some trouble reading from `process.env` 2025Q1
-const {
-	BUILD_ASSETS_PATH,
-	DEV_SERVER_URL = 'http://localhost:4321/',
-	IMAGE_SERVER_SECRET,
-	PROD_SERVER_URL,
-} = loadEnv(process.env.NODE_ENV ?? 'development', process.cwd(), '');
+const env = loadEnv(process.env.NODE_ENV ?? 'development', process.cwd(), '');
+const { BUILD_ASSETS_PATH, DEV_SERVER_URL = 'http://localhost:4321/', PROD_SERVER_URL } = env;
+
+// `astro:env` reads an empty value as unset, so these must too or the integrations and pages disagree
+const CONTENT_MEDIA_PATH = env.CONTENT_MEDIA_PATH || contentMediaPathDefault;
+const CUSTOM_CACHE_PATH = env.CUSTOM_CACHE_PATH || customCachePathDefault;
+const IMAGE_BASE_URL = env.IMAGE_BASE_URL || imageBaseUrlDefault;
 
 const isProduction = process.env.NODE_ENV === 'production';
-
-if (
-	isProduction &&
-	(!IMAGE_SERVER_SECRET || IMAGE_SERVER_SECRET === imageServerSecretPlaceholder)
-) {
-	throw new Error(
-		'IMAGE_SERVER_SECRET is unset or still the dev placeholder; production builds must sign image URLs with the real secret',
-	);
-}
 
 const isSsr = process.env.BUILD_OUTPUT_PATH === './dist/server';
 
@@ -97,28 +93,18 @@ export default defineConfig({
 			CONTENT_MEDIA_PATH: envField.string({
 				access: 'public',
 				context: 'server',
-				default: 'packages/content-demo/media',
+				default: contentMediaPathDefault,
 			}),
 			CUSTOM_CACHE_PATH: envField.string({
 				access: 'public',
 				context: 'server',
-				default: './.cache',
+				default: customCachePathDefault,
 				optional: true,
 			}),
-			IMAGE_SERVER_SECRET: envField.string({
-				access: 'secret',
-				context: 'server',
-				default: imageServerSecretPlaceholder,
-			}),
-			IMAGE_SERVER_SIGNATURE_LENGTH: envField.number({
+			IMAGE_BASE_URL: envField.string({
 				access: 'public',
 				context: 'server',
-				default: 20,
-			}),
-			IMAGE_SERVER_URL: envField.string({
-				access: 'secret',
-				context: 'server',
-				default: '/_img',
+				default: imageBaseUrlDefault,
 			}),
 			MAP_PROTOMAPS_API_KEY: envField.string({
 				access: 'public',
@@ -205,6 +191,16 @@ export default defineConfig({
 			},
 		}),
 		atlas(),
+		imageManifest({
+			cachePath: CUSTOM_CACHE_PATH,
+			imageBaseUrl: IMAGE_BASE_URL,
+			mediaPath: CONTENT_MEDIA_PATH,
+		}),
+		imageDev({
+			cachePath: CUSTOM_CACHE_PATH,
+			imageBaseUrl: IMAGE_BASE_URL,
+			mediaPath: CONTENT_MEDIA_PATH,
+		}),
 		compressor({
 			gzip: false,
 			hooks: { fileFilter: ({ filePath }) => isPrecompressed(filePath) },
@@ -263,13 +259,6 @@ export default defineConfig({
 		},
 		plugins: [tailwindcss()],
 		server: {
-			proxy: {
-				'/_img': {
-					changeOrigin: true,
-					rewrite: (path) => path.replace(/^\/_img/, ''),
-					target: 'http://localhost:3100',
-				},
-			},
 			watch: {
 				ignored: ['./*.md', '**/temp/**'],
 			},
