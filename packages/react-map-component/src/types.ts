@@ -16,7 +16,7 @@ export interface MapComponentProps extends Partial<
 	center?: [number, number];
 	controls?: ReadonlyArray<MapHostControlName> | undefined;
 	host?: MapHostOptions | undefined;
-	imageServerUrl?: string | undefined;
+	imageBaseUrl?: string | undefined;
 	isDev?: boolean | undefined;
 	isObjectiveFilterEnabled?: boolean | undefined;
 	languages?: Array<string> | undefined;

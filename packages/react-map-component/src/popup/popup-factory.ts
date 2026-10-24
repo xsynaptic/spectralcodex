@@ -24,14 +24,14 @@ export function getPopupImageSizes(maxWidthPx: number): string {
 }
 
 // The first srcSet candidate is the smallest one
-export function getPopupImageSrc(srcSet: string, imageServerUrl: string): string {
-	return `${imageServerUrl}${srcSet.split(', ', 1)[0]?.split(' ', 1)[0] ?? srcSet}`;
+export function getPopupImageSrc(srcSet: string, imageBaseUrl: string): string {
+	return `${imageBaseUrl}/${srcSet.split(', ', 1)[0]?.split(' ', 1)[0] ?? srcSet}`;
 }
 
-export function getPopupImageSrcSet(srcSet: string, imageServerUrl: string): string {
+export function getPopupImageSrcSet(srcSet: string, imageBaseUrl: string): string {
 	return srcSet
 		.split(', ')
-		.map((entry) => `${imageServerUrl}${entry}`)
+		.map((entry) => `${imageBaseUrl}/${entry}`)
 		.join(', ');
 }
 

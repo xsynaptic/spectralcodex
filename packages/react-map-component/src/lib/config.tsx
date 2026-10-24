@@ -12,7 +12,7 @@ export interface MapConfig extends Omit<
 	'controls' | 'host' | 'messages' | 'targetIds'
 > {
 	host: MapHost;
-	imageServerUrl: string;
+	imageBaseUrl: string;
 	isInteractive: boolean;
 	languages: Array<string>;
 	messages: MapMessages;
@@ -24,7 +24,7 @@ export function createMapConfig(props: MapComponentProps, host: MapHost): MapCon
 	return {
 		...R.omit(props, ['controls', 'host', 'messages', 'targetIds']),
 		host,
-		imageServerUrl: props.imageServerUrl ?? '',
+		imageBaseUrl: props.imageBaseUrl ?? '',
 		isInteractive: props.interactive !== false,
 		languages: props.languages ?? ['en'],
 		messages: { ...defaultMapMessages, ...props.messages },

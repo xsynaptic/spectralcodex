@@ -67,7 +67,7 @@ export function useMapCanvasPopup() {
 }
 
 export function useMapImagePreload() {
-	const { imageServerUrl } = useMapConfig();
+	const { imageBaseUrl } = useMapConfig();
 	const { current: map } = useMap();
 	const hoveredId = useMapStore((state) => state.hoveredId);
 	const resolve = useClickResolver();
@@ -100,8 +100,8 @@ export function useMapImagePreload() {
 		const preloadImage = new Image();
 
 		preloadImage.sizes = getPopupImageSizes(maxWidthPx);
-		preloadImage.srcset = getPopupImageSrcSet(srcSet, imageServerUrl);
-	}, [debouncedHoveredId, hoverChunkData, imageServerUrl, map, maxWidthPx, resolve]);
+		preloadImage.srcset = getPopupImageSrcSet(srcSet, imageBaseUrl);
+	}, [debouncedHoveredId, hoverChunkData, imageBaseUrl, map, maxWidthPx, resolve]);
 }
 
 export function useMapPopupLayout() {
