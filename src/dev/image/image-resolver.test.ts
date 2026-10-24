@@ -1,4 +1,4 @@
-import { renderImage } from '@spectralcodex/scripts/images-recipe';
+import { renderImage } from '@spectralcodex/scripts/images-render';
 import { mkdirSync, mkdtempSync, rmSync, utimesSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';

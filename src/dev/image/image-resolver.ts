@@ -1,4 +1,4 @@
-import { renderImage } from '@spectralcodex/scripts/images-recipe';
+import { renderImage } from '@spectralcodex/scripts/images-render';
 import { getImageDerivatives, imageQualityByFormat } from '@spectralcodex/shared/images';
 import { randomUUID } from 'node:crypto';
 import { promises as fs } from 'node:fs';
