@@ -2,103 +2,61 @@ import {
 	openGraphImageFormat,
 	openGraphImageHeight,
 	openGraphImageWidth,
-	openGraphManifestFile,
 } from '@spectralcodex/shared/open-graph';
 import { createHash } from 'node:crypto';
-import { existsSync, promises as fs, readFileSync } from 'node:fs';
-import path from 'node:path';
+import { readFileSync } from 'node:fs';
+
+import { createFileCache } from '#shared/file-cache.ts';
 
 // Everything that decides a card's pixels; hashed so a template edit can never be forgotten
 const templateFiles = ['element.tsx', 'fonts.ts', 'generate.ts'];
 
 const templateVersion = hashTemplateFiles();
 
-// A stable `{id}.jpg` filename keeps the public URL fixed, so freshness lives in a manifest instead
-export async function createOutputCache(directory: string) {
-	const manifestPath = path.join(directory, openGraphManifestFile);
-
-	const keys = new Map<string, string>(
-		existsSync(manifestPath)
-			? Object.entries(
-					JSON.parse(await fs.readFile(manifestPath, 'utf8')) as Record<string, string>,
-				)
-			: [],
-	);
-
-	function filePath(id: string): string {
-		return path.join(directory, `${id}.${openGraphImageFormat}`);
-	}
+export async function createOutputCache({
+	directory,
+	statePath,
+}: {
+	directory: string;
+	statePath: string;
+}) {
+	const cache = await createFileCache({ directory, extensions: [openGraphImageFormat], statePath });
 
 	return {
-		// The file is checked too, so a cleared output directory never reads as fresh
-		isFresh(id: string, key: string): boolean {
-			return keys.get(id) === key && existsSync(filePath(id));
+		isFresh(id: string, key: string) {
+			return cache.isFresh(getFileName(id), key);
 		},
 
 		// A card outlives the entry that asked for it; built HTML is the authority on what should exist
-		async prune(ids: Set<string>): Promise<number> {
-			// An empty set means a stale or missing `dist/`, never "delete everything"
-			if (ids.size === 0) return 0;
-
-			const suffix = `.${openGraphImageFormat}`;
-			const files = await fs.readdir(directory);
-			let removed = 0;
-
-			for (const file of files) {
-				if (!file.endsWith(suffix) || ids.has(file.slice(0, -suffix.length))) continue;
-
-				await fs.rm(path.join(directory, file));
-				removed++;
-			}
-
-			for (const id of keys.keys()) {
-				if (!ids.has(id)) keys.delete(id);
-			}
-
-			return removed;
+		planPrune(ids: ReadonlySet<string>, options?: { isMassPruneAllowed?: boolean }) {
+			return cache.planPrune(new Set([...ids].map((id) => getFileName(id))), options);
 		},
 
-		async save(): Promise<void> {
-			const sorted = [...keys].toSorted(([first], [second]) => first.localeCompare(second));
-
-			await fs.writeFile(
-				manifestPath,
-				`${JSON.stringify(Object.fromEntries(sorted), undefined, 2)}\n`,
-			);
+		save() {
+			return cache.save();
 		},
 
-		async write(id: string, key: string, data: Uint8Array): Promise<void> {
-			const target = filePath(id);
-
-			if (await hasChanged(target, data)) await fs.writeFile(target, data);
-
-			keys.set(id, key);
+		write(id: string, key: string, data: Uint8Array) {
+			return cache.write(getFileName(id), key, data);
 		},
 	};
+}
+
+function getFileName(id: string) {
+	return `${id}.${openGraphImageFormat}`;
 }
 
 // A card goes stale when its content, its source image, or the template changes
 export function getOutputCacheKey({
 	digest,
+	imageDigest,
 	imageId,
-	imageModifiedTime,
 }: {
 	digest: string;
+	imageDigest: string | undefined;
 	imageId: string;
-	imageModifiedTime: number | undefined;
 }): string {
-	return [templateVersion, digest, imageId, imageModifiedTime ?? ''].join(':');
-}
-
-// Rewriting identical bytes only churns the mtime the deploy syncs on
-async function hasChanged(target: string, data: Uint8Array): Promise<boolean> {
-	try {
-		const existing = await fs.readFile(target);
-
-		return !existing.equals(data);
-	} catch {
-		return true;
-	}
+	return [templateVersion, digest, imageId, imageDigest ?? ''].join(':');
 }
 
 function hashTemplateFiles(): string {

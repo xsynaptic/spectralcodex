@@ -1,5 +1,6 @@
 #!/usr/bin/env tsx
-import { openGraphOutputPath } from '@spectralcodex/shared/open-graph';
+import { openGraphOutputPath, openGraphStatePath } from '@spectralcodex/shared/open-graph';
+import { createSourceFingerprints } from '@spectralcodex/shared/source-fingerprint';
 import chalk from 'chalk';
 import { rmSync } from 'node:fs';
 import * as fs from 'node:fs/promises';
@@ -15,13 +16,18 @@ import { getBuiltEntries } from '#og-image/built-entries.ts';
 import { loadOpenGraphFonts } from '#og-image/fonts.ts';
 import { createRenderer, processImage } from '#og-image/generate.ts';
 import { createOutputCache, getOutputCacheKey } from '#og-image/output-cache.ts';
-import { findWorkspaceRoot, safelyCreateDirectory } from '#shared/utils.ts';
+import { Refusal } from '#shared/cli-error.ts';
+import { findWorkspaceRoot, getLocalCachePath, safelyCreateDirectory } from '#shared/utils.ts';
 
 const rootPath = findWorkspaceRoot();
 
 const { values } = parseArgs({
 	args: process.argv.slice(2),
 	options: {
+		'allow-mass-prune': {
+			default: false,
+			type: 'boolean',
+		},
 		'clear-cache': {
 			default: false,
 			type: 'boolean',
@@ -36,6 +42,10 @@ const { values } = parseArgs({
 		},
 		'output-path': {
 			default: openGraphOutputPath,
+			type: 'string',
+		},
+		'state-path': {
+			default: openGraphStatePath,
 			type: 'string',
 		},
 	},
@@ -57,16 +67,12 @@ function exitOnUnresolvedEntries(unresolved: Array<string>) {
 	process.exit(1);
 }
 
-async function getImageModifiedTime(imageId: string): Promise<number | undefined> {
-	const imagePath = path.join(rootPath, values['media-path'], imageId);
+const fingerprints = createSourceFingerprints(getLocalCachePath(rootPath));
 
-	try {
-		const stats = await fs.stat(imagePath);
+async function getImageDigest(imageId: string) {
+	const fingerprint = await fingerprints.get(path.join(rootPath, values['media-path'], imageId));
 
-		return stats.mtimeMs;
-	} catch {
-		return undefined;
-	}
+	return fingerprint?.sha256;
 }
 
 // Resolve the readable source image path from the media path
@@ -118,7 +124,7 @@ async function main() {
 
 	if (values['clear-cache']) {
 		rmSync(outputPath, { force: true, recursive: true });
-		console.log(chalk.yellow(`🗑️  Cleared OG image output and manifest\n`));
+		console.log(chalk.yellow(`🗑️  Cleared OG image output\n`));
 	}
 
 	const renderCard = await loadRenderer();
@@ -133,7 +139,13 @@ async function main() {
 
 	safelyCreateDirectory(outputPath);
 
-	const outputCache = await createOutputCache(outputPath);
+	const outputCache = await createOutputCache({
+		directory: outputPath,
+		statePath: path.resolve(rootPath, values['state-path']),
+	});
+	const prune = await outputCache.planPrune(new Set(entries.map((entry) => entry.id)), {
+		isMassPruneAllowed: values['allow-mass-prune'],
+	});
 
 	// Decoding is bounded by memory (a 3 MB buffer per slot), rendering by CPU
 	const decodeLimit = pLimit(10);
@@ -142,14 +154,14 @@ async function main() {
 	const counts = { errors: 0, generated: 0, skipped: 0 };
 
 	async function selectStaleEntries(batch: ImageBatch) {
-		const imageModifiedTime = await getImageModifiedTime(batch.imageId);
+		const imageDigest = await getImageDigest(batch.imageId);
 		const stale: Array<{ entry: OpenGraphContentEntry; key: string }> = [];
 
 		for (const entry of batch.entries) {
 			const key = getOutputCacheKey({
 				digest: entry.digest,
+				imageDigest,
 				imageId: batch.imageId,
-				imageModifiedTime,
 			});
 
 			if (outputCache.isFresh(entry.id, key)) {
@@ -207,14 +219,20 @@ async function main() {
 
 	await Promise.all(batches.map((batch) => decodeLimit(() => renderBatch(batch))));
 
-	const prunedCount = await outputCache.prune(new Set(entries.map((entry) => entry.id)));
-
+	await prune.apply();
 	await outputCache.save();
 
-	logSummary({ ...counts, pruned: prunedCount });
+	logSummary({ ...counts, pruned: prune.orphans.length });
 	console.log(chalk.gray(`Output: ${outputPath}`));
 
 	if (counts.errors > 0) process.exit(1);
 }
 
-await main();
+try {
+	await main();
+} catch (error) {
+	if (!(error instanceof Refusal)) throw error;
+
+	console.log(chalk.red(error.message));
+	process.exitCode = 1;
+}

@@ -1,7 +1,6 @@
 import { ContentCollectionsEnum } from '@spectralcodex/shared/collections';
+import { collectDistMatches } from '@spectralcodex/shared/dist-scan';
 import { openGraphBasePath } from '@spectralcodex/shared/open-graph';
-import { readdirSync, readFileSync } from 'node:fs';
-import path from 'node:path';
 
 import type { OpenGraphContentEntry } from '#og-image/types.ts';
 import type { ContentEntry } from '#shared/astro-content.ts';
@@ -12,42 +11,24 @@ import { resolveEntry, toOpenGraphEntryItem } from '#og-image/content.ts';
 import { resolveFallbackImageId } from '#og-image/fallback.ts';
 import { getCollectionEntries, withAstroContent } from '#shared/astro-content.ts';
 
-export function extractBuiltFilenames(distPath: string): Set<string> {
-	const ogImageRegex = /property="og:image" content="([^"]+)"/g;
+export async function extractBuiltFilenames(distPath: string): Promise<Set<string>> {
 	const ogPathSegment = `/${openGraphBasePath}/`;
+	const urls = await collectDistMatches(
+		distPath,
+		(relativePath) => relativePath.endsWith('.html'),
+		() => /property="og:image" content="([^"]+)"/g,
+	);
 	const filenames = new Set<string>();
 
-	function collectFromHtml(filePath: string): void {
-		const content = readFileSync(filePath, 'utf8');
+	for (const url of urls) {
+		const index = url.indexOf(ogPathSegment);
 
-		for (const match of content.matchAll(ogImageRegex)) {
-			const url = match[1] ?? '';
-			const index = url.indexOf(ogPathSegment);
+		if (index === -1) continue;
 
-			if (index === -1) continue;
+		const filename = url.slice(index + ogPathSegment.length).replace(/\.[^.]+$/, '');
 
-			const filename = url.slice(index + ogPathSegment.length).replace(/\.[^.]+$/, '');
-
-			if (filename) filenames.add(filename);
-		}
+		if (filename) filenames.add(filename);
 	}
-
-	function walkDir(dir: string): void {
-		const dirents = readdirSync(dir, { withFileTypes: true });
-
-		for (const dirent of dirents) {
-			const fullPath = path.join(dir, dirent.name);
-
-			if (dirent.isDirectory()) {
-				walkDir(fullPath);
-				continue;
-			}
-
-			if (dirent.isFile() && dirent.name.endsWith('.html')) collectFromHtml(fullPath);
-		}
-	}
-
-	walkDir(distPath);
 
 	return filenames;
 }
@@ -59,7 +40,7 @@ export async function getBuiltEntries({
 }): Promise<{ entries: Array<OpenGraphContentEntry>; unresolved: Array<string> }> {
 	const { chronologyImageIndex, entries: contentEntries } = await buildContentEntries();
 	const indexEntries = buildIndexEntries();
-	const distFilenames = extractBuiltFilenames(distPath);
+	const distFilenames = await extractBuiltFilenames(distPath);
 
 	const entries: Array<OpenGraphContentEntry> = [];
 	const unresolved: Array<string> = [];
