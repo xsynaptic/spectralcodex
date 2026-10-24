@@ -36,10 +36,10 @@ export interface ImageComponentProps extends Omit<
 	'alt' | 'height' | 'sizes' | 'src' | 'srcset' | 'width'
 > {
 	alt: string;
+	imageSource: ImageSource;
 	preset: ImagePresetName;
 	priority?: boolean;
 	sizes: string;
-	source: ImageSource;
 	width: number;
 }
 

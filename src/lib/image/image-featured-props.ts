@@ -36,10 +36,10 @@ export async function getImageFeaturedProps({
 	return {
 		imageProps: {
 			alt: sanitizeImageAltAttribute(alt ?? imageEntry.data.title),
+			imageSource: getImageSource(imageEntry),
 			preset,
 			priority,
 			sizes,
-			source: getImageSource(imageEntry),
 			width,
 		} satisfies ImageComponentProps,
 		placeholderProps: {

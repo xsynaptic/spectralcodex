@@ -126,9 +126,9 @@ export function createSampleImageProps(entry: ComputedEntry<'images'>) {
 	return {
 		imageProps: {
 			alt: sanitizeImageAltAttribute(entry.data.title),
+			imageSource: getImageSource(entry),
 			preset: 'content',
 			sizes: getImageLayoutSizesProp(ImageLayoutEnum.Default),
-			source: getImageSource(entry),
 			width: ImageSizeEnum.Medium,
 		} satisfies ImageComponentProps,
 		placeholderProps: { aspectRatio, imageId: entry.id } satisfies ImagePlaceholderProps,

@@ -2,15 +2,6 @@ export const contentExcerptIdentifier = '<!-- more -->';
 
 export const hashShortLength = 12;
 
-export const imageLowQualityValue = 70 as const;
-export const imageHeroQualityValue = 70 as const;
-export const imageHighQualityValue = 85 as const;
-export const imageLowQualityFormat = 'webp' as const;
-export const imageHeroQualityFormat = 'webp' as const;
-export const imageHighQualityFormat = 'jpg' as const;
-
-export const imageDownloadWidthMax = 3600;
-
 export const backlinksDisplayCountMinimum = 3;
 
 // The nearby distance limit is in kilometers

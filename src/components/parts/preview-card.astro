@@ -1,15 +1,16 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
+import { ImageSizeEnum } from '@spectralcodex/shared/images';
+
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import Anchor from '#components/parts/anchor.astro';
 import CardFrame from '#components/parts/card-frame.astro';
 import Image from '#components/parts/image.astro';
 import Prose from '#components/parts/prose.astro';
 import { MicroformatClassNames } from '#components/types.ts';
-import { imageLowQualityFormat, imageLowQualityValue, tailwindBreakpointSm } from '#constants.ts';
+import { tailwindBreakpointSm } from '#constants.ts';
 import { getImageFeaturedProps } from '#lib/image/image-featured-props.ts';
-import { ImageSizeEnum } from '#lib/image/image-types.ts';
 import { renderSlot } from '#lib/utils/astro.ts';
 
 interface Props extends HTMLAttributes<'div'> {
@@ -26,17 +27,10 @@ const TitleTag = titleAs ?? 'h3';
 
 const { imageProps, placeholderProps } = await getImageFeaturedProps({
 	alt,
-	imageFormat: imageLowQualityFormat,
 	imageId,
-	imageQuality: imageLowQualityValue,
+	preset: 'card',
 	sizes: `auto, (max-width: ${tailwindBreakpointSm}) 100vw, 425px`,
 	width: ImageSizeEnum.Medium,
-	widths: [
-		ImageSizeEnum.ExtraSmall,
-		ImageSizeEnum.Small,
-		ImageSizeEnum.Medium,
-		ImageSizeEnum.Large,
-	],
 });
 
 const titleMultilingual = await renderSlot(Astro.slots, 'preview-title-multilingual');

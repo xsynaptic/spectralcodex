@@ -4,8 +4,8 @@ import { getImageDerivative } from '@spectralcodex/shared/images';
 import { IMAGE_BASE_URL } from 'astro:env/server';
 
 interface ImagePathOptions {
+	imageSource: ImageSource;
 	preset: ImagePresetName;
-	source: ImageSource;
 }
 
 export const imageBaseUrl = IMAGE_BASE_URL.replace(/\/+$/, '');
@@ -15,9 +15,9 @@ function getImageUrl(imagePath: string) {
 }
 
 // `getImageDerivative` records every path for the build manifest
-export function createImagePathFunction({ preset, source }: ImagePathOptions) {
+export function createImagePathFunction({ imageSource, preset }: ImagePathOptions) {
 	return function getImagePath(width: number | undefined) {
-		return getImageDerivative(source, preset, width).path;
+		return getImageDerivative(imageSource, preset, width).path;
 	};
 }
 

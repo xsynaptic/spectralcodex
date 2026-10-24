@@ -1,20 +1,15 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
-import { IMAGE_SERVER_SECRET, IMAGE_SERVER_URL } from 'astro:env/server';
+import { getImagePresetWidths } from '@spectralcodex/shared/images';
 
 import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 
 import ImageMetadataItem from '#components/image-metadata/image-metadata-item.astro';
 import DateDisplay from '#components/parts/date-display.astro';
-import {
-	imageDownloadWidthMax,
-	imageHighQualityFormat,
-	imageHighQualityValue,
-} from '#constants.ts';
+import { getImageSource } from '#lib/collections/images/images-data.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getImageBreakpoints } from '#lib/image/image-layout.ts';
-import { createImageUrlFunction } from '#lib/image/image-server.ts';
+import { createImageUrlFunction } from '#lib/image/image-url.ts';
 import { DatePresetEnum } from '#lib/utils/date.ts';
 import { formatStringTemplate } from '#lib/utils/text.ts';
 
@@ -26,22 +21,15 @@ const { entry, ...props } = Astro.props;
 
 const t = getTranslations();
 
-// Mirrors the srcset params in `content-image.astro` so the link hits an existing render and cache entry
-const downloadBreakpoints = getImageBreakpoints({
-	maxWidth: Math.min(entry.data.width, imageDownloadWidthMax),
-});
-const downloadWidth = downloadBreakpoints.length > 0 ? Math.max(...downloadBreakpoints) : undefined;
+// The widest `content` srcset candidate, so the link hits a file that already exists
+const imageSource = getImageSource(entry);
+const downloadWidth = getImagePresetWidths('content', imageSource).at(-1);
 const downloadHeight = downloadWidth
 	? Math.round((downloadWidth * entry.data.height) / entry.data.width)
 	: undefined;
 
-const getImageUrl = createImageUrlFunction({
-	imageFormat: imageHighQualityFormat,
-	imageQuality: imageHighQualityValue,
-	serverSecret: IMAGE_SERVER_SECRET,
-	serverUrl: IMAGE_SERVER_URL,
-});
-const downloadUrl = downloadWidth ? getImageUrl(entry.id, { width: downloadWidth }) : undefined;
+const getImageUrl = createImageUrlFunction({ imageSource, preset: 'content' });
+const downloadUrl = downloadWidth ? getImageUrl(downloadWidth) : undefined;
 ---
 
 <script>

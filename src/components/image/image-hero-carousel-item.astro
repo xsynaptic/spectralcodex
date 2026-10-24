@@ -1,13 +1,13 @@
 ---
+import { ImageSizeEnum } from '@spectralcodex/shared/images';
+
 import type { ImageFeaturedWithCaption } from '#lib/catalog/catalog-types.ts';
 
 import ImageCarouselCaption from '#components/image/image-carousel-caption.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import Image from '#components/parts/image.astro';
 import { MicroformatClassNames } from '#components/types.ts';
-import { imageHeroQualityFormat, imageHeroQualityValue } from '#constants.ts';
 import { getImageFeaturedProps } from '#lib/image/image-featured-props.ts';
-import { ImageSizeEnum } from '#lib/image/image-types.ts';
 
 interface Props extends ImageFeaturedWithCaption {
 	alt: string;
@@ -29,9 +29,8 @@ const {
 
 const { imageProps, placeholderProps } = await getImageFeaturedProps({
 	alt,
-	imageFormat: imageHeroQualityFormat,
 	imageId,
-	imageQuality: imageHeroQualityValue,
+	preset: 'hero',
 	priority: index === 0,
 	sizes: '100vw',
 	width: ImageSizeEnum.ExtraExtraLarge,

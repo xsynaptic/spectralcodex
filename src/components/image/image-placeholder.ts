@@ -1,7 +1,9 @@
 import type { Cache } from '@spectralcodex/shared/cache';
+import type { SourceFingerprints } from '@spectralcodex/shared/source-fingerprint';
 import type { Buffer } from 'node:buffer';
 
 import { createSqliteCache } from '@spectralcodex/shared/cache';
+import { createSourceFingerprints } from '@spectralcodex/shared/source-fingerprint';
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { promises as fs } from 'node:fs';
 import { hash } from 'ohash';
@@ -15,15 +17,14 @@ import { ImageFitOptionEnum } from '#lib/image/image-types.ts';
 const imagePlaceholderPixelCountHighQuality = 1600;
 const imagePlaceholderPixelCountLowQuality = 250;
 
-/**
- * Get a placeholder for an image with specified aspect ratio
- * Results are cached in SQLite, keyed by imageId + aspectRatio + fit + position + quality
- * The stored mtime hash invalidates stale entries when the source image changes
- *
- * For source aspect ratio placeholders, pass the image's native width/height ratio
- * For cropped placeholders, pass the target display aspect ratio
- */
-async function createImagePlaceholderFunction({ cache }: { cache: Cache<string> }) {
+// Source-ratio placeholders pass the native width/height ratio; crops pass the display ratio
+async function createImagePlaceholderFunction({
+	cache,
+	fingerprints,
+}: {
+	cache: Cache<string>;
+	fingerprints: SourceFingerprints;
+}) {
 	const getImageById = await getImageByIdFunction();
 
 	return async function getImagePlaceholder({
@@ -37,9 +38,11 @@ async function createImagePlaceholderFunction({ cache }: { cache: Cache<string> 
 
 		if (!imageEntry) return;
 
-		const mtime = await getImageMtime(imageEntry.data.path, imageEntry.data.modifiedTime);
-
-		// Normalize aspect ratio for consistent cache keys
+		const sourceVersion = await getSourceVersion(
+			fingerprints,
+			imageEntry.data.path,
+			imageEntry.data.modifiedTime,
+		);
 		const normalizedRatio = Math.round(aspectRatio * 1000) / 1000;
 
 		const cacheKey = hash({
@@ -51,7 +54,7 @@ async function createImagePlaceholderFunction({ cache }: { cache: Cache<string> 
 				position,
 			},
 		});
-		const contentHash = hash({ mtime, version: 1 });
+		const contentHash = hash({ source: sourceVersion, version: 1 });
 
 		const cachedDataUrl = cache.get(cacheKey, contentHash);
 
@@ -75,10 +78,6 @@ async function createImagePlaceholderFunction({ cache }: { cache: Cache<string> 
 	};
 }
 
-/**
- * Generate a placeholder data URL with specified aspect ratio
- * Sharp handles cropping via fit/position when aspect ratios don't match
- */
 async function generatePlaceholderDataUrl({
 	aspectRatio,
 	fit = ImageFitOptionEnum.Cover,
@@ -107,18 +106,17 @@ async function generatePlaceholderDataUrl({
 	return `data:image/${placeholderBuffer.info.format};base64,${placeholderBuffer.data.toString('base64')}`;
 }
 
-// `stat` is authoritative; the collection's stored time covers a source that has since moved
-async function getImageMtime(path: string, storedTime: Date | undefined) {
-	try {
-		const stats = await fs.stat(path);
+// The collection's stored time covers a source that has since moved
+async function getSourceVersion(
+	fingerprints: SourceFingerprints,
+	path: string,
+	modifiedTime: Date | undefined,
+) {
+	const fingerprint = await fingerprints.get(path);
 
-		return stats.mtimeMs;
-	} catch {
-		return storedTime?.getTime();
-	}
+	return fingerprint?.sha256 ?? modifiedTime?.getTime();
 }
 
-// Generate placeholder dimensions from aspect ratio and pixel budget
 function getPlaceholderDimensions(aspectRatio: number, pixelCount: number) {
 	const height = Math.sqrt(pixelCount / aspectRatio);
 	const width = pixelCount / height;
@@ -140,6 +138,7 @@ export async function getImagePlaceholderFunction() {
 	if (!imagePlaceholderFunction) {
 		imagePlaceholderFunction = createImagePlaceholderFunction({
 			cache: createSqliteCache(CUSTOM_CACHE_PATH, 'image-placeholders'),
+			fingerprints: createSourceFingerprints(CUSTOM_CACHE_PATH),
 		});
 	}
 	return imagePlaceholderFunction;

@@ -1,20 +1,18 @@
 ---
-import type { ImageComponentProps } from '#lib/image/image-types.ts';
+import { ImageSizeEnum } from '@spectralcodex/shared/images';
 
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import Image from '#components/parts/image.astro';
 import { MicroformatClassNames } from '#components/types.ts';
-import { getImageByIdFunction } from '#lib/collections/images/images-data.ts';
+import { getImageByIdFunction, getImageSource } from '#lib/collections/images/images-data.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getImageBreakpoints } from '#lib/image/image-layout.ts';
-import { ImageSizeEnum } from '#lib/image/image-types.ts';
 import { sanitizeImageAltAttribute } from '#lib/utils/text.ts';
 
-interface Props extends Pick<ImageComponentProps, 'operations'> {
+interface Props {
 	sizes: string;
 }
 
-const { sizes, ...props } = Astro.props;
+const { sizes } = Astro.props;
 
 const imageSrc = 'v/a-synaptic-2025-1.jpg';
 
@@ -23,21 +21,21 @@ const t = getTranslations();
 const getImageById = await getImageByIdFunction();
 
 const imageEntry = getImageById(imageSrc);
+const imageSource = imageEntry ? getImageSource(imageEntry) : undefined;
 ---
 
-{imageEntry ? (
+{imageSource ? (
 	<ImagePlaceholder
 		class="relative overflow-hidden rounded-xs grayscale"
 		placeholderProps={{ aspectRatio: 1, imageId: imageSrc }}
 	>
 		<Image
 			alt={sanitizeImageAltAttribute(t('author.photo.alt'))}
-			breakpoints={getImageBreakpoints({ maxWidth: ImageSizeEnum.Large })}
 			class:list={['aspect-square', MicroformatClassNames.Photo]}
+			imageSource={imageSource}
+			preset="author"
 			sizes={sizes}
-			src={imageSrc}
-			unstyled={true}
-			{...props}
+			width={ImageSizeEnum.Large}
 		/>
 	</ImagePlaceholder>
 ) : undefined}

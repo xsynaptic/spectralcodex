@@ -44,10 +44,13 @@ async function createThumbnailFunction(): Promise<GetThumbnailFunction> {
 
 		if (!imageEntry) return;
 
-		const source = getImageSource(imageEntry);
+		const imageSource = getImageSource(imageEntry);
 
 		// Popup thumbnails are stored as paths; the popup prepends the image base URL at render time
-		return getLocationThumbnailProps(source, createImagePathFunction({ preset: 'popup', source }));
+		return getLocationThumbnailProps(
+			imageSource,
+			createImagePathFunction({ imageSource, preset: 'popup' }),
+		);
 	};
 }
 
