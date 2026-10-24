@@ -21,11 +21,10 @@ function getOpenOutcome(url: string, scopeUrl: string | undefined) {
 
 function getPointPage(
 	{ canOpen, isPageHidden, pointUrl }: MapClickInput,
-	isTarget: boolean,
-	isLoneTarget: boolean,
+	{ isLoneTarget, isPick, isTarget }: { isLoneTarget: boolean; isPick: boolean; isTarget: boolean },
 ) {
 	if (!canOpen || !pointUrl) return;
-	if (isTarget && !isLoneTarget && !isPageHidden) return;
+	if (isTarget && !isLoneTarget && !isPageHidden && !isPick) return;
 
 	return pointUrl;
 }
@@ -36,7 +35,7 @@ function resolvePointClick(
 ): MapClickOutcome {
 	const isTarget = input.targetIds.includes(pointId);
 	const isLoneTarget = isTarget && input.targetIds.length === 1;
-	const url = getPointPage(input, isTarget, isLoneTarget);
+	const url = getPointPage(input, { isLoneTarget, isPick, isTarget });
 
 	if (url) return getOpenOutcome(url, input.scopeUrl);
 	if (isLoneTarget) return { kind: 'none' };

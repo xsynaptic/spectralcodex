@@ -78,11 +78,11 @@ const residualCases = [
 		form: 'multi-Point prefix',
 		id: 'baozhong-longyan-sugar-factory:0',
 		stored: 'baozhong-:0',
-		title: 'Longyan Sugar Factory: Entrance Pillars',
+		title: 'Longyan Sugar Factory',
 	},
-	{ form: 'multi-Point exact', id: 'old-street:12', stored: ':12', title: 'Old Street: Gate' },
+	{ form: 'multi-Point exact', id: 'old-street:12', stored: ':12', title: 'Old Street' },
 	{ form: 'single-Point colon', id: 'fort-north', stored: '', title: 'Fort: North' },
-	{ form: 'multi-Point colon', id: 'fort-north:0', stored: 'fort-north:0', title: 'Fort: North' },
+	{ form: 'multi-Point colon', id: 'fort-north:0', stored: ':0', title: 'Fort: North' },
 	{ form: 'empty slug', id: 'dagangshan', stored: 'dagangshan', title: '大崗山' },
 ];
 

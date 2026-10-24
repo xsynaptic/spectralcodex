@@ -59,3 +59,8 @@ export const GeometryPointsSchema = z.strictObject({
 	precision: NumericScaleSchema.optional(),
 	wikipediaUrl: z.url().optional(),
 });
+
+export const GeometryPointsArraySchema = GeometryPointsSchema.array().refine(
+	(points) => points.length < 2 || points.every((point) => point.title !== undefined),
+	{ message: 'Every Point of a Location with several needs a `title`' },
+);

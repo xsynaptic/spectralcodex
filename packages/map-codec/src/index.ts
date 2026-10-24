@@ -12,6 +12,7 @@ export type { MapPayloadBase } from '#map-payloads.ts';
 export { createRuleTest, getMapRowById, selectMapRows } from '#map-rules.ts';
 export type { MapFeaturesRule, MapInterval } from '#map-rules.ts';
 export type { MapScopeRow } from '#map-scopes.ts';
+export { getMapRowLabel, joinMapTitles } from '#map-titles.ts';
 export { isMapView } from '#map-view.ts';
 export type { MapScope, MapView } from '#map-view.ts';
 export type {

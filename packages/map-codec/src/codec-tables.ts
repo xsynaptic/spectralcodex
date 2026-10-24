@@ -11,6 +11,7 @@ export const sourceFields = {
 	objective: plain('o'),
 	outlier: plain('l'),
 	pointTitle: plain('q'),
+	pointTitleMultilingual: plain('m'),
 	precision: plain('p'),
 	rating: plain('r'),
 	regionOrdinals: plain('b'),

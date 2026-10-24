@@ -121,13 +121,60 @@ describe('searchMap', () => {
 		expect(getTitles(rows, [], '金礦')).toEqual(['Gold Mine']);
 	});
 
-	test('a Location with several Points is one row', () => {
+	describe('a Location with several Points', () => {
 		const rows = [
-			makeRow('salt-0', 'Budai Saltworks', { url: '/budai-saltworks/' }),
-			makeRow('salt-1', 'Budai Saltworks', { url: '/budai-saltworks/' }),
+			makeRow('budai-saltworks:0', 'Budai Saltworks', {
+				pointTitle: 'Salt Pans',
+				pointTitleMultilingual: '鹽田',
+				regionOrdinals: [8],
+				titleMultilingual: '布袋鹽場',
+				url: '/budai-saltworks/',
+			}),
+			makeRow('budai-saltworks:1', 'Budai Saltworks', {
+				pointTitle: 'Zhounan Saltworks',
+				regionOrdinals: [8],
+				titleMultilingual: '布袋鹽場',
+				url: '/budai-saltworks/',
+			}),
 		];
+		const index = createSearchIndex(rows, [makeScope('chiayi', 'Chiayi', { interval: [7, 10] })]);
 
-		expect(getTitles(rows, [], 'budai')).toEqual(['Budai Saltworks']);
+		test('lists the Location under its own titles, then each Point after it', () => {
+			const results = searchMap(index, 'budai') ?? [];
+
+			expect(
+				results.map(({ title, titleMultilingual }) => [title.text, titleMultilingual?.text]),
+			).toEqual([
+				['Budai Saltworks', '布袋鹽場'],
+				['Budai Saltworks: Salt Pans', '布袋鹽場：鹽田'],
+				['Budai Saltworks: Zhounan Saltworks', '布袋鹽場'],
+			]);
+			expect(results.map((result) => result.kind === 'location' && result.pointId)).toEqual([
+				'budai-saltworks:0',
+				'budai-saltworks:0',
+				'budai-saltworks:1',
+			]);
+		});
+
+		test('a Point is found by its own words, and the words may fall in either title', () => {
+			expect(getTitles(rows, [], 'zhounan')).toEqual(['Budai Saltworks: Zhounan Saltworks']);
+			expect(searchMap(index, 'budai pans')?.map(({ title }) => title)).toEqual([
+				{
+					ranges: [
+						[0, 5],
+						[22, 26],
+					],
+					text: 'Budai Saltworks: Salt Pans',
+				},
+			]);
+		});
+
+		test('a Region word takes in the Location but not its Points', () => {
+			expect(searchMap(index, 'chiayi')?.map(({ title }) => title.text)).toEqual([
+				'Chiayi',
+				'Budai Saltworks',
+			]);
+		});
 	});
 
 	test('a Multilingual Title is its own field, highlighted in its own text', () => {

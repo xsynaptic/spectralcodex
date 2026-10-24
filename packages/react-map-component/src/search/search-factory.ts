@@ -1,6 +1,6 @@
 import type { MapInterval, MapScopeRow, MapSourceItem } from '@spectralcodex/map-codec';
 
-import { createRuleTest } from '@spectralcodex/map-codec';
+import { createRuleTest, joinMapTitles } from '@spectralcodex/map-codec';
 
 import type { MapSearchRange } from '#search/search-normalize.ts';
 
@@ -31,14 +31,21 @@ interface SearchField {
 	normalized: string;
 }
 
+interface RowSource {
+	kind: 'location' | 'point';
+	properties: MapSourceItem['properties'];
+	title: string;
+	titleMultilingual: string | undefined;
+}
+
 interface SearchEntry {
 	fields: Array<SearchField>;
 	key: string;
 	score: number;
-	source:
-		| { kind: 'location'; properties: MapSourceItem['properties'] }
-		| { kind: 'scope'; row: MapScopeRow };
+	source: RowSource | { kind: 'scope'; row: MapScopeRow };
 }
+
+const sourceKindOrder = ['scope', 'location', 'point'] as const;
 
 interface SearchRegion {
 	fields: Array<SearchField>;
@@ -83,15 +90,48 @@ function createScopeEntry(row: MapScopeRow): SearchEntry {
 	return { fields, key: `${row.kind}-${row.id}`, score: row.count, source: { kind: 'scope', row } };
 }
 
-function createLocationEntry({ properties }: MapSourceItem): SearchEntry {
-	const { entryQuality, id, rating, title, titleMultilingual, url } = properties;
+function createRowEntry(key: string, source: RowSource): SearchEntry {
+	const { entryQuality, rating } = source.properties;
 
 	return {
-		fields: getTitleFields(title, titleMultilingual),
-		key: `location-${url ?? id}`,
+		fields: getTitleFields(source.title, source.titleMultilingual),
+		key,
 		score: entryQuality + rating,
-		source: { kind: 'location', properties },
+		source,
 	};
+}
+
+function createRowEntries(rows: ReadonlyArray<MapSourceItem>) {
+	const entries: Array<SearchEntry> = [];
+	const locationKeys = new Set<string>();
+
+	for (const { properties } of rows) {
+		const { id, pointTitle, pointTitleMultilingual, title, titleMultilingual, url } = properties;
+		const locationKey = `location-${url ?? id}`;
+
+		if (!locationKeys.has(locationKey)) {
+			locationKeys.add(locationKey);
+			entries.push(
+				createRowEntry(locationKey, { kind: 'location', properties, title, titleMultilingual }),
+			);
+		}
+
+		if (pointTitle === undefined) continue;
+
+		entries.push(
+			createRowEntry(`point-${id}`, {
+				kind: 'point',
+				properties,
+				title: joinMapTitles(title, pointTitle),
+				titleMultilingual:
+					titleMultilingual === undefined
+						? undefined
+						: joinMapTitles(titleMultilingual, pointTitleMultilingual),
+			}),
+		);
+	}
+
+	return entries;
 }
 
 export function createSearchIndex(
@@ -109,7 +149,7 @@ export function createSearchIndex(
 	}
 
 	return {
-		entries: [...scopes.map(createScopeEntry), ...rows.map(createLocationEntry)],
+		entries: [...scopes.map(createScopeEntry), ...createRowEntries(rows)],
 		regions,
 		regionTitleByOrdinal,
 	};
@@ -222,14 +262,14 @@ function compareCandidates(first: Candidate, second: Candidate) {
 
 function rankCandidates(candidates: Iterable<Candidate>, limit: number) {
 	const buckets: Array<Array<Candidate>> = Array.from(
-		{ length: (matchTier.region + 1) * 2 },
+		{ length: (matchTier.region + 1) * sourceKindOrder.length },
 		() => [],
 	);
 
 	for (const candidate of candidates) {
-		const isLocation = candidate.entry.source.kind === 'location';
+		const kindIndex = sourceKindOrder.indexOf(candidate.entry.source.kind);
 
-		buckets[candidate.tier * 2 + (isLocation ? 1 : 0)]?.push(candidate);
+		buckets[candidate.tier * sourceKindOrder.length + kindIndex]?.push(candidate);
 	}
 
 	const ranked: Array<Candidate> = [];
@@ -296,7 +336,7 @@ function toResult(
 	regionTitleByOrdinal: MapSearchIndex['regionTitleByOrdinal'],
 ): MapSearchResult {
 	const { source } = entry;
-	const { title, titleMultilingual } = source.kind === 'scope' ? source.row : source.properties;
+	const { title, titleMultilingual } = source.kind === 'scope' ? source.row : source;
 	const texts = {
 		title: toText(title, terms),
 		...(titleMultilingual ? { titleMultilingual: toText(titleMultilingual, terms) } : {}),
@@ -325,18 +365,15 @@ export function searchMap(index: MapSearchIndex, query: string) {
 	if (terms.length === 0) return;
 
 	const regionTestsByTerm = terms.map((term) => getRegionTests(index.regions, term));
-	const candidateByKey = new Map<string, Candidate>();
+	const candidates: Array<Candidate> = [];
 
 	for (const entry of index.entries) {
 		const candidate = matchEntry(entry, terms, regionTestsByTerm);
-		const current = candidateByKey.get(entry.key);
 
-		if (candidate && (!current || candidate.tier < current.tier)) {
-			candidateByKey.set(entry.key, candidate);
-		}
+		if (candidate) candidates.push(candidate);
 	}
 
-	return rankCandidates(candidateByKey.values(), mapSearchLimit).map((candidate) =>
+	return rankCandidates(candidates, mapSearchLimit).map((candidate) =>
 		toResult(candidate, terms, index.regionTitleByOrdinal),
 	);
 }

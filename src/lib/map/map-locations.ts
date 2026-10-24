@@ -7,6 +7,7 @@ import type {
 import type { Feature, Position } from 'geojson';
 
 import {
+	joinMapTitles,
 	mapPointIdSeparator,
 	MapPopupOwnField,
 	pickMapPopupProperties,
@@ -142,13 +143,22 @@ export function getLocationsMapPopupData(
 	features: ReadonlyArray<MapLocationFeature>,
 ): Array<MapPopupItem> {
 	return features.map((feature) => {
+		const { ownTitle, ownTitleMultilingualValue, title, titleMultilingualValue } =
+			feature.properties;
+
 		return {
 			...pickMapPopupProperties(feature.properties),
 			id: feature.id,
-			title: stripDiacritics(feature.properties.title),
-			...(feature.properties.ownTitle === undefined
+			title: stripDiacritics(joinMapTitles(title, ownTitle)),
+			...(titleMultilingualValue === undefined
 				? {}
-				: { ownTitle: stripDiacritics(feature.properties.ownTitle) }),
+				: {
+						titleMultilingualValue: joinMapTitles(
+							titleMultilingualValue,
+							ownTitleMultilingualValue,
+						),
+					}),
+			...(ownTitle === undefined ? {} : { ownTitle: stripDiacritics(ownTitle) }),
 			...(feature.properties.image === undefined
 				? {}
 				: { image: { srcSet: feature.properties.image.srcSet } }),
@@ -160,7 +170,7 @@ export function getLocationsMapSourceData(
 	features: ReadonlyArray<MapLocationFeature>,
 ): Array<MapSourceItem> {
 	return features.map((feature) => {
-		const { titleMultilingualValue } = feature.properties;
+		const { ownTitle, ownTitleMultilingualValue, titleMultilingualValue } = feature.properties;
 
 		return {
 			geometry: {
@@ -175,9 +185,10 @@ export function getLocationsMapSourceData(
 				...(titleMultilingualValue === undefined
 					? {}
 					: { titleMultilingual: stripDiacritics(titleMultilingualValue) }),
-				...(feature.properties.pointTitle === undefined
+				...(ownTitle === undefined ? {} : { pointTitle: stripDiacritics(ownTitle) }),
+				...(ownTitleMultilingualValue === undefined
 					? {}
-					: { pointTitle: stripDiacritics(feature.properties.pointTitle) }),
+					: { pointTitleMultilingual: stripDiacritics(ownTitleMultilingualValue) }),
 			},
 			type: 'Feature',
 		} satisfies MapSourceItem;
@@ -248,14 +259,15 @@ function getFeatureTitleProperties({
 		data: geometry,
 		prop: 'title',
 	})?.primary;
-	const pointTitle = isMultiPoint
-		? getPointTitle(geometry.title, geometryTitleMultilingual)
-		: undefined;
 
 	return {
-		title: geometry.title ? `${entry.data.title}: ${geometry.title}` : entry.data.title,
-		...getMultilingualTitleProperties(entryTitleMultilingual, geometryTitleMultilingual),
-		...(pointTitle === undefined ? {} : { pointTitle }),
+		title: entry.data.title,
+		...(entryTitleMultilingual === undefined
+			? {}
+			: {
+					titleMultilingualLang: entryTitleMultilingual.lang,
+					titleMultilingualValue: entryTitleMultilingual.value,
+				}),
 		...(isMultiPoint ? getOwnTitleProperties(geometry.title, geometryTitleMultilingual) : {}),
 	};
 }
@@ -273,13 +285,6 @@ function getOwnTitleProperties(
 					ownTitleMultilingualValue: multilingual.value,
 				}),
 	};
-}
-
-function getPointTitle(title: string | undefined, multilingual: MultilingualContent | undefined) {
-	if (title === undefined) return multilingual?.value;
-	if (multilingual === undefined) return title;
-
-	return `${title} (${multilingual.value})`;
 }
 
 function getGeometryFeatureProperties(
@@ -311,20 +316,6 @@ function getGeometryLinkProperties(
 	return {
 		googleMapsUrl,
 		wikipediaUrl: geometry.wikipediaUrl ?? entry.data._wikipediaUrl,
-	};
-}
-
-function getMultilingualTitleProperties(
-	entryTitle: MultilingualContent | undefined,
-	geometryTitle: MultilingualContent | undefined,
-) {
-	if (!entryTitle) return {};
-
-	return {
-		titleMultilingualLang: entryTitle.lang,
-		titleMultilingualValue: geometryTitle
-			? `${entryTitle.value}：${geometryTitle.value}`
-			: entryTitle.value,
 	};
 }
 

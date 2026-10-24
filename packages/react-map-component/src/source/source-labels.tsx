@@ -21,7 +21,12 @@ function getTargetsLabelLayerStyle({
 		filter: ['all', ['has', 'pointTitle'], ['in', ['get', 'id'], ['literal', targetIds]]],
 		id: MapLayerIdEnum.TargetsLabel,
 		layout: {
-			'text-field': ['get', 'pointTitle'],
+			'text-field': [
+				'case',
+				['has', 'pointTitleMultilingual'],
+				['concat', ['get', 'pointTitle'], ' (', ['get', 'pointTitleMultilingual'], ')'],
+				['get', 'pointTitle'],
+			],
 			'text-font': ['Noto Sans Medium'],
 			'text-justify': 'auto',
 			'text-max-width': 8,

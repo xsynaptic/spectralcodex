@@ -1,6 +1,7 @@
 import type { MapPopupItem, MapSourceItem } from '@spectralcodex/map-codec';
 import type { LngLat } from 'maplibre-gl';
 
+import { getMapRowLabel } from '@spectralcodex/map-codec';
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { useMap } from 'react-map-gl/maplibre';
 
@@ -22,10 +23,6 @@ export type MapPopupItemExtended = MapPopupItem &
 	};
 
 const mapImagePreloadDelayMs = 100;
-
-function getRowTitle({ title, titleMultilingual }: MapSourceItem['properties']) {
-	return titleMultilingual ? `${title} (${titleMultilingual})` : title;
-}
 
 function useDebouncedValue<T>(value: T, delayMs: number): T {
 	const [debouncedValue, setDebouncedValue] = useState(value);
@@ -54,7 +51,7 @@ export function useMapCanvasPopup() {
 		const { precision, url } = selectedSourceItem.properties;
 
 		return {
-			title: getRowTitle(selectedSourceItem.properties),
+			title: getMapRowLabel(selectedSourceItem.properties),
 			...chunkData?.find((item) => item.id === selectedId),
 			id: selectedId,
 			popupCoordinates: getPopupCoordinates(selectedSourceItem),

@@ -1,7 +1,5 @@
 export const mapPointIdSeparator = ':';
 
-const titleSeparator = ': ';
-
 function slugify(text: string) {
 	return text
 		.replaceAll(/['"‘’“”]/g, '')
@@ -17,12 +15,6 @@ function splitMapRowId(id: string) {
 	if (separatorIndex === -1) return { entryId: id, pointSuffix: '' };
 
 	return { entryId: id.slice(0, separatorIndex), pointSuffix: id.slice(separatorIndex) };
-}
-
-function getTitleSlug(title: string, isPoint: boolean) {
-	const separatorIndex = isPoint ? title.lastIndexOf(titleSeparator) : -1;
-
-	return slugify(separatorIndex === -1 ? title : title.slice(0, separatorIndex));
 }
 
 function getIdResidual(entryId: string, slug: string) {
@@ -41,12 +33,12 @@ export function decodeMapRowId(stored: string, title: string) {
 
 	if (entryId !== '' && !entryId.endsWith('-')) return stored;
 
-	return `${entryId}${getTitleSlug(title, pointSuffix !== '')}${pointSuffix}`;
+	return `${entryId}${slugify(title)}${pointSuffix}`;
 }
 
 export function encodeMapRowId(id: string, title: string) {
 	const { entryId, pointSuffix } = splitMapRowId(id);
-	const residual = getIdResidual(entryId, getTitleSlug(title, pointSuffix !== ''));
+	const residual = getIdResidual(entryId, slugify(title));
 
 	if (residual !== undefined && decodeMapRowId(`${residual}${pointSuffix}`, title) === id) {
 		return `${residual}${pointSuffix}`;

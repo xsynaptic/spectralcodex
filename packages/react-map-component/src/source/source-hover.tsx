@@ -2,6 +2,7 @@ import type { ExpressionSpecification } from 'maplibre-gl';
 import type { FC } from 'react';
 import type { SymbolLayerSpecification } from 'react-map-gl/maplibre';
 
+import { getMapRowLabel } from '@spectralcodex/map-codec';
 import { tailwindColors } from '@spectralcodex/shared/map';
 import { memo, useMemo } from 'react';
 import { Layer, Source } from 'react-map-gl/maplibre';
@@ -57,12 +58,7 @@ function getPointsLabelLayerStyle(isDarkMode: boolean) {
 		filter: ['!', ['has', 'point_count']],
 		id: MapLayerIdEnum.PointsLabel,
 		layout: {
-			'text-field': [
-				'case',
-				['has', 'titleMultilingual'],
-				['concat', ['get', 'title'], ' (', ['get', 'titleMultilingual'], ')'],
-				['get', 'title'],
-			],
+			'text-field': ['get', 'label'],
 			'text-font': ['Noto Sans Medium'],
 			'text-ignore-placement': true,
 			'text-justify': 'auto',
@@ -89,7 +85,14 @@ export const MapSourceHover: FC = memo(function MapSourceHover() {
 		hoveredRow !== undefined && isLabelledTarget(hoveredRow.properties, targetIds);
 
 	const data = useMemo(() => {
-		const labelFeature = (isHoveredLabelled ? undefined : hoveredRow) ?? hoveredCluster;
+		const labelRow =
+			hoveredRow === undefined || isHoveredLabelled
+				? undefined
+				: {
+						...hoveredRow,
+						properties: { ...hoveredRow.properties, label: getMapRowLabel(hoveredRow.properties) },
+					};
+		const labelFeature = labelRow ?? hoveredCluster;
 
 		return { features: labelFeature ? [labelFeature] : [], type: 'FeatureCollection' as const };
 	}, [hoveredCluster, hoveredRow, isHoveredLabelled]);

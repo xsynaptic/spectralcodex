@@ -89,6 +89,7 @@ const sourceCodec = createFieldCodec(sourceFields, {
 	objective: same(z.number().int().optional()),
 	outlier: same(z.boolean().optional()),
 	pointTitle: same(z.string().optional()),
+	pointTitleMultilingual: same(z.string().optional()),
 	precision: same(z.number().int()),
 	rating: same(z.number().int()),
 	regionOrdinals: same(z.number().int().array().optional()),
@@ -198,7 +199,14 @@ export type MapSourceItemCompressed = z.input<typeof MapSourceItemSchema>;
 export type MapFeatureProperties = Omit<MapPopupItem, 'id'> &
 	Omit<
 		MapSourceItem['properties'],
-		'chunkKey' | 'hasImage' | 'id' | 'regionOrdinals' | 'themeIndices' | 'titleMultilingual'
+		| 'chunkKey'
+		| 'hasImage'
+		| 'id'
+		| 'pointTitle'
+		| 'pointTitleMultilingual'
+		| 'regionOrdinals'
+		| 'themeIndices'
+		| 'titleMultilingual'
 	>;
 
 export function encodeMapPopupData(

@@ -5,6 +5,7 @@ import { makeEntry, makePoint } from '#lib/collections/collections-test-utils.ts
 import {
 	getLocationFeatureIds,
 	getLocationFeatures,
+	getLocationsMapPopupData,
 	getLocationsMapSourceData,
 } from '#lib/map/map-locations.ts';
 
@@ -76,33 +77,28 @@ describe('getLocationFeatures', () => {
 		expect(result[0]?.properties.title).toBe('Longshan Temple');
 	});
 
-	test('builds one feature per point and suffixes point titles', () => {
+	test('builds one feature per point, each titled by its Location', () => {
 		const result = getLocationFeatures([
 			makeLocation('bopiliao', {
-				geometry: [makePoint(121.5, 25, { title: 'North Block' }), makePoint(121.51, 25.01)],
-				title: 'Bopiliao',
-			}),
-		]);
-
-		expect(result.map((feature) => feature.id)).toEqual(['bopiliao:0', 'bopiliao:1']);
-		expect(result[0]?.properties.title).toBe('Bopiliao: North Block');
-		expect(result[1]?.properties.title).toBe('Bopiliao');
-	});
-
-	test('joins entry and point multilingual titles', () => {
-		const result = getLocationFeatures([
-			makeLocation('bopiliao', {
-				geometry: [makePoint(121.5, 25, { title: 'North Block', title_zh: '北街' })],
+				geometry: [
+					makePoint(121.5, 25, { title: 'North Block', title_zh: '北街' }),
+					makePoint(121.51, 25.01, { title: 'South Block' }),
+				],
 				title: 'Bopiliao',
 				title_zh: '剝皮寮',
 			}),
 		]);
 
-		expect(result[0]?.properties.titleMultilingualLang).toBe('zh');
-		expect(result[0]?.properties.titleMultilingualValue).toBe('剝皮寮：北街');
+		expect(result.map((feature) => feature.id)).toEqual(['bopiliao:0', 'bopiliao:1']);
+		expect(
+			result.map(({ properties }) => [properties.title, properties.titleMultilingualValue]),
+		).toEqual([
+			['Bopiliao', '剝皮寮'],
+			['Bopiliao', '剝皮寮'],
+		]);
 	});
 
-	test('each Point of a Location with several carries its own title, its multilingual title in brackets', () => {
+	test('each Point of a Location with several carries its own title and Multilingual Title', () => {
 		const result = getLocationFeatures([
 			makeLocation('bopiliao', {
 				geometry: [
@@ -119,12 +115,6 @@ describe('getLocationFeatures', () => {
 			}),
 		]);
 
-		expect(result.map((feature) => feature.properties.pointTitle)).toEqual([
-			'North Block (北街)',
-			'South Block',
-			undefined,
-			undefined,
-		]);
 		expect(
 			result.map(({ properties }) => [
 				properties.ownTitle,
@@ -315,5 +305,56 @@ describe('getLocationsMapSourceData', () => {
 			title: 'Hue Citadel',
 			titleMultilingual: 'Kinh thanh Hue',
 		});
+	});
+
+	test('a Point carries its own titles beside its Location titles', () => {
+		const rows = getLocationsMapSourceData(
+			getLocationFeatures([
+				makeLocation('bopiliao', {
+					geometry: [
+						makePoint(121.5, 25, { title: 'North Block', title_zh: '北街' }),
+						makePoint(121.51, 25.01, { title: 'South Block' }),
+					],
+					title: 'Bopiliao',
+					title_zh: '剝皮寮',
+				}),
+			]),
+		);
+
+		expect(
+			rows.map(({ properties }) => [
+				properties.title,
+				properties.titleMultilingual,
+				properties.pointTitle,
+				properties.pointTitleMultilingual,
+			]),
+		).toEqual([
+			['Bopiliao', '剝皮寮', 'North Block', '北街'],
+			['Bopiliao', '剝皮寮', 'South Block', undefined],
+		]);
+	});
+});
+
+describe('getLocationsMapPopupData', () => {
+	test('a Point reads after its Location in each language', () => {
+		const items = getLocationsMapPopupData(
+			getLocationFeatures([
+				makeLocation('bopiliao', {
+					geometry: [
+						makePoint(121.5, 25, { title: 'North Block', title_zh: '北街' }),
+						makePoint(121.51, 25.01, { title: 'South Block' }),
+					],
+					title: 'Bopiliao',
+					title_zh: '剝皮寮',
+				}),
+			]),
+		);
+
+		expect(
+			items.map(({ title, titleMultilingualValue }) => [title, titleMultilingualValue]),
+		).toEqual([
+			['Bopiliao: North Block', '剝皮寮：北街'],
+			['Bopiliao: South Block', '剝皮寮'],
+		]);
 	});
 });

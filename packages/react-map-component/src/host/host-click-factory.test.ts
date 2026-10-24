@@ -55,10 +55,20 @@ describe('resolveClick', () => {
 		expect(resolveClick({ ...target, isPageHidden: true })).toEqual(open);
 	});
 
-	test("a search pick eases to a Target's popup, which a click leaves where it is", () => {
-		expect(
-			resolveClick({ ...hosted, ...oneOfTwoTargets, hit: { ...click, isPick: true } }),
-		).toEqual({ isEased: true, kind: 'popup', pointId });
+	test('a search pick opens the page even when its Point is one of several Targets', () => {
+		const pick = { ...click, isPick: true };
+
+		expect(resolveClick({ ...hosted, ...oneOfTwoTargets, hit: pick })).toEqual(open);
+	});
+
+	test("on a map that cannot open pages, a search pick eases to a Target's popup, which a click leaves where it is", () => {
+		const unhosted = { ...hosted, ...oneOfTwoTargets, canOpen: false };
+
+		expect(resolveClick({ ...unhosted, hit: { ...click, isPick: true } })).toEqual({
+			isEased: true,
+			kind: 'popup',
+			pointId,
+		});
 	});
 
 	test('a link opens in place on a hosted map and turns the held Scope back on when it is its page', () => {

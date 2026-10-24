@@ -17,6 +17,7 @@ import { validateLinkIds } from '#validate-content/link-ids.ts';
 import { validateLocationsCoordinates } from '#validate-content/locations-coordinates.ts';
 import { validateLocationsDuplicates } from '#validate-content/locations-duplicates.ts';
 import { validateLocationsOverlap } from '#validate-content/locations-overlap.ts';
+import { validateLocationsPointTitles } from '#validate-content/locations-point-titles.ts';
 import { validateLocationsRegions } from '#validate-content/locations-region.ts';
 import { validateMdxComponents } from '#validate-content/mdx.ts';
 import { validateReferences } from '#validate-content/references.ts';
@@ -92,6 +93,7 @@ function getValidations(
 			run: () => validateImageFeaturedMissing(bodyContentEntries),
 		},
 		{ name: 'location-duplicates', run: () => validateLocationsDuplicates(locationEntries) },
+		{ name: 'location-point-titles', run: () => validateLocationsPointTitles(locationEntries) },
 		{ name: 'location-regions', run: () => validateLocationsRegions(locationEntries) },
 		{
 			name: 'location-overlap',
