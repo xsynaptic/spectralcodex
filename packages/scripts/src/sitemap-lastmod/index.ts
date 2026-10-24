@@ -1,59 +1,62 @@
 import type { SitemapLastmod } from '@spectralcodex/shared/sitemap';
 
 import { getPublicId } from '@spectralcodex/shared/entries';
+import { getCachePaths } from '@spectralcodex/shared/paths';
 import { joinUrl } from '@spectralcodex/shared/routing';
-import { sitemapLastmodPath } from '@spectralcodex/shared/sitemap';
-import chalk from 'chalk';
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { $ } from 'zx';
 
 import type { ContentEntry } from '#shared/astro-content.ts';
+import type { ScriptPaths } from '#shared/cli-command.ts';
 
 import { getCollectionEntries, withAstroContent } from '#shared/astro-content.ts';
+import { formatCount, log } from '#shared/cli-output.ts';
+import { withSpinner } from '#shared/cli-progress.ts';
 import { safelyCreateDirectory } from '#shared/utils.ts';
 import { getGitFileDates } from '#sitemap-lastmod/git-file-dates.ts';
 
 interface SitemapLastmodOptions {
-	contentPath?: string;
-	outputPath?: string;
-	rootPath: string;
+	paths: ScriptPaths;
 	siteUrl: string;
 }
 
 const rootCollections = new Set(['locations', 'pages', 'posts']);
 
-export async function generateSitemapLastmod(options: SitemapLastmodOptions): Promise<void> {
-	console.log(chalk.magenta('=== Sitemap lastmod ==='));
+export async function generateSitemapLastmod({ paths, siteUrl }: SitemapLastmodOptions) {
+	const collectionsPath = paths.contentDataPath;
+	const outputPath = getCachePaths(paths.cachePath).sitemapLastmodPath;
 
-	const { contentPathAbs, contentPathRelative, outputPath } = resolvePaths(options);
+	const gitMap = await withSpinner('Reading git log', async () => {
+		const topLevel = await $({ cwd: collectionsPath })`git rev-parse --show-toplevel`;
+		const keyPrefix = path.relative(paths.rootPath, topLevel.stdout.trim());
 
-	console.log(chalk.blue('Reading git log...'));
-
-	const gitMap = await getGitFileDates({
-		cwd: contentPathAbs,
-		keyPrefix: contentPathRelative,
-		pathspec: 'collections/',
+		return getGitFileDates({
+			cwd: collectionsPath,
+			...(keyPrefix ? { keyPrefix } : {}),
+			pathspec: '.',
+		});
 	});
 
-	console.log(chalk.blue('Loading content...'));
-
 	// Only file-based content collections carry a `filePath` under the content directory
-	const entries = await withAstroContent((content) =>
-		getCollectionEntries(content, [
-			'chronology',
-			'locations',
-			'pages',
-			'posts',
-			'regions',
-			'resources',
-			'series',
-			'themes',
-		]),
+	const entries = await withSpinner('Loading content', () =>
+		withAstroContent((content) =>
+			getCollectionEntries(content, [
+				'chronology',
+				'locations',
+				'pages',
+				'posts',
+				'regions',
+				'resources',
+				'series',
+				'themes',
+			]),
+		),
 	);
 
 	const { missingDateCount, resolvedCount, urls } = resolveUrls(entries, gitMap, {
-		contentPathPrefix: `${contentPathRelative}/collections/`,
-		siteUrl: options.siteUrl,
+		contentPathPrefix: `${path.relative(paths.rootPath, collectionsPath)}/`,
+		siteUrl,
 	});
 
 	safelyCreateDirectory(path.dirname(outputPath));
@@ -65,29 +68,17 @@ export async function generateSitemapLastmod(options: SitemapLastmodOptions): Pr
 
 	writeFileSync(outputPath, JSON.stringify(payload, undefined, 2));
 
-	console.log(chalk.green(`Resolved: ${String(resolvedCount)} URLs`));
+	log.success(`Resolved ${formatCount(resolvedCount)} URLs → ${outputPath}`);
 
 	if (missingDateCount > 0) {
-		console.log(chalk.yellow(`  ${String(missingDateCount)} entries with no matching git history`));
+		log.warn(`${formatCount(missingDateCount)} entries with no matching git history`);
 	}
-
-	console.log(chalk.gray(`Output: ${outputPath}`));
 }
 
 function buildContentUrl(siteUrl: string, collection: string, id: string): string {
 	const collectionSegment = rootCollections.has(collection) ? '' : collection;
 
 	return joinUrl(siteUrl, collectionSegment, id, '/');
-}
-
-function resolvePaths(options: SitemapLastmodOptions) {
-	const contentPathRelative = options.contentPath ?? 'packages/content';
-
-	return {
-		contentPathAbs: path.resolve(options.rootPath, contentPathRelative),
-		contentPathRelative,
-		outputPath: path.resolve(options.rootPath, options.outputPath ?? sitemapLastmodPath),
-	};
 }
 
 function resolveUrls(
@@ -107,7 +98,7 @@ function resolveUrls(
 
 		if (!gitDate) {
 			missingDateCount++;
-			console.log(chalk.yellow(`  No git history: ${entry.filePath}`));
+			log.detail(`No git history: ${entry.filePath}`);
 			continue;
 		}
 

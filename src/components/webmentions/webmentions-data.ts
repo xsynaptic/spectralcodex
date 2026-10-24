@@ -1,10 +1,10 @@
 import type { Webmention } from '@spectralcodex/shared/schemas';
 
+import { getWebmentionsPath } from '@spectralcodex/shared/paths';
 import { WebmentionPropertyEnum, WebmentionSchema } from '@spectralcodex/shared/schemas';
 import { CONTENT_DATA_PATH } from 'astro:env/server';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
-import process from 'node:process';
 
 // Bridgy backfeeds our own thread continuations as replies; they are not third-party commentary
 const selfAuthorUrls = new Set([
@@ -110,7 +110,7 @@ function isSelfAuthored(mention: Webmention) {
 }
 
 async function loadWebmentions() {
-	const filePath = path.join(process.cwd(), CONTENT_DATA_PATH, '..', 'data', 'webmentions.jsonl');
+	const filePath = getWebmentionsPath(path.resolve(CONTENT_DATA_PATH));
 
 	try {
 		const fileContents = await readFile(filePath, 'utf8');

@@ -1,11 +1,12 @@
 import type { GeometryBoundingBox } from '@spectralcodex/shared/schemas';
 
 import { GeometryBoundingBoxSchema, GeometryDivisionIdSchema } from '@spectralcodex/shared/schemas';
-import chalk from 'chalk';
 import path from 'node:path';
 
 import type { RegionMetadata } from '#map-divisions/types.ts';
 import type { ContentEntry } from '#shared/astro-content.ts';
+
+import { formatCount, log } from '#shared/cli-output.ts';
 
 export function getDivisionIds(entry: ContentEntry): Array<string> {
 	const divisionId = GeometryDivisionIdSchema.optional().parse(entry.data.divisionId);
@@ -40,10 +41,8 @@ export function parseRegionData(entries: Array<ContentEntry>) {
 
 	const regionsWithDivisionIds = regions.filter((r) => r.divisionIds.length > 0);
 
-	console.log(
-		chalk.green(
-			`Found ${chalk.cyan(String(regionsWithDivisionIds.length))} regions with division IDs (${chalk.cyan(String(regions.length))} total regions)`,
-		),
+	log.detail(
+		`${formatCount(regionsWithDivisionIds.length)} of ${formatCount(regions.length)} Regions name divisions`,
 	);
 
 	return { allRegions: regions, regionsWithDivisionIds };

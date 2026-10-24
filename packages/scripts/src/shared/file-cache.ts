@@ -1,7 +1,7 @@
 import { existsSync, promises as fs } from 'node:fs';
 import path from 'node:path';
 
-import { Refusal } from '#shared/cli-error.ts';
+import { Refusal } from '#shared/cli-command.ts';
 import { readFileIfExists, readJsonFile, sortRecord, writeJsonFile } from '#shared/utils.ts';
 
 const sidecarFile = 'sidecar.json';

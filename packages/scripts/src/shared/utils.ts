@@ -1,38 +1,30 @@
-import chalk from 'chalk';
 import { existsSync, mkdirSync } from 'node:fs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { $ } from 'zx';
 
+import { log } from '#shared/cli-output.ts';
+
 export function safelyCreateDirectory(dir: string) {
 	if (existsSync(dir)) return;
 
 	mkdirSync(dir, { recursive: true });
-	console.log(chalk.gray(`Created directory: ${chalk.cyan(dir)}`));
+	log.detail(`Created directory: ${dir}`);
 }
-
-// Walk up the directory tree looking for `pnpm-workspace.yaml` to locate the monorepo root
-// Cached at module load: scripts only ever run from one place per invocation
-let cachedWorkspaceRoot: string | undefined;
 
 export async function ensureSshKeychain() {
 	try {
 		await $`ssh-add --apple-load-keychain 2>/dev/null`;
 	} catch {
-		// Ignore - not on macOS or no keychain
+		// Not on macOS, or no keychain
 	}
 }
 
 export function findWorkspaceRoot(startDir: string = process.cwd()): string {
-	if (cachedWorkspaceRoot) return cachedWorkspaceRoot;
-
 	let current = path.resolve(startDir);
 
 	while (current !== path.dirname(current)) {
-		if (existsSync(path.join(current, 'pnpm-workspace.yaml'))) {
-			cachedWorkspaceRoot = current;
-			return current;
-		}
+		if (existsSync(path.join(current, 'pnpm-workspace.yaml'))) return current;
 
 		current = path.dirname(current);
 	}
@@ -47,10 +39,6 @@ export async function isExistingFile(filePath: string) {
 	} catch {
 		return false;
 	}
-}
-
-export function getLocalCachePath(rootPath: string) {
-	return path.resolve(rootPath, process.env.CUSTOM_CACHE_PATH || '.cache');
 }
 
 export async function readFileIfExists(filePath: string) {

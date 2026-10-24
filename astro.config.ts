@@ -5,6 +5,12 @@ import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 import { astroCacheDir } from '@spectralcodex/shared/constants';
 import { getUrlPathIndexing } from '@spectralcodex/shared/indexing';
+import {
+	contentDataPathDefault,
+	contentMediaPathDefault,
+	customCachePathDefault,
+	getCachePaths,
+} from '@spectralcodex/shared/paths';
 import { readSitemapLastmod } from '@spectralcodex/shared/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import buildLogger from '@xsynaptic/astro-build-logger';
@@ -25,11 +31,8 @@ import devInventory from '#dev/inventory/inventory-integration.ts';
 import atlas from '#lib/atlas/atlas-integration.ts';
 import imageManifest from '#lib/image/image-manifest-integration.ts';
 
-const contentMediaPathDefault = 'packages/content-demo/media';
-const customCachePathDefault = './.cache';
 const imageBaseUrlDefault = '/_img';
 
-// Vite's `loadEnv` reintroduced after having some trouble reading from `process.env` 2025Q1
 const env = loadEnv(process.env.NODE_ENV ?? 'development', process.cwd(), '');
 const { BUILD_ASSETS_PATH, DEV_SERVER_URL = 'http://localhost:4321/', PROD_SERVER_URL } = env;
 
@@ -55,19 +58,16 @@ function isPrecompressed(filePath: string) {
 	return distFilePath.startsWith(`${assetsPath}/`) && /\.(?:css|js)$/.test(distFilePath);
 }
 
-// Git-derived per-URL dates, written by the sitemap-lastmod deploy step before the build
 // Read on first use, so loading this config never depends on a file a content script writes
 let sitemapLastmodCache: ReturnType<typeof readSitemapLastmod> | undefined;
 
 function getSitemapLastmod() {
-	if (!sitemapLastmodCache) sitemapLastmodCache = readSitemapLastmod();
+	if (!sitemapLastmodCache)
+		sitemapLastmodCache = readSitemapLastmod(getCachePaths(CUSTOM_CACHE_PATH).sitemapLastmodPath);
 
 	return sitemapLastmodCache;
 }
 
-/**
- * @link https://astro.build/config
- */
 export default defineConfig({
 	build: {
 		...(BUILD_ASSETS_PATH ? { assets: BUILD_ASSETS_PATH } : {}),
@@ -75,7 +75,6 @@ export default defineConfig({
 	cacheDir: astroCacheDir,
 	site: isProduction && PROD_SERVER_URL ? PROD_SERVER_URL : DEV_SERVER_URL,
 	trailingSlash: isProduction ? trailingSlash : 'ignore',
-	// Still having some trouble getting this working as expected due to memory issues
 	...(isSsr
 		? {
 				adapter: node({
@@ -88,7 +87,7 @@ export default defineConfig({
 			CONTENT_DATA_PATH: envField.string({
 				access: 'public',
 				context: 'server',
-				default: 'packages/content-demo/collections',
+				default: contentDataPathDefault,
 			}),
 			CONTENT_MEDIA_PATH: envField.string({
 				access: 'public',

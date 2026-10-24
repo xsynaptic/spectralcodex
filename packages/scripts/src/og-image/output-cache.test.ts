@@ -4,7 +4,7 @@ import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 
 import { createOutputCache, getOutputCacheKey } from '#og-image/output-cache.ts';
-import { Refusal } from '#shared/cli-error.ts';
+import { Refusal } from '#shared/cli-command.ts';
 
 describe('getOutputCacheKey', () => {
 	const base = { digest: 'digest', imageDigest: 'source-a', imageId: 'image/entry.jpg' };

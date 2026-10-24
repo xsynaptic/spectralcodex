@@ -5,6 +5,7 @@ import type { UrlStatus } from '#check-links/types.ts';
 
 import { getStats, getUrlsByStatusGroupedByContent } from '#check-links/db.ts';
 import { UrlStatusEnum } from '#check-links/types.ts';
+import { log } from '#shared/cli-output.ts';
 
 interface ReportSection {
 	color: (text: string) => string;
@@ -49,37 +50,30 @@ export function printList(filter?: string): void {
 
 		printSection(section);
 	}
-
-	console.log('');
 }
 
 export function printSessionSummary(checked: number, healthy: number, issues: number): void {
-	console.log('');
-	console.log(
-		chalk.blue(
-			`Session: ${String(checked)} checked, ${chalk.green(`${String(healthy)} healthy`)}, ${chalk.red(`${String(issues)} issues`)}`,
-		),
-	);
+	log.summary([
+		['Checked', checked],
+		['Healthy', healthy],
+		['Issues', issues],
+	]);
 }
 
 export function printStatus(): void {
 	const { blocked, error, healthy, missing, pending, redirect, total } = getStats();
 
-	console.log('');
-	console.log(chalk.magenta('=== Link Check Status ==='));
-	console.log('');
-	console.log(`  Total URLs:  ${String(total)}`);
-	console.log(`  Healthy:     ${chalk.green(String(healthy))}`);
-	console.log(`  Redirected:  ${chalk.yellow(String(redirect))}`);
-	console.log(`  Missing:     ${chalk.magenta(String(missing))}`);
-	console.log(`  Blocked:     ${chalk.cyan(String(blocked))}`);
-	console.log(`  Error:       ${chalk.red(String(error))}`);
-	console.log(`  Pending:     ${chalk.gray(String(pending))}`);
-	console.log('');
+	log.data(chalk.magenta('Link check status'));
+	log.data(`  Total URLs:  ${String(total)}`);
+	log.data(`  Healthy:     ${chalk.green(String(healthy))}`);
+	log.data(`  Redirected:  ${chalk.yellow(String(redirect))}`);
+	log.data(`  Missing:     ${chalk.magenta(String(missing))}`);
+	log.data(`  Blocked:     ${chalk.cyan(String(blocked))}`);
+	log.data(`  Error:       ${chalk.red(String(error))}`);
+	log.data(`  Pending:     ${chalk.gray(String(pending))}`);
 }
 
 function entryId(contentId: string): string {
-	// content_id is "collection/entry-id", we only need the entry ID
 	const slash = contentId.indexOf('/');
 
 	if (slash === -1) return contentId;
@@ -92,14 +86,14 @@ function printSection({ color, formatUrl, label, status }: ReportSection): void 
 
 	if (grouped.size === 0) return;
 
-	console.log('');
-	console.log(color(`--- ${label} (${String(grouped.size)} entries) ---`));
+	log.data('');
+	log.data(color(`--- ${label} (${String(grouped.size)} entries) ---`));
 
 	for (const [contentId, rows] of grouped) {
-		console.log(`  ${entryId(contentId)}:`);
+		log.data(`  ${entryId(contentId)}:`);
 
 		for (const row of rows) {
-			console.log(`    - ${formatUrl(row)}`);
+			log.data(`    - ${formatUrl(row)}`);
 		}
 	}
 }

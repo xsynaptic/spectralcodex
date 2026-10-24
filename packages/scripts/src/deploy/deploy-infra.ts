@@ -1,4 +1,3 @@
-import chalk from 'chalk';
 import path from 'node:path';
 
 import type { DeployConfig } from '#deploy/deploy-config.ts';
@@ -6,6 +5,7 @@ import type { DeployConfig } from '#deploy/deploy-config.ts';
 import { validateCaddyConfig } from '#deploy/deploy-caddy.ts';
 import { loadDeployConfig, requireEnv } from '#deploy/deploy-config.ts';
 import { rsyncTo, sshCapture, sshExec, sshExecWithInput } from '#deploy/rsync-exec.ts';
+import { formatDuration, log } from '#shared/cli-output.ts';
 
 interface DeployInfraOptions {
 	dryRun?: boolean;
@@ -19,7 +19,6 @@ interface InfraSyncTarget {
 	source: string;
 }
 
-// Builds the single server-side .env consumed by deploy/docker-compose.yml (caddy, umami, cache-warmer)
 function buildServerEnv(config: DeployConfig): string {
 	const lines = [
 		`UMAMI_DATA_PATH=${requireEnv('UMAMI_DATA_PATH')}`,
@@ -73,9 +72,9 @@ export async function deployInfra(options: DeployInfraOptions): Promise<void> {
 	const deployDir = path.join(rootPath, 'deploy');
 	const remotePath = config.remotePath;
 
-	console.log(chalk.blue('Deploying infrastructure...'));
-	console.log(chalk.gray(`  To: ${config.remoteHost}:${remotePath}/`));
-	if (dryRun) console.log(chalk.yellow('  DRY RUN'));
+	log.step('Deploying infrastructure...');
+	log.detail(`To: ${config.remoteHost}:${remotePath}/`);
+	if (dryRun) log.warn('Dry run');
 
 	await validateCaddyConfig(deployDir);
 
@@ -84,15 +83,14 @@ export async function deployInfra(options: DeployInfraOptions): Promise<void> {
 	await syncInfraFiles({ config, deployDir, dryRun });
 
 	if (dryRun) {
-		console.log(chalk.yellow('Skipping remote SSH commands (dry run)'));
-		console.log(chalk.yellow(`DRY RUN write ${remotePath}/.env`));
-		console.log(chalk.green(`Done in ${((Date.now() - start) / 1000).toFixed(1)}s`));
+		log.warn(`Dry run; skipping remote commands and the ${remotePath}/.env write`);
+		log.success(`Infrastructure synced in ${formatDuration(Date.now() - start)}`);
 		return;
 	}
 
 	await updateRemoteServices(config, serverEnv);
 
-	console.log(chalk.green(`Done in ${((Date.now() - start) / 1000).toFixed(1)}s`));
+	log.success(`Infrastructure deployed in ${formatDuration(Date.now() - start)}`);
 }
 
 async function syncInfraFiles({
@@ -116,7 +114,7 @@ async function syncInfraFiles({
 async function updateRemoteServices(config: DeployConfig, serverEnv: string): Promise<void> {
 	const remotePath = config.remotePath;
 
-	console.log(chalk.gray('Writing server environment...'));
+	log.detail('Writing server environment...');
 	await sshExecWithInput(
 		config,
 		`umask 077 && cat > ${remotePath}/.env && chmod 600 ${remotePath}/.env`,
@@ -125,25 +123,25 @@ async function updateRemoteServices(config: DeployConfig, serverEnv: string): Pr
 
 	const composeCmd = `cd ${remotePath} && docker compose`;
 
-	console.log(chalk.gray('Pulling images...'));
+	log.detail('Pulling images...');
 	await sshExec(config, `${composeCmd} pull`);
 
 	// cache-warmer is under the `jobs` profile; --profile ensures it builds alongside the rest
-	console.log(chalk.gray('Building local images...'));
+	log.detail('Building local images...');
 	await sshExec(config, `${composeCmd} --profile jobs build`);
 
-	console.log(chalk.gray('Recreating containers...'));
+	log.detail('Recreating containers...');
 	await sshExec(config, `${composeCmd} up -d --remove-orphans --wait --wait-timeout 120`);
 
-	console.log(chalk.gray('Verifying service state...'));
+	log.detail('Verifying service state...');
 	const psOutput = await sshCapture(config, `${composeCmd} ps`);
-	console.log(psOutput);
+	log.info(psOutput);
 
 	if (/\(unhealthy\)|Exit|Restarting/.test(psOutput)) {
 		throw new Error('One or more services unhealthy or restarting');
 	}
 
 	// Caddy serves its config from a bind mount, so a Caddyfile-only change needs a reload
-	console.log(chalk.gray('Reloading Caddy...'));
+	log.detail('Reloading Caddy...');
 	await sshExec(config, 'docker exec caddy caddy reload --config /etc/caddy/Caddyfile');
 }

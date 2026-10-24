@@ -6,6 +6,7 @@ import {
 	getBrowserConfig,
 	getConfig,
 	getWebComponentConfig,
+	restrictedSyntaxDefaults,
 } from '@xsynaptic/eslint-config';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import globals from 'globals';
@@ -78,6 +79,28 @@ export default getConfig(
 				'react-hooks/static-components': 'warn',
 				'react-hooks/unsupported-syntax': 'warn',
 				'react-hooks/use-memo': 'warn',
+			},
+		},
+		{
+			files: ['packages/scripts/src/**/*.{ts,tsx}'],
+			rules: {
+				'no-console': 'error',
+				'no-restricted-syntax': [
+					'error',
+					...restrictedSyntaxDefaults,
+					{
+						message: '`runCommand` owns exit codes; throw a `Refusal` instead',
+						selector: "CallExpression[callee.object.name='process'][callee.property.name='exit']",
+					},
+				],
+			},
+		},
+		{
+			files: ['packages/scripts/src/shared/cli-*.ts'],
+			rules: {
+				'no-console': 'off',
+				'no-restricted-syntax': ['error', ...restrictedSyntaxDefaults],
+				'unicorn/no-process-exit': 'off',
 			},
 		},
 		getBrowserConfig(['src/components/**/*']),

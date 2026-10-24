@@ -1,3 +1,4 @@
+import { getCachePaths } from '@spectralcodex/shared/paths';
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -9,21 +10,18 @@ import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { isListed } from '#lib/utils/content-policy.ts';
 
-// A general file loading function that resolves the file path relative to the project root
 async function loadDataFile(filePath: string) {
 	const resolvedFilePath = path.join(process.cwd(), filePath);
 
 	return readFile(resolvedFilePath, 'utf8');
 }
 
-// Load JSON data from the configured content data path
 async function loadJsonData(filePath: string) {
 	const fileContent = await loadDataFile(filePath);
 
 	return JSON.parse(fileContent) as unknown;
 }
 
-// Schema for similar content data
 const SimilarContentItemSchema = z
 	.record(
 		z.string(),
@@ -70,7 +68,7 @@ async function createSimilarContentFunction() {
 }
 
 async function loadSimilarContentData() {
-	const filePath = path.join(CUSTOM_CACHE_PATH, 'similar-content.json');
+	const filePath = getCachePaths(CUSTOM_CACHE_PATH).similarContentPath;
 
 	try {
 		const similarContent = await loadJsonData(filePath);

@@ -75,7 +75,7 @@ describe('createDevImageResolver', () => {
 		expect(render).toHaveBeenCalledTimes(2);
 	});
 
-	test('a file pnpm images built is served as is', async () => {
+	test('a file pnpm render-images built is served as is', async () => {
 		const builtPath = path.join(rootPath, 'img');
 		const built = path.join(builtPath, 'a/b-1-450.jpg');
 

@@ -3,11 +3,11 @@ import type { GeometryBoundingBox } from '@spectralcodex/shared/schemas';
 import type { Geometry } from 'geojson';
 
 import { DuckDBInstance } from '@duckdb/node-api';
-import chalk from 'chalk';
 
 import type { DivisionGeometry, DivisionItem } from '#map-divisions/types.ts';
 
 import { getDivisionDataCache, saveDivisionDataCache } from '#map-divisions/geojson-cache.ts';
+import { formatCount, formatError, log } from '#shared/cli-output.ts';
 
 interface DivisionRow {
 	areaId: string;
@@ -28,42 +28,24 @@ export async function fetchDivisionData({
 	overtureUrl: string;
 	selectionBBox: GeometryBoundingBox;
 }): Promise<Map<string, DivisionItem>> {
-	console.log(
-		chalk.blue(
-			`Fetching division data for ${chalk.cyan(String(divisionIds.size))} unique division IDs...`,
-		),
-	);
-
 	const { cached: divisionsById, uncachedIds } = await readCachedDivisions(divisionIds, cachePath);
 
-	if (uncachedIds.size === 0) {
-		console.log(
-			chalk.green(`All ${chalk.cyan(String(divisionIds.size))} divisions found in cache`),
-		);
+	if (uncachedIds.size === 0) return divisionsById;
 
-		return divisionsById;
-	}
-
-	console.log(
-		chalk.blue(
-			`Fetching ${chalk.cyan(String(uncachedIds.size))} uncached divisions from Overture Maps...`,
-		),
-	);
+	log.step(`Querying Overture Maps for ${formatCount(uncachedIds.size)} uncached divisions...`);
 
 	const rows = await runDivisionQuery(db, buildQuery(overtureUrl, uncachedIds, selectionBBox));
 
-	console.log(chalk.green(`Found ${chalk.cyan(String(rows.length))} total divisions`));
-
 	if (rows.length === 0) {
-		console.warn(chalk.yellow(`No division data found for any division IDs`));
+		log.warn('No division data found for any division IDs');
 
 		return divisionsById;
 	}
 
-	for (const [index, row] of rows.entries()) {
-		const id = uncachedIds.has(row.areaId) ? row.areaId : row.parentDivisionId;
+	log.detail(`Found ${formatCount(rows.length)} divisions`);
 
-		console.log(chalk.gray(`  Match ${chalk.cyan(String(index + 1))}: ${chalk.cyan(id)}`));
+	for (const row of rows) {
+		const id = uncachedIds.has(row.areaId) ? row.areaId : row.parentDivisionId;
 
 		const geometry = parseDivisionGeometry(row, id);
 
@@ -78,29 +60,21 @@ export async function fetchDivisionData({
 }
 
 export async function initializeDuckDB(): Promise<DuckDBConnection> {
-	try {
-		const instance = await DuckDBInstance.create(':memory:');
-		const connection = await instance.connect();
+	const instance = await DuckDBInstance.create(':memory:');
+	const connection = await instance.connect();
 
-		await connection.run(`
-			INSTALL spatial;
-			LOAD spatial;
-			INSTALL httpfs;
-			LOAD httpfs;
-			SET enable_object_cache=true;
-			SET http_timeout=12000;
-			SET http_retries=5;
-			SET s3_region='us-west-2';
-		`);
+	await connection.run(`
+		INSTALL spatial;
+		LOAD spatial;
+		INSTALL httpfs;
+		LOAD httpfs;
+		SET enable_object_cache=true;
+		SET http_timeout=12000;
+		SET http_retries=5;
+		SET s3_region='us-west-2';
+	`);
 
-		console.log(chalk.green('DuckDB initialized with spatial and httpfs extensions'));
-
-		return connection;
-	} catch (error) {
-		console.error(chalk.red('Failed to initialize DuckDB:'), error);
-
-		throw error;
-	}
+	return connection;
 }
 
 function buildQuery(baseUrl: string, divisionIds: Set<string>, boundingBox?: GeometryBoundingBox) {
@@ -146,10 +120,8 @@ function buildQuery(baseUrl: string, divisionIds: Set<string>, boundingBox?: Geo
 async function cacheDivisionGeometry(id: string, geometry: DivisionGeometry, cachePath: string) {
 	try {
 		await saveDivisionDataCache(id, geometry, cachePath);
-
-		console.log(chalk.gray(`  Cached ${chalk.cyan(id)}`));
 	} catch (error) {
-		console.warn(chalk.yellow(`Failed to cache ${chalk.cyan(id)}:`), error);
+		log.warn(`Failed to cache ${id}: ${formatError(error)}`);
 	}
 }
 
@@ -161,7 +133,7 @@ function parseDivisionGeometry(row: DivisionRow, id: string): DivisionGeometry |
 
 		return;
 	} catch (error) {
-		console.warn(chalk.yellow(`Failed to parse geometry for ${chalk.cyan(id)}:`), error);
+		log.warn(`Failed to parse geometry for ${id}: ${formatError(error)}`);
 
 		return;
 	}
@@ -175,7 +147,6 @@ async function readCachedDivisions(divisionIds: Set<string>, cachePath: string) 
 		const item = await getDivisionDataCache(divisionId, cachePath);
 
 		if (item) {
-			console.log(chalk.gray(`  Using cached data for ${chalk.cyan(divisionId)}`));
 			cached.set(divisionId, item);
 		} else {
 			uncachedIds.add(divisionId);
@@ -186,29 +157,18 @@ async function readCachedDivisions(divisionIds: Set<string>, cachePath: string) 
 }
 
 async function runDivisionQuery(db: DuckDBConnection, query: string): Promise<Array<DivisionRow>> {
-	console.log(chalk.blue(`Running query against Overture Maps...`));
+	const result = await db.run(query);
+	const rows: Array<DivisionRow> = [];
 
-	try {
-		const result = await db.run(query);
-
-		console.log(chalk.green(`Found ${chalk.cyan(String(result.rowCount))} rows`));
-
-		const rows: Array<DivisionRow> = [];
-
-		for (let index = 0; index < result.chunkCount; index++) {
-			for (const row of result.getChunk(index).getRows()) {
-				rows.push({
-					areaId: row[0] as string,
-					geometryGeojson: row[2] as string,
-					parentDivisionId: row[1] as string,
-				});
-			}
+	for (let index = 0; index < result.chunkCount; index++) {
+		for (const row of result.getChunk(index).getRows()) {
+			rows.push({
+				areaId: row[0] as string,
+				geometryGeojson: row[2] as string,
+				parentDivisionId: row[1] as string,
+			});
 		}
-
-		return rows;
-	} catch (error) {
-		console.log(chalk.red(`\nQuery failed`));
-		console.error(chalk.red(`Error fetching batch data:`), error);
-		throw error;
 	}
+
+	return rows;
 }

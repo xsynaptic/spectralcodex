@@ -17,7 +17,7 @@ import {
 	recordConsumedManifest,
 	writeEngine,
 } from '#images/images-state.ts';
-import { Refusal } from '#shared/cli-error.ts';
+import { Refusal } from '#shared/cli-command.ts';
 import { createFileCache } from '#shared/file-cache.ts';
 import { createPurgeQueue } from '#shared/purge-queue.ts';
 import { readFileIfExists } from '#shared/utils.ts';
@@ -263,7 +263,7 @@ export async function buildImages(options: ImageBuildOptions) {
 	signal?.throwIfAborted();
 
 	if (failures.length > 0) {
-		throw new Error(`${String(failures.length)} derivatives failed:\n${formatList(failures)}`);
+		throw new Error(`${String(failures.length)} images failed to render:\n${formatList(failures)}`);
 	}
 
 	await prune.apply();

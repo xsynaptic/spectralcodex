@@ -1,10 +1,10 @@
 import { openGraphBasePath } from '@spectralcodex/shared/open-graph';
-import chalk from 'chalk';
 import { readdirSync } from 'node:fs';
 import path from 'node:path';
 
 import { loadDeployConfig } from '#deploy/deploy-config.ts';
 import { rsyncTo, sshExecWithInput } from '#deploy/rsync-exec.ts';
+import { formatDuration, log } from '#shared/cli-output.ts';
 
 interface DeployAppOptions {
 	dryRun?: boolean;
@@ -19,11 +19,11 @@ export async function deployApp(options: DeployAppOptions): Promise<void> {
 
 	const distPath = path.join(rootPath, 'dist');
 
-	console.log(chalk.blue('Transferring app...'));
-	console.log(chalk.gray(`  From: ${distPath}`));
-	console.log(chalk.gray(`  To:   ${config.remoteHost}:${config.sitePath}`));
+	log.step('Transferring app...');
+	log.detail(`From: ${distPath}`);
+	log.detail(`To:   ${config.remoteHost}:${config.sitePath}`);
 
-	if (dryRun) console.log(chalk.yellow('  DRY RUN'));
+	if (dryRun) log.warn('Dry run');
 
 	const start = Date.now();
 
@@ -47,5 +47,5 @@ export async function deployApp(options: DeployAppOptions): Promise<void> {
 		);
 	}
 
-	console.log(chalk.green(`Done in ${((Date.now() - start) / 1000).toFixed(1)}s`));
+	log.success(`App transferred in ${formatDuration(Date.now() - start)}`);
 }

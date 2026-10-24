@@ -1,4 +1,5 @@
-import chalk from 'chalk';
+import { Refusal } from '#shared/cli-command.ts';
+import { log } from '#shared/cli-output.ts';
 
 export interface DeployConfig {
 	imageBaseUrl: string;
@@ -23,13 +24,13 @@ const requiredEnvVars = [
 type RequiredEnvVar = (typeof requiredEnvVars)[number];
 
 const exampleEnvLines = [
-	'  DEPLOY_REMOTE_HOST=deploy@your-server.com',
-	'  DEPLOY_SSH_KEY_PATH=/path/to/ssh/key (optional)',
-	'  DEPLOY_REMOTE_PATH=/opt/server',
-	'  DEPLOY_SITE_PATH=/var/www/spectralcodex',
-	'  PROD_SERVER_URL=https://example.com/',
-	'  DEPLOY_MEDIA_PATH=/mnt/storage/spectralcodex',
-	'  IMAGE_BASE_URL=https://img.example.com',
+	'DEPLOY_REMOTE_HOST=deploy@your-server.com',
+	'DEPLOY_SSH_KEY_PATH=/path/to/ssh/key (optional)',
+	'DEPLOY_REMOTE_PATH=/opt/server',
+	'DEPLOY_SITE_PATH=/var/www/spectralcodex',
+	'PROD_SERVER_URL=https://example.com/',
+	'DEPLOY_MEDIA_PATH=/mnt/storage/spectralcodex',
+	'IMAGE_BASE_URL=https://img.example.com',
 ];
 
 export function loadDeployConfig(): DeployConfig {
@@ -48,21 +49,22 @@ export function loadDeployConfig(): DeployConfig {
 }
 
 export function printDeployConfig(config: DeployConfig) {
-	console.log(chalk.blue('Deploy Configuration:'));
-	console.log(chalk.gray(`  Remote:      ${config.remoteHost}`));
-	console.log(chalk.gray(`  Remote path: ${config.remotePath}`));
-	console.log(chalk.gray(`  Site path:   ${config.sitePath}`));
-	console.log(chalk.gray(`  Site URL:    ${config.siteUrl}`));
-	console.log(chalk.gray(`  Media path:  ${config.mediaPath}`));
-	console.log(chalk.gray(`  Images path: ${config.imagesPath}`));
-	console.log(chalk.gray(`  Image URL:   ${config.imageBaseUrl}`));
-	console.log('');
+	log.step('Deploy configuration');
+	log.summary([
+		['Remote', config.remoteHost],
+		['Remote path', config.remotePath],
+		['Site path', config.sitePath],
+		['Site URL', config.siteUrl],
+		['Media path', config.mediaPath],
+		['Images path', config.imagesPath],
+		['Image URL', config.imageBaseUrl],
+	]);
 }
 
 export function requireEnv(name: string): string {
 	const value = process.env[name];
 	if (!value) {
-		throw new Error(`Missing required environment variable: ${name}`);
+		throw new Refusal(`Missing required environment variable: ${name}`);
 	}
 	return value;
 }
@@ -83,14 +85,11 @@ function readRequiredEnvVars(): Record<RequiredEnvVar, string> {
 
 	if (missing.length === 0) return values;
 
-	const message = `Missing required environment variables: ${missing.join(', ')}`;
-
-	console.error(chalk.red(message));
-	console.error(chalk.gray('\nExample .env configuration:'));
+	log.detail('Example .env configuration:');
 
 	for (const line of exampleEnvLines) {
-		console.error(chalk.gray(line));
+		log.detail(`  ${line}`);
 	}
 
-	throw new Error(message);
+	throw new Refusal(`Missing required environment variables: ${missing.join(', ')}`);
 }

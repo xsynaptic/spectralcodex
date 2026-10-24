@@ -1,24 +1,28 @@
-#!/usr/bin/env tsx
-import { parseArgs } from 'node:util';
-
 import { deployCaddy } from '#deploy/deploy-caddy.ts';
+import { loadDeployConfig } from '#deploy/deploy-config.ts';
 import { verifyEdge } from '#deploy/verify-edge.ts';
-import { ensureSshKeychain, findWorkspaceRoot } from '#shared/utils.ts';
+import { defineCommand, runCommand } from '#shared/cli-command.ts';
+import { ensureSshKeychain } from '#shared/utils.ts';
 
-const { values } = parseArgs({
-	args: process.argv.slice(2),
-	options: {
-		'dry-run': { default: false, type: 'boolean' },
-	},
-});
+await runCommand(
+	defineCommand({
+		name: 'deploy-caddy',
+		options: {
+			'dry-run': {
+				default: false,
+				description: 'Validate and show what would change, without reloading',
+				type: 'boolean',
+			},
+		},
+		async run({ paths, values }) {
+			const isDryRun = values['dry-run'];
 
-const isDryRun = values['dry-run'];
+			await ensureSshKeychain();
+			await deployCaddy({ dryRun: isDryRun, rootPath: paths.rootPath });
 
-await ensureSshKeychain();
-
-await deployCaddy({
-	dryRun: isDryRun,
-	rootPath: findWorkspaceRoot(),
-});
-
-if (!isDryRun) await verifyEdge();
+			if (!isDryRun) await verifyEdge({ cachePath: paths.cachePath, config: loadDeployConfig() });
+		},
+		summary: 'Validate, upload and reload the Caddy config, then verify the edge cache headers',
+		title: 'Deploy Caddy',
+	}),
+);

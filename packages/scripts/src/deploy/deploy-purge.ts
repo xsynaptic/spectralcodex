@@ -1,7 +1,7 @@
-import chalk from 'chalk';
 import * as R from 'remeda';
 
 import { requireEnv } from '#deploy/deploy-config.ts';
+import { formatCount, log } from '#shared/cli-output.ts';
 import { createPurgeQueue } from '#shared/purge-queue.ts';
 
 // Cloudflare Free: 100 URLs per single-file purge call
@@ -68,7 +68,7 @@ export async function purgeQueuedFiles({
 	const names = [...queue.queued];
 
 	if (names.length === 0) {
-		console.log(chalk.gray(`No ${label} queued for purge`));
+		log.detail(`No ${label} queued for purge`);
 		return;
 	}
 
@@ -79,23 +79,21 @@ export async function purgeQueuedFiles({
 	const prefix = getPurgePrefix(baseUrl);
 	const isPrefixPurge = names.length > prefixPurgeThreshold;
 
-	console.log(
-		chalk.blue(
-			isPrefixPurge
-				? `Purging ${prefix} for ${String(names.length)} queued ${label}...`
-				: `Purging ${String(names.length)} ${label}...`,
-		),
+	log.step(
+		isPrefixPurge
+			? `Purging ${prefix} for ${formatCount(names.length)} queued ${label}...`
+			: `Purging ${formatCount(names.length)} ${label}...`,
 	);
 
 	if (dryRun) {
-		console.log(chalk.yellow('  DRY RUN; the queue is kept'));
+		log.warn('Dry run; the queue is kept');
 		return;
 	}
 
 	if (isPrefixPurge) {
 		await requestPurge({ prefixes: [prefix] });
 		await queue.remove(names);
-		console.log(chalk.green('Purge done'));
+		log.success('Purge done');
 		return;
 	}
 
@@ -104,5 +102,5 @@ export async function purgeQueuedFiles({
 		await queue.remove(batch);
 	}
 
-	console.log(chalk.green('Purge done'));
+	log.success('Purge done');
 }

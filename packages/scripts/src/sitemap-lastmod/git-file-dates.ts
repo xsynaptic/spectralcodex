@@ -1,15 +1,13 @@
 import { $ } from 'zx';
 
+import { log } from '#shared/cli-output.ts';
+
 interface GitFileDatesOptions {
-	// Directory to run git in (repo root or a subdirectory)
 	cwd: string;
-	// Commit timestamp to record (default: committer)
 	date?: 'author' | 'committer';
-	// Prepended to each key, to rebase paths onto a common root
 	keyPrefix?: string;
-	// Behaviour on a shallow clone, where dates would be wrong (default: throw)
+	// A shallow clone would report wrong dates
 	onShallow?: 'ignore' | 'throw' | 'warn';
-	// Limit the log to these paths (git pathspec)
 	pathspec?: Array<string> | string;
 }
 
@@ -76,5 +74,5 @@ async function warnOrThrowOnShallow(cwd: string, onShallow: 'ignore' | 'throw' |
 
 	if (onShallow === 'throw') throw new Error(message);
 
-	console.warn(message);
+	log.warn(message);
 }

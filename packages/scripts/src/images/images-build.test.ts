@@ -14,7 +14,7 @@ import sharp from 'sharp';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 
 import { buildImages } from '#images/images-build.ts';
-import { Refusal } from '#shared/cli-error.ts';
+import { Refusal } from '#shared/cli-command.ts';
 import { findWorkspaceRoot, readFileIfExists } from '#shared/utils.ts';
 
 const demoImageId = 'example-folder-1/example-image-1.jpg';

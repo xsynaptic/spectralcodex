@@ -1,80 +1,66 @@
-#!/usr/bin/env tsx
-import path from 'node:path';
-import { parseArgs } from 'node:util';
-
 import { fallbackImageIds } from '#og-image/fallback.ts';
 import { getCollectionEntries, withAstroContent } from '#shared/astro-content.ts';
+import { defineCommand, runCommand } from '#shared/cli-command.ts';
+import { formatCount, log } from '#shared/cli-output.ts';
+import { withSpinner } from '#shared/cli-progress.ts';
 import { collectMediaFiles, extractImageFeaturedIds, extractMdxImageIds } from '#shared/images.ts';
-import { findWorkspaceRoot } from '#shared/utils.ts';
 
-const rootPath = findWorkspaceRoot();
-
-const { values } = parseArgs({
-	args: process.argv.slice(2),
-	options: {
-		ignore: {
-			default: [],
-			multiple: true,
-			type: 'string',
-		},
-		'media-path': {
-			default: 'packages/content/media',
-			type: 'string',
-		},
-	},
-});
-
-const mediaPath = path.join(rootPath, values['media-path']);
-
-const allEntries = await withAstroContent((content) =>
-	getCollectionEntries(content, [
-		'chronology',
-		'locations',
-		'pages',
-		'posts',
-		'regions',
-		'resources',
-		'series',
-		'themes',
-	]),
-);
-
-const mediaFiles = collectMediaFiles(mediaPath, { ignore: values.ignore });
-const referencedImages = new Set<string>();
-
-for (const entry of allEntries) {
-	const frontmatterIds = extractImageFeaturedIds(entry.data);
-	const mdxIds = entry.body ? extractMdxImageIds(entry.body) : [];
-
-	for (const id of frontmatterIds) {
-		referencedImages.add(id);
-	}
-	for (const id of mdxIds) {
-		referencedImages.add(id);
-	}
+function getEntryImageIds(entry: Awaited<ReturnType<typeof loadEntries>>[number]) {
+	return [
+		...extractImageFeaturedIds(entry.data),
+		...(entry.body ? extractMdxImageIds(entry.body) : []),
+	];
 }
 
 // OG image fallbacks are referenced indirectly; seed them so they aren't flagged
-for (const value of Object.values(fallbackImageIds)) {
-	if (typeof value === 'string') {
-		referencedImages.add(value);
-	} else {
-		for (const fallbackId of value) {
-			referencedImages.add(fallbackId);
-		}
-	}
+function collectReferencedImages(entries: Awaited<ReturnType<typeof loadEntries>>) {
+	return new Set([
+		...entries.flatMap((entry) => getEntryImageIds(entry)),
+		...Object.values(fallbackImageIds).flat(),
+	]);
 }
 
-const orphanedFiles: Array<string> = [];
-
-for (const file of mediaFiles) {
-	if (!referencedImages.has(file)) {
-		orphanedFiles.push(file);
-	}
+function loadEntries() {
+	return withAstroContent((content) =>
+		getCollectionEntries(content, [
+			'chronology',
+			'locations',
+			'pages',
+			'posts',
+			'regions',
+			'resources',
+			'series',
+			'themes',
+		]),
+	);
 }
 
-orphanedFiles.sort((fileA, fileB) => fileA.localeCompare(fileB));
+await runCommand(
+	defineCommand({
+		name: 'media-orphans',
+		options: {
+			ignore: {
+				description: 'Skip media paths starting with this prefix; repeatable',
+				multiple: true,
+				type: 'string',
+			},
+		},
+		async run({ paths, values }) {
+			const entries = await withSpinner('Loading content', loadEntries);
+			const mediaFiles = collectMediaFiles(paths.mediaPath, { ignore: values.ignore ?? [] });
+			const referencedImages = collectReferencedImages(entries);
 
-for (const file of orphanedFiles) {
-	console.log(file);
-}
+			const orphanedFiles = [...mediaFiles]
+				.filter((file) => !referencedImages.has(file))
+				.toSorted((fileA, fileB) => fileA.localeCompare(fileB));
+
+			for (const file of orphanedFiles) log.data(file);
+
+			log.info(
+				`${formatCount(orphanedFiles.length)} of ${formatCount(mediaFiles.size)} media files unreferenced`,
+			);
+		},
+		summary: 'List media files no entry references, one path per line on stdout',
+		title: 'Media orphans',
+	}),
+);

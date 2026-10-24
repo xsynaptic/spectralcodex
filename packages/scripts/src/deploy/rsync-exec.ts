@@ -1,5 +1,6 @@
-import chalk from 'chalk';
 import { $ } from 'zx';
+
+import { log } from '#shared/cli-output.ts';
 
 interface RsyncOptions {
 	archive?: 'av' | 'avz';
@@ -50,7 +51,6 @@ export async function rsyncTo(
 	return result.stdout;
 }
 
-// Like sshExec but captures and returns stdout
 export async function sshCapture(config: SshTarget, command: string): Promise<string> {
 	const sshArgs = [...(config.sshKeyPath ? ['-i', config.sshKeyPath] : []), config.remoteHost];
 
@@ -66,7 +66,7 @@ export async function sshExec(
 	{ dryRun = false }: { dryRun?: boolean } = {},
 ): Promise<void> {
 	if (dryRun) {
-		console.log(chalk.yellow(`DRY RUN ssh: ${command}`));
+		log.warn(`Dry run; ssh: ${command}`);
 		return;
 	}
 

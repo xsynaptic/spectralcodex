@@ -1,4 +1,4 @@
-import chalk from 'chalk';
+import { log } from '#shared/cli-output.ts';
 
 export interface EntryReference {
 	collection: string;
@@ -29,22 +29,29 @@ export function reportValidationResult({
 	status,
 	summary,
 }: ValidationResult): void {
-	const color = status === 'fail' ? chalk.red : chalk.yellow;
-
-	// The warning glyph is narrow, so it carries its own trailing space
-	const marker = status === 'fail' ? '❌' : '⚠️ ';
-
-	const issueLines = issues.flatMap((issue) => toIssueLines(issue, marker));
-
-	for (const line of issueLines) {
-		console.log(color(line));
+	function report(text: string) {
+		if (status === 'fail') {
+			log.error(text);
+		} else {
+			log.warn(text);
+		}
 	}
 
-	console.log(status === 'pass' ? chalk.green(`✓ ${summary}`) : chalk.yellow(`⚠️  ${summary}`));
+	for (const issue of issues) {
+		const details = issue.details ?? [];
 
-	for (const note of notes) {
-		console.log(chalk.dim(note));
+		report(issue.message);
+
+		for (const detail of details) log.detail(detail);
 	}
+
+	if (status === 'pass') {
+		log.success(summary);
+	} else {
+		report(summary);
+	}
+
+	for (const note of notes) log.detail(note);
 }
 
 export function toReferenceValidationResult(
@@ -66,10 +73,4 @@ export function toValidationResult(
 	if (issues.length === 0) return { issues: [], status: 'pass', summary: summaries.pass };
 
 	return { issues, status: 'fail', summary: summaries.fail };
-}
-
-function toIssueLines(issue: ValidationIssue, marker: string) {
-	const details = issue.details ?? [];
-
-	return [`${marker} ${issue.message}`, ...details.map((detail) => `   ${detail}`)];
 }

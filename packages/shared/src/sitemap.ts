@@ -1,8 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { z } from 'zod';
 
-export const sitemapLastmodPath = '.cache/sitemap-lastmod.json';
-
 const SitemapLastmodSchema = z.object({
 	generatedAt: z.string(),
 	urls: z.record(z.string(), z.string()),
@@ -10,7 +8,7 @@ const SitemapLastmodSchema = z.object({
 
 export type SitemapLastmod = z.infer<typeof SitemapLastmodSchema>;
 
-export function readSitemapLastmod(filePath = sitemapLastmodPath): SitemapLastmod {
+export function readSitemapLastmod(filePath: string): SitemapLastmod {
 	if (existsSync(filePath)) {
 		try {
 			return SitemapLastmodSchema.parse(JSON.parse(readFileSync(filePath, 'utf8')));

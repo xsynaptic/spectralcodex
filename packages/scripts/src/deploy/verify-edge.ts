@@ -1,7 +1,10 @@
 import type { ImageDerivative, ImageFormat, ImageManifest } from '@spectralcodex/shared/images';
 
-import { imageManifestFile, imageQualityByFormat } from '@spectralcodex/shared/images';
-import chalk from 'chalk';
+import {
+	getImageCachePaths,
+	imageManifestFile,
+	imageQualityByFormat,
+} from '@spectralcodex/shared/images';
 import { randomBytes } from 'node:crypto';
 import { stat } from 'node:fs/promises';
 import path from 'node:path';
@@ -9,9 +12,8 @@ import * as R from 'remeda';
 
 import type { DeployConfig } from '#deploy/deploy-config.ts';
 
-import { loadDeployConfig } from '#deploy/deploy-config.ts';
-import { getLocalImagePaths } from '#images/images-state.ts';
-import { findWorkspaceRoot, readJsonFile } from '#shared/utils.ts';
+import { log } from '#shared/cli-output.ts';
+import { readJsonFile } from '#shared/utils.ts';
 
 interface EdgeExpectation {
 	cacheControl: string;
@@ -37,15 +39,21 @@ const imageContentTypes = { jpg: 'image/jpeg', webp: 'image/webp' } satisfies Re
 
 const imageSampleSize = 20;
 
-export async function verifyEdge(): Promise<void> {
-	const config = loadDeployConfig();
+type ImageCachePaths = ReturnType<typeof getImageCachePaths>;
 
+export async function verifyEdge({
+	cachePath,
+	config,
+}: {
+	cachePath: string;
+	config: DeployConfig;
+}): Promise<void> {
 	const baseUrl = config.siteUrl.replace(/\/$/, '');
 
 	const token = Date.now().toString();
 	const cacheBust = `edge-check=${token}`;
 
-	console.log(chalk.blue('Verifying edge cache tiers...'));
+	log.step('Verifying edge cache tiers...');
 
 	const failures: Array<string> = [];
 
@@ -59,7 +67,7 @@ export async function verifyEdge(): Promise<void> {
 			return;
 		}
 
-		console.log(chalk.gray(`  ok  ${expectation.label}: ${expectation.path}`));
+		log.detail(`ok  ${expectation.label}: ${expectation.path}`);
 	}
 
 	const documentResponse = await request(`${baseUrl}/?${cacheBust}`, 'GET', 'document (/)');
@@ -81,7 +89,14 @@ export async function verifyEdge(): Promise<void> {
 		const document = getDocumentExpectations(html);
 
 		expectations.push(...document.expectations);
-		failures.push(...document.failures, ...(await getImageHostFailures(html, config, token)));
+		failures.push(
+			...document.failures,
+			...(await getImageHostFailures(html, {
+				config,
+				imagePaths: getImageCachePaths(cachePath),
+				token,
+			})),
+		);
 	}
 
 	const results = await Promise.all(
@@ -101,14 +116,14 @@ export async function verifyEdge(): Promise<void> {
 
 	if (failures.length > 0) {
 		for (const failure of failures) {
-			console.error(chalk.red(`  fail  ${failure}`));
+			log.error(failure);
 		}
 		throw new Error(
 			`Edge verification failed: ${String(failures.length)} check(s) do not match deploy/caddy/Caddyfile or a Cloudflare rule is overriding them`,
 		);
 	}
 
-	console.log(chalk.green('Edge verification passed'));
+	log.success('Edge verification passed');
 }
 
 function fetchWithTimeout(url: string, method: 'GET' | 'HEAD') {
@@ -253,7 +268,7 @@ async function getHeroImageFailures(imageUrl: string) {
 		return [`hero image (${imageUrl}): expected X-Content-Type-Options nosniff`];
 	}
 
-	console.log(chalk.gray(`  ok  hero image: ${imageUrl}`));
+	log.detail(`ok  hero image: ${imageUrl}`);
 
 	return [];
 }
@@ -286,7 +301,7 @@ async function getLegacyRedirectFailures(imageBaseUrl: string, imagePath: string
 		return [`legacy redirect (${legacyPath}): expected /${imagePath}, got ${location}`];
 	}
 
-	console.log(chalk.gray(`  ok  legacy redirect: ${legacyPath}`));
+	log.detail(`ok  legacy redirect: ${legacyPath}`);
 
 	return [];
 }
@@ -306,7 +321,7 @@ async function getMissingImageFailures(imageBaseUrl: string, token: string) {
 
 	if (failure) return [`missing image (${missingPath}): ${failure}`];
 
-	console.log(chalk.gray(`  ok  missing image: ${missingPath}`));
+	log.detail(`ok  missing image: ${missingPath}`);
 
 	return [];
 }
@@ -323,13 +338,11 @@ async function getFileSize(filePath: string) {
 
 async function getSampleFailure(
 	imageBaseUrl: string,
-	rootPath: string,
+	derivativesPath: string,
 	derivative: ImageDerivative,
 ) {
 	const expectedType = imageContentTypes[derivative.format];
-	const localSize = await getFileSize(
-		path.join(getLocalImagePaths(rootPath).derivativesPath, derivative.path),
-	);
+	const localSize = await getFileSize(path.join(derivativesPath, derivative.path));
 	const response = await request(`${imageBaseUrl}/${derivative.path}`, 'GET', derivative.path);
 	const contentType = response.headers.get('content-type');
 	const body = await response.arrayBuffer();
@@ -341,29 +354,37 @@ async function getSampleFailure(
 	return `image sample (${derivative.path}): expected 200, ${expectedType} and ${String(localSize)} bytes, got ${String(response.status)}, ${String(contentType)} and ${String(body.byteLength)} bytes`;
 }
 
-async function getManifestSampleFailures(imageBaseUrl: string) {
-	const rootPath = findWorkspaceRoot();
+async function getManifestSampleFailures(imageBaseUrl: string, imagePaths: ImageCachePaths) {
 	const manifest = await readJsonFile<ImageManifest>(
-		path.join(getLocalImagePaths(rootPath).statePath, imageManifestFile),
+		path.join(imagePaths.statePath, imageManifestFile),
 	);
 
 	if (!manifest) return ['image sample: no local image manifest'];
 
 	const sample = R.sample(manifest.derivatives, imageSampleSize);
 	const failures = await Promise.all(
-		sample.map((derivative) => getSampleFailure(imageBaseUrl, rootPath, derivative)),
+		sample.map((derivative) =>
+			getSampleFailure(imageBaseUrl, imagePaths.derivativesPath, derivative),
+		),
 	);
 
 	const sampleFailures = failures.filter(R.isNonNullish);
 
 	if (sampleFailures.length === 0) {
-		console.log(chalk.gray(`  ok  image sample: ${String(sample.length)} manifest paths`));
+		log.detail(`ok  image sample: ${String(sample.length)} manifest paths`);
 	}
 
 	return sampleFailures;
 }
 
-async function getImageHostFailures(html: string, config: DeployConfig, token: string) {
+async function getImageHostFailures(
+	html: string,
+	{
+		config,
+		imagePaths,
+		token,
+	}: { config: DeployConfig; imagePaths: ImageCachePaths; token: string },
+) {
 	const srcset = /<img\b[^>]*\bfetchpriority="high"[^>]*\bsrcset="([^"]+)"/.exec(html)?.[1];
 	const candidate = srcset?.trim().split(/\s+/, 1)[0];
 
@@ -380,7 +401,7 @@ async function getImageHostFailures(html: string, config: DeployConfig, token: s
 		getHeroImageFailures(imageUrl),
 		getLegacyRedirectFailures(config.imageBaseUrl, imagePath),
 		getMissingImageFailures(config.imageBaseUrl, token),
-		getManifestSampleFailures(config.imageBaseUrl),
+		getManifestSampleFailures(config.imageBaseUrl, imagePaths),
 	]);
 
 	return results.flat();

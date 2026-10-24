@@ -1,16 +1,12 @@
 import type { ImageManifest } from '@spectralcodex/shared/images';
 
-import {
-	getImageCachePaths,
-	imageConsumedManifestFile,
-	imageManifestFile,
-} from '@spectralcodex/shared/images';
+import { imageConsumedManifestFile, imageManifestFile } from '@spectralcodex/shared/images';
 import { createHash } from 'node:crypto';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
 
-import { getLocalCachePath, readFileIfExists, readJsonFile, writeJsonFile } from '#shared/utils.ts';
+import { readFileIfExists, readJsonFile, writeJsonFile } from '#shared/utils.ts';
 
 const engineFile = 'engine.txt';
 const previousManifestFile = 'manifest-previous.json';
@@ -22,10 +18,6 @@ export const engineId = createHash('sha256')
 	.update(JSON.stringify({ ...engineVersions, arch: process.arch, platform: process.platform }))
 	.digest('hex')
 	.slice(0, 8);
-
-export function getLocalImagePaths(rootPath: string) {
-	return getImageCachePaths(getLocalCachePath(rootPath));
-}
 
 export async function readManifest(statePath: string) {
 	return readJsonFile<ImageManifest>(path.join(statePath, imageManifestFile));

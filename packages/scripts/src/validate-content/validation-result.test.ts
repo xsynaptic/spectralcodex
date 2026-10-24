@@ -28,7 +28,7 @@ describe('reportValidationResult', () => {
 
 	beforeEach(() => {
 		lines.length = 0;
-		vi.spyOn(console, 'log').mockImplementation((line: string) => {
+		vi.spyOn(console, 'error').mockImplementation((line: string) => {
 			lines.push(line);
 		});
 	});
@@ -45,7 +45,7 @@ describe('reportValidationResult', () => {
 			summary: '2 image aspect ratios valid',
 		});
 
-		expect(lines).toEqual(['✓ 2 image aspect ratios valid', '   2  3:2']);
+		expect(lines).toEqual(['✓ 2 image aspect ratios valid', '     2  3:2']);
 	});
 
 	test('prints issues above the summary, with details indented', () => {
@@ -56,9 +56,9 @@ describe('reportValidationResult', () => {
 		});
 
 		expect(lines).toEqual([
-			'❌ a-post.mdx',
-			'   Line 3: broken link ID "missing"',
-			'⚠️  Found 1 broken link ID(s)',
+			'✗ a-post.mdx',
+			'  Line 3: broken link ID "missing"',
+			'✗ Found 1 broken link ID(s)',
 		]);
 	});
 
@@ -69,6 +69,6 @@ describe('reportValidationResult', () => {
 			summary: 'Found 1 overlap(s)',
 		});
 
-		expect(lines).toEqual(['⚠️  a: overlaps b (3.0m)', '⚠️  Found 1 overlap(s)']);
+		expect(lines).toEqual(['⚠ a: overlaps b (3.0m)', '⚠ Found 1 overlap(s)']);
 	});
 });

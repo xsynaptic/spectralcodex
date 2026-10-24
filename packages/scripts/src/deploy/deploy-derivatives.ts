@@ -1,20 +1,15 @@
-import { imageQualityByFormat } from '@spectralcodex/shared/images';
-import {
-	openGraphBasePath,
-	openGraphImageFormat,
-	openGraphOutputPath,
-	openGraphStatePath,
-} from '@spectralcodex/shared/open-graph';
-import chalk from 'chalk';
-import path from 'node:path';
-import { createInterface } from 'node:readline/promises';
+import { getImageCachePaths, imageQualityByFormat } from '@spectralcodex/shared/images';
+import { openGraphBasePath, openGraphImageFormat } from '@spectralcodex/shared/open-graph';
+import { getCachePaths } from '@spectralcodex/shared/paths';
 
 import type { DeployConfig } from '#deploy/deploy-config.ts';
+import type { ScriptPaths } from '#shared/cli-command.ts';
 
 import { purgeQueuedFiles } from '#deploy/deploy-purge.ts';
 import { rsyncTo } from '#deploy/rsync-exec.ts';
-import { getLocalImagePaths } from '#images/images-state.ts';
-import { Refusal } from '#shared/cli-error.ts';
+import { Refusal } from '#shared/cli-command.ts';
+import { formatCount, formatDuration, log } from '#shared/cli-output.ts';
+import { isPhraseConfirmed } from '#shared/cli-prompt.ts';
 import { getMassPruneLimit, listFileCacheFiles } from '#shared/file-cache.ts';
 import { createPurgeQueue } from '#shared/purge-queue.ts';
 
@@ -55,13 +50,13 @@ export const derivativePruneOptions = {
 	extraFlags: ['--delete', '--existing', '--ignore-existing', '--itemize-changes'],
 };
 
-export function getImageSet(rootPath: string, config: DeployConfig): DerivativeSet {
-	const { derivativesPath, statePath } = getLocalImagePaths(rootPath);
+export function getImageSet(paths: ScriptPaths, config: DeployConfig): DerivativeSet {
+	const { derivativesPath, statePath } = getImageCachePaths(paths.cachePath);
 
 	return {
-		command: 'pnpm images',
+		command: 'pnpm render-images',
 		extensions: Object.keys(imageQualityByFormat),
-		label: 'image derivatives',
+		label: 'images',
 		localPath: derivativesPath,
 		purgeBaseUrl: config.imageBaseUrl,
 		remotePath: config.imagesPath,
@@ -70,14 +65,14 @@ export function getImageSet(rootPath: string, config: DeployConfig): DerivativeS
 }
 
 // The deploy's hostname purge already covers the site host, so cards need no queue of their own
-export function getOpenGraphSet(rootPath: string, config: DeployConfig): DerivativeSet {
+export function getOpenGraphSet(paths: ScriptPaths, config: DeployConfig): DerivativeSet {
 	return {
 		command: 'pnpm og-image',
 		extensions: [openGraphImageFormat],
-		label: 'OpenGraph cards',
-		localPath: path.join(rootPath, openGraphOutputPath),
+		label: 'OpenGraph images',
+		localPath: getCachePaths(paths.cachePath).openGraphPath,
 		remotePath: `${config.sitePath}/${openGraphBasePath}`,
-		statePath: path.join(rootPath, openGraphStatePath),
+		statePath: getCachePaths(paths.cachePath).openGraphStatePath,
 	};
 }
 
@@ -97,17 +92,6 @@ export function getDeletedPaths(rsyncOutput: string) {
 
 		return deletedPath && !deletedPath.endsWith('/') ? [deletedPath] : [];
 	});
-}
-
-async function isPruneConfirmed(message: string) {
-	if (!process.stdin.isTTY) return false;
-
-	const prompt = createInterface({ input: process.stdin, output: process.stdout });
-	const answer = await prompt.question(message);
-
-	prompt.close();
-
-	return answer.trim() === 'prune';
 }
 
 async function purgeSet(set: DerivativeSet, isDryRun: boolean, deletedPaths: Array<string> = []) {
@@ -134,7 +118,7 @@ function assertPruneLimit(
 	if (isAllowed || count <= limit) return;
 
 	throw new Refusal(
-		`Refusing to delete ${String(count)} remote ${set.label} (limit ${String(limit)}); pass --allow-mass-prune if the local cache is right`,
+		`Refusing to delete ${formatCount(count)} remote ${set.label} (limit ${formatCount(limit)}); pass --allow-mass-prune if the local cache is right`,
 	);
 }
 
@@ -145,16 +129,16 @@ export async function uploadDerivatives(
 	const files = await listLocalFiles(set);
 	const destination = `${config.remoteHost}:${set.remotePath}/`;
 
-	console.log(chalk.blue(`Syncing ${set.label}...`));
-	console.log(chalk.gray(`  From: ${set.localPath}/ (${String(files.length)} files)`));
-	console.log(chalk.gray(`  To:   ${destination}`));
-	if (dryRun) console.log(chalk.yellow('  DRY RUN'));
+	log.step(`Deploying ${set.label}...`);
+	log.detail(`From: ${set.localPath}/ (${formatCount(files.length)} files)`);
+	log.detail(`To:   ${destination}`);
+	if (dryRun) log.warn('Dry run');
 
 	const start = Date.now();
 
 	await rsyncTo(`${set.localPath}/`, destination, { ...derivativeUploadOptions, config, dryRun });
 
-	console.log(chalk.green(`Done in ${((Date.now() - start) / 1000).toFixed(1)}s`));
+	log.success(`Deployed ${set.label} in ${formatDuration(Date.now() - start)}`);
 
 	await purgeSet(set, dryRun);
 }
@@ -165,21 +149,22 @@ export async function pruneRemoteDerivatives(
 		config,
 		dryRun = false,
 		isMassPruneAllowed = false,
-	}: DerivativeDeployOptions & { isMassPruneAllowed?: boolean },
+		signal,
+	}: DerivativeDeployOptions & { isMassPruneAllowed?: boolean; signal: AbortSignal },
 ) {
 	const files = await listLocalFiles(set);
 	const source = `${set.localPath}/`;
 	const destination = `${config.remoteHost}:${set.remotePath}/`;
 	const pruneOptions = { ...derivativePruneOptions, config };
 
-	console.log(chalk.blue(`Listing remote ${set.label} absent from ${source}...`));
+	log.step(`Listing remote ${set.label} absent from ${source}...`);
 
 	const planned = getDeletedPaths(
 		await rsyncTo(source, destination, { ...pruneOptions, dryRun: true }),
 	);
 
 	if (planned.length === 0) {
-		console.log(chalk.green('Nothing to prune'));
+		log.success('Nothing to prune');
 		return;
 	}
 
@@ -189,23 +174,27 @@ export async function pruneRemoteDerivatives(
 		isAllowed: isMassPruneAllowed,
 	});
 
-	console.log(
-		chalk.yellow(`${String(planned.length)} remote files will be deleted (listed above)`),
-	);
+	log.warn(`${formatCount(planned.length)} remote files will be deleted (listed above)`);
 
 	if (dryRun) {
-		console.log(chalk.yellow('  DRY RUN'));
+		log.warn('Dry run; nothing deleted');
 		return;
 	}
 
-	if (!(await isPruneConfirmed('Type "prune" to delete them: '))) {
-		console.log(chalk.yellow('Not confirmed; nothing deleted'));
+	const isConfirmed = await isPhraseConfirmed({
+		message: `Delete ${formatCount(planned.length)} remote ${set.label}?`,
+		phrase: 'prune',
+		signal,
+	});
+
+	if (!isConfirmed) {
+		log.warn('Not confirmed; nothing deleted');
 		return;
 	}
 
 	const deleted = getDeletedPaths(await rsyncTo(source, destination, pruneOptions));
 
-	console.log(chalk.green(`Deleted ${String(deleted.length)} remote ${set.label}`));
+	log.success(`Deleted ${formatCount(deleted.length)} remote ${set.label}`);
 
 	await purgeSet(set, false, deleted);
 }

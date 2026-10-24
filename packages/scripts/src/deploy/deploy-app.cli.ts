@@ -1,21 +1,28 @@
-#!/usr/bin/env tsx
-import { parseArgs } from 'node:util';
-
 import { deployApp } from '#deploy/deploy-app.ts';
-import { ensureSshKeychain, findWorkspaceRoot } from '#shared/utils.ts';
+import { defineCommand, runCommand } from '#shared/cli-command.ts';
+import { ensureSshKeychain } from '#shared/utils.ts';
 
-const { values } = parseArgs({
-	args: process.argv.slice(2),
-	options: {
-		'dry-run': { default: false, type: 'boolean' },
-		'skip-delete': { default: false, type: 'boolean' },
-	},
-});
+await runCommand(
+	defineCommand({
+		name: 'deploy-app',
+		options: {
+			'dry-run': { default: false, description: 'Show what rsync would send', type: 'boolean' },
+			'skip-delete': {
+				default: false,
+				description: 'Keep remote files missing from dist and skip asset retention',
+				type: 'boolean',
+			},
+		},
+		async run({ paths, values }) {
+			await ensureSshKeychain();
 
-await ensureSshKeychain();
-
-await deployApp({
-	dryRun: values['dry-run'],
-	rootPath: findWorkspaceRoot(),
-	skipDelete: values['skip-delete'],
-});
+			await deployApp({
+				dryRun: values['dry-run'],
+				rootPath: paths.rootPath,
+				skipDelete: values['skip-delete'],
+			});
+		},
+		summary: 'Transfer the built site in dist to the server',
+		title: 'Deploy app',
+	}),
+);
