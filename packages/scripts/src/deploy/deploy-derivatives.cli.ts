@@ -1,5 +1,3 @@
-import * as R from 'remeda';
-
 import { loadDeployConfig } from '#deploy/deploy-config.ts';
 import {
 	getImageSet,
@@ -7,15 +5,13 @@ import {
 	pruneRemoteDerivatives,
 	uploadDerivatives,
 } from '#deploy/deploy-derivatives.ts';
-import { defineCommand, Refusal, runCommand } from '#shared/cli-command.ts';
+import { defineCommand, runCommand } from '#shared/cli-command.ts';
 import { ensureSshKeychain } from '#shared/utils.ts';
-
-const derivativeSets = { images: getImageSet, og: getOpenGraphSet };
 
 await runCommand(
 	defineCommand({
 		interrupted: 'the server keeps every finished file, so the next run resumes',
-		name: 'deploy-images|deploy-og',
+		name: 'deploy-images',
 		options: {
 			'allow-mass-prune': {
 				default: false,
@@ -29,32 +25,27 @@ await runCommand(
 				type: 'boolean',
 			},
 		},
-		positional: { description: 'images or og; each alias passes its own', name: 'set' },
-		async run({ paths, positionals, signal, values }) {
-			const [requestedSet] = positionals;
-
-			if (requestedSet === undefined || !R.isIncludedIn(requestedSet, R.keys(derivativeSets))) {
-				throw new Refusal(`Expected an image set (images or og), got ${String(requestedSet)}`);
-			}
-
+		async run({ paths, signal, values }) {
 			await ensureSshKeychain();
 
 			const config = loadDeployConfig();
-			const set = derivativeSets[requestedSet](paths, config);
+			const sets = [getImageSet(paths, config), getOpenGraphSet(paths, config)];
 
-			if (values['prune-remote']) {
-				await pruneRemoteDerivatives(set, {
-					config,
-					dryRun: values['dry-run'],
-					isMassPruneAllowed: values['allow-mass-prune'],
-					signal,
-				});
-				return;
+			for (const set of sets) {
+				if (values['prune-remote']) {
+					await pruneRemoteDerivatives(set, {
+						config,
+						dryRun: values['dry-run'],
+						isMassPruneAllowed: values['allow-mass-prune'],
+						signal,
+					});
+					continue;
+				}
+
+				await uploadDerivatives(set, { config, dryRun: values['dry-run'] });
 			}
-
-			await uploadDerivatives(set, { config, dryRun: values['dry-run'] });
 		},
-		summary: 'Upload rendered images or OpenGraph images to the server, or prune remote orphans',
+		summary: 'Upload rendered images and OpenGraph images to the server, or prune remote orphans',
 		title: 'Deploy images',
 	}),
 );

@@ -18,4 +18,4 @@ One Ctrl-C arrives as several signals: SIGINT from the terminal, a copy forwarde
 
 ## Deploy uploads
 
-`deploy-images` and `deploy-og` upload changed files and never delete on the server. `--prune-remote` removes remote files missing from the local cache, refuses past 2% of them without `--allow-mass-prune`, and waits for you to type `prune`.
+`deploy-images` uploads changed image derivatives and OG cards, and never deletes on the server. `--prune-remote` removes remote files missing from the local cache, refuses past 2% of them without `--allow-mass-prune`, and waits for you to type `prune`.

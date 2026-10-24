@@ -13,7 +13,6 @@
 		"deploy-caddy": "pnpm -F @spectralcodex/scripts deploy-caddy",
 		"deploy-images": "pnpm -F @spectralcodex/scripts deploy-images",
 		"deploy-infra": "pnpm -F @spectralcodex/scripts deploy-infra",
-		"deploy-og": "pnpm -F @spectralcodex/scripts deploy-og",
 		"deploy-site": "pnpm -F @spectralcodex/scripts deploy-site",
 		"dev": "astro dev",
 		"fallow": "fallow",
