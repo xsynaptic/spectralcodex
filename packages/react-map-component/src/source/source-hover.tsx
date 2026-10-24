@@ -9,6 +9,7 @@ import { Layer, Source } from 'react-map-gl/maplibre';
 import { useMapRow } from '#data/data-query.ts';
 import { useIsDarkMode } from '#lib/dark-mode.ts';
 import { MapLayerIdEnum, MapSourceIdEnum } from '#source/source-config.ts';
+import { isLabelledTarget, selectTargetIds } from '#store/store-factory.ts';
 import { useMapStore } from '#store/store.tsx';
 
 const hoverStateExpression = [
@@ -81,14 +82,17 @@ export const MapSourceHover: FC = memo(function MapSourceHover() {
 	const hoveredCluster = useMapStore((state) => state.hoveredCluster);
 	const hoveredId = useMapStore((state) => state.hoveredId);
 	const selectedId = useMapStore((state) => state.selectedId);
+	const targetIds = useMapStore(selectTargetIds);
 
 	const hoveredRow = useMapRow(hoveredCluster || selectedId ? undefined : hoveredId);
+	const isHoveredLabelled =
+		hoveredRow !== undefined && isLabelledTarget(hoveredRow.properties, targetIds);
 
 	const data = useMemo(() => {
-		const labelFeature = hoveredRow ?? hoveredCluster;
+		const labelFeature = (isHoveredLabelled ? undefined : hoveredRow) ?? hoveredCluster;
 
 		return { features: labelFeature ? [labelFeature] : [], type: 'FeatureCollection' as const };
-	}, [hoveredCluster, hoveredRow]);
+	}, [hoveredCluster, hoveredRow, isHoveredLabelled]);
 
 	const clustersLabelStyle = useMemo(
 		() => getClustersLabelLayerStyle(MapSourceIdEnum.HoverCollection),

@@ -46,4 +46,12 @@ describe('getTargetPopupItem', () => {
 			wikipediaUrl: undefined,
 		});
 	});
+
+	test('a labelled Point shows its own title and drops the Location title in every script', () => {
+		expect(getTargetPopupItem({ ...item, pointTitle: 'Point (殿)' })).toMatchObject({
+			title: 'Point (殿)',
+			titleMultilingualLang: undefined,
+			titleMultilingualValue: undefined,
+		});
+	});
 });

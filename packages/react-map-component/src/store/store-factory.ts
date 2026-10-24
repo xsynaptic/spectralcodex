@@ -49,6 +49,13 @@ export function selectTargetIds({ view }: MapStoreView) {
 	return view.targetIds ?? emptyTargetIds;
 }
 
+export function isLabelledTarget(
+	properties: Pick<MapSourceItem['properties'], 'id' | 'pointTitle'>,
+	targetIds: ReadonlyArray<string>,
+) {
+	return properties.pointTitle !== undefined && targetIds.includes(properties.id);
+}
+
 export function selectScope({
 	isScopeEnabled,
 	scope,

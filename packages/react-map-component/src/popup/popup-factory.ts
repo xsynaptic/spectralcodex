@@ -5,7 +5,11 @@ import { MapPopupOwnField } from '@spectralcodex/map-codec';
 import { isClusterHoverId } from '#lib/cluster-hover.ts';
 
 export function getTargetPopupItem<
-	Item extends MapPopupItem & { precision: number | undefined; url?: string | undefined },
+	Item extends MapPopupItem & {
+		pointTitle?: string | undefined;
+		precision: number | undefined;
+		url?: string | undefined;
+	},
 >(item: Item): Item {
 	const own = item.own ?? 0;
 
@@ -14,6 +18,13 @@ export function getTargetPopupItem<
 		description: own & MapPopupOwnField.Description ? item.description : undefined,
 		image: own & MapPopupOwnField.Image ? item.image : undefined,
 		precision: own & MapPopupOwnField.Precision ? item.precision : undefined,
+		...(item.pointTitle === undefined
+			? {}
+			: {
+					title: item.pointTitle,
+					titleMultilingualLang: undefined,
+					titleMultilingualValue: undefined,
+				}),
 		url: undefined,
 		wikipediaUrl: own & MapPopupOwnField.Wikipedia ? item.wikipediaUrl : undefined,
 	};

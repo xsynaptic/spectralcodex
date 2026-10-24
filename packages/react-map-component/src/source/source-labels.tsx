@@ -11,21 +11,14 @@ import { selectTargetIds } from '#store/store-factory.ts';
 import { useMapStore } from '#store/store.tsx';
 
 function getTargetsLabelLayerStyle({
-	hoveredId,
 	isDarkMode,
 	targetIds,
 }: {
-	hoveredId: string | undefined;
 	isDarkMode: boolean;
 	targetIds: Array<string>;
 }) {
 	return {
-		filter: [
-			'all',
-			['has', 'pointTitle'],
-			['in', ['get', 'id'], ['literal', targetIds]],
-			['!=', ['get', 'id'], hoveredId ?? ''],
-		],
+		filter: ['all', ['has', 'pointTitle'], ['in', ['get', 'id'], ['literal', targetIds]]],
 		id: MapLayerIdEnum.TargetsLabel,
 		layout: {
 			'text-field': ['get', 'pointTitle'],
@@ -44,12 +37,11 @@ function getTargetsLabelLayerStyle({
 
 export const MapSourceLabels: FC = memo(function MapSourceLabels() {
 	const isDarkMode = useIsDarkMode();
-	const hoveredId = useMapStore((state) => state.hoveredId);
 	const targetIds = useMapStore(selectTargetIds);
 
 	const targetsLabelLayerStyle = useMemo(
-		() => getTargetsLabelLayerStyle({ hoveredId, isDarkMode, targetIds }),
-		[hoveredId, isDarkMode, targetIds],
+		() => getTargetsLabelLayerStyle({ isDarkMode, targetIds }),
+		[isDarkMode, targetIds],
 	);
 
 	return <Layer key={MapLayerIdEnum.TargetsLabel} {...targetsLabelLayerStyle} />;
