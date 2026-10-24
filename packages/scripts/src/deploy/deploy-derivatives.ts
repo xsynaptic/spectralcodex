@@ -5,12 +5,12 @@ import { getCachePaths } from '@spectralcodex/shared/paths';
 import type { DeployConfig } from '#deploy/deploy-config.ts';
 import type { ScriptPaths } from '#shared/cli-command.ts';
 
-import { purgeQueuedFiles } from '#deploy/deploy-purge.ts';
+import { requestCloudflarePurge } from '#deploy/cloudflare-purge.ts';
 import { rsyncTo } from '#deploy/rsync-exec.ts';
 import { Refusal } from '#shared/cli-command.ts';
 import { formatCount, formatDuration, log } from '#shared/cli-output.ts';
 import { isPhraseConfirmed } from '#shared/cli-prompt.ts';
-import { getMassPruneLimit, listFileCacheFiles } from '#shared/file-cache.ts';
+import { assertPruneLimit, listFileCacheFiles } from '#shared/file-cache.ts';
 import { createPurgeQueue } from '#shared/purge-queue.ts';
 
 export interface DerivativeSet {
@@ -101,25 +101,12 @@ async function purgeSet(set: DerivativeSet, isDryRun: boolean, deletedPaths: Arr
 
 	for (const deletedPath of deletedPaths) await queue.add(deletedPath);
 
-	await purgeQueuedFiles({
+	await queue.drain({
 		baseUrl: set.purgeBaseUrl,
 		dryRun: isDryRun,
 		label: set.label,
-		statePath: set.statePath,
+		request: requestCloudflarePurge,
 	});
-}
-
-function assertPruneLimit(
-	set: DerivativeSet,
-	{ count, fileCount, isAllowed }: { count: number; fileCount: number; isAllowed: boolean },
-) {
-	const limit = getMassPruneLimit(fileCount);
-
-	if (isAllowed || count <= limit) return;
-
-	throw new Refusal(
-		`Refusing to delete ${formatCount(count)} remote ${set.label} (limit ${formatCount(limit)}); pass --allow-mass-prune if the local cache is right`,
-	);
 }
 
 export async function uploadDerivatives(
@@ -168,10 +155,11 @@ export async function pruneRemoteDerivatives(
 		return;
 	}
 
-	assertPruneLimit(set, {
+	assertPruneLimit({
 		count: planned.length,
-		fileCount: files.length + planned.length,
 		isAllowed: isMassPruneAllowed,
+		subject: `remote ${set.label}`,
+		total: files.length + planned.length,
 	});
 
 	log.warn(`${formatCount(planned.length)} remote files will be deleted (listed above)`);

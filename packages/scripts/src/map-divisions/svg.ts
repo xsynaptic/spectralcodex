@@ -15,7 +15,7 @@ import { optimize } from 'svgo';
 import type { DivisionFeatureCollection, DivisionGeometry } from '#map-divisions/types.ts';
 
 import { formatCount, log } from '#shared/cli-output.ts';
-import { safelyCreateDirectory } from '#shared/utils.ts';
+import { safelyCreateDirectory } from '#shared/files.ts';
 
 interface SvgOptions {
 	divisionClippingBBox?: GeometryBoundingBox;

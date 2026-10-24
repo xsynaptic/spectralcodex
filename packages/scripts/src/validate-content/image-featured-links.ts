@@ -1,6 +1,6 @@
 import type { ContentEntry } from '#shared/astro-content.ts';
 
-import { parseImageFeatured } from '#shared/images.ts';
+import { parseImageFeatured } from '#shared/image-references.ts';
 import { toValidationResult } from '#validate-content/validation-result.ts';
 
 export function validateImageFeaturedLinks(

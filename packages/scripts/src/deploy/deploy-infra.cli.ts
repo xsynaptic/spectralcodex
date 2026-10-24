@@ -1,6 +1,6 @@
 import { deployInfra } from '#deploy/deploy-infra.ts';
+import { ensureSshKeychain } from '#deploy/rsync-exec.ts';
 import { defineCommand, runCommand } from '#shared/cli-command.ts';
-import { ensureSshKeychain } from '#shared/utils.ts';
 
 await runCommand(
 	defineCommand({

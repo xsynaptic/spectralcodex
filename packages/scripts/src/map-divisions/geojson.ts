@@ -18,7 +18,7 @@ import type {
 } from '#map-divisions/types.ts';
 
 import { log } from '#shared/cli-output.ts';
-import { safelyCreateDirectory } from '#shared/utils.ts';
+import { safelyCreateDirectory } from '#shared/files.ts';
 
 const maskToleranceExponent = 0.6;
 const maskToleranceMetresPerKm = 0.34;

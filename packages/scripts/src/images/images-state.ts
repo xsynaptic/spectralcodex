@@ -6,7 +6,7 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
 
-import { readFileIfExists, readJsonFile, writeJsonFile } from '#shared/utils.ts';
+import { readFileIfExists, readJsonFile, writeJsonFile } from '#shared/files.ts';
 
 const engineFile = 'engine.txt';
 const previousManifestFile = 'manifest-previous.json';

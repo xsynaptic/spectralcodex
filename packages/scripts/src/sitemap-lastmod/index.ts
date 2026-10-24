@@ -13,7 +13,7 @@ import type { ScriptPaths } from '#shared/cli-command.ts';
 import { getCollectionEntries, withAstroContent } from '#shared/astro-content.ts';
 import { formatCount, log } from '#shared/cli-output.ts';
 import { withSpinner } from '#shared/cli-progress.ts';
-import { safelyCreateDirectory } from '#shared/utils.ts';
+import { safelyCreateDirectory } from '#shared/files.ts';
 import { getGitFileDates } from '#sitemap-lastmod/git-file-dates.ts';
 
 interface SitemapLastmodOptions {

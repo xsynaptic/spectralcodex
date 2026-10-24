@@ -1,7 +1,6 @@
 import { getCachePaths } from '@spectralcodex/shared/paths';
 import { createSourceFingerprints } from '@spectralcodex/shared/source-fingerprint';
 import { rmSync } from 'node:fs';
-import * as fs from 'node:fs/promises';
 import path from 'node:path';
 import pLimit from 'p-limit';
 
@@ -17,17 +16,7 @@ import { createOutputCache, getOutputCacheKey } from '#og-image/output-cache.ts'
 import { defineCommand, Refusal, runCommand } from '#shared/cli-command.ts';
 import { formatCount, formatError, log } from '#shared/cli-output.ts';
 import { createProgress, withSpinner } from '#shared/cli-progress.ts';
-import { safelyCreateDirectory } from '#shared/utils.ts';
-
-async function getSourceImagePath(imagePath: string): Promise<string | undefined> {
-	try {
-		await fs.access(imagePath, fs.constants.R_OK);
-
-		return imagePath;
-	} catch {
-		return undefined;
-	}
-}
+import { isExistingFile, safelyCreateDirectory } from '#shared/files.ts';
 
 function assertResolvedEntries(unresolved: Array<string>) {
 	if (unresolved.length === 0) return;
@@ -139,9 +128,9 @@ async function generateCards({
 		// Nothing to draw, so the source image is never decoded
 		if (stale.length === 0) return;
 
-		const imagePath = await getSourceImagePath(path.join(paths.mediaPath, batch.imageId));
+		const imagePath = path.join(paths.mediaPath, batch.imageId);
 
-		if (!imagePath) {
+		if (!(await isExistingFile(imagePath))) {
 			for (const { entry } of stale) {
 				log.error(`Missing image: ${batch.imageId} (used by ${entry.collection}/${entry.id})`);
 				counts.errors++;

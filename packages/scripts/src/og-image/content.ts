@@ -4,14 +4,14 @@ import { getOpenGraphId } from '@spectralcodex/shared/open-graph';
 import { stripDiacritics } from '@spectralcodex/shared/text';
 import { z } from 'zod';
 
-import type { OpenGraphContentEntry, OpenGraphEntryItem } from '#og-image/types.ts';
+import type { OpenGraphEntryItem } from '#og-image/types.ts';
 import type { ContentEntry } from '#shared/astro-content.ts';
 import type { RegionParentMap } from '#shared/entries.ts';
 
 import { getChronologyTitle } from '#og-image/chronology.ts';
 import { getFallbackImageId } from '#og-image/fallback.ts';
 import { getRegionParentsById, toReferenceIds } from '#shared/entries.ts';
-import { extractImageFeaturedIds } from '#shared/images.ts';
+import { getEntryImageIds } from '#shared/image-references.ts';
 
 // Sensitive locations present override regions; fallback imagery must not leak the true region
 export function resolveOgRegions(data: Record<string, unknown>): Array<string> {
@@ -32,7 +32,7 @@ function getImageFeaturedData({
 	entry: Pick<ContentEntry, 'data' | 'id'>;
 	regionParentMap?: RegionParentMap | undefined;
 }): { imageFeaturedId: string; isFallback: boolean } {
-	const imageFeaturedId = extractImageFeaturedIds(entry.data)[0];
+	const imageFeaturedId = getEntryImageIds(entry).featured[0];
 
 	if (imageFeaturedId) return { imageFeaturedId, isFallback: false };
 
@@ -71,47 +71,6 @@ const TitleOverrideSchema = z
 	.optional();
 
 type TitleOverride = z.infer<typeof TitleOverrideSchema>;
-
-// Resolution order: content entries, then static index entries, then synthesized chronology ids
-export function resolveEntry({
-	chronologyImageIndex,
-	contentEntries,
-	filename,
-	indexEntries,
-}: {
-	chronologyImageIndex: Map<string, string>;
-	contentEntries: Map<string, OpenGraphContentEntry>;
-	filename: string;
-	indexEntries: Map<string, OpenGraphContentEntry>;
-}): OpenGraphContentEntry | undefined {
-	const fromContent = contentEntries.get(filename);
-
-	if (fromContent) return fromContent;
-
-	const fromIndex = indexEntries.get(filename);
-
-	if (fromIndex) return fromIndex;
-
-	if (/^\d{4}(?:-\d{2})?$/.test(filename)) {
-		const derivedImageId = chronologyImageIndex.get(filename);
-
-		return {
-			collection: ContentCollectionsEnum.Chronology,
-			digest: `chronology-${filename}`,
-			id: filename,
-			imageFeaturedId:
-				derivedImageId ??
-				getFallbackImageId({
-					collection: ContentCollectionsEnum.Chronology,
-					id: filename,
-				}),
-			isFallback: !derivedImageId,
-			title: getChronologyTitle(filename),
-		};
-	}
-
-	return undefined;
-}
 
 // The one place an entry becomes a card, shared with the dev-only Inventory route
 export function toOpenGraphEntryItem({

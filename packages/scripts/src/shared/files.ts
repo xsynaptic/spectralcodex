@@ -1,7 +1,6 @@
 import { existsSync, mkdirSync } from 'node:fs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { $ } from 'zx';
 
 import { log } from '#shared/cli-output.ts';
 
@@ -10,26 +9,6 @@ export function safelyCreateDirectory(dir: string) {
 
 	mkdirSync(dir, { recursive: true });
 	log.detail(`Created directory: ${dir}`);
-}
-
-export async function ensureSshKeychain() {
-	try {
-		await $`ssh-add --apple-load-keychain 2>/dev/null`;
-	} catch {
-		// Not on macOS, or no keychain
-	}
-}
-
-export function findWorkspaceRoot(startDir: string = process.cwd()): string {
-	let current = path.resolve(startDir);
-
-	while (current !== path.dirname(current)) {
-		if (existsSync(path.join(current, 'pnpm-workspace.yaml'))) return current;
-
-		current = path.dirname(current);
-	}
-
-	throw new Error(`Could not locate pnpm-workspace.yaml above ${startDir}`);
 }
 
 export async function isExistingFile(filePath: string) {
@@ -63,10 +42,4 @@ export async function writeJsonFile(filePath: string, value: unknown, space?: nu
 	await fs.mkdir(path.dirname(filePath), { recursive: true });
 	await fs.writeFile(temporary, `${JSON.stringify(value, undefined, space)}\n`);
 	await fs.rename(temporary, filePath);
-}
-
-export function sortRecord<Value>(entries: Iterable<[string, Value]>) {
-	return Object.fromEntries(
-		[...entries].toSorted(([first], [second]) => first.localeCompare(second)),
-	);
 }

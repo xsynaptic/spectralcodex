@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 import type { ContentEntry } from '#shared/astro-content.ts';
 
-import { extractImageFeaturedIds } from '#shared/images.ts';
+import { getEntryImageIds } from '#shared/image-references.ts';
 
 /**
  * Chronology title format: "Chronology: March 2024" or "Chronology: 2024"
@@ -104,7 +104,7 @@ function extractDatedCategories(
 function extractEntryCandidate(
 	entry: ContentEntry,
 ): Omit<ChronologyImageCandidate, 'category'> | undefined {
-	const imageFeaturedId = extractImageFeaturedIds(entry.data)[0];
+	const imageFeaturedId = getEntryImageIds(entry).featured[0];
 
 	if (!imageFeaturedId) return undefined;
 

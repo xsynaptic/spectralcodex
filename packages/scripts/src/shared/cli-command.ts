@@ -2,13 +2,13 @@ import type { ParseArgsOptionDescriptor } from 'node:util';
 
 import { resolveContentPaths } from '@spectralcodex/shared/paths';
 import chalk from 'chalk';
+import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 import * as R from 'remeda';
 import { ProcessOutput } from 'zx';
 
 import { formatDuration, log, stopActiveSpinner, symbols } from '#shared/cli-output.ts';
-import { findWorkspaceRoot } from '#shared/utils.ts';
 
 export class Refusal extends Error {}
 
@@ -173,6 +173,18 @@ export function getFailureReport(
 	}
 
 	return { exitCode: 1, isInterrupted: false, ...describeError(error) };
+}
+
+export function findWorkspaceRoot(startDir: string = process.cwd()): string {
+	let current = path.resolve(startDir);
+
+	while (current !== path.dirname(current)) {
+		if (existsSync(path.join(current, 'pnpm-workspace.yaml'))) return current;
+
+		current = path.dirname(current);
+	}
+
+	throw new Error(`Could not locate pnpm-workspace.yaml above ${startDir}`);
 }
 
 function resolveScriptPaths(): ScriptPaths {

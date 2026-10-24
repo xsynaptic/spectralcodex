@@ -16,7 +16,7 @@ import { defineCommand, parseNumberOption, Refusal, runCommand } from '#shared/c
 import { formatCount, formatError, log } from '#shared/cli-output.ts';
 import { createProgress, withSpinner } from '#shared/cli-progress.ts';
 import { toReferenceIds } from '#shared/entries.ts';
-import { safelyCreateDirectory } from '#shared/utils.ts';
+import { safelyCreateDirectory } from '#shared/files.ts';
 import { calculateMetadataBoost } from '#similar-content/metadata.ts';
 
 const cacheName = 'similar-content-cache';

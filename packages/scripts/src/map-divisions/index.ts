@@ -14,7 +14,7 @@ import { getCollectionEntries, withAstroContent } from '#shared/astro-content.ts
 import { defineCommand, Refusal, runCommand } from '#shared/cli-command.ts';
 import { formatCount, formatError, log } from '#shared/cli-output.ts';
 import { createProgress, withSpinner } from '#shared/cli-progress.ts';
-import { isExistingFile, safelyCreateDirectory } from '#shared/utils.ts';
+import { isExistingFile, safelyCreateDirectory } from '#shared/files.ts';
 
 const stacCatalogUrl = 'https://stac.overturemaps.org/catalog.json';
 const s3Base = 's3://overturemaps-us-west-2/release';

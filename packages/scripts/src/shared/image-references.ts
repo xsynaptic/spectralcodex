@@ -2,9 +2,11 @@ import { ImageFeaturedSchema } from '@spectralcodex/shared/schemas';
 import { readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 
+import type { ContentEntry } from '#shared/astro-content.ts';
+
 import { findComponentTags, getTagProp } from '#shared/component-tags.ts';
 
-export function collectMediaFiles(
+export function listMediaImages(
 	mediaPath: string,
 	options?: { ignore?: ReadonlyArray<string> },
 ): Set<string> {
@@ -33,7 +35,7 @@ export function collectMediaFiles(
 	return files;
 }
 
-export function extractImageFeaturedIds(frontmatter: Record<string, unknown>): Array<string> {
+function getFeaturedImageIds(frontmatter: Record<string, unknown>): Array<string> {
 	const data = parseImageFeatured(frontmatter);
 
 	if (!data) return [];
@@ -43,10 +45,16 @@ export function extractImageFeaturedIds(frontmatter: Record<string, unknown>): A
 	return data.map((item) => (typeof item === 'string' ? item : item.id));
 }
 
-export function extractMdxImageIds(content: string): Array<string> {
-	return findComponentTags(content, ['Img'])
+function getBodyImageIds(body: string | undefined): Array<string> {
+	if (!body) return [];
+
+	return findComponentTags(body, ['Img'])
 		.map((tag) => getTagProp(tag, 'src'))
 		.filter((src) => src !== undefined);
+}
+
+export function getEntryImageIds(entry: Pick<ContentEntry, 'body' | 'data'>) {
+	return { body: getBodyImageIds(entry.body), featured: getFeaturedImageIds(entry.data) };
 }
 
 export function parseImageFeatured(frontmatter: Record<string, unknown>) {

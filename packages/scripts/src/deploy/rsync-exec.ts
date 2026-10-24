@@ -2,6 +2,14 @@ import { $ } from 'zx';
 
 import { log } from '#shared/cli-output.ts';
 
+export async function ensureSshKeychain() {
+	try {
+		await $`ssh-add --apple-load-keychain 2>/dev/null`;
+	} catch {
+		// ssh-add fails off macOS or without a keychain, and then there is nothing to load
+	}
+}
+
 interface RsyncOptions {
 	archive?: 'av' | 'avz';
 	config: SshTarget;

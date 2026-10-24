@@ -2,7 +2,8 @@ import { existsSync, promises as fs } from 'node:fs';
 import path from 'node:path';
 
 import { Refusal } from '#shared/cli-command.ts';
-import { readFileIfExists, readJsonFile, sortRecord, writeJsonFile } from '#shared/utils.ts';
+import { formatCount } from '#shared/cli-output.ts';
+import { readFileIfExists, readJsonFile, writeJsonFile } from '#shared/files.ts';
 
 const sidecarFile = 'sidecar.json';
 
@@ -15,8 +16,28 @@ interface FileCacheSidecar {
 }
 
 // Above this many removals a wrong manifest or media root is likelier than a real cleanup
-export function getMassPruneLimit(fileCount: number) {
+function getMassPruneLimit(fileCount: number) {
 	return Math.max(100, Math.ceil(fileCount / 50));
+}
+
+export function assertPruneLimit({
+	count,
+	isAllowed,
+	subject,
+	total,
+}: {
+	count: number;
+	isAllowed: boolean;
+	subject: string;
+	total: number;
+}) {
+	const limit = getMassPruneLimit(total);
+
+	if (isAllowed || count <= limit) return;
+
+	throw new Refusal(
+		`Refusing to prune ${formatCount(count)} of ${formatCount(total)} ${subject} (limit ${formatCount(limit)}); pass --allow-mass-prune if the removal is intended`,
+	);
 }
 
 async function readDirectory(directory: string) {
@@ -74,13 +95,13 @@ export async function createFileCache({
 			}
 
 			const orphans = files.filter((name) => !keep.has(name));
-			const limit = getMassPruneLimit(files.length);
 
-			if (!isMassPruneAllowed && orphans.length > limit) {
-				throw new Refusal(
-					`Refusing to prune ${String(orphans.length)} of ${String(files.length)} files in ${directory} (limit ${String(limit)}); pass --allow-mass-prune if the build is right`,
-				);
-			}
+			assertPruneLimit({
+				count: orphans.length,
+				isAllowed: isMassPruneAllowed,
+				subject: `files in ${directory}`,
+				total: files.length,
+			});
 
 			return {
 				async apply() {
@@ -96,7 +117,9 @@ export async function createFileCache({
 
 		async save() {
 			await writeJsonFile(sidecarPath, {
-				derivatives: sortRecord(records),
+				derivatives: Object.fromEntries(
+					[...records].toSorted(([first], [second]) => first.localeCompare(second)),
+				),
 			} satisfies FileCacheSidecar);
 		},
 

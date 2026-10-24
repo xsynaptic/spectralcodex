@@ -6,9 +6,9 @@ import type { OpenGraphContentEntry } from '#og-image/types.ts';
 import type { ContentEntry } from '#shared/astro-content.ts';
 import type { RegionParentMap } from '#shared/entries.ts';
 
-import { buildChronologyImageIndex } from '#og-image/chronology.ts';
-import { resolveEntry, toOpenGraphEntryItem } from '#og-image/content.ts';
-import { resolveFallbackImageId } from '#og-image/fallback.ts';
+import { buildChronologyImageIndex, getChronologyTitle } from '#og-image/chronology.ts';
+import { toOpenGraphEntryItem } from '#og-image/content.ts';
+import { getFallbackImageId, resolveFallbackImageId } from '#og-image/fallback.ts';
 import { getCollectionEntries, withAstroContent } from '#shared/astro-content.ts';
 
 export async function extractBuiltFilenames(distPath: string): Promise<Set<string>> {
@@ -32,6 +32,47 @@ export async function extractBuiltFilenames(distPath: string): Promise<Set<strin
 
 	return filenames;
 }
+
+export function resolveEntry({
+	chronologyImageIndex,
+	contentEntries,
+	filename,
+	indexEntries,
+}: {
+	chronologyImageIndex: Map<string, string>;
+	contentEntries: Map<string, OpenGraphContentEntry>;
+	filename: string;
+	indexEntries: Map<string, OpenGraphContentEntry>;
+}): OpenGraphContentEntry | undefined {
+	const fromContent = contentEntries.get(filename);
+
+	if (fromContent) return fromContent;
+
+	const fromIndex = indexEntries.get(filename);
+
+	if (fromIndex) return fromIndex;
+
+	if (/^\d{4}(?:-\d{2})?$/.test(filename)) {
+		const derivedImageId = chronologyImageIndex.get(filename);
+
+		return {
+			collection: ContentCollectionsEnum.Chronology,
+			digest: `chronology-${filename}`,
+			id: filename,
+			imageFeaturedId:
+				derivedImageId ??
+				getFallbackImageId({
+					collection: ContentCollectionsEnum.Chronology,
+					id: filename,
+				}),
+			isFallback: !derivedImageId,
+			title: getChronologyTitle(filename),
+		};
+	}
+
+	return undefined;
+}
+
 // Built HTML is the source of truth for which OG images should exist
 export async function getBuiltEntries({
 	distPath,

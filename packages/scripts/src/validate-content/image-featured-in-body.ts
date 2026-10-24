@@ -1,19 +1,19 @@
 import type { ContentEntry } from '#shared/astro-content.ts';
 
-import { extractImageFeaturedIds, extractMdxImageIds } from '#shared/images.ts';
+import { getEntryImageIds } from '#shared/image-references.ts';
 import { toValidationResult } from '#validate-content/validation-result.ts';
 
 export function validateImageFeaturedInBody(entries: Array<ContentEntry>) {
 	const orphans: Array<{ file: string; missingIds: Array<string> }> = [];
 
 	for (const entry of entries) {
-		const featuredIds = extractImageFeaturedIds(entry.data);
+		const { body, featured } = getEntryImageIds(entry);
 
-		if (featuredIds.length === 0) continue;
+		if (featured.length === 0) continue;
 		if (!entry.body) continue;
 
-		const bodyIds = new Set(extractMdxImageIds(entry.body));
-		const missingIds = featuredIds.filter((id) => !bodyIds.has(id));
+		const bodyIds = new Set(body);
+		const missingIds = featured.filter((id) => !bodyIds.has(id));
 
 		if (missingIds.length > 0) {
 			orphans.push({ file: entry.filePath ?? entry.id, missingIds });

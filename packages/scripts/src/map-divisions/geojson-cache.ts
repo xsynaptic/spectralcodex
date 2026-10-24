@@ -3,7 +3,7 @@ import path from 'node:path';
 
 import type { DivisionGeometry, DivisionItem } from '#map-divisions/types.ts';
 
-import { safelyCreateDirectory } from '#shared/utils.ts';
+import { safelyCreateDirectory } from '#shared/files.ts';
 
 export async function getDivisionDataCache(
 	divisionId: string,

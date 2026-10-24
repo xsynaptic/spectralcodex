@@ -19,8 +19,8 @@ import {
 } from '#images/images-state.ts';
 import { Refusal } from '#shared/cli-command.ts';
 import { createFileCache } from '#shared/file-cache.ts';
+import { readFileIfExists } from '#shared/files.ts';
 import { createPurgeQueue } from '#shared/purge-queue.ts';
-import { readFileIfExists } from '#shared/utils.ts';
 
 // Measured fastest on the Mac: 10 single-threaded jobs, which needs UV_THREADPOOL_SIZE=10
 const jobCount = 10;
@@ -275,7 +275,7 @@ export async function buildImages(options: ImageBuildOptions) {
 		...counts,
 		isEngineChanged: engine !== undefined && engine !== engineId,
 		pruned: prune.orphans.length,
-		queued: purgeQueue.queued.size,
+		queued: purgeQueue.size,
 		total: manifest.derivatives.length,
 	};
 }

@@ -9,7 +9,7 @@ import sanitizeHtml from 'sanitize-html';
 import { defineCommand, runCommand } from '#shared/cli-command.ts';
 import { formatCount, log } from '#shared/cli-output.ts';
 import { withSpinner } from '#shared/cli-progress.ts';
-import { isExistingFile, safelyCreateDirectory } from '#shared/utils.ts';
+import { isExistingFile, safelyCreateDirectory } from '#shared/files.ts';
 
 const apiUrl = 'https://webmention.io/api/mentions.jf2';
 const userAgent = 'SpectralCodex-Webmentions/1.0 (+https://spectralcodex.com)';

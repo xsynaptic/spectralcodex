@@ -3,19 +3,16 @@ import { getCollectionEntries, withAstroContent } from '#shared/astro-content.ts
 import { defineCommand, runCommand } from '#shared/cli-command.ts';
 import { formatCount, log } from '#shared/cli-output.ts';
 import { withSpinner } from '#shared/cli-progress.ts';
-import { collectMediaFiles, extractImageFeaturedIds, extractMdxImageIds } from '#shared/images.ts';
-
-function getEntryImageIds(entry: Awaited<ReturnType<typeof loadEntries>>[number]) {
-	return [
-		...extractImageFeaturedIds(entry.data),
-		...(entry.body ? extractMdxImageIds(entry.body) : []),
-	];
-}
+import { getEntryImageIds, listMediaImages } from '#shared/image-references.ts';
 
 // OG image fallbacks are referenced indirectly; seed them so they aren't flagged
 function collectReferencedImages(entries: Awaited<ReturnType<typeof loadEntries>>) {
 	return new Set([
-		...entries.flatMap((entry) => getEntryImageIds(entry)),
+		...entries.flatMap((entry) => {
+			const { body, featured } = getEntryImageIds(entry);
+
+			return [...featured, ...body];
+		}),
 		...Object.values(fallbackImageIds).flat(),
 	]);
 }
@@ -47,7 +44,7 @@ await runCommand(
 		},
 		async run({ paths, values }) {
 			const entries = await withSpinner('Loading content', loadEntries);
-			const mediaFiles = collectMediaFiles(paths.mediaPath, { ignore: values.ignore ?? [] });
+			const mediaFiles = listMediaImages(paths.mediaPath, { ignore: values.ignore ?? [] });
 			const referencedImages = collectReferencedImages(entries);
 
 			const orphanedFiles = [...mediaFiles]
