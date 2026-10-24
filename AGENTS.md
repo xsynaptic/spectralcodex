@@ -13,11 +13,11 @@ Scripts live in `package.json`. Only the ones with a catch are worth stating her
 - **`pnpm build`: run it sparingly.** It is slow under memory pressure; the maintainer builds manually.
 - `pnpm check`: report-only quality gate. Mutates nothing, so run it freely.
 - `pnpm fix`: the mutating twin of `pnpm check` (autofixes, then reports what it could not fix). Somewhat slow; run once after a chunk of work, not repeatedly.
-- `pnpm images`: encodes the image derivatives the last build recorded; `deploy-site` runs it, so run it by hand only when asked.
+- `pnpm render-images`: renders the images the last build recorded; `deploy-site` runs it, so run it by hand only when asked.
 
 ## Project conventions
 
-- **Images are referenced by URL, never imported** (Vite/Rolldown runs out of memory on the large library); every URL comes from a preset in `packages/shared/src/images.ts`, `pnpm images` writes the files, and dev renders them on demand under `/_img`.
+- **Images are referenced by URL, never imported** (Vite/Rolldown runs out of memory on the large library); every URL comes from a preset in `packages/shared/src/images.ts`, `pnpm render-images` writes the files, and dev renders them on demand under `/_img`.
 - **Build-time validation is load-bearing**: internal IDs (locations, regions, themes, series), geospatial placement, and Zod schemas are checked during the build, so a bad reference fails loudly rather than shipping.
 - Dynamic route files must be lowercase: `[...id].astro`, not `[...ID].astro`.
 - Do not import from the main Astro app (`src/`) into anything under `packages/**` (the Vite/Rolldown build breaks on it). Duplicate the needed types locally in the package and leave a comment naming the source. Keep the duplication minimal.
