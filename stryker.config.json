@@ -27,7 +27,6 @@
 		"!tsconfig.json",
 		"!vitest.config.ts",
 		"!src/**",
-		"!tests/image-server/**",
 		"!packages/map-codec/**",
 		"!packages/react-map-component/**",
 		"!packages/scripts/**",
