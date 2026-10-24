@@ -1,7 +1,5 @@
 // Purge Cloudflare, then warm the edge via the public hostnames
 // Requests must traverse Cloudflare to populate the edge
-import { readFileSync, renameSync, writeFileSync } from 'node:fs';
-
 interface PurgeResult {
 	errors?: Array<{ message: string }>;
 	success: boolean;
@@ -16,18 +14,10 @@ interface WarmResult {
 
 const shouldSkipPurge = process.env.SKIP_PURGE === '1' || process.env.SKIP_PURGE === 'true';
 const siteUrl = requireEnv('SITE_URL').replace(/\/$/, '');
-const imageServerUrl = requireEnv('IMAGE_SERVER_URL');
 const cloudflareZoneId = shouldSkipPurge ? '' : requireEnv('CLOUDFLARE_ZONE_ID');
 const cloudflareApiToken = shouldSkipPurge ? '' : requireEnv('CLOUDFLARE_API_TOKEN');
 const defaultConcurrency = Number(process.env.CACHE_WARM_CONCURRENCY ?? '8') || 8;
 const warmLimit = process.env.WARM_LIMIT ? Number(process.env.WARM_LIMIT) : undefined;
-const shouldWarmAll = process.env.WARM_ALL === '1' || process.env.WARM_ALL === 'true';
-
-// New image URLs trigger vips transforms; keep below the page rate so imagor's cpu cap serves traffic
-const imageConcurrency = 2;
-
-// Persisted across runs in a Docker volume; the container filesystem is otherwise read-only
-const imageStateFile = '/state/warmed-images.txt';
 
 // Per-request timeout for warm, purge, and JMAP calls
 const timeoutMs = 30_000;
@@ -55,13 +45,6 @@ const requestHeaders: Record<string, string> = {
 // Site-relative build assets (CSS, JS, fonts) under the custom assets dir
 const assetRegex = /\/_x\/[^\s"'<>()]+/g;
 
-// Absolute image URLs scraped from HTML and CSS bodies
-const imageRegex = /https?:\/\/[^\s"'<>]+\.(?:jpe?g|png|webp|avif)(?:\?[^\s"'<>]*)?/gi;
-
-// Content pages link external images, and OG images on the site host are purged every deploy
-// Only the imagor host is warmed incrementally; its URLs are immutable and survive the purge
-const imageHost = new URL(imageServerUrl).host;
-
 interface JmapIdentityList {
 	list: Array<{ email: string; id: string }>;
 }
@@ -87,13 +70,6 @@ interface MapUrlsResult {
 	urls: Array<string>;
 }
 
-interface PersistWarmedImagesOptions {
-	failures: Array<WarmResult>;
-	referenced: ReadonlySet<string>;
-	seen: ReadonlySet<string>;
-	warmed: Array<string>;
-}
-
 interface RunReport {
 	failures: Array<WarmResult>;
 	notes: Array<string>;
@@ -103,11 +79,6 @@ interface RunReport {
 	totalUrls: number;
 }
 
-interface ScrapeTargets {
-	assets: Set<string>;
-	images: Set<string>;
-}
-
 interface Stats {
 	counts: Map<string, number>;
 	failures: Array<WarmResult>;
@@ -115,7 +86,7 @@ interface Stats {
 }
 
 interface WarmAllOptions {
-	collect?: ScrapeTargets;
+	collect?: Set<string>;
 	concurrency?: number;
 }
 
@@ -253,26 +224,6 @@ async function getStaleEdgeNote(): Promise<string | undefined> {
 	}
 }
 
-function getWarmedImages(): { note?: string; seen: Set<string> } {
-	if (shouldWarmAll) {
-		return {
-			note: 'WARM_ALL set: ignoring image state, re-warming every referenced image',
-			seen: new Set(),
-		};
-	}
-	try {
-		const contents = readFileSync(imageStateFile, 'utf8');
-		return { seen: new Set(contents.split('\n').filter(Boolean)) };
-	} catch (error) {
-		const isMissing = error instanceof Error && 'code' in error && error.code === 'ENOENT';
-		if (!isMissing) throw error;
-		return {
-			note: 'Image state missing: cold start, every referenced image is new',
-			seen: new Set(),
-		};
-	}
-}
-
 // Notes (like a skipped map manifest) force the digest even on a clean run
 function isReportWorthSending({ failures, notes }: RunReport): boolean {
 	return shouldAlertAlways || notes.length > 0 || failures.length >= alertMinFailures;
@@ -323,18 +274,10 @@ async function main(): Promise<void> {
 	const start = Date.now();
 	const run = createWarmRun();
 
-	// Read before warming so an unreadable volume fails fast rather than after the page phase
-	const { note, seen } = getWarmedImages();
-
-	if (note !== undefined) {
-		console.log(note);
-		run.notes.push(note);
-	}
-
 	if (shouldSkipPurge) console.log('SKIP_PURGE set: warming without purging');
 	else await purge();
 
-	const targets = await warmPages(run);
+	const assets = await warmPages(run);
 
 	if (!shouldSkipPurge) {
 		const staleEdgeNote = await getStaleEdgeNote();
@@ -342,24 +285,12 @@ async function main(): Promise<void> {
 		if (staleEdgeNote !== undefined) run.notes.push(staleEdgeNote);
 	}
 
-	await warmAssets(run, targets);
-
-	// Runs last so every scraped body has contributed to the image set
-	const newImages = await warmNewImages(run, targets.images, seen);
+	await warmAssets(run, assets);
 
 	// totalUrls is fixed first so retried URLs are not double-counted
 	const totalUrls = run.phases.reduce((total, [, stats]) => total + stats.total, 0);
 	const firstFailures = run.phases.flatMap(([, stats]) => stats.failures);
 	const failures = await retryFailures(run, firstFailures);
-
-	const stateNote = persistWarmedImages({
-		failures,
-		referenced: targets.images,
-		seen,
-		warmed: newImages,
-	});
-
-	if (stateNote !== undefined) run.notes.push(stateNote);
 
 	const seconds = ((Date.now() - start) / 1000).toFixed(1);
 	console.log(`Done in ${seconds}s`);
@@ -376,31 +307,6 @@ async function main(): Promise<void> {
 
 function messageOf(error: unknown): string {
 	return error instanceof Error ? error.message : String(error);
-}
-
-function persistWarmedImages({
-	failures,
-	referenced,
-	seen,
-	warmed,
-}: PersistWarmedImagesOptions): string | undefined {
-	const failedUrls = new Set(failures.map((failure) => failure.url));
-	const nextSeen = referenced.intersection(seen);
-
-	for (const url of warmed) {
-		if (!failedUrls.has(url)) nextSeen.add(url);
-	}
-
-	try {
-		saveWarmedImages(nextSeen);
-		console.log(`Image state: ${String(nextSeen.size)} URLs recorded`);
-		return undefined;
-	} catch (error) {
-		const message = `Image state save failed: ${messageOf(error)}`;
-
-		console.error(message);
-		return message;
-	}
 }
 
 // Shared iterator across N runners; next() is synchronous so concurrent runners don't race
@@ -420,8 +326,6 @@ async function pool<Item>(
 }
 
 async function purge(): Promise<void> {
-	// Image URLs are immutable (HMAC of the transform path, no content hash)
-	// The purge is scoped to the site host; image server remains warm at the edge through a deploy
 	const host = new URL(siteUrl).host;
 	console.log(`Purging Cloudflare cache (hostname ${host})...`);
 	const response = await fetch(
@@ -488,23 +392,10 @@ async function retryFailures(
 	return retryStats.failures;
 }
 
-// Temp file sits in the same directory so the rename is atomic
-function saveWarmedImages(urls: Set<string>): void {
-	const temporaryFile = `${imageStateFile}.tmp`;
-	writeFileSync(temporaryFile, [...urls].join('\n'), 'utf8');
-	renameSync(temporaryFile, imageStateFile);
-}
-
 // .href yields a fresh string, unpinning the source HTML that V8 would otherwise retain via a match slice
-function scrape(text: string, targets: ScrapeTargets): void {
-	for (const match of text.matchAll(imageRegex)) {
-		// canParse guards odd matches from throwing
-		if (!match[0] || !URL.canParse(match[0])) continue;
-		const url = new URL(match[0]);
-		if (url.host === imageHost) targets.images.add(url.href);
-	}
+function scrape(text: string, assets: Set<string>): void {
 	for (const match of text.matchAll(assetRegex)) {
-		if (match[0]) targets.assets.add(new URL(match[0], siteUrl).href);
+		if (match[0]) assets.add(new URL(match[0], siteUrl).href);
 	}
 }
 
@@ -587,7 +478,7 @@ function summarize(label: string, stats: Stats): string {
 	return `${label}: ${String(stats.total)} URLs (${summary})`;
 }
 
-async function warm(url: string, collect?: ScrapeTargets): Promise<WarmResult> {
+async function warm(url: string, collect?: Set<string>): Promise<WarmResult> {
 	const start = Date.now();
 	try {
 		const response = await fetch(url, {
@@ -616,39 +507,25 @@ async function warmAll(urls: Iterable<string>, options: WarmAllOptions = {}): Pr
 	return stats;
 }
 
-async function warmAssets(run: WarmRun, targets: ScrapeTargets): Promise<void> {
+async function warmAssets(run: WarmRun, assets: Set<string>): Promise<void> {
 	const mapResult = await getMapUrls();
 	if (mapResult.skipReason !== undefined) {
 		run.notes.push(`Map URLs skipped: ${mapResult.skipReason}`);
 	}
 	console.log(
-		`Warming ${String(targets.assets.size)} assets + ${String(mapResult.urls.length)} map URLs...`,
+		`Warming ${String(assets.size)} assets + ${String(mapResult.urls.length)} map URLs...`,
 	);
-	// Fonts and images referenced from CSS only surface once the CSS itself is warmed
-	// Images share one set across phases; assets are collected separately to avoid re-warming them
-	const cssTargets: ScrapeTargets = { assets: new Set(), images: targets.images };
-	await run.warmPhase('Assets', chain(targets.assets, mapResult.urls), { collect: cssTargets });
+	// Fonts referenced from CSS only surface once the CSS itself is warmed
+	const cssAssets = new Set<string>();
+	await run.warmPhase('Assets', chain(assets, mapResult.urls), { collect: cssAssets });
 
-	if (cssTargets.assets.size > 0) {
-		console.log(`Warming ${String(cssTargets.assets.size)} CSS-referenced assets...`);
-		await run.warmPhase('CSS assets', cssTargets.assets);
+	if (cssAssets.size > 0) {
+		console.log(`Warming ${String(cssAssets.size)} CSS-referenced assets...`);
+		await run.warmPhase('CSS assets', cssAssets);
 	}
 }
 
-async function warmNewImages(
-	run: WarmRun,
-	images: Set<string>,
-	seen: ReadonlySet<string>,
-): Promise<Array<string>> {
-	const newImages = [...images.difference(seen)];
-	console.log(
-		`Warming ${String(newImages.length)} new images of ${String(images.size)} referenced (concurrency ${String(imageConcurrency)})...`,
-	);
-	await run.warmPhase('Images (new)', newImages, { concurrency: imageConcurrency });
-	return newImages;
-}
-
-async function warmPages(run: WarmRun): Promise<ScrapeTargets> {
+async function warmPages(run: WarmRun): Promise<Set<string>> {
 	let pages = await getSitemapUrls();
 	if (warmLimit !== undefined) {
 		pages = pages.slice(0, warmLimit);
@@ -657,9 +534,9 @@ async function warmPages(run: WarmRun): Promise<ScrapeTargets> {
 	console.log(
 		`Warming ${String(pages.length)} pages (concurrency ${String(defaultConcurrency)})...`,
 	);
-	const targets: ScrapeTargets = { assets: new Set(), images: new Set() };
-	await run.warmPhase('Pages', pages, { collect: targets });
-	return targets;
+	const assets = new Set<string>();
+	await run.warmPhase('Pages', pages, { collect: assets });
+	return assets;
 }
 
 try {
@@ -669,3 +546,5 @@ try {
 	await sendAlert('[SpectralCodex] cache warm crashed', messageOf(error));
 	process.exitCode = 1;
 }
+
+export {};
