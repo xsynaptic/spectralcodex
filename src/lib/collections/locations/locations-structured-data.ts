@@ -13,9 +13,7 @@ export async function getLocationStructuredData(
 	entry: ComputedEntry<'locations'>,
 	props: { url: string },
 ): Promise<Array<Thing>> {
-	if (entry.data.override || isGeometryHidden(entry)) {
-		return [];
-	}
+	if (isGeometryHidden(entry)) return [];
 
 	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
 	const getRegionAncestors = await createRegionAncestorsFunction();

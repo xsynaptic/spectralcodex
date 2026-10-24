@@ -21,11 +21,7 @@ import {
 	createCollectionLookupByIds,
 	getRawCollection,
 } from '#lib/utils/collections.ts';
-import {
-	contentPolicy,
-	getEffectiveLocationData,
-	isGeometryHidden,
-} from '#lib/utils/content-policy.ts';
+import { getEffectiveLocationData, isGeometryHidden } from '#lib/utils/content-policy.ts';
 import { getDescriptionRendered } from '#lib/utils/description-data.ts';
 import { getContentPath } from '#lib/utils/routing.ts';
 
@@ -86,9 +82,7 @@ function getGeometryWithThumbnails(
 export const getLocationsCollection = createCollectionData({
 	collection: 'locations',
 	async compute(entries) {
-		const nearbyCandidates = contentPolicy.hideSensitiveLocations
-			? entries.filter((location) => !isGeometryHidden(location))
-			: entries;
+		const nearbyCandidates = entries.filter((location) => !isGeometryHidden(location));
 
 		const posts = await getRawCollection('posts');
 		const getThumbnail = await createThumbnailFunction();

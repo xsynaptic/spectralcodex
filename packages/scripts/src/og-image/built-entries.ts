@@ -1,5 +1,6 @@
 import { ContentCollectionsEnum } from '@spectralcodex/shared/collections';
 import { collectDistMatches } from '@spectralcodex/shared/dist-scan';
+import { applyLocationOverride } from '@spectralcodex/shared/entries';
 import { openGraphBasePath } from '@spectralcodex/shared/open-graph';
 
 import type { OpenGraphContentEntry } from '#og-image/types.ts';
@@ -124,7 +125,7 @@ async function buildContentEntries(): Promise<{
 			const item = toOpenGraphEntryItem({
 				chronologyImageIndex,
 				collection,
-				entry,
+				entry: { ...entry, data: applyLocationOverride(entry.data) },
 				regionParentMap,
 			});
 

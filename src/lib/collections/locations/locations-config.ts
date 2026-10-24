@@ -40,7 +40,7 @@ export const locations = defineCollection({
 					title: TitleSchema.optional(),
 					...titleMultilingualSchema,
 					description: z.string().optional(),
-					regions: reference('regions').array().optional(),
+					regions: reference('regions').array().min(1).optional(),
 				})
 				.strict()
 				.optional(),

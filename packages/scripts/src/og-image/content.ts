@@ -13,14 +13,6 @@ import { getFallbackImageId } from '#og-image/fallback.ts';
 import { getRegionParentsById, toReferenceIds } from '#shared/entries.ts';
 import { getEntryImageIds } from '#shared/image-references.ts';
 
-// Sensitive locations present override regions; fallback imagery must not leak the true region
-export function resolveOgRegions(data: Record<string, unknown>): Array<string> {
-	const override = z.object({ regions: z.unknown() }).safeParse(data.override);
-	const overrideRegions = toReferenceIds(override.data?.regions);
-
-	return overrideRegions.length > 0 ? overrideRegions : toReferenceIds(data.regions);
-}
-
 function getImageFeaturedData({
 	chronologyImageIndex,
 	collection,
@@ -46,12 +38,12 @@ function getImageFeaturedData({
 		imageFeaturedId: getFallbackImageId({
 			category: z.string().optional().parse(entry.data.category),
 			collection,
-			id: entry.id,
+			id: getPublicId(entry),
 			regions: regionParentMap
 				? getRegionParentsById(
 						collection === ContentCollectionsEnum.Regions
 							? z.string().optional().parse(entry.data.parent)
-							: resolveOgRegions(entry.data)[0],
+							: toReferenceIds(entry.data.regions)[0],
 						regionParentMap,
 					)
 				: undefined,
@@ -60,17 +52,6 @@ function getImageFeaturedData({
 		isFallback: true,
 	};
 }
-
-const TitleOverrideSchema = z
-	.object({
-		title: z.string().optional(),
-		title_ja: z.string().optional(),
-		title_th: z.string().optional(),
-		title_zh: z.string().optional(),
-	})
-	.optional();
-
-type TitleOverride = z.infer<typeof TitleOverrideSchema>;
 
 // The one place an entry becomes a card, shared with the dev-only Inventory route
 export function toOpenGraphEntryItem({
@@ -85,8 +66,7 @@ export function toOpenGraphEntryItem({
 	regionParentMap?: RegionParentMap | undefined;
 }): OpenGraphEntryItem | undefined {
 	const id = getOpenGraphId(getPublicId(entry));
-	const override = parseTitleOverride(collection, entry.data);
-	const title = resolveEntryTitle({ collection, data: entry.data, id, override });
+	const title = resolveEntryTitle({ collection, data: entry.data, id });
 
 	if (title === undefined) return undefined;
 
@@ -94,16 +74,16 @@ export function toOpenGraphEntryItem({
 		collection,
 		id,
 		title: stripDiacritics(title),
-		...getMultilingualTitles(entry.data, override),
+		...getMultilingualTitles(entry.data),
 		...getImageFeaturedData({ chronologyImageIndex, collection, entry, regionParentMap }),
 	};
 }
 
-function getMultilingualTitles(data: Record<string, unknown>, override: TitleOverride) {
+function getMultilingualTitles(data: Record<string, unknown>) {
 	return {
-		titleJa: parseOptionalString(override?.title_ja ?? data.title_ja),
-		titleTh: parseOptionalString(override?.title_th ?? data.title_th),
-		titleZh: parseOptionalString(override?.title_zh ?? data.title_zh),
+		titleJa: parseOptionalString(data.title_ja),
+		titleTh: parseOptionalString(data.title_th),
+		titleZh: parseOptionalString(data.title_zh),
 	};
 }
 
@@ -111,27 +91,19 @@ function parseOptionalString(value: unknown) {
 	return z.string().optional().parse(value);
 }
 
-function parseTitleOverride(collection: string, data: Record<string, unknown>): TitleOverride {
-	if (collection !== ContentCollectionsEnum.Locations) return undefined;
-
-	return TitleOverrideSchema.parse(data.override);
-}
-
 // `undefined` marks an entry that gets no OG image at all
 function resolveEntryTitle({
 	collection,
 	data,
 	id,
-	override,
 }: {
 	collection: string;
 	data: Record<string, unknown>;
 	id: string;
-	override: TitleOverride;
 }): string | undefined {
 	if (collection === ContentCollectionsEnum.Chronology) return getChronologyTitle(id);
 
-	const title = override?.title ?? z.string().optional().parse(data.title);
+	const title = z.string().optional().parse(data.title);
 
 	if (!title) return undefined;
 

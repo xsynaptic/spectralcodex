@@ -1,6 +1,6 @@
 import type { CollectionEntry } from 'astro:content';
 
-import { entryQualityFloor } from '@spectralcodex/shared/entries';
+import { applyLocationOverride, entryQualityFloor } from '@spectralcodex/shared/entries';
 
 interface ContentPolicy {
 	applyOverrides: boolean;
@@ -35,19 +35,8 @@ export function collectUnlistedLocationIds(
 	return new Set(locations.filter(({ data }) => !isListed(data)).map(({ id }) => id));
 }
 
-export function getEffectiveLocationData(
-	data: CollectionEntry<'locations'>['data'],
-): CollectionEntry<'locations'>['data'] {
-	if (!contentPolicy.applyOverrides || !data.override) return data;
-
-	const { id: _, ...overrideFields } = data.override;
-
-	return {
-		...data,
-		...overrideFields,
-		regions: overrideFields.regions ?? data.regions,
-		title: overrideFields.title ?? data.title,
-	};
+export function getEffectiveLocationData(data: CollectionEntry<'locations'>['data']) {
+	return contentPolicy.applyOverrides ? applyLocationOverride(data) : data;
 }
 
 export function countContent({

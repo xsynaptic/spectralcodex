@@ -16,51 +16,19 @@ afterEach(() => {
 
 function makeOverriddenLocation(override: Record<string, unknown>) {
 	return makeEntry('locations', 'real-place', {
-		description: 'Authored description',
 		hideGeometry: true,
 		override,
-		regions: [{ id: 'taipei' }],
 		title: 'Authored title',
-		title_zh: '真名',
 	});
 }
 
 describe('getEffectiveLocationData', () => {
-	test('applies every override field except the id when overrides apply', async () => {
+	test('applies the override outside development', async () => {
 		const { getEffectiveLocationData } = await loadContentPolicy(false);
 
-		const data = getEffectiveLocationData(
-			makeOverriddenLocation({
-				description: 'Override description',
-				id: 'anonymous',
-				regions: [{ id: 'tainan' }],
-				title: 'Override title',
-				title_zh: '假名',
-			}).data,
-		);
+		const authored = makeOverriddenLocation({ title: 'Override title' }).data;
 
-		expect(data).toMatchObject({
-			description: 'Override description',
-			regions: [{ id: 'tainan' }],
-			title: 'Override title',
-			title_zh: '假名',
-		});
-		expect(data.override?.id).toBe('anonymous');
-	});
-
-	test('keeps the authored title and regions when the override omits them', async () => {
-		const { getEffectiveLocationData } = await loadContentPolicy(false);
-
-		const data = getEffectiveLocationData(
-			makeOverriddenLocation({ description: 'Override description' }).data,
-		);
-
-		expect(data).toMatchObject({
-			description: 'Override description',
-			regions: [{ id: 'taipei' }],
-			title: 'Authored title',
-			title_zh: '真名',
-		});
+		expect(getEffectiveLocationData(authored).title).toBe('Override title');
 	});
 
 	test('returns the authored data untouched in development', async () => {

@@ -256,6 +256,7 @@ async function getContentEntries(): Promise<Array<EmbeddableEntry>> {
 		if (!entry.digest) continue;
 
 		if (
+			'override' in entry.data ||
 			typeof entry.data.entryQuality !== 'number' ||
 			entry.data.entryQuality < entryQualityFloor.listed
 		)
