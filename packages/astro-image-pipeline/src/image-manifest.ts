@@ -16,6 +16,7 @@ export type ImageQuality = Record<ImageFormat, number>;
 
 export interface ImageManifest {
 	buildId: string;
+	distPath: string;
 	files: Record<string, string>;
 	mediaPath: string;
 	quality: ImageQuality;

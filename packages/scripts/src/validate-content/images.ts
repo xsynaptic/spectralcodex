@@ -1,4 +1,4 @@
-import { getImageStem } from '@xsynaptic/astro-image-pipeline/names';
+import { getImageStem } from '@xsynaptic/astro-image-pipeline/presets';
 
 import type { ContentEntry } from '#shared/astro-content.ts';
 import type { ValidationResult } from '#validate-content/validation-result.ts';

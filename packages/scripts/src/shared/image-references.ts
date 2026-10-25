@@ -1,5 +1,5 @@
 import { ImageFeaturedSchema } from '@spectralcodex/shared/schemas';
-import { isImageSource } from '@xsynaptic/astro-image-pipeline/names';
+import { isImageSource } from '@xsynaptic/astro-image-pipeline/presets';
 import { readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 

@@ -1,4 +1,4 @@
-import { Refusal as PipelineRefusal } from '@xsynaptic/astro-image-pipeline/refusal';
+import { Refusal as PipelineRefusal } from '@xsynaptic/astro-image-pipeline/node';
 import { parseArgs } from 'node:util';
 import { describe, expect, test, vi } from 'vitest';
 import { ProcessOutput } from 'zx';

@@ -2,20 +2,20 @@ import type { ImageFormat, ImageSize } from '#image-name.ts';
 
 import { formatImageName, getImageStem } from '#image-name.ts';
 
-export interface ImagePresetCover {
+interface ImagePresetCover {
 	aspectRatio: number;
 	fit: 'cover';
 	format: ImageFormat;
 	widths: ReadonlyArray<number>;
 }
 
-export interface ImagePresetNative {
+interface ImagePresetNative {
 	fit: 'native';
 	format: ImageFormat;
 	widths: ReadonlyArray<number>;
 }
 
-export interface ImagePresetWidth {
+interface ImagePresetWidth {
 	fit: 'width';
 	format: ImageFormat;
 	widths: ReadonlyArray<number>;

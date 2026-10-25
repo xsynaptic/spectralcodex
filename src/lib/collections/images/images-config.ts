@@ -1,6 +1,6 @@
 import { ImageSizeEnum } from '@spectralcodex/shared/images';
 import { createJsonlCache, defineImageCollection } from '@xsynaptic/astro-image-loader';
-import { readSourceSize } from '@xsynaptic/astro-image-pipeline/render';
+import { readSourceSize } from '@xsynaptic/astro-image-pipeline/node';
 import { defineCollection } from 'astro:content';
 import { CONTENT_MEDIA_PATH, CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { ExifTool } from 'exiftool-vendored';

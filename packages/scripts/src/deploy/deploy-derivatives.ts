@@ -1,8 +1,11 @@
 import { openGraphBasePath, openGraphImageFormat } from '@spectralcodex/shared/open-graph';
 import { getCachePaths } from '@spectralcodex/shared/paths';
-import { assertPruneLimit, listFileCacheFiles } from '@xsynaptic/astro-image-pipeline/file-cache';
-import { getImageCachePaths } from '@xsynaptic/astro-image-pipeline/manifest';
-import { imageFormats } from '@xsynaptic/astro-image-pipeline/names';
+import {
+	assertPruneLimit,
+	getImageCachePaths,
+	listFileCacheFiles,
+} from '@xsynaptic/astro-image-pipeline/node';
+import { imageFormats } from '@xsynaptic/astro-image-pipeline/presets';
 
 import type { DeployConfig } from '#deploy/deploy-config.ts';
 import type { ScriptPaths } from '#shared/cli-command.ts';

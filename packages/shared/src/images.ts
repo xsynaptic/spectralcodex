@@ -1,5 +1,8 @@
-import type { ImageFormat } from '@xsynaptic/astro-image-pipeline/names';
-import type { CoverPresetName, ImagePreset } from '@xsynaptic/astro-image-pipeline/presets';
+import type {
+	CoverPresetName,
+	ImageFormat,
+	ImagePreset,
+} from '@xsynaptic/astro-image-pipeline/presets';
 
 import { createImagePresets } from '@xsynaptic/astro-image-pipeline/presets';
 

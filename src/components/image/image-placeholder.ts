@@ -1,9 +1,9 @@
 import type { Cache } from '@spectralcodex/shared/cache';
-import type { SourceFingerprints } from '@xsynaptic/astro-image-pipeline/fingerprints';
+import type { SourceFingerprints } from '@xsynaptic/astro-image-pipeline/node';
 import type { Buffer } from 'node:buffer';
 
 import { createSqliteCache } from '@spectralcodex/shared/cache';
-import { createSourceFingerprints } from '@xsynaptic/astro-image-pipeline/fingerprints';
+import { createSourceFingerprints } from '@xsynaptic/astro-image-pipeline/node';
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { promises as fs } from 'node:fs';
 import { hash } from 'ohash';

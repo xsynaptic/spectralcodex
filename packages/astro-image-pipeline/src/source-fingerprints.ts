@@ -7,7 +7,7 @@ import { pipeline } from 'node:stream/promises';
 
 import { readSourceSize } from '#image-render.ts';
 
-export interface SourceFingerprint {
+interface SourceFingerprint {
 	height: number;
 	sha256: string;
 	width: number;

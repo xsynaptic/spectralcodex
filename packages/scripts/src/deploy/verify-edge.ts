@@ -1,5 +1,5 @@
-import { getImageCachePaths, readManifest } from '@xsynaptic/astro-image-pipeline/manifest';
-import { parseImageName } from '@xsynaptic/astro-image-pipeline/names';
+import { getImageCachePaths, readManifest } from '@xsynaptic/astro-image-pipeline/node';
+import { parseImageName } from '@xsynaptic/astro-image-pipeline/presets';
 import { stat } from 'node:fs/promises';
 import path from 'node:path';
 import * as R from 'remeda';

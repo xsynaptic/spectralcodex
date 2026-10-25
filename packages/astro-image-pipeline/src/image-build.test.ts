@@ -47,6 +47,7 @@ async function writeBuild(sizes: ReadonlyArray<string> = allSizes) {
 	const names = getNames(sizes);
 	const manifest = {
 		buildId: `build-${String(++buildCount)}`,
+		distPath,
 		files: Object.fromEntries(names.map((name) => [name, sourceId])),
 		mediaPath,
 		quality: { jpg: 85, webp: 70 },
@@ -77,7 +78,7 @@ async function writeSource(width: number, height: number) {
 function render(
 	options: { isMassPruneAllowed?: boolean; onReplace?: (name: string) => Promise<void> } = {},
 ) {
-	return renderImages({ cachePath: root, distPath, mediaPath, ...options });
+	return renderImages({ cachePath: root, ...options });
 }
 
 function sortNames(names: ReadonlyArray<string>) {
@@ -188,8 +189,6 @@ describe('renderImages', () => {
 		await expect(
 			renderImages({
 				cachePath: root,
-				distPath,
-				mediaPath,
 				onProgress: () => {
 					controller.abort();
 				},
@@ -231,8 +230,6 @@ describe('renderImages', () => {
 		await expect(
 			renderImages({
 				cachePath: root,
-				distPath,
-				mediaPath,
 				onProgress: () => {
 					controller.abort();
 				},
@@ -296,14 +293,6 @@ describe('renderImages guards', () => {
 
 		await expect(render()).rejects.toThrow(Refusal);
 		expect(await listFiles()).toEqual([]);
-	});
-
-	test('refuses a manifest built from another media root', async () => {
-		await writeBuild();
-
-		await expect(
-			renderImages({ cachePath: root, distPath, mediaPath: path.join(root, 'other') }),
-		).rejects.toThrow(/not the configured/);
 	});
 
 	test('refuses a name larger than its source, so a shrunk source never upscales', async () => {

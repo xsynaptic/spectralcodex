@@ -1,6 +1,8 @@
-import { renderImages } from '@xsynaptic/astro-image-pipeline/build';
-import { getImageCachePaths } from '@xsynaptic/astro-image-pipeline/manifest';
-import { engineVersions } from '@xsynaptic/astro-image-pipeline/render';
+import {
+	engineVersions,
+	getImageCachePaths,
+	renderImages,
+} from '@xsynaptic/astro-image-pipeline/node';
 
 import { defineCommand, runCommand } from '#shared/cli-command.ts';
 import { log } from '#shared/cli-output.ts';
@@ -24,9 +26,7 @@ await runCommand(
 
 			const counts = await renderImages({
 				cachePath: paths.cachePath,
-				distPath: paths.distPath,
 				isMassPruneAllowed: values['allow-mass-prune'],
-				mediaPath: paths.mediaPath,
 				onProgress({ total }) {
 					if (!progress) progress = createProgress({ label: 'Rendering', total });
 

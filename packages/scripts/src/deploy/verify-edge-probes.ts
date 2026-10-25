@@ -1,7 +1,7 @@
-import type { ImageFormat } from '@xsynaptic/astro-image-pipeline/names';
+import type { ImageFormat } from '@xsynaptic/astro-image-pipeline/presets';
 
 import { imageQualityByFormat } from '@spectralcodex/shared/images';
-import { parseImageName } from '@xsynaptic/astro-image-pipeline/names';
+import { parseImageName } from '@xsynaptic/astro-image-pipeline/presets';
 import { createHash } from 'node:crypto';
 
 import type { DeployConfig } from '#deploy/deploy-config.ts';

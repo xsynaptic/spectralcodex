@@ -1,7 +1,7 @@
 import { ContentCollectionsEnum } from '@spectralcodex/shared/collections';
 import { applyLocationOverride } from '@spectralcodex/shared/entries';
 import { openGraphBasePath } from '@spectralcodex/shared/open-graph';
-import { collectOutputMatches } from '@xsynaptic/astro-image-pipeline/scan';
+import { collectOutputMatches } from '@xsynaptic/astro-image-pipeline/node';
 
 import type { OpenGraphContentEntry } from '#og-image/types.ts';
 import type { ContentEntry } from '#shared/astro-content.ts';

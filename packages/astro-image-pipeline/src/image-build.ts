@@ -37,9 +37,7 @@ const renderLockFile = 'render.lock';
 
 export interface ImageRenderOptions {
 	cachePath: string;
-	distPath: string;
 	isMassPruneAllowed?: boolean;
-	mediaPath: string;
 	onProgress?: (progress: { done: number; total: number }) => void;
 	onReplace?: (name: string) => Promise<void>;
 	signal?: AbortSignal;
@@ -132,25 +130,16 @@ async function acquireRenderLock(statePath: string) {
 	throw new Refusal(`Another render took over the stale lock at ${lockPath}`);
 }
 
-async function readCurrentManifest(
-	statePath: string,
-	{ distPath, mediaPath }: Pick<ImageRenderOptions, 'distPath' | 'mediaPath'>,
-) {
+async function readCurrentManifest(statePath: string) {
 	const manifest = await readManifest(statePath);
 
 	if (!manifest) throw new Refusal(`No image manifest in ${statePath}; build first`);
 
-	const distBuildId = await readBuildId(distPath);
+	const distBuildId = await readBuildId(manifest.distPath);
 
 	if (distBuildId !== manifest.buildId) {
 		throw new Refusal(
-			`Manifest build ${manifest.buildId} does not match ${distPath} (${distBuildId ?? 'no build id'}); rebuild first`,
-		);
-	}
-
-	if (manifest.mediaPath !== mediaPath) {
-		throw new Refusal(
-			`Manifest was built from ${manifest.mediaPath}, not the configured ${mediaPath}`,
+			`Manifest build ${manifest.buildId} does not match ${manifest.distPath} (${distBuildId ?? 'no build id'}); rebuild first`,
 		);
 	}
 
@@ -182,7 +171,7 @@ function getManifestFiles(manifest: ImageManifest) {
 
 async function readSourceDigests(
 	fingerprints: SourceFingerprints,
-	mediaPath: string,
+	{ mediaPath }: ImageManifest,
 	files: ReadonlyArray<ImageFile>,
 ) {
 	const limit = pLimit(jobCount);
@@ -254,13 +243,11 @@ function createFileProcessor({
 	counts,
 	digests,
 	manifest,
-	mediaPath,
 }: {
 	cache: ImageCache;
 	counts: ImageCounts;
 	digests: Map<string, string>;
 	manifest: ImageManifest;
-	mediaPath: string;
 }) {
 	return async function processFile(file: ImageFile) {
 		const digest = digests.get(file.sourceId);
@@ -275,7 +262,7 @@ function createFileProcessor({
 			return;
 		}
 
-		const { data, info } = await renderImage(path.join(mediaPath, file.sourceId), {
+		const { data, info } = await renderImage(path.join(manifest.mediaPath, file.sourceId), {
 			format: file.format,
 			height: file.height,
 			quality,
@@ -328,10 +315,10 @@ async function runJobs(
 	return failures;
 }
 
-async function renderManifest(options: ImageRenderOptions, statePath: string) {
-	const { cachePath, isMassPruneAllowed = false, mediaPath, onReplace, signal } = options;
-	const { filesPath } = getImageCachePaths(cachePath);
-	const manifest = await readCurrentManifest(statePath, options);
+async function renderManifest(options: ImageRenderOptions, cachePath: string) {
+	const { isMassPruneAllowed = false, onReplace, signal } = options;
+	const { filesPath, statePath } = getImageCachePaths(cachePath);
+	const manifest = await readCurrentManifest(statePath);
 	const files = getManifestFiles(manifest);
 	const engine = await readEngine(statePath);
 	const counts: ImageCounts = { encoded: 0, fresh: 0, overwritten: 0, written: 0 };
@@ -345,7 +332,7 @@ async function renderManifest(options: ImageRenderOptions, statePath: string) {
 		statePath,
 	});
 	const prune = await planPrune(cache, manifest, { isMassPruneAllowed, statePath });
-	const digests = await readSourceDigests(createSourceFingerprints(cachePath), mediaPath, files);
+	const digests = await readSourceDigests(createSourceFingerprints(cachePath), manifest, files);
 
 	// These sharp settings affect the whole process, not only this function
 	sharp.concurrency(1);
@@ -353,14 +340,10 @@ async function renderManifest(options: ImageRenderOptions, statePath: string) {
 
 	const saveLimit = pLimit(1);
 	const save = () => saveLimit(() => cache.save());
-	const failures = await runJobs(
-		files,
-		createFileProcessor({ cache, counts, digests, manifest, mediaPath }),
-		{
-			...options,
-			save,
-		},
-	);
+	const failures = await runJobs(files, createFileProcessor({ cache, counts, digests, manifest }), {
+		...options,
+		save,
+	});
 
 	await save();
 	signal?.throwIfAborted();
@@ -383,11 +366,12 @@ async function renderManifest(options: ImageRenderOptions, statePath: string) {
 }
 
 export async function renderImages(options: ImageRenderOptions) {
-	const { statePath } = getImageCachePaths(options.cachePath);
+	const cachePath = path.resolve(options.cachePath);
+	const { statePath } = getImageCachePaths(cachePath);
 	const lockPath = await acquireRenderLock(statePath);
 
 	try {
-		return await renderManifest(options, statePath);
+		return await renderManifest(options, cachePath);
 	} finally {
 		await fs.rm(lockPath, { force: true });
 	}

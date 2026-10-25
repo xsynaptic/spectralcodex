@@ -77,7 +77,13 @@ export default function imagePipeline({
 
 				const files = await resolveImageSources(absoluteMediaPath, names);
 
-				await writeManifest(statePath, { buildId, files, mediaPath: absoluteMediaPath, quality });
+				await writeManifest(statePath, {
+					buildId,
+					distPath,
+					files,
+					mediaPath: absoluteMediaPath,
+					quality,
+				});
 				await writeBuildId(distPath, buildId);
 
 				logger.info(

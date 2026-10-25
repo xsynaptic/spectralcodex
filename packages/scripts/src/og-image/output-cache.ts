@@ -3,7 +3,7 @@ import {
 	openGraphImageHeight,
 	openGraphImageWidth,
 } from '@spectralcodex/shared/open-graph';
-import { createFileCache } from '@xsynaptic/astro-image-pipeline/file-cache';
+import { createFileCache } from '@xsynaptic/astro-image-pipeline/node';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 
