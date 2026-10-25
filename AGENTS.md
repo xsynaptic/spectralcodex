@@ -13,7 +13,7 @@ Scripts live in `package.json`. Only the ones with a catch are worth stating her
 - **`pnpm build`: run it sparingly.** It is slow under memory pressure; the maintainer builds manually.
 - `pnpm check`: report-only quality gate. Mutates nothing, so run it freely.
 - `pnpm fix`: the mutating twin of `pnpm check` (autofixes, then reports what it could not fix). Somewhat slow; run once after a chunk of work, not repeatedly.
-- `pnpm render-images`: renders the images the last build recorded; `deploy-site` runs it, so run it by hand only when asked.
+- `pnpm render-images`: renders the images the last build published; `deploy-site` runs it, so run it by hand only when asked.
 
 ## Project conventions
 

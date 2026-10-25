@@ -1,11 +1,11 @@
-import { getImageCachePaths } from '@spectralcodex/shared/images';
-import { createSourceFingerprints } from '@spectralcodex/shared/source-fingerprint';
+import { renderImages } from '@xsynaptic/astro-image-pipeline/build';
+import { getImageCachePaths } from '@xsynaptic/astro-image-pipeline/manifest';
+import { engineVersions } from '@xsynaptic/astro-image-pipeline/render';
 
-import { buildImages } from '#images/images-build.ts';
-import { engineVersions } from '#images/images-state.ts';
 import { defineCommand, runCommand } from '#shared/cli-command.ts';
 import { log } from '#shared/cli-output.ts';
 import { createProgress } from '#shared/cli-progress.ts';
+import { createPurgeQueue } from '#shared/purge-queue.ts';
 
 await runCommand(
 	defineCommand({
@@ -19,13 +19,12 @@ await runCommand(
 			},
 		},
 		async run({ paths, signal, values }) {
-			const { derivativesPath, statePath } = getImageCachePaths(paths.cachePath);
+			const purgeQueue = await createPurgeQueue(getImageCachePaths(paths.cachePath).statePath);
 			let progress: ReturnType<typeof createProgress> | undefined;
 
-			const counts = await buildImages({
-				derivativesPath,
+			const counts = await renderImages({
+				cachePath: paths.cachePath,
 				distPath: paths.distPath,
-				fingerprints: createSourceFingerprints(paths.cachePath),
 				isMassPruneAllowed: values['allow-mass-prune'],
 				mediaPath: paths.mediaPath,
 				onProgress({ total }) {
@@ -33,8 +32,8 @@ await runCommand(
 
 					progress.tick();
 				},
+				onReplace: (name) => purgeQueue.add(name),
 				signal,
-				statePath,
 			});
 
 			progress?.succeed();
@@ -46,7 +45,7 @@ await runCommand(
 				['Written', counts.written],
 				['Overwritten', counts.overwritten],
 				['Pruned', counts.pruned],
-				['Purge queue', counts.queued],
+				['Purge queue', purgeQueue.size],
 			]);
 
 			if (counts.isEngineChanged) {
@@ -55,7 +54,7 @@ await runCommand(
 				);
 			}
 		},
-		summary: 'Render the images the last build recorded, incrementally',
+		summary: 'Render the images the last build published, incrementally',
 		title: `Render images (sharp ${engineVersions.sharp}, vips ${engineVersions.vips})`,
 	}),
 );

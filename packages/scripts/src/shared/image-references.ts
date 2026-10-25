@@ -1,4 +1,5 @@
 import { ImageFeaturedSchema } from '@spectralcodex/shared/schemas';
+import { isImageSource } from '@xsynaptic/astro-image-pipeline/names';
 import { readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 
@@ -23,7 +24,7 @@ export function listMediaImages(
 
 			if (stat.isDirectory()) {
 				processDirectory(fullPath, relativePath);
-			} else if (/\.(jpe?g|png|webp|avif|gif)$/i.test(entry)) {
+			} else if (isImageSource(entry)) {
 				if (ignore.some((ignored) => relativePath.startsWith(ignored))) continue;
 				files.add(relativePath);
 			}

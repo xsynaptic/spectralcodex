@@ -1,7 +1,7 @@
 import { ContentCollectionsEnum } from '@spectralcodex/shared/collections';
-import { collectDistMatches } from '@spectralcodex/shared/dist-scan';
 import { applyLocationOverride } from '@spectralcodex/shared/entries';
 import { openGraphBasePath } from '@spectralcodex/shared/open-graph';
+import { collectOutputMatches } from '@xsynaptic/astro-image-pipeline/scan';
 
 import type { OpenGraphContentEntry } from '#og-image/types.ts';
 import type { ContentEntry } from '#shared/astro-content.ts';
@@ -14,7 +14,7 @@ import { getCollectionEntries, withAstroContent } from '#shared/astro-content.ts
 
 export async function extractBuiltFilenames(distPath: string): Promise<Set<string>> {
 	const ogPathSegment = `/${openGraphBasePath}/`;
-	const urls = await collectDistMatches(
+	const urls = await collectOutputMatches(
 		distPath,
 		(relativePath) => relativePath.endsWith('.html'),
 		() => /property="og:image" content="([^"]+)"/g,

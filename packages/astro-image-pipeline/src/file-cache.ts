@@ -1,9 +1,8 @@
 import { existsSync, promises as fs } from 'node:fs';
 import path from 'node:path';
 
-import { Refusal } from '#shared/cli-command.ts';
-import { formatCount } from '#shared/cli-output.ts';
-import { readFileIfExists, readJsonFile, writeJsonFile } from '#shared/files.ts';
+import { readFileIfExists, readJsonFile, writeJsonFile } from '#files.ts';
+import { Refusal } from '#refusal.ts';
 
 const sidecarFile = 'sidecar.json';
 
@@ -15,7 +14,11 @@ interface FileCacheSidecar {
 	derivatives: Record<string, FileCacheRecord>;
 }
 
-// Above this many removals a wrong manifest or media root is likelier than a real cleanup
+function formatCount(count: number) {
+	return count.toLocaleString('en-CA');
+}
+
+// Deleting more files than this usually means the manifest or media folder is wrong
 function getMassPruneLimit(fileCount: number) {
 	return Math.max(100, Math.ceil(fileCount / 50));
 }
@@ -36,7 +39,7 @@ export function assertPruneLimit({
 	if (isAllowed || count <= limit) return;
 
 	throw new Refusal(
-		`Refusing to prune ${formatCount(count)} of ${formatCount(total)} ${subject} (limit ${formatCount(limit)}); pass --allow-mass-prune if the removal is intended`,
+		`Refusing to prune ${formatCount(count)} of ${formatCount(total)} ${subject} (limit ${formatCount(limit)}); allow a mass prune if the removal is intended`,
 	);
 }
 
@@ -48,7 +51,6 @@ async function readDirectory(directory: string) {
 	}
 }
 
-// Leftover temp files are listed too, so a prune sweeps up after an interrupted run
 export async function listFileCacheFiles(directory: string, extensions: ReadonlyArray<string>) {
 	const names = await readDirectory(directory);
 
@@ -123,7 +125,7 @@ export async function createFileCache({
 			} satisfies FileCacheSidecar);
 		},
 
-		// Identical bytes keep their mtime, which is what the deploy syncs on
+		// Unchanged bytes leave the file alone, because the deploy uploads files whose modified time changed
 		async write(name: string, key: string, data: Uint8Array) {
 			const target = filePath(name);
 			const existing = await readFileIfExists(target);

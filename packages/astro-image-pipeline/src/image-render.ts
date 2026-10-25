@@ -1,9 +1,18 @@
-import type { ImageFormat } from '@spectralcodex/shared/images';
-
+import { createHash } from 'node:crypto';
 import sharp from 'sharp';
 
-// Part of every output's cache key; bump it when the pipeline below changes its bytes
+import type { ImageFormat } from '#image-name.ts';
+
+// Bump this whenever a change below alters the output bytes, since it is part of every file's cache key
 export const imageRenderRevision = 3;
+
+export const engineVersions = sharp.versions;
+
+// The platform is included because mozjpeg output differs slightly between CPU architectures
+export const engineId = createHash('sha256')
+	.update(JSON.stringify({ ...engineVersions, arch: process.arch, platform: process.platform }))
+	.digest('hex')
+	.slice(0, 8);
 
 interface ImageRender {
 	format: ImageFormat;
@@ -26,4 +35,11 @@ export async function renderImage(source: string, { format, height, quality, wid
 	}
 
 	return stage.webp({ effort: 6, quality }).toBuffer({ resolveWithObject: true });
+}
+
+// Sizes are read after EXIF rotation, because the render rotates images the same way
+export async function readSourceSize(sourcePath: string) {
+	const { autoOrient } = await sharp(sourcePath).metadata();
+
+	return { height: autoOrient.height, width: autoOrient.width };
 }

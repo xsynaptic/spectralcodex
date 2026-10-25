@@ -3,10 +3,9 @@ import {
 	openGraphImageHeight,
 	openGraphImageWidth,
 } from '@spectralcodex/shared/open-graph';
+import { createFileCache } from '@xsynaptic/astro-image-pipeline/file-cache';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
-
-import { createFileCache } from '#shared/file-cache.ts';
 
 // Everything that decides a card's pixels; hashed so a template edit can never be forgotten
 const templateFiles = ['element.tsx', 'fonts.ts', 'generate.ts'];

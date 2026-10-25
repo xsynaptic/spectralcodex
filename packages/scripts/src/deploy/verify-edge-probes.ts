@@ -1,6 +1,7 @@
-import type { ImageFormat } from '@spectralcodex/shared/images';
+import type { ImageFormat } from '@xsynaptic/astro-image-pipeline/names';
 
 import { imageQualityByFormat } from '@spectralcodex/shared/images';
+import { parseImageName } from '@xsynaptic/astro-image-pipeline/names';
 import { createHash } from 'node:crypto';
 
 import type { DeployConfig } from '#deploy/deploy-config.ts';
@@ -180,16 +181,15 @@ function toSiteProbes(
 
 // Real legacy URLs still hit their cached 200s at the edge, so the probe makes up a signature to reach the redirect
 function getLegacyRedirectProbes(imageBaseUrl: string, imagePath: string, token: string) {
-	const match = /^(?<stem>.+)-(?<width>\d+)x(?<height>\d+)\.(?:jpg|webp)$/.exec(imagePath);
+	const parsed = parseImageName(imagePath);
 
-	if (!match?.groups) {
+	if (parsed?.height === undefined) {
 		return { failures: [`legacy redirect: hero candidate ${imagePath} is not a crop`], probes: [] };
 	}
 
-	const { height, stem, width } = match.groups;
-	const format = imagePath.endsWith('.webp') ? 'webp' : 'jpg';
+	const { format, height, stem, width } = parsed;
 	const signature = createHash('sha256').update(token).digest('base64url').slice(0, 20);
-	const legacyPath = `/${signature}/${String(width)}x${String(height)}/filters:quality(${String(imageQualityByFormat[format])}):format(${format})/${String(stem)}.jpg`;
+	const legacyPath = `/${signature}/${String(width)}x${String(height)}/filters:quality(${String(imageQualityByFormat[format])}):format(${format})/${stem}.jpg`;
 
 	const probe: EdgeProbe = {
 		expect: { cacheControl: derivativeCacheControl, location: `/${imagePath}`, status: 301 },

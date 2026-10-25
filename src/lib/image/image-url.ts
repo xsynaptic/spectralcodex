@@ -1,6 +1,7 @@
-import type { ImagePresetName, ImageSource } from '@spectralcodex/shared/images';
+import type { ImagePresetName } from '@spectralcodex/shared/images';
+import type { ImageSource } from '@xsynaptic/astro-image-pipeline/presets';
 
-import { getImageDerivative } from '@spectralcodex/shared/images';
+import { getImageName } from '@spectralcodex/shared/images';
 import { IMAGE_BASE_URL } from 'astro:env/server';
 
 interface ImagePathOptions {
@@ -14,10 +15,9 @@ function getImageUrl(imagePath: string) {
 	return `${imageBaseUrl}/${imagePath}`;
 }
 
-// `getImageDerivative` records every path for the build manifest
 export function createImagePathFunction({ imageSource, preset }: ImagePathOptions) {
 	return function getImagePath(width: number | undefined) {
-		return getImageDerivative(imageSource, preset, width).path;
+		return getImageName(imageSource, preset, width);
 	};
 }
 

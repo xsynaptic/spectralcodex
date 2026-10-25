@@ -1,4 +1,4 @@
-import type { ImageSource } from '@spectralcodex/shared/images';
+import type { ImageSource } from '@xsynaptic/astro-image-pipeline/presets';
 import type { CollectionEntry } from 'astro:content';
 
 import pMemoize from 'p-memoize';

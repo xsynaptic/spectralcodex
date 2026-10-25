@@ -1,6 +1,8 @@
-import { getImageCachePaths, imageQualityByFormat } from '@spectralcodex/shared/images';
 import { openGraphBasePath, openGraphImageFormat } from '@spectralcodex/shared/open-graph';
 import { getCachePaths } from '@spectralcodex/shared/paths';
+import { assertPruneLimit, listFileCacheFiles } from '@xsynaptic/astro-image-pipeline/file-cache';
+import { getImageCachePaths } from '@xsynaptic/astro-image-pipeline/manifest';
+import { imageFormats } from '@xsynaptic/astro-image-pipeline/names';
 
 import type { DeployConfig } from '#deploy/deploy-config.ts';
 import type { ScriptPaths } from '#shared/cli-command.ts';
@@ -10,7 +12,6 @@ import { rsyncTo } from '#deploy/rsync-exec.ts';
 import { Refusal } from '#shared/cli-command.ts';
 import { formatCount, formatDuration, log } from '#shared/cli-output.ts';
 import { isPhraseConfirmed } from '#shared/cli-prompt.ts';
-import { assertPruneLimit, listFileCacheFiles } from '#shared/file-cache.ts';
 import { createPurgeQueue } from '#shared/purge-queue.ts';
 
 export interface DerivativeSet {
@@ -51,13 +52,13 @@ export const derivativePruneOptions = {
 };
 
 export function getImageSet(paths: ScriptPaths, config: DeployConfig): DerivativeSet {
-	const { derivativesPath, statePath } = getImageCachePaths(paths.cachePath);
+	const { filesPath, statePath } = getImageCachePaths(paths.cachePath);
 
 	return {
 		command: 'pnpm render-images',
-		extensions: Object.keys(imageQualityByFormat),
+		extensions: imageFormats,
 		label: 'images',
-		localPath: derivativesPath,
+		localPath: filesPath,
 		purgeBaseUrl: config.imageBaseUrl,
 		remotePath: config.imagesPath,
 		statePath,

@@ -1,0 +1,37 @@
+{
+	"name": "@xsynaptic/astro-image-pipeline",
+	"version": "0.1.0",
+	"description": "Stable-name image derivatives for Astro sites, rendered outside the bundler",
+	"type": "module",
+	"exports": {
+		".": "./src/astro-integration.ts",
+		"./build": "./src/image-build.ts",
+		"./file-cache": "./src/file-cache.ts",
+		"./fingerprints": "./src/source-fingerprints.ts",
+		"./manifest": "./src/image-manifest.ts",
+		"./names": "./src/image-name.ts",
+		"./presets": "./src/image-presets.ts",
+		"./refusal": "./src/refusal.ts",
+		"./render": "./src/image-render.ts",
+		"./scan": "./src/output-scan.ts"
+	},
+	"imports": {
+		"#*": "./src/*"
+	},
+	"engines": {
+		"node": ">=24"
+	},
+	"license": "MIT",
+	"private": true,
+	"dependencies": {
+		"p-limit": "^7.3.3",
+		"sharp": "0.35.5"
+	},
+	"devDependencies": {
+		"astro": "^7.4.2",
+		"vitest": "^4.1.12"
+	},
+	"peerDependencies": {
+		"astro": "^7.4.2"
+	}
+}

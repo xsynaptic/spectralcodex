@@ -1,5 +1,5 @@
 import { getCachePaths } from '@spectralcodex/shared/paths';
-import { createSourceFingerprints } from '@spectralcodex/shared/source-fingerprint';
+import { createSourceFingerprints } from '@xsynaptic/astro-image-pipeline/fingerprints';
 import { rmSync } from 'node:fs';
 import path from 'node:path';
 import pLimit from 'p-limit';

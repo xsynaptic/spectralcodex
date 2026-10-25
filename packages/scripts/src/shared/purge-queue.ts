@@ -1,9 +1,8 @@
-import { promises as fs } from 'node:fs';
+import { existsSync, promises as fs } from 'node:fs';
 import path from 'node:path';
 import * as R from 'remeda';
 
 import { formatCount, log } from '#shared/cli-output.ts';
-import { readFileIfExists } from '#shared/files.ts';
 
 export type PurgeRequestBody = { files: Array<string> } | { prefixes: Array<string> };
 
@@ -24,8 +23,8 @@ function getPurgePrefix(baseUrl: string) {
 // Appended before each overwrite lands, so a run killed after the rename still leaves the purge queued
 export async function createPurgeQueue(statePath: string) {
 	const filePath = path.join(statePath, purgeQueueFile);
-	const data = await readFileIfExists(filePath);
-	const queued = new Set(data?.toString('utf8').split('\n').filter(Boolean));
+	const data = existsSync(filePath) ? await fs.readFile(filePath, 'utf8') : '';
+	const queued = new Set(data.split('\n').filter(Boolean));
 
 	async function remove(names: Iterable<string>) {
 		for (const name of names) queued.delete(name);

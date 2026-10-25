@@ -1,6 +1,7 @@
 import type { ParseArgsOptionDescriptor } from 'node:util';
 
 import { resolveContentPaths } from '@spectralcodex/shared/paths';
+import { isRefusal, Refusal } from '@xsynaptic/astro-image-pipeline/refusal';
 import chalk from 'chalk';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
@@ -10,7 +11,7 @@ import { ProcessOutput } from 'zx';
 
 import { formatDuration, log, stopActiveSpinner, symbols } from '#shared/cli-output.ts';
 
-export class Refusal extends Error {}
+export { Refusal } from '@xsynaptic/astro-image-pipeline/refusal';
 
 type CommandOption = ParseArgsOptionDescriptor & { description: string };
 
@@ -143,7 +144,7 @@ function isInterruption(error: unknown, isAborted: boolean) {
 function describeError(error: unknown): Pick<FailureReport, 'detail' | 'message'> {
 	if (isParseError(error)) return { detail: 'See --help', message: error.message };
 
-	if (error instanceof Refusal) return { message: error.message };
+	if (isRefusal(error)) return { message: error.message };
 
 	if (error instanceof ProcessOutput) {
 		const reason = error.signal
@@ -175,7 +176,7 @@ export function getFailureReport(
 	return { exitCode: 1, isInterrupted: false, ...describeError(error) };
 }
 
-export function findWorkspaceRoot(startDir: string = process.cwd()): string {
+function findWorkspaceRoot(startDir: string = process.cwd()): string {
 	let current = path.resolve(startDir);
 
 	while (current !== path.dirname(current)) {

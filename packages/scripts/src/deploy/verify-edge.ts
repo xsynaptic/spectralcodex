@@ -1,6 +1,5 @@
-import type { ImageManifest } from '@spectralcodex/shared/images';
-
-import { getImageCachePaths, imageManifestFile } from '@spectralcodex/shared/images';
+import { getImageCachePaths, readManifest } from '@xsynaptic/astro-image-pipeline/manifest';
+import { parseImageName } from '@xsynaptic/astro-image-pipeline/names';
 import { stat } from 'node:fs/promises';
 import path from 'node:path';
 import * as R from 'remeda';
@@ -15,7 +14,6 @@ import {
 	getProbeFailure,
 } from '#deploy/verify-edge-probes.ts';
 import { log } from '#shared/cli-output.ts';
-import { readJsonFile } from '#shared/files.ts';
 
 // Node's fetch never times out on its own, so a hung connection would stall the deploy
 const requestTimeoutMs = 10_000;
@@ -59,16 +57,22 @@ export async function verifyEdge({
 }
 
 async function readImageSamples(cachePath: string) {
-	const { derivativesPath, statePath } = getImageCachePaths(cachePath);
-	const manifest = await readJsonFile<ImageManifest>(path.join(statePath, imageManifestFile));
+	const { filesPath, statePath } = getImageCachePaths(cachePath);
+	const manifest = await readManifest(statePath);
 
 	if (!manifest) return;
 
+	const samples = R.sample(Object.keys(manifest.files), imageSampleSize).flatMap((name) => {
+		const parsed = parseImageName(name);
+
+		return parsed ? [{ format: parsed.format, name }] : [];
+	});
+
 	return Promise.all(
-		R.sample(manifest.derivatives, imageSampleSize).map(async (derivative) => ({
-			byteLength: await getFileSize(path.join(derivativesPath, derivative.path)),
-			format: derivative.format,
-			path: derivative.path,
+		samples.map(async ({ format, name }) => ({
+			byteLength: await getFileSize(path.join(filesPath, name)),
+			format,
+			path: name,
 		})),
 	);
 }

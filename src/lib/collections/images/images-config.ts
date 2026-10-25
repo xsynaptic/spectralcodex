@@ -1,11 +1,11 @@
 import { ImageSizeEnum } from '@spectralcodex/shared/images';
 import { createJsonlCache, defineImageCollection } from '@xsynaptic/astro-image-loader';
+import { readSourceSize } from '@xsynaptic/astro-image-pipeline/render';
 import { defineCollection } from 'astro:content';
 import { CONTENT_MEDIA_PATH, CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { ExifTool } from 'exiftool-vendored';
 import path from 'node:path';
 import { hash } from 'ohash';
-import sharp from 'sharp';
 import { z } from 'zod';
 
 import { extractExifData, ImageExifDataSchema } from '#lib/collections/images/images-exif.ts';
@@ -32,13 +32,6 @@ const extractionVersion = hash({
 	schema: z.toJSONSchema(ImageMetadataSchema, { unrepresentable: 'any' }),
 });
 
-// Extract image dimensions from the image object
-async function getImageDimensions(imagePath: string) {
-	const metadata = await sharp(imagePath).metadata();
-
-	return { height: metadata.height, width: metadata.width };
-}
-
 // Initialize ExifTool instance so it can be reused
 let exiftool: ExifTool;
 
@@ -54,7 +47,7 @@ export const images = defineCollection(
 		cache: imageLoaderCache,
 		concurrency: 80,
 		dataHandler: async ({ filePathRelative }) => {
-			const dimensions = await getImageDimensions(filePathRelative);
+			const dimensions = await readSourceSize(filePathRelative);
 			const exif = await extractExifData(filePathRelative, exiftool);
 
 			const defaultAspectRatio = 3 / 2;

@@ -4,6 +4,7 @@ import node from '@astrojs/node';
 import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 import { astroCacheDir } from '@spectralcodex/shared/constants';
+import { imageQualityByFormat } from '@spectralcodex/shared/images';
 import { getUrlPathIndexing } from '@spectralcodex/shared/indexing';
 import {
 	contentDataPathDefault,
@@ -15,6 +16,7 @@ import { siteBasePath } from '@spectralcodex/shared/routing';
 import { readSitemapLastmod } from '@spectralcodex/shared/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import buildLogger from '@xsynaptic/astro-build-logger';
+import imagePipeline from '@xsynaptic/astro-image-pipeline';
 import { autoImport } from '@xsynaptic/satteri-auto-import';
 import { imgGroupSatteriPlugin } from '@xsynaptic/satteri-img-group';
 import { trailingSlash as trailingSlashPlugin } from '@xsynaptic/satteri-trailing-slash';
@@ -27,10 +29,8 @@ import { fileURLToPath } from 'node:url';
 import { loadEnv } from 'vite';
 
 import { mdxComponentFiles } from '#constants.ts';
-import imageDev from '#dev/image/image-integration.ts';
 import devInventory from '#dev/inventory/inventory-integration.ts';
 import atlas from '#lib/atlas/atlas-integration.ts';
-import imageManifest from '#lib/image/image-manifest-integration.ts';
 
 const imageBaseUrlDefault = '/_img';
 
@@ -192,15 +192,12 @@ export default defineConfig({
 			},
 		}),
 		atlas(),
-		imageManifest({
+		imagePipeline({
+			baseUrl: IMAGE_BASE_URL,
 			cachePath: CUSTOM_CACHE_PATH,
-			imageBaseUrl: IMAGE_BASE_URL,
 			mediaPath: CONTENT_MEDIA_PATH,
-		}),
-		imageDev({
-			cachePath: CUSTOM_CACHE_PATH,
-			imageBaseUrl: IMAGE_BASE_URL,
-			mediaPath: CONTENT_MEDIA_PATH,
+			quality: imageQualityByFormat,
+			scan: { names: ['api/map/**/*.json'], urls: ['**/*.html', 'rss.xml'] },
 		}),
 		compressor({
 			gzip: false,

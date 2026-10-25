@@ -1,11 +1,11 @@
-import { renderImage } from '@spectralcodex/scripts/images-render';
 import { mkdirSync, mkdtempSync, rmSync, utimesSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import sharp from 'sharp';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
-import { createDevImageResolver } from '#dev/image/image-resolver.ts';
+import { createDevImageResolver } from '#dev-resolver.ts';
+import { renderImage } from '#image-render.ts';
 
 let rootPath: string;
 let mediaPath: string;
@@ -16,6 +16,7 @@ function createResolver(builtPath?: string) {
 		builtPath,
 		cachePath: path.join(rootPath, 'cache'),
 		mediaPath,
+		quality: { jpg: 85, webp: 70 },
 		render,
 	});
 
@@ -50,14 +51,24 @@ describe('createDevImageResolver', () => {
 		expect(await sharp(first).metadata()).toMatchObject({ height: 300, width: 450 });
 	});
 
-	test('a name no preset gives the source is not rendered', async () => {
+	test('a name outside the grammar or larger than its source is not rendered', async () => {
 		const { getDevImage, render } = createResolver();
 
-		expect(await getDevImage('a/b-1-500.jpg')).toBeUndefined();
+		expect(await getDevImage('a/b-1-450.png')).toBeUndefined();
 		expect(await getDevImage('a/b-1-1800.jpg')).toBeUndefined();
+		expect(await getDevImage('a/b-1-1200x900.webp')).toBeUndefined();
 		expect(await getDevImage('a/missing-450.jpg')).toBeUndefined();
 		expect(await getDevImage('../media/a/b-1-450.jpg')).toBeUndefined();
 		expect(render).not.toHaveBeenCalled();
+	});
+
+	test('a sidecar sharing the stem is never taken for the source', async () => {
+		writeFileSync(path.join(mediaPath, 'a/b-1.aae'), '<plist/>');
+
+		const { getDevImage, render } = createResolver();
+
+		expect(await getDevImage('a/b-1-450.jpg')).toBe(path.join(rootPath, 'cache/a/b-1-450.jpg'));
+		expect(render).toHaveBeenCalledWith(path.join(mediaPath, 'a/b-1.jpg'), expect.anything());
 	});
 
 	test('a source edited after its render is rendered again', async () => {

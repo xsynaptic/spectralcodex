@@ -5,7 +5,8 @@ import path from 'node:path';
 import sharp from 'sharp';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 
-import { createSourceFingerprints } from '#source-fingerprint.ts';
+import { renderImage } from '#image-render.ts';
+import { createSourceFingerprints } from '#source-fingerprints.ts';
 
 let directory: string;
 let sourcePath: string;
@@ -13,7 +14,7 @@ let sourcePath: string;
 const mtime = new Date('2024-01-01T00:00:00Z');
 
 beforeEach(async () => {
-	directory = mkdtempSync(path.join(tmpdir(), 'source-fingerprint-'));
+	directory = mkdtempSync(path.join(tmpdir(), 'source-fingerprints-'));
 	sourcePath = path.join(directory, 'source.png');
 
 	const image = await sharp({
@@ -35,6 +36,23 @@ describe('createSourceFingerprints', () => {
 		const fingerprint = await createSourceFingerprints(directory).get(sourcePath);
 
 		expect(fingerprint).toMatchObject({ height: 20, width: 30 });
+	});
+
+	test('a source rotated by EXIF reports its oriented size, which a width-only render fills', async () => {
+		const rotatedPath = path.join(directory, 'rotated.jpg');
+
+		await sharp({ create: { background: '#336699', channels: 3, height: 200, width: 300 } })
+			.jpeg()
+			.withMetadata({ orientation: 6 })
+			.toFile(rotatedPath);
+
+		const fingerprint = await createSourceFingerprints(directory).get(rotatedPath);
+
+		expect(fingerprint).toMatchObject({ height: 300, width: 200 });
+
+		const { info } = await renderImage(rotatedPath, { format: 'jpg', quality: 85, width: 200 });
+
+		expect(info).toMatchObject({ height: 300, width: 200 });
 	});
 
 	test('an unchanged mtime and size reuse the stored digest without reading the file', async () => {
