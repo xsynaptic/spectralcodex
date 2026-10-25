@@ -1,3 +1,4 @@
+import { Refusal as PipelineRefusal } from '@xsynaptic/astro-image-pipeline/refusal';
 import { parseArgs } from 'node:util';
 import { describe, expect, test, vi } from 'vitest';
 import { ProcessOutput } from 'zx';
@@ -51,6 +52,14 @@ describe('getFailureReport', () => {
 			exitCode: 1,
 			isInterrupted: false,
 			message: 'Nothing to prune',
+		});
+	});
+
+	test('reports a refusal thrown by the image pipeline, whose class is its own', () => {
+		expect(getFailureReport(new PipelineRefusal('Build first'), { isAborted: false })).toEqual({
+			exitCode: 1,
+			isInterrupted: false,
+			message: 'Build first',
 		});
 	});
 

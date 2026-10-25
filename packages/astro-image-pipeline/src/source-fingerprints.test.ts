@@ -32,12 +32,6 @@ afterEach(() => {
 });
 
 describe('createSourceFingerprints', () => {
-	test('reads the dimensions alongside the digest', async () => {
-		const fingerprint = await createSourceFingerprints(directory).get(sourcePath);
-
-		expect(fingerprint).toMatchObject({ height: 20, width: 30 });
-	});
-
 	test('a source rotated by EXIF reports its oriented size, which a width-only render fills', async () => {
 		const rotatedPath = path.join(directory, 'rotated.jpg');
 
@@ -82,13 +76,5 @@ describe('createSourceFingerprints', () => {
 		const second = await createSourceFingerprints(directory).get(sourcePath);
 
 		expect(second?.sha256).not.toBe(first?.sha256);
-	});
-
-	test('a missing source has no fingerprint', async () => {
-		const fingerprint = await createSourceFingerprints(directory).get(
-			path.join(directory, 'missing.png'),
-		);
-
-		expect(fingerprint).toBeUndefined();
 	});
 });

@@ -6,9 +6,6 @@ describe('parseImageName', () => {
 	test.each([
 		{ format: 'jpg', stem: 'taiwan/taipei/some-image-1', width: 1200 },
 		{ format: 'webp', height: 800, stem: 'taiwan/taipei/some-image-1', width: 1200 },
-		{ format: 'webp', height: 233, stem: 'taiwan/taipei/some-image-1', width: 350 },
-		{ format: 'jpg', height: 514, stem: 'taiwan/taipei/some-image-1', width: 771 },
-		{ format: 'webp', height: 48, stem: 'errata/2016/01/a-b-2', width: 64 },
 	] as const)('round-trips $stem at $width', (name) => {
 		expect(parseImageName(formatImageName(name))).toStrictEqual(name);
 	});

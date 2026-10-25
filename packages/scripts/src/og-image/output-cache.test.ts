@@ -4,7 +4,6 @@ import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 
 import { createOutputCache, getOutputCacheKey } from '#og-image/output-cache.ts';
-import { Refusal } from '#shared/cli-command.ts';
 
 describe('getOutputCacheKey', () => {
 	const base = { digest: 'digest', imageDigest: 'source-a', imageId: 'image/entry.jpg' };
@@ -93,7 +92,7 @@ describe('createOutputCache', () => {
 
 		await cache.write('a-post', 'key', new TextEncoder().encode('card'));
 
-		await expect(cache.planPrune(new Set())).rejects.toThrow(Refusal);
+		await expect(cache.planPrune(new Set())).rejects.toThrow('nothing references it');
 	});
 
 	test('prune refuses to delete most cards at once unless allowed', async () => {

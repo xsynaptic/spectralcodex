@@ -1,7 +1,6 @@
 import type { ParseArgsOptionDescriptor } from 'node:util';
 
 import { resolveContentPaths } from '@spectralcodex/shared/paths';
-import { isRefusal, Refusal } from '@xsynaptic/astro-image-pipeline/refusal';
 import chalk from 'chalk';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
@@ -11,7 +10,13 @@ import { ProcessOutput } from 'zx';
 
 import { formatDuration, log, stopActiveSpinner, symbols } from '#shared/cli-output.ts';
 
-export { Refusal } from '@xsynaptic/astro-image-pipeline/refusal';
+export class Refusal extends Error {
+	override name = 'Refusal';
+}
+
+function isRefusal(error: unknown): error is Refusal {
+	return error instanceof Error && error.name === 'Refusal';
+}
 
 type CommandOption = ParseArgsOptionDescriptor & { description: string };
 

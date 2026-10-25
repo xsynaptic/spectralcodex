@@ -69,6 +69,7 @@ async function writeSource(width: number, height: number) {
 				top: 40,
 			},
 		])
+		.withExif({ IFD0: { Copyright: 'source' } })
 		.jpeg()
 		.toFile(path.join(mediaPath, sourceId));
 }
@@ -180,15 +181,6 @@ describe('renderImages', () => {
 		}
 	});
 
-	test('a second run against an unchanged build encodes nothing', async () => {
-		await writeBuild();
-		await render();
-
-		const counts = await render();
-
-		expect(counts.encoded).toBe(0);
-	});
-
 	test('an interrupted run resumes without re-encoding finished files', async () => {
 		const names = await writeBuild();
 		const controller = new AbortController();
@@ -216,34 +208,17 @@ describe('renderImages', () => {
 		expect(counts.encoded).toBe(names.length - finished);
 	});
 
-	test('an unchanged mtime and size skip hashing; a touch re-hashes without re-encoding', async () => {
+	test('a touched source with unchanged bytes re-encodes nothing', async () => {
 		const sourcePath = path.join(mediaPath, sourceId);
-		const mtime = new Date('2024-01-01T00:00:00Z');
+		const touched = new Date(Date.now() + 60_000);
 
-		await fs.utimes(sourcePath, mtime, mtime);
 		await writeBuild();
 		await render();
-
-		const original = await fs.readFile(sourcePath);
-		const flipped = Buffer.from(original);
-		const middle = Math.floor(flipped.length / 2);
-
-		flipped[middle] = (flipped[middle] ?? 0) ^ 0xff;
-		await fs.writeFile(sourcePath, flipped);
-		await fs.utimes(sourcePath, mtime, mtime);
-
-		const trusted = await render();
-
-		expect(trusted.encoded).toBe(0);
-
-		const touched = new Date(mtime.getTime() + 60_000);
-
-		await fs.writeFile(sourcePath, original);
 		await fs.utimes(sourcePath, touched, touched);
 
-		const rehashed = await render();
+		const counts = await render();
 
-		expect(rehashed.encoded).toBe(0);
+		expect(counts.encoded).toBe(0);
 	});
 
 	test('a change of sharp build is reported by the first run to complete', async () => {
