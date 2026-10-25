@@ -1,3 +1,5 @@
+import type { ProcessOutput } from 'zx';
+
 import { $ } from 'zx';
 
 import { log } from '#shared/cli-output.ts';
@@ -65,6 +67,15 @@ export async function sshCapture(config: SshTarget, command: string): Promise<st
 	const result = await $`ssh ${sshArgs} ${command}`;
 
 	return result.stdout;
+}
+
+export async function sshCaptureUnchecked(
+	config: SshTarget,
+	command: string,
+): Promise<ProcessOutput> {
+	const sshArgs = [...(config.sshKeyPath ? ['-i', config.sshKeyPath] : []), config.remoteHost];
+
+	return await $({ nothrow: true, quiet: true })`ssh ${sshArgs} ${command}`;
 }
 
 // For dry-run, print the command instead of running it so a deploy preview shows remote actions

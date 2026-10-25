@@ -8,7 +8,8 @@ await runCommand(
 		options: {
 			'dry-run': {
 				default: false,
-				description: 'Sync with rsync --dry-run and skip the remote commands',
+				description:
+					'Validate the Caddy config on the server, sync with rsync --dry-run and skip the remote commands',
 				type: 'boolean',
 			},
 		},

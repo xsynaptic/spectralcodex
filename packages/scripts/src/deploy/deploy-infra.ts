@@ -2,7 +2,7 @@ import path from 'node:path';
 
 import type { DeployConfig } from '#deploy/deploy-config.ts';
 
-import { validateCaddyConfig } from '#deploy/deploy-caddy.ts';
+import { readComposeCaddyImage, syncCaddyConfig } from '#deploy/deploy-caddy.ts';
 import { loadDeployConfig, requireEnv } from '#deploy/deploy-config.ts';
 import { rsyncTo, sshCapture, sshExec, sshExecWithInput } from '#deploy/rsync-exec.ts';
 import { formatDuration, log } from '#shared/cli-output.ts';
@@ -48,8 +48,6 @@ function buildServerEnv(config: DeployConfig): string {
 
 const infraSyncTargets: Array<InfraSyncTarget> = [
 	{ extraFlags: ['--mkpath'], source: 'docker-compose.yml' },
-	{ destination: 'caddy/', extraFlags: ['--mkpath', '--delete'], source: 'caddy/' },
-	{ destination: 'certs/', extraFlags: ['--mkpath'], source: 'certs/' },
 	{
 		destination: 'umami-db-backup/',
 		extraFlags: ['--mkpath', '--delete'],
@@ -76,9 +74,14 @@ export async function deployInfra(options: DeployInfraOptions): Promise<void> {
 	log.detail(`To: ${config.remoteHost}:${remotePath}/`);
 	if (dryRun) log.warn('Dry run');
 
-	await validateCaddyConfig(deployDir);
-
 	const start = Date.now();
+
+	await syncCaddyConfig({
+		config,
+		deployDir,
+		dryRun,
+		image: await readComposeCaddyImage(deployDir),
+	});
 
 	await syncInfraFiles({ config, deployDir, dryRun });
 
