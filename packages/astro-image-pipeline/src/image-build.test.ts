@@ -5,9 +5,13 @@ import path from 'node:path';
 import sharp from 'sharp';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 
+import type { ImageRenderOptions } from '#image-build.ts';
+import type { ImageManifest } from '#image-state.ts';
+
 import { readFileIfExists } from '#files.ts';
-import { renderImages } from '#image-build.ts';
-import { writeBuildId, writeManifest } from '#image-manifest.ts';
+import { getFileKey, renderImages } from '#image-build.ts';
+import { resolveImageEncoding } from '#image-encoding.ts';
+import { imageManifestVersion, writeBuildId, writeManifest } from '#image-state.ts';
 import { Refusal } from '#refusal.ts';
 
 const sourceId = 'gallery/source-1.jpg';
@@ -43,15 +47,20 @@ function getNames(sizes: ReadonlyArray<string>) {
 	return sizes.map((size) => `${stem}-${size}`);
 }
 
-async function writeBuild(sizes: ReadonlyArray<string> = allSizes) {
+async function writeBuild(
+	sizes: ReadonlyArray<string> = allSizes,
+	{ limitInputPixels = 268_402_689 } = {},
+) {
 	const names = getNames(sizes);
 	const manifest = {
 		buildId: `build-${String(++buildCount)}`,
 		distPath,
+		encoding: resolveImageEncoding({ jpg: { quality: 85 }, webp: { quality: 70 } }),
 		files: Object.fromEntries(names.map((name) => [name, sourceId])),
+		limitInputPixels,
 		mediaPath,
-		quality: { jpg: 85, webp: 70 },
-	};
+		version: imageManifestVersion,
+	} satisfies ImageManifest;
 
 	await writeManifest(statePath, manifest);
 	await writeBuildId(distPath, manifest.buildId);
@@ -75,9 +84,7 @@ async function writeSource(width: number, height: number) {
 		.toFile(path.join(mediaPath, sourceId));
 }
 
-function render(
-	options: { isMassPruneAllowed?: boolean; onReplace?: (name: string) => Promise<void> } = {},
-) {
+function render(options: Omit<ImageRenderOptions, 'cachePath'> = {}) {
 	return renderImages({ cachePath: root, ...options });
 }
 
@@ -115,11 +122,11 @@ afterEach(async () => {
 });
 
 describe('renderImages', () => {
-	test('every file is encoded at the size its name states, with metadata stripped', async () => {
+	test('every file is rendered at the size its name states, with metadata stripped', async () => {
 		const names = await writeBuild();
 		const counts = await render();
 
-		expect(counts.encoded).toBe(names.length);
+		expect(counts.rendered).toBe(names.length);
 
 		const files = await listFiles();
 
@@ -171,7 +178,7 @@ describe('renderImages', () => {
 
 		const counts = await render();
 
-		expect(counts.encoded).toBe(names.length);
+		expect(counts.rendered).toBe(names.length);
 		expect(counts.written).toBe(0);
 		expect(counts.overwritten).toBe(0);
 
@@ -204,7 +211,7 @@ describe('renderImages', () => {
 		const counts = await render();
 
 		expect(counts.fresh).toBe(finished);
-		expect(counts.encoded).toBe(names.length - finished);
+		expect(counts.rendered).toBe(names.length - finished);
 	});
 
 	test('a touched source with unchanged bytes re-encodes nothing', async () => {
@@ -217,7 +224,7 @@ describe('renderImages', () => {
 
 		const counts = await render();
 
-		expect(counts.encoded).toBe(0);
+		expect(counts.rendered).toBe(0);
 	});
 
 	test('a change of sharp build is reported by the first run to complete', async () => {
@@ -245,48 +252,58 @@ describe('renderImages', () => {
 	});
 });
 
-describe('renderImages pruning', () => {
-	test('a file survives one build after leaving the manifest, then goes', async () => {
-		await writeBuild();
-		await render();
+// A new key re-renders the whole library (about an hour), so this only changes on purpose
+describe('getFileKey', () => {
+	test('stays pinned for a fixed input', () => {
+		const key = getFileKey({
+			digest: 'a'.repeat(64),
+			encoding: resolveImageEncoding({ jpg: { quality: 85 } }).jpg,
+			engine: 'engine',
+			format: 'jpg',
+			height: 800,
+			width: 1200,
+		});
 
-		const dropped = await listFiles();
+		expect(key).toBe('9544a2e15263848d');
+	});
+});
 
-		await writeBuild(['450x300.webp']);
-		await render();
-		await render();
+describe('renderImages failure policy', () => {
+	test('a source over the pixel limit fails the run without writing a file', async () => {
+		await writeBuild(allSizes, { limitInputPixels: 1_000_000 });
 
-		expect(await listFiles()).toEqual(dropped);
-
-		await writeBuild(['450x300.webp']);
-
-		const counts = await render();
-
-		expect(counts.pruned).toBe(dropped.length - 1);
-		expect(await listFiles()).toHaveLength(1);
+		await expect(render()).rejects.toThrow(/16 files failed to render:\n.+exceeds pixel limit/);
+		expect(await listFiles()).toEqual([]);
 	});
 
-	test('a mass prune is refused unless allowed', async () => {
+	test('a reported failure leaves its name unwritten and stale for the next run', async () => {
+		const names = await writeBuild(allSizes, { limitInputPixels: 1_000_000 });
+		const reported = await render({ onFailure: 'report' });
+
+		expect(reported.failures).toEqual(
+			sortNames(names).map((name) => ({ message: 'Input image exceeds pixel limit', name })),
+		);
+		expect(await listFiles()).toEqual([]);
+
 		await writeBuild();
 
-		const strayDirectory = path.join(filesPath, 'stray');
+		const retried = await render();
 
-		await fs.mkdir(strayDirectory, { recursive: true });
-
-		for (let index = 0; index < 101; index++) {
-			await fs.writeFile(path.join(strayDirectory, `stray-${String(index)}.webp`), 'stray');
-		}
-
-		await expect(render()).rejects.toThrow(/Refusing to prune 101/);
-		expect(await listFiles()).toHaveLength(101);
-
-		const counts = await render({ isMassPruneAllowed: true });
-
-		expect(counts.pruned).toBe(101);
+		expect(retried.rendered).toBe(names.length);
 	});
 });
 
 describe('renderImages guards', () => {
+	test('refuses a manifest from before the current version', async () => {
+		await writeBuild();
+		await fs.writeFile(
+			path.join(statePath, 'manifest.json'),
+			JSON.stringify({ buildId: 'old', files: {} }),
+		);
+
+		await expect(render()).rejects.toThrow(/version 1, not 2; rebuild first/);
+	});
+
 	test('refuses a manifest from another build than dist', async () => {
 		await writeBuild();
 		await writeBuildId(distPath, 'another-build');
@@ -332,7 +349,7 @@ describe('renderImages guards', () => {
 
 		const counts = await render();
 
-		expect(counts.encoded).toBe(allSizes.length);
+		expect(counts.rendered).toBe(allSizes.length);
 		expect(existsSync(lockPath)).toBe(false);
 	});
 });

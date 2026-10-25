@@ -1,6 +1,9 @@
+import type { ImageEncoding } from '#image-encoding.ts';
 import type { ImageFormat, ImageSize } from '#image-name.ts';
 
-import { formatImageName, getImageStem } from '#image-name.ts';
+import { resolveImageEncoding } from '#image-encoding.ts';
+import { formatImageName, getImageStem, isImageStem } from '#image-name.ts';
+import { recordImageName } from '#image-recorder.ts';
 
 interface ImagePresetCover {
 	aspectRatio: number;
@@ -40,6 +43,7 @@ export interface ImageDimensions {
 
 export interface ImageSource extends ImageDimensions {
 	id: string;
+	path?: string;
 }
 
 function getPresetSize(preset: ImagePreset, width: number, source: ImageDimensions): ImageSize {
@@ -76,7 +80,7 @@ function capImageSize(size: ImageSize, source: ImageDimensions): ImageSize {
 	};
 }
 
-// A width that isn't in the preset is only accepted when one of the preset's widths shrinks to it for this source
+// A width outside the preset is fine when one of the preset's widths shrinks to it on this source
 function resolvePresetSize(preset: ImagePreset, width: number, source: ImageDimensions) {
 	for (const presetWidth of preset.widths) {
 		const size = capImageSize(getPresetSize(preset, presetWidth, source), source);
@@ -115,22 +119,38 @@ export function createImagePresets<const Table extends Record<keyof Table, Image
 			throw new Error(`Image ${source.id} needs a width for "${presetName}"`);
 
 		const preset: ImagePreset = table[presetName];
+		const size = resolvePresetSize(preset, width, source);
 
-		if (
-			!isWithinSource(getPresetSize(preset, width, source), source) &&
-			preset.widths.includes(width)
-		) {
+		if (!size) {
 			throw new Error(
-				`Image ${source.id} (${String(source.width)}x${String(source.height)}) is too small for "${presetName}" at ${String(width)}`,
+				`Image ${source.id} (${String(source.width)}x${String(source.height)}) has no "${presetName}" rendition ${String(width)} wide`,
 			);
 		}
 
-		const size = resolvePresetSize(preset, width, source);
+		const stem = getImageStem(source.id);
 
-		if (!size) throw new Error(`Width ${String(width)} is not in the "${presetName}" preset`);
+		if (!isImageStem(stem)) {
+			throw new Error(
+				`Image ${source.id} can't be named: whitespace, quotes, &, <, >, ), commas and "." or ".." segments don't fit in an image URL; rename the file`,
+			);
+		}
 
-		return formatImageName({ format: preset.format, stem: getImageStem(source.id), ...size });
+		const name = formatImageName({ format: preset.format, stem, ...size });
+
+		recordImageName(name, source.path ?? source.id);
+
+		return name;
 	}
 
 	return { getName, getSize, getWidths };
+}
+
+export function defineImagePipeline<const Table extends Record<keyof Table, ImagePreset>>({
+	encoding,
+	presets,
+}: {
+	encoding?: ImageEncoding;
+	presets: Table;
+}) {
+	return { ...createImagePresets(presets), encoding: resolveImageEncoding(encoding) };
 }

@@ -5,6 +5,7 @@ import path from 'node:path';
 import sharp from 'sharp';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 
+import { resolveImageEncoding } from '#image-encoding.ts';
 import { renderImage } from '#image-render.ts';
 import { createSourceFingerprints } from '#source-fingerprints.ts';
 
@@ -44,7 +45,12 @@ describe('createSourceFingerprints', () => {
 
 		expect(fingerprint).toMatchObject({ height: 300, width: 200 });
 
-		const { info } = await renderImage(rotatedPath, { format: 'jpg', quality: 85, width: 200 });
+		const { info } = await renderImage(rotatedPath, {
+			encoding: resolveImageEncoding(),
+			format: 'jpg',
+			limitInputPixels: 268_402_689,
+			width: 200,
+		});
 
 		expect(info).toMatchObject({ height: 300, width: 200 });
 	});

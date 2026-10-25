@@ -48,10 +48,10 @@ describe('getFailureReport', () => {
 	});
 
 	test('reports a refusal by its message alone', () => {
-		expect(getFailureReport(new Refusal('Nothing to prune'), { isAborted: false })).toEqual({
+		expect(getFailureReport(new Refusal('Build first'), { isAborted: false })).toEqual({
 			exitCode: 1,
 			isInterrupted: false,
-			message: 'Nothing to prune',
+			message: 'Build first',
 		});
 	});
 
@@ -75,7 +75,7 @@ describe('formatHelp', () => {
 	const command = defineCommand({
 		name: 'render-images',
 		options: {
-			'allow-mass-prune': { default: false, description: 'Prune past the limit', type: 'boolean' },
+			'clear-cache': { default: false, description: 'Render from scratch', type: 'boolean' },
 			threshold: { default: '10', description: 'Distance in metres', type: 'string' },
 		},
 		positional: { description: 'One check by name', name: 'check' },
@@ -95,7 +95,7 @@ describe('formatHelp', () => {
 		]);
 		expect(lines.slice(5).map((line) => line.trim().split(/\s{2,}/))).toEqual([
 			['check', 'One check by name'],
-			['--allow-mass-prune', 'Prune past the limit'],
+			['--clear-cache', 'Render from scratch'],
 			['--threshold <value>', 'Distance in metres (default: 10)'],
 			['-h, --help', 'Show this help'],
 		]);

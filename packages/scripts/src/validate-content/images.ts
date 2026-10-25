@@ -1,4 +1,4 @@
-import { getImageStem } from '@xsynaptic/astro-image-pipeline/presets';
+import { findStemCollisions } from '@xsynaptic/astro-image-pipeline/presets';
 
 import type { ContentEntry } from '#shared/astro-content.ts';
 import type { ValidationResult } from '#validate-content/validation-result.ts';
@@ -23,7 +23,7 @@ export function validateImageReferences(entries: Array<ContentEntry>, mediaPath:
 	}
 
 	const missing = collectMissingImageIssues(entries, mediaFiles);
-	const collisions = collectStemCollisions(mediaFiles);
+	const collisions = findStemCollisions(mediaFiles);
 
 	return toValidationResult(
 		[
@@ -39,15 +39,6 @@ export function validateImageReferences(entries: Array<ContentEntry>, mediaPath:
 			pass: `${mediaFiles.size.toString()} image references valid`,
 		},
 	);
-}
-
-// Image names drop the file extension, so a.jpg beside a.png (or A.png on macOS) would get the same names
-function collectStemCollisions(mediaFiles: ReadonlySet<string>) {
-	const filesByStem = Map.groupBy(mediaFiles, (file) => getImageStem(file).toLowerCase());
-
-	return [...filesByStem.values()]
-		.filter((files) => files.length > 1)
-		.map((files) => files.toSorted((first, second) => first.localeCompare(second)));
 }
 
 function collectMissingImageIssues(entries: Array<ContentEntry>, mediaFiles: ReadonlySet<string>) {

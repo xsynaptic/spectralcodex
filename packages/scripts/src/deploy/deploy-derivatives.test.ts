@@ -4,11 +4,7 @@ import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { $ } from 'zx';
 
-import {
-	derivativePruneOptions,
-	derivativeUploadOptions,
-	getDeletedPaths,
-} from '#deploy/deploy-derivatives.ts';
+import { derivativeUploadOptions } from '#deploy/deploy-derivatives.ts';
 import { buildRsyncArgs } from '#deploy/rsync-exec.ts';
 
 let rootPath: string;
@@ -63,22 +59,5 @@ describe('the derivative upload', () => {
 		expect(() => statSync(path.join(rootPath, 'remote/a/b-1-600.jpg.tmp'))).toThrow();
 		expect(statSync(path.join(rootPath, 'remote/a/b-1-450.jpg')).mode & 0o777).toBe(0o644);
 		expect(statSync(path.join(rootPath, 'remote/a')).mode & 0o777).toBe(0o755);
-	});
-});
-
-describe('the remote prune', () => {
-	test('deletes remote files the local cache lacks and sends nothing', async () => {
-		mkdirSync(path.join(rootPath, 'remote/a/.rsync-partial'), { recursive: true });
-		writeFileSync(path.join(rootPath, 'remote/a/b-1-450.jpg'), 'jpeg bytes');
-		writeFileSync(path.join(rootPath, 'remote/a/renamed-1-450.jpg'), 'old bytes');
-		writeFileSync(path.join(rootPath, 'remote/a/.rsync-partial/b-1-900.jpg'), 'in flight');
-
-		const deleted = getDeletedPaths(await runRsync(derivativePruneOptions));
-
-		expect(deleted).toStrictEqual(['a/renamed-1-450.jpg']);
-		expect(() => statSync(path.join(rootPath, 'remote/a/b-1-450x300.webp'))).toThrow();
-		expect(statSync(path.join(rootPath, 'remote/a/.rsync-partial/b-1-900.jpg')).isFile()).toBe(
-			true,
-		);
 	});
 });

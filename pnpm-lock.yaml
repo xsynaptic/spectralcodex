@@ -389,13 +389,13 @@ importers:
       p-limit:
         specifier: ^7.3.3
         version: 7.3.3
-      sharp:
-        specifier: 0.35.5
-        version: 0.35.5(@types/node@25.9.2)
     devDependencies:
       astro:
         specifier: ^7.4.2
         version: 7.4.2(@astrojs/markdown-remark@7.3.1(supports-color@10.2.2))(@types/node@25.9.2)(esbuild@0.28.0)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0)
+      sharp:
+        specifier: 0.35.5
+        version: 0.35.5(@types/node@25.9.2)
       vitest:
         specifier: ^4.1.12
         version: 4.1.12(@types/node@25.9.2)(vite@8.3.5(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))

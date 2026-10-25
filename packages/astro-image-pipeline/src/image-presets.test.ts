@@ -57,17 +57,26 @@ describe('getName', () => {
 	});
 
 	test('a preset width the source cannot fill throws rather than upscaling', () => {
-		expect(() => getName(makeSource(960, 514), 'card-hq', 900)).toThrow('too small');
+		expect(() => getName(makeSource(960, 514), 'card-hq', 900)).toThrow(
+			'no "card-hq" rendition 900 wide',
+		);
 	});
 
 	test('a capped width is accepted only when it is the cap of a preset width', () => {
 		const source = makeSource(960, 514);
 
 		expect(getName(source, 'card-hq', 771)).toBe('taiwan/taipei/some-image-1-771x514.jpg');
-		expect(() => getName(source, 'card-hq', 700)).toThrow('not in the "card-hq" preset');
+		expect(() => getName(source, 'card-hq', 700)).toThrow('no "card-hq" rendition 700 wide');
 	});
 
 	test('a missing width throws', () => {
 		expect(() => getName(makeSource(3600, 2400), 'content', undefined)).toThrow('needs a width');
 	});
+
+	test.each(['trip/IMG 0001.jpg', 'trip/day, 2.jpg', "trip/it's.png", 'trip/../b.jpg'])(
+		'a source path the name grammar would reject throws at build time: %s',
+		(id) => {
+			expect(() => getName(makeSource(3600, 2400, id), 'content', 1200)).toThrow('rename the file');
+		},
+	);
 });

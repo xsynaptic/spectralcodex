@@ -55,14 +55,6 @@ export function endSpinner(spinner: Ora, symbol?: string, text?: string) {
 	if (activeSpinner === spinner) activeSpinner = undefined;
 }
 
-export function pauseSpinner() {
-	const spinner = activeSpinner?.isSpinning ? activeSpinner : undefined;
-
-	spinner?.stop();
-
-	return spinner;
-}
-
 export function stopActiveSpinner(symbol: string) {
 	if (activeSpinner) endSpinner(activeSpinner, symbol);
 }

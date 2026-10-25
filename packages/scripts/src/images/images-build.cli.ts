@@ -13,20 +13,12 @@ await runCommand(
 	defineCommand({
 		interrupted: 'progress is saved and the next run resumes',
 		name: 'render-images',
-		options: {
-			'allow-mass-prune': {
-				default: false,
-				description: 'Prune more local images than the safety limit allows',
-				type: 'boolean',
-			},
-		},
-		async run({ paths, signal, values }) {
+		async run({ paths, signal }) {
 			const purgeQueue = await createPurgeQueue(getImageCachePaths(paths.cachePath).statePath);
 			let progress: ReturnType<typeof createProgress> | undefined;
 
 			const counts = await renderImages({
 				cachePath: paths.cachePath,
-				isMassPruneAllowed: values['allow-mass-prune'],
 				onProgress({ total }) {
 					if (!progress) progress = createProgress({ label: 'Rendering', total });
 
@@ -40,11 +32,10 @@ await runCommand(
 
 			log.summary([
 				['Images', counts.total],
-				['Rendered', counts.encoded],
+				['Rendered', counts.rendered],
 				['Fresh', counts.fresh],
 				['Written', counts.written],
 				['Overwritten', counts.overwritten],
-				['Pruned', counts.pruned],
 				['Purge queue', purgeQueue.size],
 			]);
 

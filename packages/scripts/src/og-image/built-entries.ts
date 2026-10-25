@@ -1,7 +1,8 @@
 import { ContentCollectionsEnum } from '@spectralcodex/shared/collections';
 import { applyLocationOverride } from '@spectralcodex/shared/entries';
 import { openGraphBasePath } from '@spectralcodex/shared/open-graph';
-import { collectOutputMatches } from '@xsynaptic/astro-image-pipeline/node';
+import { readdir, readFile } from 'node:fs/promises';
+import path from 'node:path';
 
 import type { OpenGraphContentEntry } from '#og-image/types.ts';
 import type { ContentEntry } from '#shared/astro-content.ts';
@@ -11,14 +12,28 @@ import { buildChronologyImageIndex, getChronologyTitle } from '#og-image/chronol
 import { toOpenGraphEntryItem } from '#og-image/content.ts';
 import { getFallbackImageId, resolveFallbackImageId } from '#og-image/fallback.ts';
 import { getCollectionEntries, withAstroContent } from '#shared/astro-content.ts';
+import { Refusal } from '#shared/cli-command.ts';
+
+async function collectCardUrls(distPath: string) {
+	const relativePaths = await readdir(distPath, { recursive: true });
+	const urls = new Set<string>();
+
+	for (const relativePath of relativePaths) {
+		if (!relativePath.endsWith('.html')) continue;
+
+		const text = await readFile(path.join(distPath, relativePath), 'utf8');
+
+		for (const match of text.matchAll(/property="og:image" content="([^"]+)"/g)) {
+			if (match[1]) urls.add(match[1]);
+		}
+	}
+
+	return urls;
+}
 
 export async function extractBuiltFilenames(distPath: string): Promise<Set<string>> {
 	const ogPathSegment = `/${openGraphBasePath}/`;
-	const urls = await collectOutputMatches(
-		distPath,
-		(relativePath) => relativePath.endsWith('.html'),
-		() => /property="og:image" content="([^"]+)"/g,
-	);
+	const urls = await collectCardUrls(distPath);
 	const filenames = new Set<string>();
 
 	for (const url of urls) {
@@ -29,6 +44,10 @@ export async function extractBuiltFilenames(distPath: string): Promise<Set<strin
 		const filename = url.slice(index + ogPathSegment.length).replace(/\.[^.]+$/, '');
 
 		if (filename) filenames.add(filename);
+	}
+
+	if (filenames.size === 0) {
+		throw new Refusal(`No OpenGraph card URLs found in ${distPath}; check the og:image markup`);
 	}
 
 	return filenames;

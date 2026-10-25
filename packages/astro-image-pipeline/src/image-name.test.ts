@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { formatImageName, getImageStem, parseImageName } from '#image-name.ts';
+import { findStemCollisions, formatImageName, getImageStem, parseImageName } from '#image-name.ts';
 
 describe('parseImageName', () => {
 	test.each([
@@ -33,5 +33,13 @@ describe('parseImageName', () => {
 describe('getImageStem', () => {
 	test('drops only the extension of the last segment', () => {
 		expect(getImageStem('2007/vancouver.2007/x-1.jpg')).toBe('2007/vancouver.2007/x-1');
+	});
+});
+
+describe('findStemCollisions', () => {
+	test('groups sources whose stems match ignoring case and extension', () => {
+		expect(findStemCollisions(['a/b.jpg', 'a/c.jpg', 'a/B.png', 'd/b.jpg'])).toStrictEqual([
+			['a/b.jpg', 'a/B.png'],
+		]);
 	});
 });

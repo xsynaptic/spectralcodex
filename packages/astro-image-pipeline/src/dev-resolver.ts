@@ -2,18 +2,21 @@ import { randomUUID } from 'node:crypto';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 
-import type { ImageQuality } from '#image-manifest.ts';
+import type { ResolvedImageEncoding } from '#image-encoding.ts';
+import type { ImageSourceResolver } from '#image-sources.ts';
 
-import { isImageSource, parseImageName } from '#image-name.ts';
+import { parseImageName } from '#image-name.ts';
 import { isWithinSource } from '#image-presets.ts';
 import { readSourceSize, renderImage } from '#image-render.ts';
 
 interface DevImageOptions {
 	builtPath: string | undefined;
 	cachePath: string;
+	encoding: ResolvedImageEncoding;
+	limitInputPixels: number;
 	mediaPath: string;
-	quality: ImageQuality;
 	render?: typeof renderImage;
+	sources: ImageSourceResolver;
 }
 
 async function getModifiedTime(filePath: string) {
@@ -26,22 +29,14 @@ async function getModifiedTime(filePath: string) {
 	}
 }
 
-async function readDirectory(directory: string) {
-	try {
-		return await fs.readdir(directory);
-	} catch {
-		return [];
-	}
-}
+function isWithinDirectory(directory: string, filePath: string) {
+	const relativePath = path.relative(directory, filePath);
 
-async function findSourceId(mediaPath: string, stem: string) {
-	const directory = path.posix.dirname(stem);
-	const names = await readDirectory(path.join(mediaPath, directory));
-	const name = names.find(
-		(entry) => isImageSource(entry) && path.parse(entry).name === path.posix.basename(stem),
+	return (
+		relativePath !== '' &&
+		relativePath.split(path.sep)[0] !== '..' &&
+		!path.isAbsolute(relativePath)
 	);
-
-	return name === undefined ? undefined : path.posix.join(directory, name);
 }
 
 async function isNewerThanSource(target: string, sourcePath: string) {
@@ -64,9 +59,11 @@ async function writeImage(target: string, data: Uint8Array) {
 export function createDevImageResolver({
 	builtPath,
 	cachePath,
+	encoding,
+	limitInputPixels,
 	mediaPath,
-	quality,
 	render = renderImage,
+	sources,
 }: DevImageOptions) {
 	const inFlight = new Map<string, Promise<string | undefined>>();
 
@@ -75,11 +72,13 @@ export function createDevImageResolver({
 
 		if (!parsed) return;
 
-		const id = await findSourceId(mediaPath, parsed.stem);
+		const id = await sources.resolve(parsed.stem);
 
-		if (!id) return;
+		if (id === undefined) return;
 
-		const sourcePath = path.join(mediaPath, id);
+		const sourcePath = path.resolve(mediaPath, id);
+
+		if (!isWithinDirectory(mediaPath, sourcePath)) return;
 
 		if (builtPath) {
 			const built = path.join(builtPath, name);
@@ -94,9 +93,10 @@ export function createDevImageResolver({
 		if (!isWithinSource(parsed, await readSourceSize(sourcePath))) return;
 
 		const { data } = await render(sourcePath, {
+			encoding,
 			format: parsed.format,
 			height: parsed.height,
-			quality: quality[parsed.format],
+			limitInputPixels,
 			width: parsed.width,
 		});
 

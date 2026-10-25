@@ -5,12 +5,12 @@ import path from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 import { pipeline } from 'node:stream/promises';
 
+import type { ImageDimensions } from '#image-presets.ts';
+
 import { readSourceSize } from '#image-render.ts';
 
-interface SourceFingerprint {
-	height: number;
+interface SourceFingerprint extends ImageDimensions {
 	sha256: string;
-	width: number;
 }
 
 export interface SourceFingerprints {
@@ -40,7 +40,6 @@ function openDatabase(cachePath: string) {
 	return database;
 }
 
-// Hashing every source takes about 21 s, so a file whose modified time and size haven't changed reuses its stored hash
 export function createSourceFingerprints(cachePath: string): SourceFingerprints {
 	const database = openDatabase(cachePath);
 	const selectStatement = database.prepare(

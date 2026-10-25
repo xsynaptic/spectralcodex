@@ -4,20 +4,26 @@ import path from 'node:path';
 import sharp from 'sharp';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
+import type { ImageSourceResolver } from '#image-sources.ts';
+
 import { createDevImageResolver } from '#dev-resolver.ts';
+import { resolveImageEncoding } from '#image-encoding.ts';
 import { renderImage } from '#image-render.ts';
+import { createDirectorySources } from '#image-sources.ts';
 
 let rootPath: string;
 let mediaPath: string;
 
-function createResolver(builtPath?: string) {
+function createResolver(builtPath?: string, sources = createDirectorySources(mediaPath)) {
 	const render = vi.fn(renderImage);
 	const getDevImage = createDevImageResolver({
 		builtPath,
 		cachePath: path.join(rootPath, 'cache'),
+		encoding: resolveImageEncoding(),
+		limitInputPixels: 268_402_689,
 		mediaPath,
-		quality: { jpg: 85, webp: 70 },
 		render,
+		sources,
 	});
 
 	return { getDevImage, render };
@@ -69,6 +75,27 @@ describe('createDevImageResolver', () => {
 
 		expect(await getDevImage('a/b-1-450.jpg')).toBe(path.join(rootPath, 'cache/a/b-1-450.jpg'));
 		expect(render).toHaveBeenCalledWith(path.join(mediaPath, 'a/b-1.jpg'), expect.anything());
+	});
+
+	test('a source added after the resolver started is found', async () => {
+		const { getDevImage } = createResolver();
+
+		expect(await getDevImage('a/c-1-450.jpg')).toBeUndefined();
+
+		await sharp(path.join(mediaPath, 'a/b-1.jpg')).toFile(path.join(mediaPath, 'a/c-1.jpg'));
+
+		expect(await getDevImage('a/c-1-450.jpg')).toBe(path.join(rootPath, 'cache/a/c-1-450.jpg'));
+	});
+
+	test('a source resolved outside the media folder is not rendered', async () => {
+		const sources: ImageSourceResolver = { resolve: () => Promise.resolve('../outside.jpg') };
+
+		writeFileSync(path.join(rootPath, 'outside.jpg'), '');
+
+		const { getDevImage, render } = createResolver(undefined, sources);
+
+		expect(await getDevImage('a/b-1-450.jpg')).toBeUndefined();
+		expect(render).not.toHaveBeenCalled();
 	});
 
 	test('a source edited after its render is rendered again', async () => {

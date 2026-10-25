@@ -44,5 +44,11 @@ export function getLocationThumbnailProps(
 
 	if (widths.length === 0) return;
 
-	return widths.map((width) => ({ path: getImagePath(width), width }));
+	// A getter, so only popups that reach the map JSON record their image names
+	return widths.map((width) => ({
+		get path() {
+			return getImagePath(width);
+		},
+		width,
+	}));
 }

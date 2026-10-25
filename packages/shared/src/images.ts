@@ -4,7 +4,7 @@ import type {
 	ImagePreset,
 } from '@xsynaptic/astro-image-pipeline/presets';
 
-import { createImagePresets } from '@xsynaptic/astro-image-pipeline/presets';
+import { defineImagePipeline } from '@xsynaptic/astro-image-pipeline/presets';
 
 export const ImageSizeEnum = {
 	ExtraExtraExtraLarge: 3600,
@@ -47,8 +47,16 @@ export type ImagePresetName = keyof typeof imagePresets;
 
 export type ImageCoverPresetName = CoverPresetName<typeof imagePresets>;
 
+export const imagePipelineConfig = defineImagePipeline({
+	encoding: {
+		jpg: { quality: imageQualityByFormat.jpg },
+		webp: { quality: imageQualityByFormat.webp },
+	},
+	presets: imagePresets,
+});
+
 export const {
 	getName: getImageName,
 	getSize: getImagePresetSize,
 	getWidths: getImagePresetWidths,
-} = createImagePresets(imagePresets);
+} = imagePipelineConfig;

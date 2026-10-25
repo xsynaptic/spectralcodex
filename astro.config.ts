@@ -4,7 +4,7 @@ import node from '@astrojs/node';
 import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 import { astroCacheDir } from '@spectralcodex/shared/constants';
-import { imageQualityByFormat } from '@spectralcodex/shared/images';
+import { imagePipelineConfig } from '@spectralcodex/shared/images';
 import { getUrlPathIndexing } from '@spectralcodex/shared/indexing';
 import {
 	contentDataPathDefault,
@@ -196,8 +196,7 @@ export default defineConfig({
 			baseUrl: IMAGE_BASE_URL,
 			cachePath: CUSTOM_CACHE_PATH,
 			mediaPath: CONTENT_MEDIA_PATH,
-			quality: imageQualityByFormat,
-			scan: { names: ['api/map/**/*.json'], urls: ['**/*.html', 'rss.xml'] },
+			pipeline: imagePipelineConfig,
 		}),
 		compressor({
 			gzip: false,

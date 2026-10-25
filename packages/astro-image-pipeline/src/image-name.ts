@@ -1,4 +1,3 @@
-// The images-legacy block in deploy/caddy/Caddyfile also hard-codes this naming format, so keep the two in step
 export const imageFormats = ['jpg', 'webp'] as const;
 
 export type ImageFormat = (typeof imageFormats)[number];
@@ -13,11 +12,13 @@ export interface ImageName extends ImageSize {
 	stem: string;
 }
 
-export const imageNameTerminators = String.raw`\s"'&<>),`;
+const imageNameTerminators = String.raw`\s"'&<>),`;
 
-export const imageNamePatternSource = String.raw`(?<stem>[^${imageNameTerminators}]+?)-(?<width>[1-9]\d*)(?:x(?<height>[1-9]\d*))?\.(?<format>${imageFormats.join('|')})`;
+const imageNamePatternSource = String.raw`(?<stem>[^${imageNameTerminators}]+?)-(?<width>[1-9]\d*)(?:x(?<height>[1-9]\d*))?\.(?<format>${imageFormats.join('|')})`;
 
 const imageNamePattern = new RegExp(`^${imageNamePatternSource}$`);
+
+const imageStemPattern = new RegExp(`^[^${imageNameTerminators}]+$`);
 
 const unsafeSegments = new Set(['', '.', '..']);
 
@@ -37,6 +38,19 @@ export function isImageSource(id: string) {
 
 export function getImageStem(id: string) {
 	return id.replace(/\.[^./]+$/, '');
+}
+
+export function isImageStem(stem: string) {
+	return imageStemPattern.test(stem) && isSafeStem(stem);
+}
+
+// Names drop the extension, so a.jpg and a.png (or A.png on a case-insensitive disk) would collide
+export function findStemCollisions(ids: Iterable<string>) {
+	const idsByStem = Map.groupBy(ids, (id) => getImageStem(id).toLowerCase());
+
+	return [...idsByStem.values()]
+		.filter((stemIds) => stemIds.length > 1)
+		.map((stemIds) => stemIds.toSorted((first, second) => first.localeCompare(second)));
 }
 
 export function formatImageName({ format, height, stem, width }: ImageName) {

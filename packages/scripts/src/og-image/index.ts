@@ -1,22 +1,23 @@
+import type { DerivativeJob, SourceFingerprints } from '@xsynaptic/astro-image-pipeline/node';
+
 import { getCachePaths } from '@spectralcodex/shared/paths';
-import { createSourceFingerprints } from '@xsynaptic/astro-image-pipeline/node';
+import { createSourceFingerprints, runDerivatives } from '@xsynaptic/astro-image-pipeline/node';
 import { rmSync } from 'node:fs';
 import path from 'node:path';
-import pLimit from 'p-limit';
 
 import type { ImageBatch } from '#og-image/batch.ts';
-import type { OpenGraphContentEntry } from '#og-image/types.ts';
+import type { ProcessedImage } from '#og-image/generate.ts';
 import type { ScriptPaths } from '#shared/cli-command.ts';
 
 import { batchEntriesBySourceImage } from '#og-image/batch.ts';
 import { getBuiltEntries } from '#og-image/built-entries.ts';
 import { loadOpenGraphFonts } from '#og-image/fonts.ts';
 import { createRenderer, processImage } from '#og-image/generate.ts';
-import { createOutputCache, getOutputCacheKey } from '#og-image/output-cache.ts';
+import { getCardName, getOutputCacheKey } from '#og-image/output-cache.ts';
 import { defineCommand, Refusal, runCommand } from '#shared/cli-command.ts';
-import { formatCount, formatError, log } from '#shared/cli-output.ts';
+import { formatCount, log } from '#shared/cli-output.ts';
 import { createProgress, withSpinner } from '#shared/cli-progress.ts';
-import { isExistingFile, safelyCreateDirectory } from '#shared/files.ts';
+import { isExistingFile } from '#shared/files.ts';
 
 function assertResolvedEntries(unresolved: Array<string>) {
 	if (unresolved.length === 0) return;
@@ -30,14 +31,14 @@ function assertResolvedEntries(unresolved: Array<string>) {
 
 async function prepareCards({
 	isClearCache,
-	isMassPruneAllowed,
 	paths,
 }: {
 	isClearCache: boolean;
-	isMassPruneAllowed: boolean;
 	paths: ScriptPaths;
 }) {
-	const { openGraphPath: outputPath, openGraphStatePath } = getCachePaths(paths.cachePath);
+	const { openGraphPath: outputPath, openGraphStatePath: statePath } = getCachePaths(
+		paths.cachePath,
+	);
 
 	if (isClearCache) {
 		rmSync(outputPath, { force: true, recursive: true });
@@ -56,121 +57,101 @@ async function prepareCards({
 
 	assertResolvedEntries(unresolved);
 
-	safelyCreateDirectory(outputPath);
+	return { entries, outputPath, renderCard: createRenderer({ fonts }), statePath };
+}
 
-	const outputCache = await createOutputCache({
-		directory: outputPath,
-		statePath: openGraphStatePath,
-	});
-	const prune = await outputCache.planPrune(new Set(entries.map((entry) => entry.id)), {
-		isMassPruneAllowed,
-	});
+async function decodeBatchImage(batch: ImageBatch, mediaPath: string) {
+	const imagePath = path.join(mediaPath, batch.imageId);
 
-	return { entries, outputCache, outputPath, prune, renderCard: createRenderer({ fonts }) };
+	if (!(await isExistingFile(imagePath))) throw new Error(`Missing image: ${batch.imageId}`);
+
+	return processImage({ imageInput: imagePath, isFallback: batch.isFallback });
+}
+
+function createBatchDecoder(mediaPath: string) {
+	let current: undefined | { batch: ImageBatch; image: Promise<ProcessedImage> };
+
+	return function getBatchImage(batch: ImageBatch) {
+		if (current?.batch !== batch) current = { batch, image: decodeBatchImage(batch, mediaPath) };
+
+		return current.image;
+	};
+}
+
+async function createCardJobs({
+	batches,
+	fingerprints,
+	mediaPath,
+	renderCard,
+}: {
+	batches: ReadonlyArray<ImageBatch>;
+	fingerprints: SourceFingerprints;
+	mediaPath: string;
+	renderCard: ReturnType<typeof createRenderer>;
+}) {
+	const getBatchImage = createBatchDecoder(mediaPath);
+	const jobs: Array<DerivativeJob> = [];
+
+	for (const batch of batches) {
+		const fingerprint = await fingerprints.get(path.join(mediaPath, batch.imageId));
+
+		for (const entry of batch.entries) {
+			jobs.push({
+				key: getOutputCacheKey({
+					digest: entry.digest,
+					imageDigest: fingerprint?.sha256,
+					imageId: batch.imageId,
+				}),
+				name: getCardName(entry.id),
+				render: async () => renderCard(entry, await getBatchImage(batch)),
+			});
+		}
+	}
+
+	return jobs;
 }
 
 async function generateCards({
+	isClearCache,
 	paths,
 	signal,
-	...options
 }: {
 	isClearCache: boolean;
-	isMassPruneAllowed: boolean;
 	paths: ScriptPaths;
 	signal: AbortSignal;
 }) {
-	const { entries, outputCache, outputPath, prune, renderCard } = await prepareCards({
-		...options,
+	const { entries, outputPath, renderCard, statePath } = await prepareCards({
+		isClearCache,
 		paths,
 	});
-	const fingerprints = createSourceFingerprints(paths.cachePath);
-
-	// Decoding is bounded by memory (a 3 MB buffer per slot), rendering by CPU
-	const decodeLimit = pLimit(10);
-	const renderLimit = pLimit(16);
-
-	const counts = { errors: 0, generated: 0, skipped: 0 };
+	const batches = batchEntriesBySourceImage(entries);
+	const jobs = await createCardJobs({
+		batches,
+		fingerprints: createSourceFingerprints(paths.cachePath),
+		mediaPath: paths.mediaPath,
+		renderCard,
+	});
+	let latest = { fresh: 0, rendered: 0 };
 	const progress = createProgress({
 		label: 'Rendering',
-		note: () => `${formatCount(counts.generated)} rendered, ${formatCount(counts.skipped)} cached`,
-		total: entries.length,
+		note: () => `${formatCount(latest.rendered)} rendered, ${formatCount(latest.fresh)} cached`,
+		total: jobs.length,
+	});
+	const counts = await runDerivatives({
+		directory: outputPath,
+		jobs,
+		onFailure: 'report',
+		onProgress(update) {
+			latest = update;
+			progress.tick();
+		},
+		signal,
+		statePath,
 	});
 
-	async function selectStaleEntries(batch: ImageBatch) {
-		const fingerprint = await fingerprints.get(path.join(paths.mediaPath, batch.imageId));
-		const imageDigest = fingerprint?.sha256;
-		const stale: Array<{ entry: OpenGraphContentEntry; key: string }> = [];
+	for (const { message, name } of counts.failures) log.error(`${name}: ${message}`);
 
-		for (const entry of batch.entries) {
-			const key = getOutputCacheKey({
-				digest: entry.digest,
-				imageDigest,
-				imageId: batch.imageId,
-			});
-
-			if (outputCache.isFresh(entry.id, key)) {
-				counts.skipped++;
-				progress.tick();
-				continue;
-			}
-
-			stale.push({ entry, key });
-		}
-
-		return stale;
-	}
-
-	async function renderBatch(batch: ImageBatch) {
-		if (signal.aborted) return;
-
-		const stale = await selectStaleEntries(batch);
-
-		// Nothing to draw, so the source image is never decoded
-		if (stale.length === 0) return;
-
-		const imagePath = path.join(paths.mediaPath, batch.imageId);
-
-		if (!(await isExistingFile(imagePath))) {
-			for (const { entry } of stale) {
-				log.error(`Missing image: ${batch.imageId} (used by ${entry.collection}/${entry.id})`);
-				counts.errors++;
-				progress.tick();
-			}
-			return;
-		}
-
-		const image = await processImage({ imageInput: imagePath, isFallback: batch.isFallback });
-
-		await Promise.all(
-			stale.map(({ entry, key }) =>
-				renderLimit(async () => {
-					try {
-						await outputCache.write(entry.id, key, await renderCard(entry, image));
-						counts.generated++;
-					} catch (error) {
-						log.error(`${entry.collection}/${entry.id}: ${formatError(error)}`);
-						counts.errors++;
-					}
-
-					progress.tick();
-				}),
-			),
-		);
-	}
-
-	const batches = batchEntriesBySourceImage(entries);
-
-	await Promise.all(batches.map((batch) => decodeLimit(() => renderBatch(batch))));
-
-	if (signal.aborted) {
-		await outputCache.save();
-		signal.throwIfAborted();
-	}
-
-	await prune.apply();
-	await outputCache.save();
-
-	if (counts.errors > 0) {
+	if (counts.failures.length > 0) {
 		progress.warn();
 	} else {
 		progress.succeed();
@@ -179,14 +160,16 @@ async function generateCards({
 	log.summary([
 		['Entries', entries.length],
 		['Source images', batches.length],
-		['Rendered', counts.generated],
-		['Cached', counts.skipped],
-		['Pruned', prune.orphans.length],
-		['Errors', counts.errors],
+		['Rendered', counts.rendered],
+		['Cached', counts.fresh],
+		['Written', counts.written],
+		['Errors', counts.failures.length],
 	]);
 	log.detail(`Output: ${outputPath}`);
 
-	if (counts.errors > 0) throw new Refusal(`${formatCount(counts.errors)} card(s) failed`);
+	if (counts.failures.length > 0) {
+		throw new Refusal(`${formatCount(counts.failures.length)} card(s) failed`);
+	}
 }
 
 await runCommand(
@@ -194,11 +177,6 @@ await runCommand(
 		interrupted: 'finished cards are saved and the next run resumes',
 		name: 'og-image',
 		options: {
-			'allow-mass-prune': {
-				default: false,
-				description: 'Prune more cards than the safety limit allows',
-				type: 'boolean',
-			},
 			'clear-cache': {
 				default: false,
 				description: 'Delete every card and render from scratch',
@@ -208,7 +186,6 @@ await runCommand(
 		async run({ paths, signal, values }) {
 			await generateCards({
 				isClearCache: values['clear-cache'],
-				isMassPruneAllowed: values['allow-mass-prune'],
 				paths,
 				signal,
 			});

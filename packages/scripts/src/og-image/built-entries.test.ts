@@ -114,9 +114,16 @@ describe('extractBuiltFilenames', () => {
 	});
 
 	test('ignores og images outside the og path and non-html files', async () => {
+		writeHtml('index.html', ogImageMeta('https://example.com/og/homepage.jpg'));
 		writeHtml('page.html', ogImageMeta('https://cdn.example.com/images/not-og.jpg'));
 		writeHtml('data.json', ogImageMeta('https://example.com/og/ignored.jpg'));
 
-		expect([...(await extractBuiltFilenames(distPath))]).toEqual([]);
+		expect([...(await extractBuiltFilenames(distPath))]).toEqual(['homepage']);
+	});
+
+	test('refuses a build with no card URLs, so a markup change cannot silently stop new cards', async () => {
+		writeHtml('index.html', '<meta property="og:title" content="Home">');
+
+		await expect(extractBuiltFilenames(distPath)).rejects.toThrow(/No OpenGraph card URLs/);
 	});
 });

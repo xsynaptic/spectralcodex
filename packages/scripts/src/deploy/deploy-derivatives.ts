@@ -1,11 +1,8 @@
 import { openGraphBasePath, openGraphImageFormat } from '@spectralcodex/shared/open-graph';
 import { getCachePaths } from '@spectralcodex/shared/paths';
-import {
-	assertPruneLimit,
-	getImageCachePaths,
-	listFileCacheFiles,
-} from '@xsynaptic/astro-image-pipeline/node';
+import { getImageCachePaths } from '@xsynaptic/astro-image-pipeline/node';
 import { imageFormats } from '@xsynaptic/astro-image-pipeline/presets';
+import { readdir } from 'node:fs/promises';
 
 import type { DeployConfig } from '#deploy/deploy-config.ts';
 import type { ScriptPaths } from '#shared/cli-command.ts';
@@ -14,7 +11,6 @@ import { requestCloudflarePurge } from '#deploy/cloudflare-purge.ts';
 import { rsyncTo } from '#deploy/rsync-exec.ts';
 import { Refusal } from '#shared/cli-command.ts';
 import { formatCount, formatDuration, log } from '#shared/cli-output.ts';
-import { isPhraseConfirmed } from '#shared/cli-prompt.ts';
 import { createPurgeQueue } from '#shared/purge-queue.ts';
 
 export interface DerivativeSet {
@@ -47,13 +43,6 @@ export const derivativeUploadOptions = {
 	isProgressShown: false,
 } as const;
 
-// `--existing` with `--ignore-existing` sends nothing, so the run only deletes
-export const derivativePruneOptions = {
-	...derivativeUploadOptions,
-	excludes: [...derivativeUploadOptions.excludes, `${partialDirectory}/`],
-	extraFlags: ['--delete', '--existing', '--ignore-existing', '--itemize-changes'],
-};
-
 export function getImageSet(paths: ScriptPaths, config: DeployConfig): DerivativeSet {
 	const { filesPath, statePath } = getImageCachePaths(paths.cachePath);
 
@@ -80,30 +69,31 @@ export function getOpenGraphSet(paths: ScriptPaths, config: DeployConfig): Deriv
 	};
 }
 
-async function listLocalFiles(set: DerivativeSet) {
-	const files = await listFileCacheFiles(set.localPath, set.extensions);
+async function readLocalNames(localPath: string) {
+	try {
+		return await readdir(localPath, { recursive: true });
+	} catch {
+		return [];
+	}
+}
 
-	if (files.length === 0) {
+async function countLocalFiles(set: DerivativeSet) {
+	const names = await readLocalNames(set.localPath);
+	const count = names.filter((name) =>
+		set.extensions.some((extension) => name.endsWith(`.${extension}`)),
+	).length;
+
+	if (count === 0) {
 		throw new Refusal(`No ${set.label} in ${set.localPath}; run \`${set.command}\` first`);
 	}
 
-	return files;
+	return count;
 }
 
-export function getDeletedPaths(rsyncOutput: string) {
-	return rsyncOutput.split('\n').flatMap((line) => {
-		const deletedPath = /^\*deleting +(?<path>.+)$/.exec(line)?.groups?.path;
-
-		return deletedPath && !deletedPath.endsWith('/') ? [deletedPath] : [];
-	});
-}
-
-async function purgeSet(set: DerivativeSet, isDryRun: boolean, deletedPaths: Array<string> = []) {
+async function purgeSet(set: DerivativeSet, isDryRun: boolean) {
 	if (set.purgeBaseUrl === undefined) return;
 
 	const queue = await createPurgeQueue(set.statePath);
-
-	for (const deletedPath of deletedPaths) await queue.add(deletedPath);
 
 	await queue.drain({
 		baseUrl: set.purgeBaseUrl,
@@ -117,11 +107,11 @@ export async function uploadDerivatives(
 	set: DerivativeSet,
 	{ config, dryRun = false }: DerivativeDeployOptions,
 ) {
-	const files = await listLocalFiles(set);
+	const fileCount = await countLocalFiles(set);
 	const destination = `${config.remoteHost}:${set.remotePath}/`;
 
 	log.step(`Deploying ${set.label}...`);
-	log.detail(`From: ${set.localPath}/ (${formatCount(files.length)} files)`);
+	log.detail(`From: ${set.localPath}/ (${formatCount(fileCount)} files)`);
 	log.detail(`To:   ${destination}`);
 	if (dryRun) log.warn('Dry run');
 
@@ -132,61 +122,4 @@ export async function uploadDerivatives(
 	log.success(`Deployed ${set.label} in ${formatDuration(Date.now() - start)}`);
 
 	await purgeSet(set, dryRun);
-}
-
-export async function pruneRemoteDerivatives(
-	set: DerivativeSet,
-	{
-		config,
-		dryRun = false,
-		isMassPruneAllowed = false,
-		signal,
-	}: DerivativeDeployOptions & { isMassPruneAllowed?: boolean; signal: AbortSignal },
-) {
-	const files = await listLocalFiles(set);
-	const source = `${set.localPath}/`;
-	const destination = `${config.remoteHost}:${set.remotePath}/`;
-	const pruneOptions = { ...derivativePruneOptions, config };
-
-	log.step(`Listing remote ${set.label} absent from ${source}...`);
-
-	const planned = getDeletedPaths(
-		await rsyncTo(source, destination, { ...pruneOptions, dryRun: true }),
-	);
-
-	if (planned.length === 0) {
-		log.success('Nothing to prune');
-		return;
-	}
-
-	assertPruneLimit({
-		count: planned.length,
-		isAllowed: isMassPruneAllowed,
-		subject: `remote ${set.label}`,
-		total: files.length + planned.length,
-	});
-
-	log.warn(`${formatCount(planned.length)} remote files will be deleted (listed above)`);
-
-	if (dryRun) {
-		log.warn('Dry run; nothing deleted');
-		return;
-	}
-
-	const isConfirmed = await isPhraseConfirmed({
-		message: `Delete ${formatCount(planned.length)} remote ${set.label}?`,
-		phrase: 'prune',
-		signal,
-	});
-
-	if (!isConfirmed) {
-		log.warn('Not confirmed; nothing deleted');
-		return;
-	}
-
-	const deleted = getDeletedPaths(await rsyncTo(source, destination, pruneOptions));
-
-	log.success(`Deleted ${formatCount(deleted.length)} remote ${set.label}`);
-
-	await purgeSet(set, false, deleted);
 }

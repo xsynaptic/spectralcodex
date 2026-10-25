@@ -17,14 +17,15 @@
 	"license": "MIT",
 	"private": true,
 	"dependencies": {
-		"p-limit": "^7.3.3",
-		"sharp": "0.35.5"
+		"p-limit": "^7.3.3"
 	},
 	"devDependencies": {
 		"astro": "^7.4.2",
+		"sharp": "0.35.5",
 		"vitest": "^4.1.12"
 	},
 	"peerDependencies": {
-		"astro": "^7.4.2"
+		"astro": "^7.4.2",
+		"sharp": "^0.35"
 	}
 }
