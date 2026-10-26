@@ -1,6 +1,6 @@
 {
 	"name": "@xsynaptic/spectralcodex",
-	"version": "7.31.0",
+	"version": "7.32.0",
 	"scripts": {
 		"build": "astro check && astro build",
 		"check": "lefthook run check",
@@ -68,8 +68,8 @@
 		"@spectralcodex/react-map-component": "workspace:*",
 		"@spectralcodex/scripts": "workspace:*",
 		"@spectralcodex/shared": "workspace:*",
-		"@stryker-mutator/core": "^10.0.0",
-		"@stryker-mutator/vitest-runner": "^10.0.0",
+		"@stryker-mutator/core": "^10.1.1",
+		"@stryker-mutator/vitest-runner": "^10.1.1",
 		"@tailwindcss/vite": "^4.3.3",
 		"@tanstack/eslint-plugin-query": "^5.104.5",
 		"@turf/centroid": "^7.4.0",
@@ -108,7 +108,7 @@
 		"geokdbush": "^2.1.0",
 		"globals": "^17.13.0",
 		"kdbush": "^4.1.0",
-		"knip": "^6.42.1",
+		"knip": "^6.43.0",
 		"lefthook": "^2.2.2",
 		"ohash": "^2.0.12",
 		"p-memoize": "^9.0.0",
