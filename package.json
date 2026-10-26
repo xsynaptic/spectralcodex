@@ -1,6 +1,6 @@
 {
 	"name": "@xsynaptic/spectralcodex",
-	"version": "7.32.0",
+	"version": "7.33.0",
 	"scripts": {
 		"build": "astro check && astro build",
 		"check": "lefthook run check",
