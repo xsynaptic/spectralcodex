@@ -128,8 +128,13 @@ export function getConnectionPoints(connections: ReadonlyArray<Connection>) {
 	return [...pointById.values()];
 }
 
-function getClusterId(position: DisplayedPosition | undefined) {
-	return position?.kind === 'cluster' ? position.clusterId : undefined;
+// Location ids never hold `#`, so a cluster key cannot collide with a Point id
+function getDrawnEnd(point: PositionedPoint, position: DisplayedPosition | undefined) {
+	if (position?.kind === 'cluster') {
+		return { coordinates: position.coordinates, key: `#${String(position.clusterId)}` };
+	}
+
+	return { coordinates: point.coordinates, key: point.id };
 }
 
 export function getConnectionCollection(
@@ -137,27 +142,21 @@ export function getConnectionCollection(
 	positions: ReadonlyMap<string, DisplayedPosition>,
 ): ConnectionCollection {
 	const features: ConnectionCollection['features'] = [];
+	const drawnPairs = new Set<string>();
 
 	for (const { from, kind, to } of connections) {
-		const fromPosition = positions.get(from.id);
-		const toPosition = positions.get(to.id);
-		const clusterId = getClusterId(fromPosition);
+		const fromEnd = getDrawnEnd(from, positions.get(from.id));
+		const toEnd = getDrawnEnd(to, positions.get(to.id));
+		const pairKey = getPairKey(fromEnd.key, toEnd.key);
 
-		if (clusterId !== undefined && clusterId === getClusterId(toPosition)) continue;
+		if (fromEnd.key === toEnd.key || drawnPairs.has(pairKey)) continue;
 
-		const coordinates = getArcCoordinates(
-			{
-				coordinates: from.coordinates,
-				displayedCoordinates: fromPosition?.coordinates ?? from.coordinates,
-			},
-			{
-				coordinates: to.coordinates,
-				displayedCoordinates: toPosition?.coordinates ?? to.coordinates,
-			},
-		);
-
+		drawnPairs.add(pairKey);
 		features.push({
-			geometry: { coordinates, type: 'LineString' },
+			geometry: {
+				coordinates: getArcCoordinates(fromEnd.coordinates, toEnd.coordinates),
+				type: 'LineString',
+			},
 			properties: { kind },
 			type: 'Feature',
 		});

@@ -63,18 +63,32 @@ describe('getConnectionCollection', () => {
 		expect(features.map(({ properties }) => properties.kind)).toEqual(['link', 'link']);
 	});
 
-	test('links into one cluster keep their own arcs and meet at the cluster', () => {
+	test('links into one cluster draw one line to the cluster', () => {
 		const cluster = clusterAt(3, [120.15, 23]);
 		const positions = new Map([
 			['shrine', cluster],
 			['theater', cluster],
 		]);
 		const { features } = getConnectionCollection(getConnections(rows, 'temple:0'), positions);
-		const [fromShrine, fromTheater] = features
-			.filter(({ properties }) => properties.kind === 'link')
-			.map(({ geometry }) => geometry.coordinates);
+		const links = features.filter(({ properties }) => properties.kind === 'link');
 
-		expect(fromShrine?.at(0)).toEqual(fromTheater?.at(0));
-		expect(fromShrine?.at(16)).not.toEqual(fromTheater?.at(16));
+		expect(links).toHaveLength(1);
+		expect(links[0]?.geometry.coordinates.at(0)?.[0]).toBeCloseTo(120.15);
+	});
+
+	test('a link merged into a line between Points draws as the Points line', () => {
+		const cluster = clusterAt(5, [120.05, 23]);
+		const positions = new Map([
+			['shrine', cluster],
+			['temple:1', cluster],
+		]);
+		const { features } = getConnectionCollection(getConnections(rows, 'temple:0'), positions);
+
+		expect(features.map(({ properties }) => properties.kind)).toEqual([
+			'points',
+			'points',
+			'points',
+			'link',
+		]);
 	});
 });
