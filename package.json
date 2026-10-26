@@ -113,7 +113,7 @@
 		"ohash": "^2.0.12",
 		"p-memoize": "^9.0.0",
 		"prettier": "^3.9.10",
-		"prettier-plugin-astro": "^1.1.1",
+		"prettier-plugin-astro": "^1.1.2",
 		"prettier-plugin-tailwindcss": "^0.8.1",
 		"remeda": "^2.53.0",
 		"satteri": "^0.10.5",
