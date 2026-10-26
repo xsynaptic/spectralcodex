@@ -3,6 +3,7 @@ import type { FC } from 'react';
 import { useMapCanvasData } from '#data/data-canvas.tsx';
 import { useMapDivision } from '#data/data-query.ts';
 import { useMapConfig } from '#lib/config.tsx';
+import { MapSourceConnections } from '#source/source-connections.tsx';
 import { MapSourceDivisions } from '#source/source-divisions.tsx';
 import { MapSourceHover } from '#source/source-hover.tsx';
 import { MapSourceLabels } from '#source/source-labels.tsx';
@@ -21,6 +22,7 @@ export const MapSource: FC = function MapSource() {
 	return (
 		<>
 			<MapSourceDivisions data={divisionMask} />
+			<MapSourceConnections rows={pointCollection.features} />
 			<MapSourcePoints data={pointCollection} interactive={isInteractive} />
 			<MapSourceLabels />
 			<MapSourceHover />

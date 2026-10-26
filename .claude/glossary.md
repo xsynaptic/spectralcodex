@@ -108,6 +108,8 @@ Map Scope, Map Filter, Map Target and Map View keep the prefix everywhere outsid
 
 **Map View**: What the page being read asks the Atlas map to show: its Map Targets, a Map Scope, or neither. Each page carries one, and the map reads it again on every navigation. _Avoid_: page state, map state, viewport (that is the camera).
 
+**Connection**: A line on a map tying one Location to its own Points and to the Locations it shares a Backlink with. _Avoid_: connector, edge, link line.
+
 ### Imagery
 
 **Image**: A photograph in the media library, described by its own embedded metadata (capture settings, date, and sometimes coordinates) rather than by hand-authored frontmatter. _Avoid_: photo, asset, file, media.

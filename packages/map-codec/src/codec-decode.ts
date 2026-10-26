@@ -46,7 +46,23 @@ export function decodeMapDirectory(columns: MapDirectoryColumns): Array<MapSourc
 		});
 	}
 
+	resolveBacklinks(rows, columnsByKey[sourceFields.backlinks.key]);
+
 	return rows;
+}
+
+function resolveBacklinks(rows: Array<MapSourceItem>, backlinkColumn: Array<unknown> | undefined) {
+	if (!backlinkColumn) return;
+
+	for (const [index, row] of rows.entries()) {
+		const indices = backlinkColumn[index] as Array<number> | null | undefined;
+
+		if (!indices) continue;
+
+		row.properties.backlinks = indices.map(
+			(backlinkIndex) => rows[backlinkIndex]?.properties.id ?? '',
+		);
+	}
 }
 
 export function decodeMapPopupData(

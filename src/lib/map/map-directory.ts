@@ -24,12 +24,15 @@ import path from 'node:path';
 import pMemoize from 'p-memoize';
 import * as R from 'remeda';
 
+import type { Catalog } from '#lib/catalog/catalog-factory.ts';
 import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 
-import { atlasRegionId } from '#constants.ts';
+import { atlasRegionId, mapBacklinkDistanceLimitKm } from '#constants.ts';
+import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import { getObjectiveLocations } from '#lib/collections/locations/locations-subsets.ts';
 import { getRegionsCollection, getRegionsTree } from '#lib/collections/regions/regions-data.ts';
+import { getMapBacklinksByRowId } from '#lib/map/map-backlinks.ts';
 import { assignChunks } from '#lib/map/map-chunks.ts';
 import { hashMapPayloads } from '#lib/map/map-directory-hash.ts';
 import { getMapThemeIndexById } from '#lib/map/map-entry-rules.ts';
@@ -53,6 +56,7 @@ interface MapDataset {
 }
 
 interface MapDatasetContext {
+	backlinksOf: Catalog['backlinksOf'];
 	isPrivate?: boolean | undefined;
 	ordinalById: ReadonlyMap<string, number>;
 	prefix: string;
@@ -85,6 +89,18 @@ function buildLocationByFeatureId(
 	return locationByFeatureId;
 }
 
+function getFirstRowIdByEntryId(locations: Array<ComputedEntry<'locations'>>) {
+	const firstRowIdByEntryId = new Map<string, string>();
+
+	for (const entry of locations) {
+		const [rowId] = getLocationFeatureIds(entry);
+
+		if (rowId) firstRowIdByEntryId.set(entry.id, rowId);
+	}
+
+	return firstRowIdByEntryId;
+}
+
 function getMembershipIndices(
 	references: ReadonlyArray<{ id: string }>,
 	indexById: ReadonlyMap<string, number>,
@@ -110,11 +126,16 @@ function assertDerivedUrl({ properties: { id, url } }: MapSourceItem) {
 
 function buildMapDataset(
 	locations: Array<ComputedEntry<'locations'>>,
-	{ isPrivate, ordinalById, prefix, themeIndexById }: MapDatasetContext,
+	{ backlinksOf, isPrivate, ordinalById, prefix, themeIndexById }: MapDatasetContext,
 ) {
 	const features = getLocationFeatures(locations, { includeHidden: isPrivate });
 	const sourceData = getLocationsMapSourceData(features);
 	const popupData = getLocationsMapPopupData(features);
+	const backlinksByRowId = getMapBacklinksByRowId(sourceData, {
+		backlinksOf,
+		distanceLimit: mapBacklinkDistanceLimitKm,
+		firstRowIdByEntryId: getFirstRowIdByEntryId(locations),
+	});
 
 	const locationByFeatureId = buildLocationByFeatureId(locations);
 	const popupById = new Map(
@@ -149,6 +170,7 @@ function buildMapDataset(
 				...(isPrivate ? sourceItem.properties : R.omit(sourceItem.properties, ['objective'])),
 				...(regionOrdinals.length > 0 ? { regionOrdinals } : {}),
 				...(themeIndices.length > 0 ? { themeIndices } : {}),
+				backlinks: backlinksByRowId.get(id),
 				chunkKey: chunkKeyById.get(id) ?? '0',
 			},
 		} satisfies MapSourceItem;
@@ -227,8 +249,13 @@ export const getMapDirectoryData = pMemoize(async (): Promise<MapDirectoryData> 
 	const regionsTree = await getRegionsTree();
 	const themeIndexById = await getMapThemeIndexById();
 	const objectiveLocations = await getObjectiveLocations();
+	const catalog = await getCatalog();
 
-	const context = { ordinalById: regionsTree.ordinalById, themeIndexById };
+	const context = {
+		backlinksOf: catalog.backlinksOf,
+		ordinalById: regionsTree.ordinalById,
+		themeIndexById,
+	};
 
 	const objectives = buildMapDataset(objectiveLocations, {
 		...context,

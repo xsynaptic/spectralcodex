@@ -4,6 +4,7 @@ import { coded, field, getFieldKeys, keysOf, plain, withFallback } from '#codec-
 import { LocationStatusNumericMapping } from '#map-codes.ts';
 
 export const sourceFields = {
+	backlinks: plain('c'),
 	chunkKey: plain('k'),
 	entryQuality: withFallback('f', 1),
 	hasImage: withFallback('n', false),

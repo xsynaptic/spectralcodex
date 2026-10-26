@@ -330,6 +330,35 @@ describe('MapDirectorySchema', () => {
 
 		expect(MapDirectorySchema.safeParse({ ...columns, u: ['/alpha/'] }).success).toBe(false);
 	});
+
+	test('Backlinks encode as row indices and decode back to ids', () => {
+		const alpha = sourceItemOf('alpha', 'Alpha');
+		const point = sourceItemOf('beta-gamma:1', 'Gamma');
+
+		alpha.properties.backlinks = ['beta-gamma:1'];
+		point.properties.backlinks = ['alpha'];
+
+		const columns = encodeMapDirectory([alpha, point]);
+
+		expect(columns[mapSourceKeys.backlinks]).toEqual([[1], [0]]);
+		expect(MapDirectorySchema.parse(viaJson(columns))).toEqual([alpha, point]);
+	});
+
+	test('a Backlink to a row outside the directory throws on encode', () => {
+		const alpha = sourceItemOf('alpha', 'Alpha');
+
+		alpha.properties.backlinks = ['missing'];
+
+		expect(() => encodeMapDirectory([alpha])).toThrow(/missing/);
+	});
+
+	test('a Backlink index out of range is rejected', () => {
+		const columns = encodeMapDirectory([sourceItemOf('alpha', 'Alpha')]);
+
+		expect(
+			MapDirectorySchema.safeParse({ ...columns, [mapSourceKeys.backlinks]: [[1]] }).success,
+		).toBe(false);
+	});
 });
 
 // Unlike structuredClone, JSON turns `undefined` column entries into `null` as the real payload does
@@ -345,8 +374,10 @@ function directoryOf(rows: Array<MapSourceItem>) {
 
 describe('decodeMapDirectory matches MapDirectorySchema', () => {
 	const chunked = sourceItemOf('beta-gamma', 'Gamma');
+	const linking = sourceItemOf('delta', 'Delta');
 
 	chunked.properties.chunkKey = '3';
+	linking.properties.backlinks = ['beta-gamma'];
 
 	test.each([
 		{ name: 'a fully populated row', rows: [fullSourceItem] },
@@ -362,6 +393,7 @@ describe('decodeMapDirectory matches MapDirectorySchema', () => {
 			name: 'mixed rows with nulls',
 			rows: [fullSourceItem, sourceItemOf('alpha', 'Alpha'), chunked],
 		},
+		{ name: 'Backlinks between rows', rows: [chunked, linking] },
 		{ name: 'no rows', rows: [] },
 	])('$name', ({ rows }) => {
 		const columns = directoryOf(rows);

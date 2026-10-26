@@ -2,6 +2,8 @@ export const MapLayerIdEnum = {
 	Clusters: 'clusters',
 	ClustersLabel: 'clusters-label',
 	ClustersLabelHover: 'clusters-label-hover',
+	ConnectionsBand: 'connections-band',
+	ConnectionsLine: 'connections-line',
 	DivisionHalo: 'division-halo',
 	DivisionMask: 'division-mask',
 	DivisionOutline: 'division-outline',
@@ -13,6 +15,7 @@ export const MapLayerIdEnum = {
 } as const satisfies Record<string, string>;
 
 export const MapSourceIdEnum = {
+	ConnectionCollection: 'connectionCollection',
 	DivisionCollection: 'divisionCollection',
 	HoverCollection: 'hoverCollection',
 	PointCollection: 'pointCollection',

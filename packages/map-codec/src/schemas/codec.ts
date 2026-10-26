@@ -82,6 +82,7 @@ const geometryCodec = z.codec(
 );
 
 const sourceCodec = createFieldCodec(sourceFields, {
+	backlinks: same(z.string().array().optional()),
 	chunkKey: same(z.string().optional()),
 	entryQuality: withDefault(z.number().int()),
 	hasImage: withDefault(z.boolean()),
@@ -155,12 +156,74 @@ export const MapSourceItemSchema = z.codec(
 
 const mapDirectoryColumnKeys = Object.values(mapSourceKeys);
 
+type MapDirectoryColumnMap = Partial<
+	Record<(typeof mapDirectoryColumnKeys)[number], Array<unknown>>
+>;
+
+function isBacklinkColumn(column: Array<unknown> | undefined, rowCount: number) {
+	return (column ?? []).every(
+		(indices) =>
+			indices === null ||
+			indices === undefined ||
+			(Array.isArray(indices) &&
+				indices.every((index) => Number.isSafeInteger(index) && index >= 0 && index < rowCount)),
+	);
+}
+
+// Row indices keep the payload small; ids survive picking out a subset of rows
+function getBacklinkIds(columns: MapDirectoryColumnMap, indices: Array<number>) {
+	const ids = columns[mapSourceKeys.id] ?? [];
+	const titles = columns[mapSourceKeys.title] ?? [];
+
+	return indices.map((index) => {
+		const id = ids[index];
+		const title = titles[index];
+
+		return typeof id === 'string' && typeof title === 'string'
+			? decodeMapRowId(id, title)
+			: undefined;
+	});
+}
+
+function getBacklinkIndices(rows: ReadonlyArray<MapSourceItemCompressed>) {
+	const indexById = new Map(
+		rows.map((row, index) => [
+			decodeMapRowId(row[mapSourceKeys.id], row[mapSourceKeys.title]),
+			index,
+		]),
+	);
+
+	return rows.map((row) => {
+		const backlinkIds = row[mapSourceKeys.backlinks];
+
+		return backlinkIds?.map((backlinkId) => {
+			const index = indexById.get(backlinkId);
+
+			if (index === undefined) {
+				throw new Error(
+					`[Map codec] A row has a Backlink to "${backlinkId}", which is not in the directory`,
+				);
+			}
+
+			return index;
+		});
+	});
+}
+
 export const MapDirectorySchema = z.codec(
 	z
 		.partialRecord(z.enum(mapDirectoryColumnKeys), z.array(z.unknown()))
 		.refine((columns) => new Set(Object.values(columns).map((column) => column.length)).size <= 1, {
 			message: 'Every directory column must hold one value per row',
-		}),
+		})
+		.refine(
+			(columns) =>
+				isBacklinkColumn(
+					columns[mapSourceKeys.backlinks],
+					Object.values(columns).at(0)?.length ?? 0,
+				),
+			{ message: 'Every Backlink must be the index of a directory row' },
+		),
 	z.array(MapSourceItemSchema),
 	{
 		decode: (columns) => {
@@ -175,14 +238,22 @@ export const MapDirectorySchema = z.codec(
 					if (value !== undefined) row[key] = value;
 				}
 
+				const indices = row[mapSourceKeys.backlinks];
+
+				if (Array.isArray(indices)) {
+					row[mapSourceKeys.backlinks] = getBacklinkIds(columns, indices as Array<number>);
+				}
+
 				return row as MapSourceItemCompressed;
 			});
 		},
 		encode: (rows) => {
-			const columns: Partial<Record<(typeof mapDirectoryColumnKeys)[number], Array<unknown>>> = {};
+			const columns: MapDirectoryColumnMap = {};
+			const backlinkIndices = getBacklinkIndices(rows);
 
 			for (const key of mapDirectoryColumnKeys) {
-				const column = rows.map((row) => row[key]);
+				const column =
+					key === mapSourceKeys.backlinks ? backlinkIndices : rows.map((row) => row[key]);
 
 				if (column.some((value) => value !== undefined)) columns[key] = column;
 			}
@@ -209,6 +280,7 @@ export type MapSourceItemCompressed = z.input<typeof MapSourceItemSchema>;
 export type MapFeatureProperties = Omit<MapPopupItem, 'id'> &
 	Omit<
 		MapSourceItem['properties'],
+		| 'backlinks'
 		| 'chunkKey'
 		| 'hasImage'
 		| 'id'

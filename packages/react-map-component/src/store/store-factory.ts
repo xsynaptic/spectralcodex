@@ -49,6 +49,13 @@ export function selectTargetIds({ view }: MapStoreView) {
 	return view.targetIds ?? emptyTargetIds;
 }
 
+export function selectConnectionSubjectId({
+	selectedId,
+	view,
+}: Pick<MapDataState, 'selectedId' | 'view'>) {
+	return view.targetIds?.[0] ?? selectedId;
+}
+
 export function isLabelledTarget(
 	properties: Pick<MapSourceItem['properties'], 'id' | 'pointTitle'>,
 	targetIds: ReadonlyArray<string>,

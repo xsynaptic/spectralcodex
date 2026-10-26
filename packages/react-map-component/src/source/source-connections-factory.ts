@@ -1,0 +1,167 @@
+import type { MapSourceItem } from '@spectralcodex/map-codec';
+import type { FeatureCollection, LineString } from 'geojson';
+
+import { getMapRowById, getMapRowUrl } from '@spectralcodex/map-codec';
+
+import type { DisplayedPosition, PositionedPoint } from '#canvas/canvas-positions-factory.ts';
+
+import { getPositionedPoint } from '#canvas/canvas-positions-factory.ts';
+import { getArcCoordinates } from '#source/source-arc-factory.ts';
+
+export interface Connection {
+	from: PositionedPoint;
+	kind: 'link' | 'points';
+	to: PositionedPoint;
+}
+
+export type ConnectionCollection = FeatureCollection<LineString, Pick<Connection, 'kind'>>;
+
+function getPairKey(firstId: string, secondId: string) {
+	return [firstId, secondId].toSorted((first, second) => first.localeCompare(second)).join(' ');
+}
+
+function getDistance(from: PositionedPoint, to: PositionedPoint) {
+	const [fromLongitude, fromLatitude] = from.coordinates;
+	const [toLongitude, toLatitude] = to.coordinates;
+	const longitudeScale = Math.cos((fromLatitude * Math.PI) / 180);
+
+	return Math.hypot((toLongitude - fromLongitude) * longitudeScale, toLatitude - fromLatitude);
+}
+
+function findNearestPair(
+	joined: ReadonlyArray<PositionedPoint>,
+	remaining: ReadonlyArray<PositionedPoint>,
+) {
+	let nearest: undefined | { distance: number; from: PositionedPoint; to: PositionedPoint };
+
+	for (const from of joined) {
+		for (const to of remaining) {
+			const distance = getDistance(from, to);
+
+			if (!nearest || distance < nearest.distance) nearest = { distance, from, to };
+		}
+	}
+
+	return nearest;
+}
+
+// Prim's shortest tree; a star or a full web gets messy on Locations with many Points
+function getPointConnections([first, ...rest]: ReadonlyArray<PositionedPoint>) {
+	if (!first) return [];
+
+	const joined = [first];
+	const remaining = [...rest];
+	const connections: Array<Connection> = [];
+
+	while (remaining.length > 0) {
+		const nearest = findNearestPair(joined, remaining);
+
+		if (!nearest) break;
+
+		remaining.splice(remaining.indexOf(nearest.to), 1);
+		joined.push(nearest.to);
+		connections.push({ from: nearest.from, kind: 'points', to: nearest.to });
+	}
+
+	return connections;
+}
+
+function getLinkConnections(rows: ReadonlyArray<MapSourceItem>, main: PositionedPoint) {
+	const connections: Array<Connection> = [];
+
+	for (const row of rows) {
+		const { backlinks = [], id } = row.properties;
+
+		for (const backlinkId of backlinks) {
+			if (id !== main.id && backlinkId !== main.id) continue;
+
+			const backlink = getMapRowById(rows, backlinkId);
+
+			if (!backlink) continue;
+
+			connections.push({
+				from: getPositionedPoint(backlink),
+				kind: 'link',
+				to: getPositionedPoint(row),
+			});
+		}
+	}
+
+	return connections;
+}
+
+// Links meet the subject at its first Point, which is where the build stores them
+export function getConnections(
+	rows: ReadonlyArray<MapSourceItem>,
+	subjectId: string | undefined,
+): Array<Connection> {
+	if (!subjectId || !getMapRowById(rows, subjectId)) return [];
+
+	const url = getMapRowUrl(subjectId);
+	const points = rows
+		.filter(({ properties }) => getMapRowUrl(properties.id) === url)
+		.map((row) => getPositionedPoint(row))
+		.toSorted((first, second) => first.id.localeCompare(second.id, undefined, { numeric: true }));
+	const [main] = points;
+
+	if (!main) return [];
+
+	const connectionByPair = new Map<string, Connection>();
+
+	for (const connection of [...getPointConnections(points), ...getLinkConnections(rows, main)]) {
+		const key = getPairKey(connection.from.id, connection.to.id);
+
+		if (!connectionByPair.has(key)) connectionByPair.set(key, connection);
+	}
+
+	return [...connectionByPair.values()];
+}
+
+export function getConnectionPoints(connections: ReadonlyArray<Connection>) {
+	const pointById = new Map<string, PositionedPoint>();
+
+	for (const { from, to } of connections) {
+		pointById.set(from.id, from);
+		pointById.set(to.id, to);
+	}
+
+	return [...pointById.values()];
+}
+
+function getClusterId(position: DisplayedPosition | undefined) {
+	return position?.kind === 'cluster' ? position.clusterId : undefined;
+}
+
+export function getConnectionCollection(
+	connections: ReadonlyArray<Connection>,
+	positions: ReadonlyMap<string, DisplayedPosition>,
+): ConnectionCollection {
+	const features: ConnectionCollection['features'] = [];
+
+	for (const { from, kind, to } of connections) {
+		const fromPosition = positions.get(from.id);
+		const toPosition = positions.get(to.id);
+		const clusterId = getClusterId(fromPosition);
+
+		if (clusterId !== undefined && clusterId === getClusterId(toPosition)) continue;
+
+		const coordinates = getArcCoordinates(
+			{
+				coordinates: from.coordinates,
+				displayedCoordinates: fromPosition?.coordinates ?? from.coordinates,
+			},
+			{
+				coordinates: to.coordinates,
+				displayedCoordinates: toPosition?.coordinates ?? to.coordinates,
+			},
+		);
+
+		features.push({
+			geometry: { coordinates, type: 'LineString' },
+			properties: { kind },
+			type: 'Feature',
+		});
+	}
+
+	return { features, type: 'FeatureCollection' };
+}

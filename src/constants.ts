@@ -10,6 +10,8 @@ export const locationsNearbyDistanceLimit = 10;
 
 export const mapGeometryCoordinatesPrecision = 6;
 
+export const mapBacklinkDistanceLimitKm = 20;
+
 export const atlasRegionId = 'taiwan';
 
 export const mapDisplayRegionIds = new Set([
