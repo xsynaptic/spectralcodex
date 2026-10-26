@@ -131,6 +131,16 @@ export function createProgress({ label, note, total }: ProgressOptions) {
 	};
 }
 
+// A failure leaves the spinner active for `runCommand` to mark as failed
+export async function withStatus<Result>(text: string, task: () => Promise<Result>) {
+	const spinner = startSpinner(text);
+	const result = await task();
+
+	endSpinner(spinner);
+
+	return result;
+}
+
 export async function withSpinner<Result>(
 	text: string,
 	task: () => Promise<Result>,

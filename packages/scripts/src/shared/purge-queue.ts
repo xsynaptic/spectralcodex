@@ -3,6 +3,7 @@ import path from 'node:path';
 import * as R from 'remeda';
 
 import { formatCount, log } from '#shared/cli-output.ts';
+import { withSpinner } from '#shared/cli-progress.ts';
 
 export type PurgeRequestBody = { files: Array<string> } | { prefixes: Array<string> };
 
@@ -67,31 +68,35 @@ export async function createPurgeQueue(statePath: string) {
 
 			const prefix = getPurgePrefix(baseUrl);
 			const isPrefixPurge = names.length > prefixPurgeThreshold;
-
-			log.step(
-				isPrefixPurge
-					? `Purging ${prefix} for ${formatCount(names.length)} queued ${label}...`
-					: `Purging ${formatCount(names.length)} ${label}...`,
-			);
+			const count = formatCount(names.length);
 
 			if (dryRun) {
-				log.warn('Dry run; the queue is kept');
+				log.warn(`Dry run; ${count} ${label} stay queued for purge`);
 				return;
 			}
 
 			if (isPrefixPurge) {
-				await request({ prefixes: [prefix] });
-				await remove(names);
-				log.success('Purge done');
+				await withSpinner(
+					`Purging ${prefix} for ${count} queued ${label}`,
+					async () => {
+						await request({ prefixes: [prefix] });
+						await remove(names);
+					},
+					() => `Purged ${prefix} for ${count} queued ${label}`,
+				);
 				return;
 			}
 
-			for (const batch of R.chunk(names, purgeBatchSize)) {
-				await request({ files: batch.map((name) => `${baseUrl}/${name}`) });
-				await remove(batch);
-			}
-
-			log.success('Purge done');
+			await withSpinner(
+				`Purging ${count} ${label}`,
+				async () => {
+					for (const batch of R.chunk(names, purgeBatchSize)) {
+						await request({ files: batch.map((name) => `${baseUrl}/${name}`) });
+						await remove(batch);
+					}
+				},
+				() => `Purged ${count} ${label} from Cloudflare`,
+			);
 		},
 		get size() {
 			return queued.size;

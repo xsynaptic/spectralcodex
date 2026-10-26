@@ -77,7 +77,11 @@ await runCommand(
 					return;
 				}
 
-				await runRoot('Running E2E smoke tests...', ['test-e2e-smoke']);
+				await runRoot('Running E2E smoke tests...', [
+					'--silent',
+					'test-e2e-smoke',
+					'--reporter=line',
+				]);
 			}
 
 			const steps: Array<() => Promise<void>> = [

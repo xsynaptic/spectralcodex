@@ -3,11 +3,19 @@ import path from 'node:path';
 import { z } from 'zod';
 
 import type { DeployConfig } from '#deploy/deploy-config.ts';
+import type { RsyncChange } from '#deploy/rsync-exec.ts';
 
 import { loadDeployConfig } from '#deploy/deploy-config.ts';
-import { rsyncTo, sshCaptureUnchecked, sshExec } from '#deploy/rsync-exec.ts';
+import {
+	formatRsyncChange,
+	parseRsyncChange,
+	rsyncTo,
+	sshCapture,
+	sshCaptureUnchecked,
+} from '#deploy/rsync-exec.ts';
 import { Refusal } from '#shared/cli-command.ts';
 import { formatDuration, log } from '#shared/cli-output.ts';
+import { withStatus } from '#shared/cli-progress.ts';
 
 interface DeployCaddyOptions {
 	dryRun?: boolean;
@@ -29,64 +37,86 @@ export async function deployCaddy(options: DeployCaddyOptions): Promise<void> {
 	const config = loadDeployConfig();
 	const deployDir = path.join(rootPath, 'deploy');
 
-	log.step('Deploying Caddy config...');
-
 	if (dryRun) log.warn('Dry run');
 
 	const start = Date.now();
 
-	const image = await sshCaptureOrRefuse(
-		config,
-		"docker inspect -f '{{.Config.Image}}' caddy",
-		'Could not read the running Caddy image',
+	const image = await withStatus('Reading the running Caddy image', () =>
+		sshCaptureOrRefuse(
+			config,
+			"docker inspect -f '{{.Config.Image}}' caddy",
+			'Could not read the running Caddy image',
+		),
 	);
 
-	await syncCaddyConfig({ config, deployDir, dryRun, image });
+	const changes = await syncCaddyConfig({ config, deployDir, dryRun, image });
 
-	await sshExec(config, 'docker exec caddy caddy reload --config /etc/caddy/Caddyfile', {
-		dryRun,
-	});
+	if (!dryRun) {
+		await withStatus('Reloading Caddy', () =>
+			sshCaptureOrRefuse(
+				config,
+				'docker exec caddy caddy reload --config /etc/caddy/Caddyfile',
+				'Caddy rejected the reload; the previous config keeps serving',
+			),
+		);
+	}
 
-	log.success(`Caddy deployed in ${formatDuration(Date.now() - start)}`);
+	const parts = [
+		dryRun ? 'Caddy config checked (dry run)' : 'Caddy config live',
+		...(changes.length === 0 ? ['no changes'] : []),
+		`validated with ${image}`,
+		formatDuration(Date.now() - start),
+	];
+
+	log.success(parts.join(' · '));
+	logCaddyChanges(changes);
+}
+
+export function logCaddyChanges(changes: ReadonlyArray<RsyncChange>) {
+	for (const change of changes) log.detail(`  ${formatRsyncChange(change)}`);
 }
 
 // A rejected reload keeps the old config serving, so the broken file only surfaces on the next restart
 // Copy into the live dirs rather than renaming staging over them; the container's bind mounts would keep the old ones
-export async function syncCaddyConfig(options: SyncCaddyConfigOptions): Promise<void> {
+export async function syncCaddyConfig(
+	options: SyncCaddyConfigOptions,
+): Promise<Array<RsyncChange>> {
 	const { config, deployDir, dryRun, image } = options;
 
 	const stagingPath = `${config.remotePath}/.staging`;
-
-	log.detail(`Staging: ${deployDir}/{caddy,certs}/ → ${config.remoteHost}:${stagingPath}/`);
 
 	// rsync ignores gitignore, so stray tooling residue would otherwise land in the Caddy config dir
 	await rsyncTo(`${deployDir}/caddy/`, `${config.remoteHost}:${stagingPath}/caddy/`, {
 		config,
 		excludes: ['node_modules', '.astro'],
 		extraFlags: ['--mkpath', '--delete'],
+		label: 'Staging Caddy config',
 	});
 
 	await rsyncTo(`${deployDir}/certs/`, `${config.remoteHost}:${stagingPath}/certs/`, {
 		config,
 		extraFlags: ['--mkpath', '--delete'],
+		label: 'Staging certificates',
 	});
 
-	log.detail(`Validating with ${image}`);
-
-	await sshCaptureOrRefuse(
-		config,
-		`docker run --rm --network none -v ${stagingPath}/caddy:/etc/caddy:ro -v ${stagingPath}/certs:/certs:ro ${image} caddy validate --config /etc/caddy/Caddyfile`,
-		'Caddy rejected the config; live config unchanged',
+	await withStatus(`Validating with ${image}`, () =>
+		sshCaptureOrRefuse(
+			config,
+			`docker run --rm --network none -v ${stagingPath}/caddy:/etc/caddy:ro -v ${stagingPath}/certs:/certs:ro ${image} caddy validate --config /etc/caddy/Caddyfile`,
+			'Caddy rejected the config; live config unchanged',
+		),
 	);
-
-	log.detail(dryRun ? 'Live changes (dry run):' : 'Swapping into live config:');
 
 	const swapFlags = dryRun ? '-ai --dry-run --delay-updates' : '-ai --delay-updates';
 
-	await sshExec(
-		config,
-		`rsync ${swapFlags} --delete ${stagingPath}/caddy/ ${config.remotePath}/caddy/ && rsync ${swapFlags} ${stagingPath}/certs/ ${config.remotePath}/certs/`,
+	const swapOutput = await withStatus('Swapping into live config', () =>
+		sshCapture(
+			config,
+			`rsync ${swapFlags} --delete ${stagingPath}/caddy/ ${config.remotePath}/caddy/ && rsync ${swapFlags} ${stagingPath}/certs/ ${config.remotePath}/certs/`,
+		),
 	);
+
+	return swapOutput.split('\n').flatMap((line) => parseRsyncChange(line) ?? []);
 }
 
 export async function readComposeCaddyImage(deployDir: string): Promise<string> {

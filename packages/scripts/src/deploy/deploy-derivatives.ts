@@ -8,9 +8,9 @@ import type { DeployConfig } from '#deploy/deploy-config.ts';
 import type { ScriptPaths } from '#shared/cli-command.ts';
 
 import { requestCloudflarePurge } from '#deploy/cloudflare-purge.ts';
-import { rsyncTo } from '#deploy/rsync-exec.ts';
+import { describeRsyncSummary, rsyncTo } from '#deploy/rsync-exec.ts';
 import { Refusal } from '#shared/cli-command.ts';
-import { formatCount, formatDuration, log } from '#shared/cli-output.ts';
+import { formatDuration, log } from '#shared/cli-output.ts';
 import { createPurgeQueue } from '#shared/purge-queue.ts';
 
 export interface DerivativeSet {
@@ -21,6 +21,7 @@ export interface DerivativeSet {
 	purgeBaseUrl?: string;
 	remotePath: string;
 	statePath: string;
+	title: string;
 }
 
 interface DerivativeDeployOptions {
@@ -32,7 +33,7 @@ const partialDirectory = '.rsync-partial';
 
 // A truncated file at a served path would be cached at the edge for a year, so transfers land whole
 export const derivativeUploadOptions = {
-	archive: 'av',
+	compress: false,
 	excludes: ['*.tmp', '.DS_Store'],
 	extraFlags: [
 		'--mkpath',
@@ -40,7 +41,6 @@ export const derivativeUploadOptions = {
 		'--delay-updates',
 		'--chmod=D755,F644',
 	],
-	isProgressShown: false,
 } as const;
 
 export function getImageSet(paths: ScriptPaths, config: DeployConfig): DerivativeSet {
@@ -54,6 +54,7 @@ export function getImageSet(paths: ScriptPaths, config: DeployConfig): Derivativ
 		purgeBaseUrl: config.imageBaseUrl,
 		remotePath: config.imagesPath,
 		statePath,
+		title: 'Images',
 	};
 }
 
@@ -66,6 +67,7 @@ export function getOpenGraphSet(paths: ScriptPaths, config: DeployConfig): Deriv
 		localPath: getCachePaths(paths.cachePath).openGraphPath,
 		remotePath: `${config.sitePath}/${openGraphBasePath}`,
 		statePath: getCachePaths(paths.cachePath).openGraphStatePath,
+		title: 'OpenGraph images',
 	};
 }
 
@@ -77,17 +79,15 @@ async function readLocalNames(localPath: string) {
 	}
 }
 
-async function countLocalFiles(set: DerivativeSet) {
+async function assertLocalFiles(set: DerivativeSet) {
 	const names = await readLocalNames(set.localPath);
-	const count = names.filter((name) =>
+	const hasFiles = names.some((name) =>
 		set.extensions.some((extension) => name.endsWith(`.${extension}`)),
-	).length;
+	);
 
-	if (count === 0) {
+	if (!hasFiles) {
 		throw new Refusal(`No ${set.label} in ${set.localPath}; run \`${set.command}\` first`);
 	}
-
-	return count;
 }
 
 async function purgeSet(set: DerivativeSet, isDryRun: boolean) {
@@ -107,19 +107,22 @@ export async function uploadDerivatives(
 	set: DerivativeSet,
 	{ config, dryRun = false }: DerivativeDeployOptions,
 ) {
-	const fileCount = await countLocalFiles(set);
-	const destination = `${config.remoteHost}:${set.remotePath}/`;
+	await assertLocalFiles(set);
 
-	log.step(`Deploying ${set.label}...`);
-	log.detail(`From: ${set.localPath}/ (${formatCount(fileCount)} files)`);
-	log.detail(`To:   ${destination}`);
 	if (dryRun) log.warn('Dry run');
 
 	const start = Date.now();
 
-	await rsyncTo(`${set.localPath}/`, destination, { ...derivativeUploadOptions, config, dryRun });
+	const summary = await rsyncTo(`${set.localPath}/`, `${config.remoteHost}:${set.remotePath}/`, {
+		...derivativeUploadOptions,
+		config,
+		dryRun,
+		label: `Uploading ${set.label}`,
+	});
 
-	log.success(`Deployed ${set.label} in ${formatDuration(Date.now() - start)}`);
+	log.success(
+		`${set.title} uploaded · ${describeRsyncSummary(summary)} · ${formatDuration(Date.now() - start)}`,
+	);
 
 	await purgeSet(set, dryRun);
 }

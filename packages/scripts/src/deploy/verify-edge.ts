@@ -13,7 +13,7 @@ import {
 	getEdgeProbes,
 	getProbeFailure,
 } from '#deploy/verify-edge-probes.ts';
-import { log } from '#shared/cli-output.ts';
+import { endSpinner, formatCount, formatDuration, log, startSpinner } from '#shared/cli-output.ts';
 
 // Node's fetch never times out on its own, so a hung connection would stall the deploy
 const requestTimeoutMs = 10_000;
@@ -27,13 +27,13 @@ export async function verifyEdge({
 	cachePath: string;
 	config: DeployConfig;
 }): Promise<void> {
-	const token = Date.now().toString();
-
-	log.step('Verifying edge cache tiers...');
+	const start = Date.now();
+	const token = start.toString();
+	const spinner = startSpinner('Verifying edge cache tiers');
 
 	const documentProbe = getDocumentProbe({ config, token });
 	const documentResponse = await request(documentProbe);
-	const documentFailure = reportProbe(
+	const documentFailure = labelFailure(
 		documentProbe,
 		await getProbeFailure(documentProbe, documentResponse),
 	);
@@ -44,6 +44,8 @@ export async function verifyEdge({
 		R.isNonNullish,
 	);
 
+	endSpinner(spinner);
+
 	if (failures.length > 0) {
 		for (const failure of failures) {
 			log.error(failure);
@@ -53,7 +55,11 @@ export async function verifyEdge({
 		);
 	}
 
-	log.success('Edge verification passed');
+	const probeCount = formatCount(edge.probes.length + 1);
+
+	log.success(
+		`Edge verified · ${probeCount} probes passed · ${formatDuration(Date.now() - start)}`,
+	);
 }
 
 async function readImageSamples(cachePath: string) {
@@ -92,15 +98,13 @@ async function runProbes(probes: ReadonlyArray<EdgeProbe>) {
 		probes.map(async (probe) => getProbeFailure(probe, await request(probe))),
 	);
 
-	return probes.map((probe, index) => reportProbe(probe, failures[index]));
+	return probes.map((probe, index) => labelFailure(probe, failures[index]));
 }
 
-function reportProbe(probe: EdgeProbe, failure: string | undefined) {
-	if (failure !== undefined) return `${probe.label} (${describeProbe(probe)}): ${failure}`;
+function labelFailure(probe: EdgeProbe, failure: string | undefined) {
+	if (failure === undefined) return;
 
-	log.detail(`ok  ${probe.label}: ${describeProbe(probe)}`);
-
-	return;
+	return `${probe.label} (${describeProbe(probe)}): ${failure}`;
 }
 
 function fetchWithTimeout(probe: EdgeProbe) {

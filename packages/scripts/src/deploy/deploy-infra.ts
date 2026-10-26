@@ -2,9 +2,15 @@ import path from 'node:path';
 
 import type { DeployConfig } from '#deploy/deploy-config.ts';
 
-import { readComposeCaddyImage, syncCaddyConfig } from '#deploy/deploy-caddy.ts';
+import { logCaddyChanges, readComposeCaddyImage, syncCaddyConfig } from '#deploy/deploy-caddy.ts';
 import { loadDeployConfig, requireEnv } from '#deploy/deploy-config.ts';
-import { rsyncTo, sshCapture, sshExec, sshExecWithInput } from '#deploy/rsync-exec.ts';
+import {
+	describeRsyncSummary,
+	rsyncTo,
+	sshCapture,
+	sshExec,
+	sshExecWithInput,
+} from '#deploy/rsync-exec.ts';
 import { formatDuration, log } from '#shared/cli-output.ts';
 
 interface DeployInfraOptions {
@@ -76,12 +82,11 @@ export async function deployInfra(options: DeployInfraOptions): Promise<void> {
 
 	const start = Date.now();
 
-	await syncCaddyConfig({
-		config,
-		deployDir,
-		dryRun,
-		image: await readComposeCaddyImage(deployDir),
-	});
+	const image = await readComposeCaddyImage(deployDir);
+	const caddyChanges = await syncCaddyConfig({ config, deployDir, dryRun, image });
+
+	log.detail(`Caddy config validated with ${image}`);
+	logCaddyChanges(caddyChanges);
 
 	await syncInfraFiles({ config, deployDir, dryRun });
 
@@ -106,11 +111,13 @@ async function syncInfraFiles({
 	dryRun: boolean;
 }): Promise<void> {
 	for (const { destination = '', source, ...rsyncFlags } of infraSyncTargets) {
-		await rsyncTo(
+		const summary = await rsyncTo(
 			`${deployDir}/${source}`,
 			`${config.remoteHost}:${config.remotePath}/${destination}`,
-			{ config, dryRun, ...rsyncFlags },
+			{ config, dryRun, label: `Syncing ${source}`, ...rsyncFlags },
 		);
+
+		log.detail(`${source} · ${describeRsyncSummary(summary)}`);
 	}
 }
 

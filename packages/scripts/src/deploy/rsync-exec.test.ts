@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { buildRsyncArgs } from '#deploy/rsync-exec.ts';
+import { buildRsyncArgs, describeRsyncSummary, parseRsyncChange } from '#deploy/rsync-exec.ts';
 
 function makeConfig(sshKeyPath?: string) {
 	return {
@@ -10,19 +10,19 @@ function makeConfig(sshKeyPath?: string) {
 }
 
 describe('buildRsyncArgs', () => {
-	test('defaults to archive plus compression with no ssh flag', () => {
+	test('defaults to compressed, itemized archive with stats and no ssh flag', () => {
 		expect(buildRsyncArgs('dist/', 'host:/path', { config: makeConfig() })).toEqual([
-			'-avz',
-			'--progress',
+			'-azi',
+			'--stats',
 			'dist/',
 			'host:/path',
 		]);
 	});
 
-	test('places the ssh key flag directly after progress', () => {
+	test('places the ssh key flag directly after stats', () => {
 		expect(buildRsyncArgs('dist/', 'host:/path', { config: makeConfig('/k') })).toEqual([
-			'-avz',
-			'--progress',
+			'-azi',
+			'--stats',
 			'-e',
 			'ssh -i /k',
 			'dist/',
@@ -34,20 +34,10 @@ describe('buildRsyncArgs', () => {
 		expect(buildRsyncArgs('dist/', 'host:/path', { config: makeConfig('') })).not.toContain('-e');
 	});
 
-	test('drops verbosity and progress when quiet, keeping compression', () => {
+	test('skips compression for payloads that are already compressed', () => {
 		expect(
-			buildRsyncArgs('host:/path/', 'backups/', { config: makeConfig(), quiet: true }),
-		).toEqual(['-az', 'host:/path/', 'backups/']);
-	});
-
-	test('keeps the file list but drops progress when asked', () => {
-		expect(
-			buildRsyncArgs('media/', 'host:/path/', {
-				archive: 'av',
-				config: makeConfig(),
-				isProgressShown: false,
-			}),
-		).toEqual(['-av', 'media/', 'host:/path/']);
+			buildRsyncArgs('media/', 'host:/path/', { compress: false, config: makeConfig() }),
+		).toEqual(['-ai', '--stats', 'media/', 'host:/path/']);
 	});
 
 	test('emits excludes in order, ahead of extra flags', () => {
@@ -58,8 +48,8 @@ describe('buildRsyncArgs', () => {
 		});
 
 		expect(args).toEqual([
-			'-avz',
-			'--progress',
+			'-azi',
+			'--stats',
 			'--exclude=manifest.json',
 			'--exclude=*.tmp',
 			'--checksum',
@@ -75,13 +65,54 @@ describe('buildRsyncArgs', () => {
 			extraFlags: ['--delete-after'],
 		});
 
-		expect(args).toEqual([
-			'-avz',
-			'--progress',
-			'--delete-after',
-			'--dry-run',
-			'dist/',
-			'host:/path',
-		]);
+		expect(args).toEqual(['-azi', '--stats', '--delete-after', '--dry-run', 'dist/', 'host:/path']);
+	});
+});
+
+describe('parseRsyncChange', () => {
+	test('tells new files from updated ones', () => {
+		expect(parseRsyncChange('>f+++++++++ a/x.txt')).toEqual({ kind: 'new', path: 'a/x.txt' });
+		expect(parseRsyncChange('>f..t...... Caddyfile')).toEqual({
+			kind: 'updated',
+			path: 'Caddyfile',
+		});
+	});
+
+	test('counts deleted files but not deleted directories', () => {
+		expect(parseRsyncChange('*deleting   old/z.txt')).toEqual({
+			kind: 'removed',
+			path: 'old/z.txt',
+		});
+		expect(parseRsyncChange('*deleting   old/')).toBeUndefined();
+	});
+
+	test('ignores directory, attribute-only and stats lines', () => {
+		expect(parseRsyncChange('cd+++++++++ a/')).toBeUndefined();
+		expect(parseRsyncChange('.d..t...... ./')).toBeUndefined();
+		expect(parseRsyncChange('.f...p..... a/x.txt')).toBeUndefined();
+		expect(parseRsyncChange('Total bytes sent: 7,116,637')).toBeUndefined();
+	});
+
+	test('keeps spaces inside a path', () => {
+		expect(parseRsyncChange('>f.st...... og/a b.jpg')?.path).toBe('og/a b.jpg');
+	});
+});
+
+describe('describeRsyncSummary', () => {
+	test('reports nothing to do as no changes', () => {
+		expect(describeRsyncSummary({ bytesSent: 121, changes: [] })).toBe('no changes');
+	});
+
+	test('orders counts new, updated, removed and skips empty kinds', () => {
+		expect(
+			describeRsyncSummary({
+				bytesSent: 7_116_637,
+				changes: [
+					{ kind: 'removed', path: 'a' },
+					{ kind: 'new', path: 'b' },
+					{ kind: 'removed', path: 'c' },
+				],
+			}),
+		).toBe('1 new, 2 removed · 7.1 MB sent');
 	});
 });

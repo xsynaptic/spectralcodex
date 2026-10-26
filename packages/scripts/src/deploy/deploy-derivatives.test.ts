@@ -25,10 +25,7 @@ async function runRsync(options: Omit<Parameters<typeof buildRsyncArgs>[2], 'con
 }
 
 async function syncOutputs() {
-	const output = await runRsync({
-		...derivativeUploadOptions,
-		extraFlags: [...derivativeUploadOptions.extraFlags, '--itemize-changes'],
-	});
+	const output = await runRsync(derivativeUploadOptions);
 
 	return output.split('\n');
 }

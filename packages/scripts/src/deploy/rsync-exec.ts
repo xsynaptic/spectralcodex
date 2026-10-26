@@ -1,8 +1,14 @@
-import type { ProcessOutput } from 'zx';
+import chalk from 'chalk';
+import { $, ProcessOutput } from 'zx';
 
-import { $ } from 'zx';
-
-import { log } from '#shared/cli-output.ts';
+import {
+	endSpinner,
+	formatBytes,
+	formatCount,
+	log,
+	startSpinner,
+	symbols,
+} from '#shared/cli-output.ts';
 
 export async function ensureSshKeychain() {
 	try {
@@ -12,14 +18,16 @@ export async function ensureSshKeychain() {
 	}
 }
 
-interface RsyncOptions {
-	archive?: 'av' | 'avz';
+interface RsyncArgsOptions {
+	compress?: boolean;
 	config: SshTarget;
 	dryRun?: boolean;
 	excludes?: ReadonlyArray<string>;
 	extraFlags?: ReadonlyArray<string>;
-	isProgressShown?: boolean;
-	quiet?: boolean;
+}
+
+interface RsyncOptions extends RsyncArgsOptions {
+	label: string;
 }
 
 interface SshTarget {
@@ -27,15 +35,35 @@ interface SshTarget {
 	sshKeyPath?: string;
 }
 
+const rsyncChangeKinds = ['new', 'updated', 'removed'] as const;
+
+export interface RsyncChange {
+	kind: (typeof rsyncChangeKinds)[number];
+	path: string;
+}
+
+export interface RsyncSummary {
+	bytesSent: number;
+	changes: Array<RsyncChange>;
+}
+
+const rollingWindowSize = 10;
+
+// An itemized line is an 11-character change code and a space, then the path
+const itemizePrefixLength = 12;
+
+const bytesSentPattern = /^Total bytes sent: ([\d,]+)/;
+
 export function buildRsyncArgs(
 	source: Array<string> | string,
 	destination: string,
-	options: RsyncOptions,
+	options: RsyncArgsOptions,
 ): Array<string> {
 	const { config, dryRun = false, excludes = [], extraFlags = [] } = options;
 
 	return [
-		...getArchiveFlags(options),
+		getArchiveFlag(options),
+		'--stats',
 		...(config.sshKeyPath ? ['-e', `ssh -i ${config.sshKeyPath}`] : []),
 		...excludes.map((pattern) => `--exclude=${pattern}`),
 		...extraFlags,
@@ -45,20 +73,131 @@ export function buildRsyncArgs(
 	];
 }
 
+function getArchiveFlag({ compress = true }: RsyncArgsOptions) {
+	return compress ? '-azi' : '-ai';
+}
+
+export function parseRsyncChange(line: string): RsyncChange | undefined {
+	const path = line.slice(itemizePrefixLength);
+
+	if (line.startsWith('*deleting ')) {
+		return path.endsWith('/') ? undefined : { kind: 'removed', path };
+	}
+
+	if (!/^[<>]f/.test(line)) return;
+
+	return { kind: line.slice(2, 11) === '+++++++++' ? 'new' : 'updated', path };
+}
+
+export function formatRsyncChange(change: RsyncChange) {
+	return `${change.kind.padEnd(8)}${change.path}`;
+}
+
+export function describeRsyncSummary({ bytesSent, changes }: RsyncSummary) {
+	const counts = rsyncChangeKinds.flatMap((kind) => {
+		const count = changes.filter((change) => change.kind === kind).length;
+
+		return count > 0 ? [`${formatCount(count)} ${kind}`] : [];
+	});
+
+	if (counts.length === 0) return 'no changes';
+
+	return `${counts.join(', ')} · ${formatBytes(bytesSent)} sent`;
+}
+
+function truncateStart(text: string, width: number) {
+	return text.length <= width ? text : `…${text.slice(-(width - 1))}`;
+}
+
+function createRollingWindow(label: string) {
+	const spinner = startSpinner(label);
+	const recent: Array<RsyncChange> = [];
+	let count = 0;
+
+	function render() {
+		const pathWidth = (process.stderr.columns || 80) - 12;
+		const lines = recent.map((change) =>
+			chalk.gray(`    ${change.kind.padEnd(8)}${truncateStart(change.path, pathWidth)}`),
+		);
+
+		spinner.text = [`${label} · ${formatCount(count)} changed`, ...lines].join('\n');
+	}
+
+	return {
+		add(change: RsyncChange) {
+			count += 1;
+			recent.push(change);
+			if (recent.length > rollingWindowSize) recent.shift();
+			render();
+		},
+		clear() {
+			endSpinner(spinner);
+		},
+		fail() {
+			endSpinner(spinner, symbols.error);
+		},
+	};
+}
+
+function readStderrLines(output: ProcessOutput) {
+	return output.stderr
+		.split('\n')
+		.map((line) => line.trim())
+		.filter(Boolean);
+}
+
+function collectRsyncLine(summary: RsyncSummary, line: string) {
+	const change = parseRsyncChange(line);
+
+	if (change) {
+		summary.changes.push(change);
+		return change;
+	}
+
+	const bytesSent = bytesSentPattern.exec(line)?.[1];
+
+	if (bytesSent !== undefined) summary.bytesSent = Number(bytesSent.replaceAll(',', ''));
+
+	return;
+}
+
+function reportRsyncFailure(error: unknown) {
+	if (!(error instanceof ProcessOutput)) return;
+
+	for (const line of readStderrLines(error)) log.detail(line);
+}
+
 export async function rsyncTo(
 	source: Array<string> | string,
 	destination: string,
 	options: RsyncOptions,
-): Promise<string> {
+): Promise<RsyncSummary> {
 	const command = $({
-		stdio: ['inherit', 'pipe', 'inherit'],
+		quiet: true,
+		stdio: ['inherit', 'pipe', 'pipe'],
 	})`rsync ${buildRsyncArgs(source, destination, options)}`;
+	const window = createRollingWindow(options.label);
+	const summary: RsyncSummary = { bytesSent: 0, changes: [] };
 
-	command.pipe(process.stdout);
+	try {
+		for await (const line of command) {
+			const change = collectRsyncLine(summary, line);
 
-	const result = await command;
+			if (change) window.add(change);
+		}
+	} catch (error) {
+		window.fail();
+		reportRsyncFailure(error);
+		throw error;
+	}
 
-	return result.stdout;
+	window.clear();
+
+	const output = await command;
+
+	for (const line of readStderrLines(output)) log.warn(line);
+
+	return summary;
 }
 
 export async function sshCapture(config: SshTarget, command: string): Promise<string> {
@@ -103,11 +242,4 @@ export async function sshExecWithInput(
 	const sshArgs = [...(config.sshKeyPath ? ['-i', config.sshKeyPath] : []), config.remoteHost];
 
 	await $({ input, stdio: ['pipe', 'inherit', 'inherit'] })`ssh ${sshArgs} ${command}`;
-}
-
-// Callers that parse the returned file list need `-v`; a quiet pull prints nothing on success
-function getArchiveFlags({ archive = 'avz', isProgressShown = true, quiet = false }: RsyncOptions) {
-	if (quiet) return [`-${archive.replace('v', '')}`];
-
-	return isProgressShown ? [`-${archive}`, '--progress'] : [`-${archive}`];
 }

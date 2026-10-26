@@ -1,6 +1,8 @@
 import { loadDeployConfig } from '#deploy/deploy-config.ts';
-import { sshExec } from '#deploy/rsync-exec.ts';
+import { sshCaptureUnchecked } from '#deploy/rsync-exec.ts';
+import { Refusal } from '#shared/cli-command.ts';
 import { log } from '#shared/cli-output.ts';
+import { withSpinner } from '#shared/cli-progress.ts';
 
 interface InvokeCacheRefreshOptions {
 	dryRun?: boolean;
@@ -13,15 +15,25 @@ export async function invokeCacheRefresh(options: InvokeCacheRefreshOptions): Pr
 
 	const config = loadDeployConfig();
 
-	log.step('Firing cache refresh on server (detached)...');
-
 	// Gracefully stop any prior run (SIGTERM for a clean exit), then free the name; latest deploy wins
 	const command = `cd ${config.remotePath} && (docker stop cache-warmer-run 2>/dev/null; docker rm -f cache-warmer-run 2>/dev/null; true) && docker compose run -d --name cache-warmer-run cache-warmer`;
 
-	await sshExec(config, command, { dryRun });
-
-	if (!dryRun) {
-		log.success('Cache refresh launched');
-		log.detail(`Tail: ssh ${config.remoteHost} docker logs -f cache-warmer-run`);
+	if (dryRun) {
+		log.warn(`Dry run; ssh: ${command}`);
+		return;
 	}
+
+	await withSpinner(
+		'Launching cache refresh',
+		async () => {
+			const result = await sshCaptureUnchecked(config, command);
+
+			if (result.exitCode !== 0) {
+				throw new Refusal(`Cache refresh failed to launch\n${result.stderr.trim()}`);
+			}
+		},
+		() => 'Cache refresh launched',
+	);
+
+	log.detail(`Tail: ssh ${config.remoteHost} docker logs -f cache-warmer-run`);
 }

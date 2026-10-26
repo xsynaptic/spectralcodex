@@ -33,7 +33,7 @@ await runCommand(
 			log.summary([
 				['Images', counts.total],
 				['Rendered', counts.rendered],
-				['Fresh', counts.fresh],
+				['Up to date', counts.fresh],
 				['Written', counts.written],
 				['Overwritten', counts.overwritten],
 				['Purge queue', purgeQueue.size],

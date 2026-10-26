@@ -7,8 +7,24 @@ let activeSpinner: Ora | undefined;
 
 const countFormat = new Intl.NumberFormat('en-CA');
 
+const byteUnits = ['B', 'kB', 'MB', 'GB', 'TB'] as const;
+
 export function formatCount(count: number) {
 	return countFormat.format(count);
+}
+
+export function formatBytes(bytes: number) {
+	let value = bytes;
+	let unitIndex = 0;
+
+	while (value >= 1000 && unitIndex < byteUnits.length - 1) {
+		value /= 1000;
+		unitIndex += 1;
+	}
+
+	const unit = byteUnits[unitIndex] ?? 'B';
+
+	return unitIndex === 0 ? `${String(value)} ${unit}` : `${value.toFixed(1)} ${unit}`;
 }
 
 export function formatError(error: unknown) {
