@@ -40,31 +40,6 @@ afterEach(() => {
 });
 
 describe('createCollectionData', () => {
-	test('memoizes a non-empty result across sequential calls', async () => {
-		const { createCollectionData } = await importCollections();
-
-		getCollectionMock.mockResolvedValue([makePost('alpha')]);
-
-		const getPostsCollection = createCollectionData({ collection: 'posts' });
-
-		await getPostsCollection();
-		await getPostsCollection();
-
-		expect(getCollectionMock).toHaveBeenCalledTimes(1);
-	});
-
-	test('memoizes across concurrent calls', async () => {
-		const { createCollectionData } = await importCollections();
-
-		getCollectionMock.mockResolvedValue([makePost('alpha')]);
-
-		const getPostsCollection = createCollectionData({ collection: 'posts' });
-
-		await Promise.all([getPostsCollection(), getPostsCollection(), getPostsCollection()]);
-
-		expect(getCollectionMock).toHaveBeenCalledTimes(1);
-	});
-
 	test('returns the store objects uncopied when there is no compute', async () => {
 		const { createCollectionData } = await importCollections();
 

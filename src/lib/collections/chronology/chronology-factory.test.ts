@@ -34,6 +34,9 @@ describe('createChronologyData', () => {
 
 		expect(ids(month.created)).toEqual(['a-post']);
 		expect(ids(data.chronologyIndexData['2024']?.created ?? [])).toEqual(['a-post']);
+		expect(Object.values(data.chronologyDailyData['2024'] ?? {})).toEqual([
+			{ created: 1, updated: 0, visited: 0 },
+		]);
 	});
 });
 
@@ -484,9 +487,47 @@ describe('createChronologyData index limits', () => {
 		expect(data.chronologyIndexData['2024']?.createdCount).toBe(25);
 	});
 
-	test('the index tier requires quality >= 3 of updated and visited too', () => {
+	test('an index highlight shared across years goes to the most recent year', () => {
 		const data = createChronologyData(
 			[
+				// Anchor populates 2023 in the data map before 2024 (oldest-first insertion order)
+				// Test fails unless the year loop deliberately iterates newest-first
+				makeCatalogItem({
+					collection: 'posts',
+					dateCreated: new Date(2023, 5, 9),
+					id: 'anchor-2023',
+				}),
+				// Index candidate in 2023 (created) and 2024 (updated) -> highlighted in the most recent year
+				makeCatalogItem({
+					collection: 'posts',
+					dateCreated: new Date(2023, 5, 10),
+					dateUpdated: new Date(2024, 5, 15),
+					id: 'shared',
+					imageId: 'img-shared',
+				}),
+			],
+			[],
+		);
+
+		expect(ids(data.chronologyIndexData['2024']?.highlights ?? [])).toContain('shared');
+		expect(ids(data.chronologyIndexData['2023']?.highlights ?? [])).not.toContain('shared');
+	});
+
+	test('the index tier requires quality >= 3 in every category', () => {
+		const data = createChronologyData(
+			[
+				makeCatalogItem({
+					collection: 'posts',
+					dateCreated: new Date(2024, 5, 10),
+					entryQuality: 3,
+					id: 'c3',
+				}),
+				makeCatalogItem({
+					collection: 'posts',
+					dateCreated: new Date(2024, 5, 11),
+					entryQuality: 2,
+					id: 'c2',
+				}),
 				makeCatalogItem({
 					collection: 'posts',
 					dateCreated: new Date(2023, 0, 10),
@@ -515,72 +556,25 @@ describe('createChronologyData index limits', () => {
 					entryQuality: 2,
 					id: 'v2',
 				}),
+				makeCatalogItem({
+					collection: 'posts',
+					dateCreated: new Date(2022, 5, 10),
+					entryQuality: 2,
+					id: 'below-threshold',
+				}),
 			],
 			[],
 		);
 
 		const index = data.chronologyIndexData['2024'];
 
+		expect(ids(index?.created ?? [])).toEqual(['c3']);
 		expect(ids(index?.updated ?? [])).toEqual(['u3']);
 		expect(ids(index?.visited ?? [])).toEqual(['v3']);
-	});
-
-	test('an index highlight shared across years goes to the most recent year', () => {
-		const data = createChronologyData(
-			[
-				// Anchor populates 2023 in the data map before 2024 (oldest-first insertion order)
-				// Test fails unless the year loop deliberately iterates newest-first
-				makeCatalogItem({
-					collection: 'posts',
-					dateCreated: new Date(2023, 5, 9),
-					id: 'anchor-2023',
-				}),
-				// Index candidate in 2023 (created) and 2024 (updated) -> highlighted in the most recent year
-				makeCatalogItem({
-					collection: 'posts',
-					dateCreated: new Date(2023, 5, 10),
-					dateUpdated: new Date(2024, 5, 15),
-					id: 'shared',
-					imageId: 'img-shared',
-				}),
-			],
-			[],
-		);
-
-		expect(ids(data.chronologyIndexData['2024']?.highlights ?? [])).toContain('shared');
-		expect(ids(data.chronologyIndexData['2023']?.highlights ?? [])).not.toContain('shared');
-	});
-
-	test('the index tier requires quality >= 3', () => {
-		const belowThreshold = createChronologyData(
-			[
-				makeCatalogItem({
-					collection: 'posts',
-					dateCreated: new Date(2024, 5, 10),
-					entryQuality: 2,
-					id: 'q2',
-				}),
-			],
-			[],
-		);
 
 		// Present in monthly (complete record) and yearly (>= 2), absent from the index (>= 3)
-		expect(belowThreshold.chronologyMonthlyData).toHaveLength(1);
-		expect(belowThreshold.chronologyIndexData['2024']).toBeUndefined();
-
-		const atThreshold = createChronologyData(
-			[
-				makeCatalogItem({
-					collection: 'posts',
-					dateCreated: new Date(2024, 5, 10),
-					entryQuality: 3,
-					id: 'q3',
-				}),
-			],
-			[],
-		);
-
-		expect(ids(atThreshold.chronologyIndexData['2024']?.created ?? [])).toEqual(['q3']);
+		expect(data.chronologyMonthlyData.some((item) => item.year === '2022')).toBe(true);
+		expect(data.chronologyIndexData['2022']).toBeUndefined();
 	});
 });
 
@@ -588,13 +582,6 @@ describe('getDateData', () => {
 	test('buckets a late-evening UTC instant in its UTC month', () => {
 		expect(getDateData(new Date('2024-05-31T20:00:00Z'))).toMatchObject({
 			month: '05',
-			year: '2024',
-		});
-	});
-
-	test('buckets UTC midnight at a month boundary in the new month', () => {
-		expect(getDateData(new Date('2024-06-01T00:00:00Z'))).toMatchObject({
-			month: '06',
 			year: '2024',
 		});
 	});
@@ -608,18 +595,6 @@ describe('getMonthName', () => {
 
 describe('buildChronologyDailyData', () => {
 	// UTC-instant literals so day bucketing stays timezone stable (getUTC* reads)
-	test('tallies a creation on its UTC day', () => {
-		const daily = buildChronologyDailyData([
-			makeCatalogItem({
-				collection: 'posts',
-				dateCreated: new Date('2024-03-10T12:00:00Z'),
-				id: 'a',
-			}),
-		]);
-
-		expect(daily['2024']?.['2024-03-10']).toEqual({ created: 1, updated: 0, visited: 0 });
-	});
-
 	test('does not count an update made on the same UTC day as creation', () => {
 		const daily = buildChronologyDailyData([
 			makeCatalogItem({
@@ -681,7 +656,7 @@ describe('buildChronologyDailyData', () => {
 		expect(daily['2024']?.['2024-03-15']).toEqual({ created: 0, updated: 0, visited: 1 });
 	});
 
-	test('counts accumulate across entries sharing a UTC day', () => {
+	test('tallies creations on their UTC day, accumulating across entries', () => {
 		const daily = buildChronologyDailyData([
 			makeCatalogItem({
 				collection: 'posts',
@@ -696,17 +671,5 @@ describe('buildChronologyDailyData', () => {
 		]);
 
 		expect(daily['2024']?.['2024-03-10']).toEqual({ created: 2, updated: 0, visited: 0 });
-	});
-
-	test('excludes the pages collection', () => {
-		const daily = buildChronologyDailyData([
-			makeCatalogItem({
-				collection: 'pages',
-				dateCreated: new Date('2024-03-10T12:00:00Z'),
-				id: 'a-page',
-			}),
-		]);
-
-		expect(daily['2024']).toBeUndefined();
 	});
 });

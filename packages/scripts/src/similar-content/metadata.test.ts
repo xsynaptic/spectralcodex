@@ -7,18 +7,18 @@ function makeEmbedding(themes: Array<string>, regions: Array<string>) {
 }
 
 describe('calculateMetadataBoost', () => {
-	test('one shared theme scores 0.15', () => {
-		const current = makeEmbedding(['ruins'], []);
-		const other = makeEmbedding(['ruins'], []);
-
-		expect(calculateMetadataBoost(current, other)).toBeCloseTo(0.15);
-	});
-
-	test('shared theme and region scores 0.25', () => {
-		const current = makeEmbedding(['ruins'], ['taiwan']);
-		const other = makeEmbedding(['ruins'], ['taiwan']);
-
-		expect(calculateMetadataBoost(current, other)).toBeCloseTo(0.25);
+	test.each([
+		{ expected: 0.15, label: 'one shared theme', other: makeEmbedding(['ruins'], []) },
+		{
+			expected: 0.25,
+			label: 'a shared theme and region',
+			other: makeEmbedding(['ruins'], ['taiwan']),
+		},
+		{ expected: 0, label: 'nothing shared', other: makeEmbedding(['temples'], ['vietnam']) },
+	])('$label scores $expected', ({ expected, other }) => {
+		expect(calculateMetadataBoost(makeEmbedding(['ruins'], ['taiwan']), other)).toBeCloseTo(
+			expected,
+		);
 	});
 
 	test('four shared themes cap at 0.3', () => {
@@ -27,12 +27,5 @@ describe('calculateMetadataBoost', () => {
 		const other = makeEmbedding(themes, []);
 
 		expect(calculateMetadataBoost(current, other)).toBe(0.3);
-	});
-
-	test('nothing shared scores 0', () => {
-		const current = makeEmbedding(['ruins'], ['taiwan']);
-		const other = makeEmbedding(['temples'], ['vietnam']);
-
-		expect(calculateMetadataBoost(current, other)).toBe(0);
 	});
 });

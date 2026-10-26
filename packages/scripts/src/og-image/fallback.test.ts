@@ -65,18 +65,11 @@ describe('getFallbackImageId priority chain', () => {
 		expect(chosen).toBe(fallbackImageIds['taiwan/tainan']);
 	});
 
-	test('a Taiwan region with an unknown parent falls back to the Taiwan key', () => {
-		const chosen = getFallbackImageId({
-			collection: 'locations',
-			id,
-			regions: ['taiwan', 'atlantis'],
-		});
-
-		expect(chosen).toBe(fallbackImageIds.taiwan);
-	});
-
-	test('a Taiwan region with no parent at all falls back to the Taiwan key', () => {
-		expect(getFallbackImageId({ collection: 'locations', id, regions: ['taiwan'] })).toBe(
+	test.each([
+		{ label: 'an unknown parent', regions: ['taiwan', 'atlantis'] },
+		{ label: 'no parent at all', regions: ['taiwan'] },
+	])('a Taiwan region with $label falls back to the Taiwan key', ({ regions }) => {
+		expect(getFallbackImageId({ collection: 'locations', id, regions })).toBe(
 			fallbackImageIds.taiwan,
 		);
 	});
@@ -111,24 +104,18 @@ describe('getFallbackImageId priority chain', () => {
 		);
 	});
 
-	test('an unknown ancestor with no other signal falls through to the default pool', () => {
-		const chosen = getFallbackImageId({ collection: 'posts', id, regions: ['atlantis'] });
-
-		expect(optionsFor('default')).toContain(chosen);
-	});
-
-	test('nothing at all falls through to the default pool', () => {
-		expect(optionsFor('default')).toContain(getFallbackImageId({ collection: 'posts', id }));
+	test.each([
+		{ label: 'an unknown ancestor with no other signal', regions: ['atlantis'] },
+		{ label: 'nothing at all', regions: undefined },
+	])('$label falls through to the default pool', ({ regions }) => {
+		expect(optionsFor('default')).toContain(
+			getFallbackImageId({ collection: 'posts', id, regions }),
+		);
 	});
 });
 
 describe('resolveFallbackImageId', () => {
 	const manyIds = Array.from({ length: 64 }, (_, index) => `entry-${String(index)}`);
-
-	test('a string-valued key returns that string for any id', () => {
-		expect(resolveFallbackImageId('japan', 'a')).toBe(fallbackImageIds.japan);
-		expect(resolveFallbackImageId('japan', 'zzzzzzzz')).toBe(fallbackImageIds.japan);
-	});
 
 	test('an unknown key falls back to the default pool', () => {
 		const chosen = resolveFallbackImageId('no-such-key', 'a');
@@ -136,10 +123,10 @@ describe('resolveFallbackImageId', () => {
 		expect(optionsFor('default')).toContain(chosen);
 	});
 
-	test('an array-valued key always resolves to one of its options', () => {
+	test('an array-valued key always resolves to one of its options, the empty id included', () => {
 		const options = optionsFor('taiwan-theaters');
 
-		for (const id of manyIds) {
+		for (const id of ['', ...manyIds]) {
 			expect(options).toContain(resolveFallbackImageId('taiwan-theaters', id));
 		}
 	});
@@ -148,9 +135,5 @@ describe('resolveFallbackImageId', () => {
 		const chosen = new Set(manyIds.map((id) => resolveFallbackImageId('default', id)));
 
 		expect(chosen.size).toBeGreaterThan(1);
-	});
-
-	test('the empty id still resolves to an option', () => {
-		expect(optionsFor('default')).toContain(resolveFallbackImageId('default', ''));
 	});
 });

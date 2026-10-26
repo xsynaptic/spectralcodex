@@ -47,16 +47,14 @@ describe('getFailureReport', () => {
 		).toEqual({ exitCode: 1, isInterrupted: false, message: 'Child process exited with code 2' });
 	});
 
-	test('reports a refusal by its message alone', () => {
-		expect(getFailureReport(new Refusal('Build first'), { isAborted: false })).toEqual({
-			exitCode: 1,
-			isInterrupted: false,
-			message: 'Build first',
-		});
-	});
-
-	test('reports a refusal thrown by the image pipeline, whose class is its own', () => {
-		expect(getFailureReport(new PipelineRefusal('Build first'), { isAborted: false })).toEqual({
+	test.each([
+		{ label: 'ours', refusal: new Refusal('Build first') },
+		{
+			label: 'the image pipeline, whose class is its own',
+			refusal: new PipelineRefusal('Build first'),
+		},
+	])('reports a refusal thrown by $label by its message alone', ({ refusal }) => {
+		expect(getFailureReport(refusal, { isAborted: false })).toEqual({
 			exitCode: 1,
 			isInterrupted: false,
 			message: 'Build first',

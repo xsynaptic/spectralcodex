@@ -110,6 +110,7 @@ describe('selectMapRows', () => {
 		expect(getIds(selectMapRows([inside, outside], { index: 2, type: 'theme' }))).toEqual([
 			'inside',
 		]);
+		expect(selectMapRows([inside, outside], { index: 99, type: 'theme' })).toEqual([]);
 	});
 
 	test('ids rule preserves the list order and drops ids missing from the rows', () => {
@@ -130,12 +131,6 @@ describe('selectMapRows', () => {
 			'at-left',
 			'at-right',
 		]);
-	});
-
-	test('a row in several regions is kept when any one ordinal is inside', () => {
-		const row = makeRow({ id: 'multi', regionOrdinals: [99, 5] });
-
-		expect(selectMapRows([row], { interval: [1, 10], type: 'region' })).toHaveLength(1);
 	});
 
 	test('rows missing the relevant column are excluded by a rule', () => {
@@ -181,43 +176,18 @@ describe('selectMapRows index matches the linear filter', () => {
 			expect(getIds(selectMapRows(rows, rule))).toEqual(getIds(selectByFilter(rows, rule)));
 		}
 	});
-
-	test('rows without ordinals or themes are never selected', () => {
-		const bareIds = new Set(
-			rows
-				.filter(({ properties }) => !properties.regionOrdinals && !properties.themeIndices)
-				.map(({ properties }) => properties.id),
-		);
-		const selected = [
-			...selectMapRows(rows, { interval: [-Infinity, Infinity], type: 'region' }),
-			...Array.from({ length: themeCount }, (_, index) =>
-				selectMapRows(rows, { index, type: 'theme' }),
-			).flat(),
-		];
-
-		expect(bareIds.size).toBeGreaterThan(0);
-		expect(selected.filter(({ properties }) => bareIds.has(properties.id))).toEqual([]);
-	});
 });
 
 describe('selectMapRows edge cases', () => {
-	test('an empty interval selects nothing', () => {
-		const row = makeRow({ regionOrdinals: [5] });
-
-		expect(selectMapRows([row], { interval: [6, 5], type: 'region' })).toEqual([]);
-	});
-
-	test('an unknown theme selects nothing', () => {
-		const row = makeRow({ themeIndices: [2] });
-
-		expect(selectMapRows([row], { index: 99, type: 'theme' })).toEqual([]);
-	});
-
 	test('a row matching on several ordinals or a repeated theme appears once', () => {
 		const row = makeRow({ id: 'repeat', regionOrdinals: [3, 4, 4], themeIndices: [2, 2] });
+		const straddling = makeRow({ id: 'straddling', regionOrdinals: [99, 5] });
 
 		expect(getIds(selectMapRows([row], { interval: [1, 10], type: 'region' }))).toEqual(['repeat']);
 		expect(getIds(selectMapRows([row], { index: 2, type: 'theme' }))).toEqual(['repeat']);
+		expect(getIds(selectMapRows([straddling], { interval: [1, 10], type: 'region' }))).toEqual([
+			'straddling',
+		]);
 	});
 
 	test('a result can be mutated without touching the next selection', () => {

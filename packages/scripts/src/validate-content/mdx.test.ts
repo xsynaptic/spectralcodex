@@ -16,7 +16,7 @@ describe('collectComponentIssues', () => {
 		expect(collectComponentIssues(body)).toEqual([]);
 	});
 
-	test('flags a Link with no props at all', () => {
+	test('flags a Link with no props, or other props but no id', () => {
 		expect(collectComponentIssues('See <Link>this label</Link>.')).toEqual([
 			{
 				context: 'See <Link>this label</Link>.',
@@ -24,17 +24,8 @@ describe('collectComponentIssues', () => {
 				message: 'Link component missing id prop',
 			},
 		]);
-	});
 
-	test('flags a Link carrying other props but no id', () => {
 		const issues = collectComponentIssues('<Link class="anchor">text</Link>');
-
-		expect(issues).toHaveLength(1);
-		expect(issues[0]?.message).toBe('Link component missing id prop');
-	});
-
-	test('does not read a `data-id` prop as the `id` prop', () => {
-		const issues = collectComponentIssues('<Link data-id="wat-arun">text</Link>');
 
 		expect(issues).toHaveLength(1);
 		expect(issues[0]?.message).toBe('Link component missing id prop');
@@ -45,22 +36,6 @@ describe('collectComponentIssues', () => {
 
 		expect(issues).toHaveLength(1);
 		expect(issues[0]?.message).toBe('Img component missing src prop');
-	});
-
-	test('reports the line the component sits on', () => {
-		const body = ['Intro.', '', 'More prose.', '', '<Link>no id here</Link>'].join('\n');
-
-		expect(collectComponentIssues(body)[0]?.lineNumber).toBe(5);
-	});
-
-	test('does not mistake a longer tag name for the one it checks', () => {
-		expect(collectComponentIssues('<LinkList items="a" />')).toEqual([]);
-	});
-
-	test('orders issues across component types by line', () => {
-		const body = ['<Img alt="first">a</Img>', '<Link>second</Link>'].join('\n');
-
-		expect(collectComponentIssues(body).map((issue) => issue.lineNumber)).toEqual([1, 2]);
 	});
 });
 

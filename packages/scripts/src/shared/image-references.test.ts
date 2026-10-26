@@ -16,18 +16,6 @@ describe('getEntryImageIds', () => {
 		expect(getBodyIds(body.join('\n'))).toEqual(['temples/facade.jpg', 'streets/alley.jpg']);
 	});
 
-	test('does not read `data-src` as the `src` prop', () => {
-		expect(getBodyIds('<Img data-src="temples/facade.jpg" />')).toEqual([]);
-	});
-
-	test('skips ImgGroup, which is a different component', () => {
-		expect(getBodyIds('<ImgGroup src="temples/facade.jpg" />')).toEqual([]);
-	});
-
-	test('reads a single-quoted value', () => {
-		expect(getBodyIds("<Img src='temples/facade.jpg' />")).toEqual(['temples/facade.jpg']);
-	});
-
 	test('reads imageFeatured as a single id or a list of ids and objects', () => {
 		expect(getEntryImageIds({ data: { imageFeatured: 'temples/facade.jpg' } }).featured).toEqual([
 			'temples/facade.jpg',

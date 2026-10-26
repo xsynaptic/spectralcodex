@@ -47,32 +47,6 @@ describe('createRegionsTree', () => {
 	});
 });
 
-describe('getRegionHierarchy', () => {
-	test('ancestors are nearest-first with the root last', () => {
-		const regionsTree = createRegionsTree(makeRegionsFixture());
-
-		expect(getRegionHierarchy(regionsTree, 'taipei')._ancestors).toEqual([
-			'north-taiwan',
-			'taiwan',
-		]);
-	});
-
-	test('children and siblings are id-sorted; empty groups are empty arrays', () => {
-		const regionsTree = createRegionsTree(makeRegionsFixture());
-
-		expect(getRegionHierarchy(regionsTree, 'taiwan')).toEqual({
-			_ancestors: [],
-			_children: ['north-taiwan', 'tainan'],
-			_siblings: [],
-		});
-		expect(getRegionHierarchy(regionsTree, 'north-taiwan')._siblings).toEqual(['tainan']);
-		expect(getRegionHierarchy(regionsTree, 'taipei')).toMatchObject({
-			_children: [],
-			_siblings: ['keelung'],
-		});
-	});
-});
-
 describe('getRegionLangCode', () => {
 	test('a deep descendant takes the root language, not an intermediate ancestor', () => {
 		const regions = [
@@ -109,6 +83,7 @@ describe('createRegionContentFunction', () => {
 		// The temple sits in two subtrees of taiwan but is counted once
 		expect(taiwan._locations).toEqual(['temple', 'fort']);
 		expect(taiwan._locationCount).toBe(2);
+		expect(taiwan._entryCount).toBe(4);
 		expect(taipei._locations).toEqual(['temple', 'fort']);
 		expect(tainan._locations).toEqual(['temple']);
 
@@ -117,22 +92,11 @@ describe('createRegionContentFunction', () => {
 		expect(taipei._posts).toEqual(['post-taipei']);
 		expect(tainan._posts).toEqual([]);
 		expect(tainan._postCount).toBe(0);
-	});
-
-	test('_entryCount totals every gathered collection', () => {
-		const getRegionContent = createRegionContentFunction({
-			locations: [makeLocation('temple', ['taipei'])],
-			posts: [makePost('post-taipei', ['taipei'])],
-			regionsTree: createRegionsTree(makeRegionsFixture()),
-		});
-
-		expect(getRegionContent('taiwan')._entryCount).toBe(2);
-		expect(getRegionContent('tainan')._entryCount).toBe(0);
+		expect(tainan._entryCount).toBe(1);
 	});
 });
 
-// `contentPolicy` reads `import.meta.env.DEV` once at module load, so the policy-gated paths are
-// only reachable through a fresh import, as `content-policy.test.ts` does
+// `contentPolicy` reads `import.meta.env.DEV` once at module load, so each environment needs a fresh import
 async function loadFactory(isDev: boolean) {
 	vi.stubEnv('DEV', isDev);
 	vi.resetModules();
@@ -145,60 +109,58 @@ afterEach(() => {
 	vi.resetModules();
 });
 
-async function taipeiCountsFor(isDev: boolean) {
-	const { createRegionContentFunction, createRegionsTree } = await loadFactory(isDev);
-
-	const getRegionContent = createRegionContentFunction({
-		locations: [
-			makeLocation('temple', ['taipei']),
-			makeLocation('bunker', ['taipei'], { hideGeometry: true }),
-			makeLocation('theater', ['taipei'], { hideFromLists: true }),
-		],
-		posts: [],
-		regionsTree: createRegionsTree(makeRegionsFixture()),
-	});
-
-	return getRegionContent('taipei');
-}
-
 describe('createRegionContentFunction counts follow listings', () => {
-	test('an unlisted Location is gathered but not counted; a geometry-hidden one counts', async () => {
-		const taipei = await taipeiCountsFor(false);
+	test.each([
+		{ environment: 'production', isDev: false },
+		{ environment: 'development', isDev: true },
+	])(
+		'in $environment an unlisted Location is gathered but not counted; a geometry-hidden one counts',
+		async ({ isDev }) => {
+			const { createRegionContentFunction, createRegionsTree } = await loadFactory(isDev);
 
-		expect(taipei._locations).toEqual(['temple', 'bunker', 'theater']);
-		expect(taipei._locationCount).toBe(2);
-		expect(taipei._entryCount).toBe(2);
-	});
+			const taipei = createRegionContentFunction({
+				locations: [
+					makeLocation('temple', ['taipei']),
+					makeLocation('bunker', ['taipei'], { hideGeometry: true }),
+					makeLocation('theater', ['taipei'], { hideFromLists: true }),
+				],
+				posts: [],
+				regionsTree: createRegionsTree(makeRegionsFixture()),
+			})('taipei');
 
-	test('development counts the same, since listings are not gated on the environment', async () => {
-		const taipei = await taipeiCountsFor(true);
-
-		expect(taipei._locations).toEqual(['temple', 'bunker', 'theater']);
-		expect(taipei._locationCount).toBe(2);
-	});
+			expect(taipei._locations).toEqual(['temple', 'bunker', 'theater']);
+			expect(taipei._locationCount).toBe(2);
+			expect(taipei._entryCount).toBe(2);
+		},
+	);
 });
 
-async function overriddenLocationRegionsFor(isDev: boolean) {
-	const { createRegionContentFunction, createRegionsTree } = await loadFactory(isDev);
-
-	const getRegionContent = createRegionContentFunction({
-		locations: [makeLocation('temple', ['taipei'], { override: { regions: [{ id: 'tainan' }] } })],
-		posts: [],
-		regionsTree: createRegionsTree(makeRegionsFixture()),
-	});
-
-	return {
-		tainan: getRegionContent('tainan')._locations,
-		taipei: getRegionContent('taipei')._locations,
-	};
-}
-
 describe('Override regions under the content policy', () => {
-	test('in production an override files the Location under its override regions', async () => {
-		expect(await overriddenLocationRegionsFor(false)).toEqual({ tainan: ['temple'], taipei: [] });
-	});
+	test.each([
+		{
+			expected: { tainan: ['temple'], taipei: [] },
+			isDev: false,
+			rule: 'production files the Location under its override regions',
+		},
+		{
+			expected: { tainan: [], taipei: ['temple'] },
+			isDev: true,
+			rule: 'development keeps the authored regions',
+		},
+	])('$rule', async ({ expected, isDev }) => {
+		const { createRegionContentFunction, createRegionsTree } = await loadFactory(isDev);
 
-	test('in development the authored regions stand', async () => {
-		expect(await overriddenLocationRegionsFor(true)).toEqual({ tainan: [], taipei: ['temple'] });
+		const getRegionContent = createRegionContentFunction({
+			locations: [
+				makeLocation('temple', ['taipei'], { override: { regions: [{ id: 'tainan' }] } }),
+			],
+			posts: [],
+			regionsTree: createRegionsTree(makeRegionsFixture()),
+		});
+
+		expect({
+			tainan: getRegionContent('tainan')._locations,
+			taipei: getRegionContent('taipei')._locations,
+		}).toEqual(expected);
 	});
 });

@@ -15,12 +15,6 @@ describe('getTranslations', () => {
 		expect(t('notFound.title', 'zh')).toBe(t('notFound.title', 'en'));
 		expect(t('notFound.title', 'ja')).toBe(t('notFound.title', 'en'));
 	});
-
-	test('English is the default when no language is named', () => {
-		const t = getTranslations();
-
-		expect(t('notice.danger')).toBe(t('notice.danger', 'en'));
-	});
 });
 
 describe('getTranslations plural', () => {

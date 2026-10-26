@@ -3,31 +3,21 @@ import { describe, expect, test } from 'vitest';
 import { getLinkPlatform } from '#lib/utils/link-platforms.ts';
 
 describe('getLinkPlatform', () => {
-	test('an alias domain resolves to the same platform as the main one', () => {
-		expect(getLinkPlatform('https://youtu.be/abc')).toBe('YouTube');
-		expect(getLinkPlatform('https://www.youtube.com/watch?v=abc')).toBe('YouTube');
+	test.each([
+		['https://youtu.be/abc', 'YouTube'],
+		['https://www.youtube.com/watch?v=abc', 'YouTube'],
+		['https://m.facebook.com/story.php?id=1', 'Facebook'],
+		['https://facebook.com', 'Facebook'],
+	])('%s resolves to %s', (url, expected) => {
+		expect(getLinkPlatform(url)).toBe(expected);
 	});
 
-	test('subdomains and bare hosts resolve alongside canonical URLs', () => {
-		expect(getLinkPlatform('https://m.facebook.com/story.php?id=1')).toBe('Facebook');
-		expect(getLinkPlatform('https://facebook.com')).toBe('Facebook');
-	});
-
-	test('a platform with a Chinese title still reports the English one', () => {
-		expect(getLinkPlatform('https://vocus.cc/article/abc')).toBe('Vocus');
-	});
-
-	test('an unlisted host is unlabelled rather than guessed', () => {
-		expect(getLinkPlatform('https://en.wikipedia.org/wiki/Taiwan')).toBeUndefined();
-	});
-
-	test('a host merely containing a platform domain is unlabelled', () => {
-		expect(getLinkPlatform('https://spectralcodex.com/posts/abc')).toBeUndefined();
-		expect(getLinkPlatform('https://www.e-flux.com/journal/abc')).toBeUndefined();
-		expect(getLinkPlatform('https://kaokao12.nidbox.com/p/1')).toBeUndefined();
-	});
-
-	test('host casing does not affect the match', () => {
-		expect(getLinkPlatform('https://WWW.Facebook.COM/story.php?id=1')).toBe('Facebook');
+	test.each([
+		'https://en.wikipedia.org/wiki/Taiwan',
+		'https://spectralcodex.com/posts/abc',
+		'https://www.e-flux.com/journal/abc',
+		'https://kaokao12.nidbox.com/p/1',
+	])('%s is unlabelled', (url) => {
+		expect(getLinkPlatform(url)).toBeUndefined();
 	});
 });

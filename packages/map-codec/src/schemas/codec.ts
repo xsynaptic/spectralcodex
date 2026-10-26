@@ -38,7 +38,7 @@ function codedEnum<Value extends string>(codes: Readonly<Record<Value, number>>)
 	return { compressed: z.enum(codes), standard: z.enum(values) };
 }
 
-export function createFieldCodec<
+function createFieldCodec<
 	Fields extends MapCodecTable,
 	Schemas extends Record<keyof Fields, FieldSchemas>,
 >(fields: Fields, schemas: Schemas) {

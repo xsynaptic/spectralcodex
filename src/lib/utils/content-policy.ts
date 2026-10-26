@@ -8,7 +8,7 @@ interface ContentPolicy {
 }
 
 // Two fields from one condition, so call sites name the rule they implement rather than the environment
-export const contentPolicy = {
+const contentPolicy = {
 	applyOverrides: !import.meta.env.DEV,
 	hideSensitiveLocations: !import.meta.env.DEV,
 } satisfies ContentPolicy;

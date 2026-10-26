@@ -20,17 +20,16 @@ describe('getImageExposureValue', () => {
 		expect(getImageExposureValue({ aperture: '8', shutterSpeed: '2' })).toBe('5');
 	});
 
-	test('returns undefined for a missing input or an unusable fraction', () => {
-		expect(getImageExposureValue({ aperture: undefined, shutterSpeed: '1/250' })).toBeUndefined();
-		expect(getImageExposureValue({ aperture: '2.8', shutterSpeed: '0/250' })).toBeUndefined();
-		expect(getImageExposureValue({ aperture: '2.8', shutterSpeed: '1/x' })).toBeUndefined();
-	});
-
-	test('returns undefined when the result is not a finite number', () => {
-		expect(getImageExposureValue({ aperture: 'wide', shutterSpeed: '1/250' })).toBeUndefined();
-		expect(getImageExposureValue({ aperture: '2.8', shutterSpeed: 'bulb' })).toBeUndefined();
-		expect(getImageExposureValue({ aperture: '2.8', shutterSpeed: '0' })).toBeUndefined();
-		expect(getImageExposureValue({ aperture: '0', shutterSpeed: '1/250' })).toBeUndefined();
+	test.each([
+		{ aperture: undefined, shutterSpeed: '1/250' },
+		{ aperture: '2.8', shutterSpeed: '0/250' },
+		{ aperture: '2.8', shutterSpeed: '1/x' },
+		{ aperture: 'wide', shutterSpeed: '1/250' },
+		{ aperture: '2.8', shutterSpeed: 'bulb' },
+		{ aperture: '2.8', shutterSpeed: '0' },
+		{ aperture: '0', shutterSpeed: '1/250' },
+	])('returns undefined for aperture $aperture and shutter speed $shutterSpeed', (input) => {
+		expect(getImageExposureValue(input)).toBeUndefined();
 	});
 });
 

@@ -9,20 +9,13 @@ const entry = (body?: unknown) =>
 	({ ...(body === undefined ? {} : { body }) }) as unknown as ContentEntry;
 
 describe('hasEntryContent', () => {
-	test('a body with prose counts as content', () => {
-		expect(hasEntryContent(entry('Some prose.'))).toBe(true);
-	});
-
-	test('a whitespace-only body does not', () => {
-		expect(hasEntryContent(entry(' \n\t '))).toBe(false);
-		expect(hasEntryContent(entry(''))).toBe(false);
-	});
-
-	test('an entry with no body at all does not', () => {
-		expect(hasEntryContent(entry())).toBe(false);
-	});
-
-	test('a body that is not a string does not', () => {
-		expect(hasEntryContent(entry(42))).toBe(false);
+	test.each([
+		{ body: 'Some prose.', expected: true, shape: 'a body with prose' },
+		{ body: ' \n\t ', expected: false, shape: 'a whitespace-only body' },
+		{ body: '', expected: false, shape: 'an empty body' },
+		{ body: undefined, expected: false, shape: 'no body at all' },
+		{ body: 42, expected: false, shape: 'a body that is not a string' },
+	])('$shape: $expected', ({ body, expected }) => {
+		expect(hasEntryContent(entry(body))).toBe(expected);
 	});
 });

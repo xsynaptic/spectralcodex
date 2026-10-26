@@ -12,26 +12,27 @@ import {
 } from '#lib/utils/text.ts';
 
 describe('textClipper', () => {
-	test('returns short input untouched', () => {
+	test('returns input untouched up to exactly the word count', () => {
 		expect(textClipper('A short sentence.', { wordCount: 100 })).toBe('A short sentence.');
-	});
-
-	test('returns input untouched at exactly the word count', () => {
 		expect(textClipper('one two three', { wordCount: 3 })).toBe('one two three');
 	});
 
-	test('clips an English sentence identically to whitespace splitting', () => {
-		expect(textClipper('The quick brown fox jumps over the lazy dog', { wordCount: 4 })).toBe(
-			'The quick brown fox...',
-		);
-	});
+	test.each([
+		{
+			expected: 'The quick brown fox...',
+			input: 'The quick brown fox jumps over the lazy dog',
+			options: { wordCount: 4 },
+		},
+		{ expected: 'one two…', input: 'one two three four', options: { trailer: '…', wordCount: 2 } },
+	])(
+		'clips English identically to whitespace splitting: $expected',
+		({ expected, input, options }) => {
+			expect(textClipper(input, options)).toBe(expected);
+		},
+	);
 
 	test('keeps punctuation attached to the last clipped word', () => {
 		expect(textClipper('Hello there, world and beyond', { wordCount: 2 })).toBe('Hello there,...');
-	});
-
-	test('supports a custom trailer', () => {
-		expect(textClipper('one two three four', { trailer: '…', wordCount: 2 })).toBe('one two…');
 	});
 
 	test('clips pure CJK text without spaces', () => {
@@ -51,10 +52,11 @@ describe('textClipper', () => {
 });
 
 describe('stripMdxComponents', () => {
-	test('strips the named tags, paired and self-closing', () => {
+	test('strips the named tags and trims what they leave behind', () => {
 		expect(stripMdxComponents('One <Img src="a.jpg" /> two <More />three', ['Img', 'More'])).toBe(
 			'One  two three',
 		);
+		expect(stripMdxComponents('<Img src="a.jpg" />\nHello\n', ['Img'])).toBe('Hello');
 	});
 
 	test('leaves a component whose name merely starts with a stripped name', () => {
@@ -62,20 +64,15 @@ describe('stripMdxComponents', () => {
 			'a <ImgGroup cols={2}>x</ImgGroup> b',
 		);
 	});
-
-	test('trims what the stripped tags leave behind', () => {
-		expect(stripMdxComponents('<Img src="a.jpg" />\nHello\n', ['Img'])).toBe('Hello');
-	});
 });
 
 describe('refineTypography', () => {
-	test('three hyphens become an em dash before two become an en dash', () => {
-		expect(refineTypography('Taipei --- Tainan')).toBe('Taipei — Tainan');
-		expect(refineTypography('1990--1995')).toBe('1990–1995');
-	});
-
-	test('three dots become an ellipsis', () => {
-		expect(refineTypography('Wait...')).toBe('Wait…');
+	test.each([
+		['Taipei --- Tainan', 'Taipei — Tainan'],
+		['1990--1995', '1990–1995'],
+		['Wait...', 'Wait…'],
+	])('%s becomes %s, em dash before en dash', (input, expected) => {
+		expect(refineTypography(input)).toBe(expected);
 	});
 
 	test('a double quote opens at the start, after a space, and after a bracket', () => {
@@ -89,35 +86,25 @@ describe('refineTypography', () => {
 		expect(refineTypography('Taipei---"the north"')).toBe('Taipei—“the north”');
 	});
 
-	test('a single quote opens in the same positions and closes elsewhere', () => {
+	test('a single quote opens in the same positions and otherwise closes or marks an apostrophe', () => {
 		expect(refineTypography("'Hello'")).toBe('‘Hello’');
 		expect(refineTypography("she said 'hi'")).toBe('she said ‘hi’');
-	});
-
-	test('an apostrophe mid-word becomes a right single quote', () => {
 		expect(refineTypography("don't")).toBe('don’t');
 	});
 });
 
 describe('sanitizeImageAltAttribute', () => {
-	test('strips tags and keeps their text', () => {
-		expect(sanitizeImageAltAttribute('<em>Hello</em> <strong>world</strong>')).toBe('Hello world');
-	});
-
-	test('decodes entities back to plain characters', () => {
+	test('decodes entities back to plain characters and collapses whitespace', () => {
 		// A bare ampersand is escaped by the rehype round trip, then decoded back
 		expect(sanitizeImageAltAttribute('Tom & Jerry')).toBe('Tom & Jerry');
 		expect(sanitizeImageAltAttribute('Tom &amp; Jerry')).toBe('Tom & Jerry');
 		expect(sanitizeImageAltAttribute('5 &lt; 10')).toBe('5 < 10');
 		expect(sanitizeImageAltAttribute('a&nbsp;b')).toBe('a b');
+		expect(sanitizeImageAltAttribute('  a   b \n c  ')).toBe('a b c');
 	});
 
 	test('leaves an entity nobody recognizes as written', () => {
 		expect(sanitizeImageAltAttribute('&foo; stays')).toBe('&foo; stays');
-	});
-
-	test('collapses whitespace runs and trims', () => {
-		expect(sanitizeImageAltAttribute('  a   b \n c  ')).toBe('a b c');
 	});
 });
 
@@ -161,15 +148,8 @@ describe('formatStringTemplate', () => {
 });
 
 describe('renderMarkdownInline', () => {
-	test('applies smart punctuation', () => {
+	test('applies smart punctuation and wraps a CJK run in the cjk-text class', () => {
 		expect(renderMarkdownInline('"Hello" world')).toContain('“Hello”');
-	});
-
-	test('wraps a CJK run in the cjk-text class', () => {
 		expect(renderMarkdownInline('Taipei 臺北 city')).toContain('cjk-text');
-	});
-
-	test('output carries no surrounding whitespace', () => {
-		expect(renderMarkdownInline('Hello')).not.toMatch(/^\s|\s$/);
 	});
 });

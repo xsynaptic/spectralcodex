@@ -89,18 +89,15 @@ describe('collectReferenceIssues', () => {
 		expect(collectReferenceIssues(entries, { skipCollections: ['images'] })).toEqual([]);
 	});
 
-	test('ignores an object carrying an id but no collection', () => {
-		const entries = makeEntries([
-			makeEntry({ data: { override: { id: 'anonymous-place' } }, id: 'some-place' }),
-		]);
-
-		expect(collectReferenceIssues(entries)).toEqual([]);
-	});
-
-	test('ignores plain data that is not a reference', () => {
+	test('ignores an object carrying an id but no collection, and plain data that is not a reference', () => {
 		const entries = makeEntries([
 			makeEntry({
-				data: { geometry: [121.5, 25.05], links: [{ url: 'https://x.test' }], title: 'Some Place' },
+				data: {
+					geometry: [121.5, 25.05],
+					links: [{ url: 'https://x.test' }],
+					override: { id: 'anonymous-place' },
+					title: 'Some Place',
+				},
 				id: 'some-place',
 			}),
 		]);

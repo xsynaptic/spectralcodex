@@ -1,7 +1,7 @@
 import { MapPopupOwnField } from '@spectralcodex/map-codec';
 import { describe, expect, test } from 'vitest';
 
-import { getPopupImageSrc, getPopupImageSrcSet, getTargetPopupItem } from '#popup/popup-factory.ts';
+import { getPopupImageSrc, getTargetPopupItem } from '#popup/popup-factory.ts';
 
 describe('getTargetPopupItem', () => {
 	const item = {
@@ -87,12 +87,6 @@ describe('popup image', () => {
 	test('the fallback src is the narrowest source under the image base', () => {
 		expect(getPopupImageSrc(popupImageSources, 'https://img.example.com')).toBe(
 			'https://img.example.com/a/b-350x233.webp',
-		);
-	});
-
-	test('every source rides in the srcset with its width descriptor', () => {
-		expect(getPopupImageSrcSet(popupImageSources, '/_img')).toBe(
-			'/_img/a/b-700x467.webp 700w, /_img/a/b-350x233.webp 350w',
 		);
 	});
 });

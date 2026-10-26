@@ -90,7 +90,7 @@ describe('@id scheme', () => {
 describe('buildPlaceSchema', () => {
 	const taipei: [number, number] = [121.5654, 25.033];
 
-	test('reads coordinates as [lng, lat]', () => {
+	test('reads coordinates as [lng, lat] and builds its @id and url from the page path', () => {
 		const place = buildPlaceSchema({
 			coordinates: taipei,
 			description: undefined,
@@ -103,16 +103,6 @@ describe('buildPlaceSchema', () => {
 			latitude: 25.033,
 			longitude: 121.5654,
 		});
-	});
-
-	test('builds its @id and url from the page path', () => {
-		const place = buildPlaceSchema({
-			coordinates: taipei,
-			description: undefined,
-			title: 'Taipei',
-			url: '/locations/taipei/',
-		});
-
 		expect(place['@id']).toBe(`${site}/locations/taipei/#place`);
 		expect(place.url).toBe(`${site}/locations/taipei/`);
 	});
@@ -171,12 +161,6 @@ describe('buildAuthorSchema', () => {
 		expect('sameAs' in buildAuthorSchema()).toBe(false);
 		expect('sameAs' in buildAuthorSchema({ sameAs: [] })).toBe(false);
 	});
-
-	test('carries the profiles it is given', () => {
-		expect(buildAuthorSchema({ sameAs: ['https://example.com/me'] }).sameAs).toStrictEqual([
-			'https://example.com/me',
-		]);
-	});
 });
 
 const trail = (regions?: Array<RegionEntry>) =>
@@ -188,7 +172,7 @@ const trail = (regions?: Array<RegionEntry>) =>
 	}).itemListElement;
 
 describe('buildEntryBreadcrumbSchema', () => {
-	test('runs site, collection, regions root first, then the entry', () => {
+	test('runs site, collection, regions root first, then the entry, numbered from one', () => {
 		const items = trail([makeRegion('taiwan', 'Taiwan'), makeRegion('taipei', 'Taipei')]);
 
 		expect(items.map((item) => item.name)).toStrictEqual([
@@ -198,11 +182,6 @@ describe('buildEntryBreadcrumbSchema', () => {
 			'Taipei',
 			'Xinyi Market',
 		]);
-	});
-
-	test('numbers the trail from one, in array order', () => {
-		const items = trail([makeRegion('taiwan', 'Taiwan'), makeRegion('taipei', 'Taipei')]);
-
 		expect(items.map((item) => item.position)).toStrictEqual([1, 2, 3, 4, 5]);
 	});
 

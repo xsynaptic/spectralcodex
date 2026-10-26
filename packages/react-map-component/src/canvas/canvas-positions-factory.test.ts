@@ -10,7 +10,7 @@ describe('getClusterCandidates', () => {
 		{ id: 'outside', x: 30, y: 41 },
 	];
 
-	test('clusters inside the radius come back nearest first', () => {
+	test('clusters inside the radius come back nearest first, and none when none is in reach', () => {
 		expect(getClusterCandidates({ x: 0, y: 0 }, clusters, 50).map(({ id }) => id)).toEqual([
 			'near',
 			'edge',
@@ -21,9 +21,6 @@ describe('getClusterCandidates', () => {
 			'outside',
 			'near',
 		]);
-	});
-
-	test('a point with no cluster in reach has no candidates', () => {
 		expect(getClusterCandidates({ x: 500, y: 500 }, clusters, 50)).toEqual([]);
 	});
 });

@@ -9,10 +9,10 @@ function makeSource(data: Record<string, unknown>) {
 }
 
 describe('buildSourceCitations', () => {
-	test('joins authors, title and publication details with the English delimiter', () => {
+	test('joins authors with an ampersand, and title and publication details with the English delimiter', () => {
 		const { primary } = buildSourceCitations(
 			makeSource({
-				authors: [{ name: 'Paul D. Barclay' }],
+				authors: [{ name: 'Paul D. Barclay' }, { name: 'Second Author' }],
 				publishedDate: '2017',
 				publishedDetails: 'Oakland, California',
 				publisher: 'University of California Press',
@@ -20,17 +20,9 @@ describe('buildSourceCitations', () => {
 			}),
 		);
 
-		expect(primary?.authors).toBe('Paul D. Barclay');
+		expect(primary?.authors).toBe('Paul D. Barclay & Second Author');
 		expect(primary?.title).toBe('Outcasts of Empire');
 		expect(primary?.published).toBe('University of California Press, 2017, Oakland, California');
-	});
-
-	test('joins multiple authors with an ampersand', () => {
-		const { primary } = buildSourceCitations(
-			makeSource({ authors: [{ name: 'One' }, { name: 'Two' }], title: 'A Title' }),
-		);
-
-		expect(primary?.authors).toBe('One & Two');
 	});
 
 	test('quotes a Chinese title and switches to full-width punctuation', () => {
@@ -80,22 +72,11 @@ describe('buildSourceCitations', () => {
 		expect(multilingual?.published).toBe('第59輯');
 		expect(multilingual?.title).toBe('《書》');
 	});
-
-	// Regression: an empty array previously rendered a leading delimiter
 });
 
 describe('buildSourceCitations omissions', () => {
-	test('omits authors entirely when the list is empty', () => {
-		const { primary } = buildSourceCitations(
-			makeSource({ authors: [], publisher: 'A Publisher', title: 'A Title' }),
-		);
-
-		expect(primary?.authors).toBeUndefined();
-		expect(primary?.published).toBe('A Publisher');
-	});
-
-	test('a bare title carries neither an authors run nor a published run', () => {
-		const { primary } = buildSourceCitations(makeSource({ title: 'A Title' }));
+	test('a bare title with an empty authors list carries neither an authors run nor a published run', () => {
+		const { primary } = buildSourceCitations(makeSource({ authors: [], title: 'A Title' }));
 
 		expect(primary?.title).toBe('A Title');
 		expect(primary?.authors).toBeUndefined();

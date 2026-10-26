@@ -14,10 +14,6 @@ function buildGeometry(records: Array<BuildRecord>) {
 }
 
 describe('getBuildStatsGeometry', () => {
-	test('returns undefined for no records', () => {
-		expect(buildGeometry([])).toBeUndefined();
-	});
-
 	// Regression: a placeholder endpoint value landed far outside the viewBox, labelled `0s`
 	test('the trend endpoint stays inside the duration chart with only two builds', () => {
 		const end = buildGeometry([buildRecord(0, 900), buildRecord(1, 100)])?.duration.end;

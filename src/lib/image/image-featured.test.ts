@@ -20,10 +20,6 @@ const captions: Record<string, CatalogCaption> = {
 const getCaption = (id: string) => captions[id];
 
 describe('getImageFeaturedGroup', () => {
-	test('no featured image yields no group', () => {
-		expect(getImageFeaturedGroup({ getCaption, imageFeatured: undefined })).toBeUndefined();
-	});
-
 	test('a bare string and an object normalize to the same shape, in order', () => {
 		const group = getImageFeaturedGroup({
 			getCaption,

@@ -8,13 +8,7 @@ describe('parseMapView', () => {
 		expect(parseMapView('')).toEqual({});
 	});
 
-	test('a Location view carries its Targets', () => {
-		expect(parseMapView('{"targetIds":["theater","theater-1"]}')).toEqual({
-			targetIds: ['theater', 'theater-1'],
-		});
-	});
-
-	test('a Region view carries a Scope with its rule, bounds and Division', () => {
+	test('a valid view comes back whole', () => {
 		const view = {
 			scope: {
 				apiDivisionUrl: '/api/map/divisions/tainan.json',
@@ -23,16 +17,14 @@ describe('parseMapView', () => {
 				title: 'Tainan',
 				url: '/regions/tainan/',
 			},
+			targetIds: ['theater', 'theater-1'],
 		};
 
 		expect(parseMapView(JSON.stringify(view))).toEqual(view);
 	});
 
-	test('text that is not JSON yields an empty view', () => {
+	test('text that is not JSON, or a view with one malformed field, yields an empty view', () => {
 		expect(parseMapView('theater theater-1')).toEqual({});
-	});
-
-	test('one malformed field voids the whole view', () => {
 		expect(parseMapView('{"targetIds":"theater"}')).toEqual({});
 		expect(
 			parseMapView(

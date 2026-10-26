@@ -23,10 +23,6 @@ const numericMonth: Intl.DateTimeFormatOptions = { ...longMonth, month: 'numeric
 const utc = (iso: string) => new Date(`${iso}T00:00:00Z`);
 
 describe('getDateDisplay single date', () => {
-	test('renders a month name with an ordinal day and the year', () => {
-		expect(getDateDisplay(utc('2018-05-13'), undefined, longMonth)).toBe('May 13th, 2018');
-	});
-
 	test.each([
 		[1, 'May 1st, 2018'],
 		[2, 'May 2nd, 2018'],
@@ -34,6 +30,7 @@ describe('getDateDisplay single date', () => {
 		[4, 'May 4th, 2018'],
 		[11, 'May 11th, 2018'],
 		[12, 'May 12th, 2018'],
+		[13, 'May 13th, 2018'],
 		[21, 'May 21st, 2018'],
 		[22, 'May 22nd, 2018'],
 		[23, 'May 23rd, 2018'],
@@ -62,16 +59,11 @@ describe('getDateDisplay range', () => {
 		expect(display).toBe('May 13th to May 15th, 2018');
 	});
 
-	test('shows both years when the range crosses a year boundary', () => {
-		const display = getDateDisplay(utc('2018-12-30'), utc('2019-01-02'), longMonth);
-
-		expect(display).toBe('December 30th, 2018 to January 2nd, 2019');
-	});
-
-	test('keeps both years when the ends share a month but not a year', () => {
-		const display = getDateDisplay(utc('2018-05-13'), utc('2019-05-15'), longMonth);
-
-		expect(display).toBe('May 13th, 2018 to May 15th, 2019');
+	test.each([
+		['2018-12-30', '2019-01-02', 'December 30th, 2018 to January 2nd, 2019'],
+		['2018-05-13', '2019-05-15', 'May 13th, 2018 to May 15th, 2019'],
+	])('shows both years when %s and %s differ in year', (start, end, expected) => {
+		expect(getDateDisplay(utc(start), utc(end), longMonth)).toBe(expected);
 	});
 
 	test('renders a range under a format that carries no year', () => {
@@ -96,17 +88,11 @@ describe('getDateRanges', () => {
 	const tupleStart = { date: utc('2019-03-01'), hasTime: false };
 	const tupleEnd = { date: utc('2019-03-08'), hasTime: true };
 
-	test('a tuple becomes a start and an end', () => {
-		expect(getDateRanges([[tupleStart, tupleEnd]])).toStrictEqual([
+	test('a tuple becomes a start and an end; a lone entry a start with no end', () => {
+		expect(getDateRanges([single, [tupleStart, tupleEnd]])).toStrictEqual([
+			{ start: single },
 			{ end: tupleEnd, start: tupleStart },
 		]);
-	});
-
-	test('a lone entry becomes a start with no end', () => {
-		const [range] = getDateRanges([single]);
-
-		expect(range).toStrictEqual({ start: single });
-		expect(range?.end).toBeUndefined();
 	});
 
 	test('output is sorted by start date regardless of input order', () => {

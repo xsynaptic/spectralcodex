@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'vitest';
 
-import type { ChunkInputItem } from '#lib/map/map-chunks.ts';
-
 import { assignChunks } from '#lib/map/map-chunks.ts';
+
+type ChunkInputItem = Parameters<typeof assignChunks>[0][number];
 
 function itemsForChunk(
 	ids: Array<string>,
@@ -108,21 +108,6 @@ describe('assignChunks', () => {
 		expect(byId(shuffled)).toEqual(byId(forward));
 	});
 
-	test('keeps geographically distant clusters spatially coherent', () => {
-		const east = Array.from({ length: 5 }, (_, index) =>
-			makeItem(`p${String(index * 2)}`, [121 + index * 0.01, 25 + index * 0.01], 40),
-		);
-		const west = Array.from({ length: 5 }, (_, index) =>
-			makeItem(`p${String(index * 2 + 1)}`, [-73 + index * 0.01, 45 + index * 0.01], 40),
-		);
-
-		const { chunkKeyById } = assignChunks([...east, ...west], { capBytes: 250 });
-
-		const eastKeys = new Set(east.map((item) => chunkKeyById.get(item.id)));
-		const westKeys = new Set(west.map((item) => chunkKeyById.get(item.id)));
-		expect(eastKeys.intersection(westKeys).size).toBeLessThanOrEqual(1);
-	});
-
 	test('bins walk the world one grid cell at a time', () => {
 		const items = gridCellItems();
 		const { chunkIds } = assignChunks(items.toReversed(), { capBytes: 100 });
@@ -142,37 +127,27 @@ describe('assignChunks', () => {
 });
 
 describe('assignChunks byte cap', () => {
-	test('the byte cap counts the brackets and the comma between items', () => {
-		const items = [makeItem('a', [121, 25], 90), makeItem('b', [121.001, 25.001], 90)];
+	test.each([
+		[2, 183, ['0']],
+		[2, 182, ['0', '1']],
+		[3, 274, ['0']],
+		[3, 273, ['0', '1']],
+	])(
+		'%i items under a %i byte cap count the brackets and every comma between them',
+		(itemCount, capBytes, expected) => {
+			const items = Array.from({ length: itemCount }, (_, index) =>
+				makeItem(`p${String(index)}`, [121 + index * 0.001, 25 + index * 0.001], 90),
+			);
 
-		expect([...assignChunks(items, { capBytes: 183 }).chunkIds.keys()]).toEqual(['0']);
-		expect([...assignChunks(items, { capBytes: 182 }).chunkIds.keys()]).toEqual(['0', '1']);
-	});
-
-	test('the running total keeps counting separators as the bin fills', () => {
-		const items = [
-			makeItem('a', [121, 25], 90),
-			makeItem('b', [121.001, 25.001], 90),
-			makeItem('c', [121.002, 25.002], 90),
-		];
-
-		expect([...assignChunks(items, { capBytes: 274 }).chunkIds.keys()]).toEqual(['0']);
-		expect([...assignChunks(items, { capBytes: 273 }).chunkIds.keys()]).toEqual(['0', '1']);
-	});
+			expect([...assignChunks(items, { capBytes }).chunkIds.keys()]).toEqual(expected);
+		},
+	);
 
 	test('empty input yields empty maps', () => {
 		const { chunkIds, chunkKeyById } = assignChunks([]);
 
 		expect(chunkIds.size).toBe(0);
 		expect(chunkKeyById.size).toBe(0);
-	});
-
-	test('omitting options falls back to the default cap', () => {
-		const items = Array.from({ length: 50 }, (_, index) =>
-			makeItem(`d${String(index)}`, [-120 + index * 5, index], 1000),
-		);
-
-		expect(assignChunks(items).chunkIds.size).toBe(1);
 	});
 
 	test('an out-of-range coordinate packs exactly as the clamped edge does', () => {

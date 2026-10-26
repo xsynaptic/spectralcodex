@@ -13,10 +13,13 @@ function makeEntry(
 describe('buildRedirectPairs', () => {
 	test('emits a page redirect and an OG-image redirect per formerId (flat collection)', () => {
 		expect(
-			buildRedirectPairs([makeEntry('new-id', 'locations', { formerIds: ['old-id'] })]).pairs,
+			buildRedirectPairs([makeEntry('new-id', 'locations', { formerIds: ['old-a', 'old-b'] })])
+				.pairs,
 		).toEqual([
-			{ fromPath: '/old-id/', toPath: '/new-id/' },
-			{ fromPath: '/og/old-id.jpg', toPath: '/og/new-id.jpg' },
+			{ fromPath: '/old-a/', toPath: '/new-id/' },
+			{ fromPath: '/og/old-a.jpg', toPath: '/og/new-id.jpg' },
+			{ fromPath: '/old-b/', toPath: '/new-id/' },
+			{ fromPath: '/og/old-b.jpg', toPath: '/og/new-id.jpg' },
 		]);
 	});
 
@@ -26,17 +29,6 @@ describe('buildRedirectPairs', () => {
 		).toEqual([
 			{ fromPath: '/themes/old-theme/', toPath: '/themes/new-theme/' },
 			{ fromPath: '/og/old-theme.jpg', toPath: '/og/new-theme.jpg' },
-		]);
-	});
-
-	test('emits a pair for each of several formerIds', () => {
-		expect(
-			buildRedirectPairs([makeEntry('current', 'posts', { formerIds: ['old-a', 'old-b'] })]).pairs,
-		).toEqual([
-			{ fromPath: '/old-a/', toPath: '/current/' },
-			{ fromPath: '/og/old-a.jpg', toPath: '/og/current.jpg' },
-			{ fromPath: '/old-b/', toPath: '/current/' },
-			{ fromPath: '/og/old-b.jpg', toPath: '/og/current.jpg' },
 		]);
 	});
 
@@ -54,17 +46,14 @@ describe('buildRedirectPairs', () => {
 		]);
 	});
 
-	test('skips a formerId that equals the canonical (public) id', () => {
+	test('skips a formerId that equals the canonical (public) id, and entries without formerIds', () => {
 		expect(
 			buildRedirectPairs([
 				makeEntry('self', 'locations', { formerIds: ['self'] }),
 				makeEntry('real', 'locations', { formerIds: ['anon'], override: { id: 'anon' } }),
+				makeEntry('plain', 'locations'),
 			]),
 		).toEqual({ collisions: [], pairs: [], skipped: [] });
-	});
-
-	test('ignores entries without formerIds', () => {
-		expect(buildRedirectPairs([makeEntry('plain', 'locations')]).pairs).toEqual([]);
 	});
 
 	test('reports collisions with a live page or card, and skips a path already claimed', () => {

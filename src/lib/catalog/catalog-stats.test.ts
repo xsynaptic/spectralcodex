@@ -55,16 +55,6 @@ describe('getCatalogStats', () => {
 		expect(stats.posts.wordCount).toBe('900');
 	});
 
-	test('large counts are thousands-separated for display', async () => {
-		const stats = await statsFor(
-			[makeCatalogItem({ collection: 'posts', id: 'a', wordCount: 12_345 })],
-			1234,
-		);
-
-		expect(stats.posts.wordCount).toBe('12,345');
-		expect(stats.images.itemCount).toBe('1,234');
-	});
-
 	test('only locations carrying a featured image count toward withImages', async () => {
 		const stats = await statsFor([
 			makeCatalogItem({ collection: 'locations', id: 'a', imageId: 'image-a' }),

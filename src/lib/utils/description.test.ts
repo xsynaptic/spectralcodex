@@ -19,16 +19,21 @@ function setup() {
 }
 
 describe('createDescriptionRenderers', () => {
-	test('keeps inline emphasis in html and strips it from text', () => {
+	test('keeps inline emphasis in html; the text form strips it and collapses whitespace', () => {
 		const { getDescriptionRendered } = setup();
 
 		const rendered = getDescriptionRendered({
 			data: { description: 'A *thoroughly* ordinary place.' },
 			id: 'alpha',
 		});
+		const spaced = getDescriptionRendered({
+			data: { description: 'A  thoroughly   ordinary place.' },
+			id: 'beta',
+		});
 
 		expect(rendered?.html).toBe('A <em>thoroughly</em> ordinary place.');
 		expect(rendered?.text).toBe('A thoroughly ordinary place.');
+		expect(spaced?.text).toBe('A thoroughly ordinary place.');
 	});
 
 	test('serves a repeat call from the cache', () => {
@@ -40,17 +45,6 @@ describe('createDescriptionRenderers', () => {
 
 		expect(second).toEqual(first);
 		expect(setSpy).toHaveBeenCalledTimes(1);
-	});
-
-	test('collapses whitespace runs in the plain-text form', () => {
-		const { getDescriptionRendered } = setup();
-
-		const rendered = getDescriptionRendered({
-			data: { description: 'A  thoroughly   ordinary place.' },
-			id: 'alpha',
-		});
-
-		expect(rendered?.text).toBe('A thoroughly ordinary place.');
 	});
 
 	test('an entry with neither a description nor a body renders nothing', () => {
@@ -76,10 +70,11 @@ describe('createDescriptionRenderers', () => {
 });
 
 describe('getDescription', () => {
-	test('the frontmatter description wins over the body', () => {
+	test('the frontmatter description wins over the body; neither answers undefined', () => {
 		expect(getDescription({ body: 'Body text.', data: { description: 'Front matter.' } })).toBe(
 			'Front matter.',
 		);
+		expect(getDescription({ data: {} })).toBeUndefined();
 	});
 
 	test('falls back to a clipped excerpt with components and footnote markers removed', () => {
@@ -87,9 +82,5 @@ describe('getDescription', () => {
 
 		expect(getDescription(entry, { wordCount: 3 })).toBe('A place worth...');
 		expect(getDescription(entry)).toBe('A place worth visiting.');
-	});
-
-	test('neither a description nor a body answers undefined', () => {
-		expect(getDescription({ data: {} })).toBeUndefined();
 	});
 });

@@ -4,7 +4,7 @@ import { describe, expect, test } from 'vitest';
 import type { MapScope } from '#types.ts';
 
 import { makeMapSourceItem } from '#lib/map-test-utils.ts';
-import { createMapStore, hasActiveFilter } from '#store/store-factory.ts';
+import { createMapStore } from '#store/store-factory.ts';
 
 function popupOf(pointId: string) {
 	return { isEased: false, kind: 'popup', pointId } as const;
@@ -105,25 +105,6 @@ describe('createMapStore', () => {
 
 		clearSelection();
 		expect(store.getState()).toMatchObject({ isPopupVisible: true, selectedId: undefined });
-	});
-});
-
-describe('hasActiveFilter', () => {
-	test('a new store has no active filter', () => {
-		expect(hasActiveFilter(createMapStore().getState())).toBe(false);
-	});
-
-	test('a hidden status, a minimum rating or an objective above 1 is each an active filter', () => {
-		for (const filter of [
-			{ status: [LocationStatusEnum.Abandoned] },
-			{ rating: 2 },
-			{ objective: 3 },
-		]) {
-			const store = createMapStore();
-
-			store.getState().actions.setFilter(filter);
-			expect(hasActiveFilter(store.getState())).toBe(true);
-		}
 	});
 });
 

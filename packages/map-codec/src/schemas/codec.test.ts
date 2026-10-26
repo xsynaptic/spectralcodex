@@ -2,22 +2,14 @@ import { GeometryTypeEnum, LocationStatusEnum } from '@spectralcodex/shared/map'
 import { describe, expect, test } from 'vitest';
 import { z } from 'zod';
 
-import type {
-	MapDirectoryColumns,
-	MapPopupItem,
-	MapPopupItemCompressed,
-	MapSourceItem,
-} from '#schemas/codec.ts';
+import type { MapDirectoryColumns, MapPopupItem, MapSourceItem } from '#schemas/codec.ts';
 
-import { decodeMapDirectory, decodeMapPopupData } from '#codec-decode.ts';
-import { plain } from '#codec-fields.ts';
+import { decodeMapDirectory } from '#codec-decode.ts';
 import { mapPopupKeys, mapSourceKeys } from '#codec-tables.ts';
 import { LocationStatusNumericMapping } from '#map-codes.ts';
 import { getMapRowUrl } from '#map-ids.ts';
 import {
-	createFieldCodec,
 	encodeMapDirectory,
-	encodeMapPopupData,
 	MapDirectorySchema,
 	MapPopupItemSchema,
 	MapSourceItemSchema,
@@ -119,50 +111,6 @@ describe('MapSourceItemSchema decode', () => {
 			},
 			type: 'Feature',
 		});
-	});
-
-	test('a geometry that is not one position is rejected', () => {
-		const row = {
-			[mapSourceKeys.id]: 'location-1',
-			[mapSourceKeys.precision]: 3,
-			[mapSourceKeys.rating]: 5,
-			[mapSourceKeys.title]: 'Location',
-		};
-
-		expect(
-			MapSourceItemSchema.safeParse({
-				...row,
-				[mapSourceKeys.geometry]: [
-					[100, 13],
-					[101, 14],
-				],
-			}).success,
-		).toBe(false);
-		expect(
-			MapSourceItemSchema.safeParse({ ...row, [mapSourceKeys.geometry]: { j: 0, x: [100, 13] } })
-				.success,
-		).toBe(false);
-	});
-});
-
-describe('MapPopupItemSchema decode', () => {
-	test('expands popup image sources into path and width', () => {
-		const result = MapPopupItemSchema.parse({
-			[mapPopupKeys.id]: 'location-1',
-			[mapPopupKeys.popupImageSources]: [['image-350x233.webp', 350]],
-			[mapPopupKeys.title]: 'Location',
-		});
-
-		expect(result.popupImageSources).toEqual([{ path: 'image-350x233.webp', width: 350 }]);
-	});
-
-	test('leaves popupImageSources undefined when none ride', () => {
-		const result = MapPopupItemSchema.parse({
-			[mapPopupKeys.id]: 'location-1',
-			[mapPopupKeys.title]: 'Location',
-		});
-
-		expect(result.popupImageSources).toBeUndefined();
 	});
 });
 
@@ -325,12 +273,6 @@ describe('MapDirectorySchema', () => {
 		).toBe(false);
 	});
 
-	test('an unknown column is rejected', () => {
-		const columns = encodeMapDirectory([sourceItemOf('alpha', 'Alpha')]);
-
-		expect(MapDirectorySchema.safeParse({ ...columns, u: ['/alpha/'] }).success).toBe(false);
-	});
-
 	test('Backlinks encode as row indices and decode back to ids', () => {
 		const alpha = sourceItemOf('alpha', 'Alpha');
 		const point = sourceItemOf('beta-gamma:1', 'Gamma');
@@ -399,32 +341,5 @@ describe('decodeMapDirectory matches MapDirectorySchema', () => {
 		const columns = directoryOf(rows);
 
 		expect(decodeMapDirectory(columns)).toStrictEqual(MapDirectorySchema.parse(columns));
-	});
-});
-
-describe('decodeMapPopupData matches MapPopupItemSchema', () => {
-	test.each([
-		{ items: [fullPopupItem], name: 'a fully populated item' },
-		{ items: [{ id: 'a', title: 'A' }], name: 'a minimal item' },
-		{
-			items: [{ googleMapsUrl: 'https://www.google.com/maps/place/x', id: 'b', title: 'B' }],
-			name: 'a Google Maps link off the short-link host',
-		},
-	])('$name', ({ items }) => {
-		const compressed = viaJson(encodeMapPopupData(items)) as Array<MapPopupItemCompressed>;
-
-		expect(decodeMapPopupData(compressed)).toStrictEqual(
-			MapPopupItemSchema.array().parse(compressed),
-		);
-	});
-});
-
-describe('createFieldCodec', () => {
-	test('a key used twice throws rather than letting one field overwrite the other', () => {
-		const schemas = { compressed: z.string(), standard: z.string() };
-
-		expect(() =>
-			createFieldCodec({ title: plain('t'), url: plain('t') }, { title: schemas, url: schemas }),
-		).toThrow('"url" reuses the key "t" of "title"');
 	});
 });

@@ -76,28 +76,6 @@ describe('validateLocationsCoordinates', () => {
 		});
 	});
 
-	test('a lone entry flagged with skipCoordinateCheck leaves nothing to check', async () => {
-		const entries = [
-			makeEntry({
-				data: {
-					geometry: { coordinates: tainanCoordinates },
-					regions: makeRegionRefs(['taipei']),
-					skipCoordinateCheck: true,
-				},
-				id: 'skipped',
-			}),
-		];
-
-		await expect(
-			validateLocationsCoordinates(entries, regionEntries, divisionsPath),
-		).resolves.toStrictEqual({
-			issues: [],
-			notes: [],
-			status: 'fail',
-			summary: 'No locations could be checked',
-		});
-	});
-
 	test('a skipped entry that would otherwise fail does not sink a valid neighbour', async () => {
 		const entries = [
 			makeEntry({
@@ -139,27 +117,17 @@ describe('validateLocationsCoordinates', () => {
 });
 
 describe('validateLocationsCoordinates region coverage', () => {
-	test('fails when the only region has no cached Division, and says which', async () => {
-		const entries = [makeLocation('unmapped', ['atlantis'], taipeiCoordinates)];
+	test.each([
+		{ label: 'has no cached Division', regionId: 'atlantis' },
+		{ label: 'names no Division', regionId: 'zeta-land' },
+	])('fails when the only region $label, and says which', async ({ regionId }) => {
+		const entries = [makeLocation('unmapped', [regionId], taipeiCoordinates)];
 
 		await expect(
 			validateLocationsCoordinates(entries, regionEntries, divisionsPath),
 		).resolves.toStrictEqual({
 			issues: [],
-			notes: [unloadableNote('atlantis')],
-			status: 'fail',
-			summary: 'No locations could be checked',
-		});
-	});
-
-	test('fails when the only region names no Division, and says which', async () => {
-		const entries = [makeLocation('unmapped', ['zeta-land'], taipeiCoordinates)];
-
-		await expect(
-			validateLocationsCoordinates(entries, regionEntries, divisionsPath),
-		).resolves.toStrictEqual({
-			issues: [],
-			notes: [unloadableNote('zeta-land')],
+			notes: [unloadableNote(regionId)],
 			status: 'fail',
 			summary: 'No locations could be checked',
 		});

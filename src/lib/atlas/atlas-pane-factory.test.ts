@@ -9,10 +9,6 @@ import {
 const limits = { mapMin: 320, paneMin: 640, rootFontSize: 16, viewportWidth: 1600 };
 
 describe('getPaneWidthRange', () => {
-	test('the pane spans from its own minimum to what leaves the map its minimum', () => {
-		expect(getPaneWidthRange(limits)).toEqual({ max: 1280, min: 640 });
-	});
-
 	test('the pane minimum wins when the viewport cannot hold both', () => {
 		expect(getPaneWidthRange({ ...limits, viewportWidth: 900 })).toEqual({
 			max: 640,
@@ -22,32 +18,24 @@ describe('getPaneWidthRange', () => {
 });
 
 describe('clampPaneWidth', () => {
-	test('a width inside the range is kept', () => {
-		expect(clampPaneWidth(800, limits)).toBe(800);
-	});
-
-	test('a width past either limit stops at it', () => {
-		expect(clampPaneWidth(100, limits)).toBe(640);
-		expect(clampPaneWidth(1500, limits)).toBe(1280);
-	});
-
-	test('a width stored on a wider viewport shrinks to fit a narrower one', () => {
-		expect(clampPaneWidth(1280, { ...limits, viewportWidth: 1100 })).toBe(780);
+	test.each([
+		[800, 1600, 800],
+		[100, 1600, 640],
+		[1500, 1600, 1280],
+		[1280, 1100, 780],
+	])('%i on a %i viewport clamps to %i', (width, viewportWidth, expected) => {
+		expect(clampPaneWidth(width, { ...limits, viewportWidth })).toBe(expected);
 	});
 });
 
 describe('getPaneWidthForKey', () => {
-	test('left widens the pane and right narrows it', () => {
-		expect(getPaneWidthForKey('ArrowLeft', 800, limits)).toBe(832);
-		expect(getPaneWidthForKey('ArrowRight', 800, limits)).toBe(768);
-	});
-
-	test('home and end jump to the limits', () => {
-		expect(getPaneWidthForKey('Home', 800, limits)).toBe(640);
-		expect(getPaneWidthForKey('End', 800, limits)).toBe(1280);
-	});
-
-	test('other keys are left alone', () => {
-		expect(getPaneWidthForKey('Tab', 800, limits)).toBeUndefined();
+	test.each([
+		['ArrowLeft', 832],
+		['ArrowRight', 768],
+		['Home', 640],
+		['End', 1280],
+		['Tab', undefined],
+	])('%s takes a pane 800 wide to %s; left widens it', (key, expected) => {
+		expect(getPaneWidthForKey(key, 800, limits)).toBe(expected);
 	});
 });

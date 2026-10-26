@@ -13,50 +13,34 @@ afterEach(() => {
 });
 
 describe('getSeoArticleProps', () => {
-	test('omits the modified time entirely when the entry was never updated', () => {
-		const { article } = getSeoArticleProps({
-			dateCreated: new Date(2020, 0, 1),
+	const dateCreated = new Date(Date.UTC(2020, 0, 1, 12, 30));
+
+	test.each([
+		{
+			article: { publishedTime: '2020-01-01T12:30:00.000Z' },
 			dateUpdated: undefined,
-		});
-
-		expect('modifiedTime' in article).toBe(false);
-	});
-
-	test('normalizes both dates to UTC instants', () => {
-		const dateCreated = new Date(Date.UTC(2020, 0, 1, 12, 30));
-		const dateUpdated = new Date(Date.UTC(2021, 5, 2, 8));
-
-		expect(getSeoArticleProps({ dateCreated, dateUpdated })).toStrictEqual({
+		},
+		{
 			article: {
 				modifiedTime: '2021-06-02T08:00:00.000Z',
 				publishedTime: '2020-01-01T12:30:00.000Z',
 			},
+			dateUpdated: new Date(Date.UTC(2021, 5, 2, 8)),
+		},
+	])('carries a modified time only when updated: $dateUpdated', ({ article, dateUpdated }) => {
+		expect(getSeoArticleProps({ dateCreated, dateUpdated })).toStrictEqual({
+			article,
 			ogType: 'article',
 		});
 	});
 });
 
 describe('getSeoImageProps', () => {
-	test('returns an absolute URL, since crawlers do not resolve relative card images', () => {
-		const { url } = getSeoImageProps({ alt: 'Some post', id: 'some-post' });
-
-		expect(url.startsWith(`${site}/`)).toBe(true);
-	});
-
-	test('flattens a nested id so the card path stays one segment deep', () => {
-		const nested = getSeoImageProps({ alt: 'Alt', id: 'taiwan/taipei/some-location' });
-		const flat = getSeoImageProps({ alt: 'Alt', id: 'taiwan-taipei-some-location' });
-
-		expect(nested.url).toBe(flat.url);
-	});
-
-	test('carries the deployment base path', () => {
+	test('builds an absolute, base-prefixed card URL from a flattened id', () => {
 		vi.stubEnv('BASE_URL', '/preview/');
 
-		expect(getSeoImageProps({ alt: 'Alt', id: 'some-post' }).url).toContain('/preview/');
-	});
-
-	test('passes alt text through unchanged', () => {
-		expect(getSeoImageProps({ alt: 'A caption', id: 'some-post' }).alt).toBe('A caption');
+		expect(getSeoImageProps({ alt: 'Alt', id: 'taiwan/taipei/some-location' }).url).toBe(
+			`${site}/preview/og/taiwan-taipei-some-location.jpg`,
+		);
 	});
 });

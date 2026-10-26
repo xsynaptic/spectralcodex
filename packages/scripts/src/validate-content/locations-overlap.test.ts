@@ -19,17 +19,7 @@ describe('validateLocationsOverlap', () => {
 		});
 	});
 
-	test('warns on a pair within the threshold, reported once', () => {
-		const entries = [makePoint('a', 25.05), makePoint('b', 25.05005)];
-
-		const result = validateLocationsOverlap(entries, 10);
-
-		expect(result.status).toBe('warn');
-		expect(result.issues).toHaveLength(1);
-		expect(result.issues[0]?.message).toMatch(/^a: overlaps b \(5\.\dm\)$/);
-	});
-
-	test('reports every distinct pair, nearest first', () => {
+	test('warns on every distinct pair within the threshold, once each, nearest first', () => {
 		const entries = [
 			makePoint('a', 25.05),
 			makePoint('b', 25.05005), // about 5.5m from 'a'
@@ -39,6 +29,7 @@ describe('validateLocationsOverlap', () => {
 
 		const result = validateLocationsOverlap(entries, 10);
 
+		expect(result.status).toBe('warn');
 		expect(result.issues.map((issue) => issue.message)).toEqual([
 			expect.stringMatching(/^c: overlaps d \(2\.\dm\)$/),
 			expect.stringMatching(/^a: overlaps b \(5\.\dm\)$/),

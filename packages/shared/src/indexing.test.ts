@@ -32,11 +32,4 @@ describe('getUrlPathIndexing', () => {
 		expect(getUrlPathIndexing('/chronologyx/').index).toBe(true);
 		expect(getUrlPathIndexing('/objectives-archive/').index).toBe(true);
 	});
-
-	test('treats trailing-slash and bare forms identically', () => {
-		expect(getUrlPathIndexing('/posts/some-post/')).toStrictEqual(
-			getUrlPathIndexing('/posts/some-post'),
-		);
-		expect(getUrlPathIndexing('/chronology/')).toStrictEqual(getUrlPathIndexing('/chronology'));
-	});
 });

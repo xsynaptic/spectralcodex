@@ -3,24 +3,24 @@ import { describe, expect, test } from 'vitest';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 
 describe('getMultilingualContent', () => {
-	test('leads with English when no language is requested', () => {
-		const data = { title_en: 'en', title_ja: 'ja', title_zh: 'zh' };
-
-		expect(getMultilingualContent({ data, prop: 'title' })?.primary.lang).toBe('en');
-	});
-
-	test('leads with Traditional Chinese over Japanese when English is absent', () => {
-		const data = { title_ja: 'ja', title_zh: 'zh' };
-
-		expect(getMultilingualContent({ data, prop: 'title' })?.primary.lang).toBe('zh');
-	});
-
-	test('leads with the requested language', () => {
-		const data = { title_en: 'en', title_zh: 'zh' };
-
-		expect(getMultilingualContent({ data, langCode: 'zh', prop: 'title' })?.primary.lang).toBe(
-			'zh',
-		);
+	test.each([
+		{
+			expected: 'en',
+			label: 'English when no language is requested',
+			options: { data: { title_en: 'en', title_ja: 'ja', title_zh: 'zh' } },
+		},
+		{
+			expected: 'zh',
+			label: 'Traditional Chinese over Japanese when English is absent',
+			options: { data: { title_ja: 'ja', title_zh: 'zh' } },
+		},
+		{
+			expected: 'zh',
+			label: 'the requested language',
+			options: { data: { title_en: 'en', title_zh: 'zh' }, langCode: 'zh' },
+		},
+	] as const)('leads with $label', ({ expected, options }) => {
+		expect(getMultilingualContent({ ...options, prop: 'title' })?.primary.lang).toBe(expected);
 	});
 
 	test('the rest of the languages stay available behind the requested one', () => {

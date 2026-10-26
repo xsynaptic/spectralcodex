@@ -69,17 +69,38 @@ function browse(steps: Parameters<typeof browseHeld>[0]) {
 }
 
 describe('reduceMapScope', () => {
-	test('a Theme sets the Scope', () => {
-		expect(browse([{ scope: theme }])).toBe(theme);
-	});
+	test.each([
+		{ name: 'a Theme', scope: theme, steps: [{ scope: theme }] },
+		{
+			name: 'a Region reached from a member Location',
+			scope: region,
+			steps: [{ scope: theme }, locationView('theater'), { scope: region }],
+		},
+		{
+			name: 'a Region over a Scope turned off',
+			scope: region,
+			steps: [{ scope: theme }, off, { scope: region }],
+		},
+		{
+			name: 'the next visit to the page of a Scope turned off, after a member Location',
+			scope: theme,
+			steps: [{ scope: theme }, off, locationView('theater'), { scope: theme }],
+		},
+		{
+			name: 'the next visit to the page of a Scope turned off, after a page with no view',
+			scope: theme,
+			steps: [{ scope: theme }, off, noView, { scope: theme }],
+		},
+	] satisfies Array<{ name: string; scope: MapScope; steps: Parameters<typeof browse>[0] }>)(
+		'a page that sets a Scope turns it on: $name',
+		({ scope, steps }) => {
+			expect(browse(steps)).toBe(scope);
+		},
+	);
 
 	test('a member Location keeps the Scope', () => {
 		expect(browse([{ scope: theme }, locationView('theater', 'theater-1')])).toBe(theme);
 		expect(browse([{ scope: region }, locationView('temple')])).toBe(region);
-	});
-
-	test('a Region reached from a member Location replaces the Theme', () => {
-		expect(browse([{ scope: theme }, locationView('theater'), { scope: region }])).toBe(region);
 	});
 
 	test('a Location outside the Scope clears it', () => {
@@ -96,11 +117,6 @@ describe('reduceMapScope', () => {
 		expect(browse([{ scope: region }, locationView()])).toBeUndefined();
 	});
 
-	test('a Scope turned off stays off on the page that set it and on a member Location', () => {
-		expect(browse([{ scope: theme }, off, { scope: theme }])).toBeUndefined();
-		expect(browse([{ scope: theme }, off, locationView('theater')])).toBeUndefined();
-	});
-
 	test('a Scope turned off is held through any Location, so it can be turned on again', () => {
 		const held = { isScopeEnabled: false, scope: theme };
 
@@ -114,15 +130,6 @@ describe('reduceMapScope', () => {
 		expect(
 			browseHeld([{ scope: theme }, off, locationView('temple'), on, locationView('mine')]),
 		).toEqual({ isScopeEnabled: true, scope: undefined });
-	});
-
-	test('a Scope turned off is set again by the next visit to its page', () => {
-		expect(browse([{ scope: theme }, off, locationView('theater'), { scope: theme }])).toBe(theme);
-		expect(browse([{ scope: theme }, off, noView, { scope: theme }])).toBe(theme);
-	});
-
-	test('a page that sets a Scope replaces one turned off, and its own is on', () => {
-		expect(browse([{ scope: theme }, off, { scope: region }])).toBe(region);
 	});
 
 	test('a page with no view leaves the Scope untouched', () => {

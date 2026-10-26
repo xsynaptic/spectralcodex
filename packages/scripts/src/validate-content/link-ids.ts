@@ -11,15 +11,6 @@ interface LinkIdIssue {
 	location: string;
 }
 
-export function collectLinkIdIssues(
-	entries: Array<ContentEntry>,
-	validTargets: Array<ContentEntry>,
-) {
-	const validIds = new Set(validTargets.map((entry) => entry.id));
-
-	return entries.flatMap((entry) => collectEntryLinkIdIssues(entry, validIds));
-}
-
 export function validateLinkIds(
 	entries: Array<ContentEntry>,
 	validTargets: Array<ContentEntry>,

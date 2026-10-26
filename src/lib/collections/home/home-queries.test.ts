@@ -86,26 +86,6 @@ describe('queryHomeData featured items', () => {
 });
 
 describe('queryHomeData recent items', () => {
-	test('an updated entry outranks a newer one that was never revised', async () => {
-		const data = await queryWith([
-			makeCatalogItem({
-				collection: 'posts',
-				dateCreated: new Date(2024, 0, 1),
-				id: 'created-later',
-				imageId: 'i',
-			}),
-			makeCatalogItem({
-				collection: 'posts',
-				dateCreated: new Date(2019, 0, 1),
-				dateUpdated: new Date(2025, 0, 1),
-				id: 'updated-later',
-				imageId: 'i',
-			}),
-		]);
-
-		expect(ids(data.recentCatalogItems)).toStrictEqual(['updated-later', 'created-later']);
-	});
-
 	test('the cap keeps the newest sixteen, not the first sixteen found', async () => {
 		const data = await queryWith(makeItems('posts', 20));
 

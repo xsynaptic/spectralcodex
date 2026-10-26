@@ -4,7 +4,7 @@ const chunkBytesLimitKb = 150 * 1024;
 const hilbertOrder = 16;
 const hilbertSide = 2 ** hilbertOrder;
 
-export interface ChunkInputItem {
+interface ChunkInputItem {
 	id: string;
 	lat: number;
 	lng: number;

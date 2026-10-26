@@ -4,11 +4,7 @@ import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 
 import { createCatalog } from '#lib/catalog/catalog-factory.ts';
 import { makeCatalogItem } from '#lib/catalog/catalog-test-utils.ts';
-import {
-	isEditorialEntry,
-	sortCatalogByDate,
-	sortCatalogByEntryQuality,
-} from '#lib/catalog/catalog-utils.ts';
+import { sortCatalogByDate, sortCatalogByEntryQuality } from '#lib/catalog/catalog-utils.ts';
 
 const ids = (items: ReadonlyArray<CatalogItem>) => items.map((item) => item.id);
 
@@ -83,16 +79,6 @@ describe('lookups', () => {
 		makeCatalogItem({ collection: 'posts', id: 'a', title: 'Post A' }),
 	]);
 
-	test('getCaption projects the caption shape, undefined on miss', () => {
-		expect(catalog.getCaption('a')).toEqual({
-			id: 'a',
-			title: 'Post A',
-			titleMultilingual: undefined,
-			url: '/a',
-		});
-		expect(catalog.getCaption('nope')).toBeUndefined();
-	});
-
 	test('resolve returns items in entry order, throws on miss with the id', () => {
 		expect(ids(catalog.resolve([{ collection: 'posts', id: 'a' }] as never))).toEqual(['a']);
 		expect(() => catalog.resolve([{ collection: 'posts', id: 'gone' }] as never)).toThrow(/gone/);
@@ -116,13 +102,6 @@ describe('backlinksOf', () => {
 
 	test('returns every inbound link, uncapped and unfiltered, newest first', () => {
 		expect(ids(catalog.backlinksOf('target'))).toEqual(['linker-post', 'linker-region']);
-	});
-
-	test('leaves narrowing to the caller', () => {
-		expect(ids(catalog.backlinksOf('target').filter(isEditorialEntry))).toEqual(['linker-post']);
-	});
-
-	test('returns an empty array for an unknown or backlink-free id', () => {
 		expect(catalog.backlinksOf('nope')).toEqual([]);
 		expect(catalog.backlinksOf('linker-post')).toEqual([]);
 	});

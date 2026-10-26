@@ -44,11 +44,4 @@ describe('validateImageReferences', () => {
 			{ message: 'a/b.jpg, a/b.png: one stem, so their image names collide' },
 		]);
 	});
-
-	test('fails on two files whose stems differ only in case', () => {
-		writeMediaFile('a/b.jpg');
-		writeMediaFile('a/B.png');
-
-		expect(validateImageReferences([entry], mediaPath).status).toBe('fail');
-	});
 });

@@ -15,12 +15,11 @@ const titleMultilingual: MultilingualContent = { lang: 'zh', value: '臺灣' };
 describe('isCurrentNavigationItem', () => {
 	const regions: NavigationItem = { title: 'Regions', url: '/regions/' };
 
-	test('matches the pathname exactly', () => {
-		expect(isCurrentNavigationItem(regions, '/regions/')).toBe(true);
-	});
-
-	test('an ancestor of the current page is not current', () => {
-		expect(isCurrentNavigationItem(regions, '/regions/taiwan/')).toBe(false);
+	test.each([
+		['/regions/', true],
+		['/regions/taiwan/', false],
+	])('on %s the item is current: %s, since an ancestor never is', (pathname, expected) => {
+		expect(isCurrentNavigationItem(regions, pathname)).toBe(expected);
 	});
 
 	test('an item with no url is never current', () => {
@@ -43,26 +42,47 @@ describe('isActiveNavigationItem', () => {
 		url: '/regions/',
 	};
 
-	test('an ancestor of the current page is active', () => {
-		expect(isActiveNavigationItem(tree, '/regions/taiwan/taipei/')).toBe(true);
-	});
+	const posts: NavigationItem = { title: 'Posts', url: '/posts/' };
 
-	test('one active child is enough, even among quiet siblings', () => {
-		const regions = tree.children![0]!;
-
-		expect(isActiveNavigationItem(tree.children![1]!, '/regions/taiwan/taipei/')).toBe(true);
-		expect(isActiveNavigationItem(regions, '/regions/taiwan/taipei/')).toBe(false);
-	});
-
-	test('a branch holding nothing current is not active', () => {
-		expect(isActiveNavigationItem(tree, '/posts/')).toBe(false);
-	});
-
-	test('a childless item is active only when it is current', () => {
-		const posts: NavigationItem = { title: 'Posts', url: '/posts/' };
-
-		expect(isActiveNavigationItem(posts, '/posts/')).toBe(true);
-		expect(isActiveNavigationItem(posts, '/regions/')).toBe(false);
+	test.each([
+		{
+			expected: true,
+			item: tree,
+			label: 'an ancestor of the current page is active',
+			pathname: '/regions/taiwan/taipei/',
+		},
+		{
+			expected: true,
+			item: tree.children![1]!,
+			label: 'one active child is enough to make a branch active',
+			pathname: '/regions/taiwan/taipei/',
+		},
+		{
+			expected: false,
+			item: tree.children![0]!,
+			label: 'a quiet sibling is not active',
+			pathname: '/regions/taiwan/taipei/',
+		},
+		{
+			expected: false,
+			item: tree,
+			label: 'a branch holding nothing current is not active',
+			pathname: '/posts/',
+		},
+		{
+			expected: true,
+			item: posts,
+			label: 'a childless item is active when it is current',
+			pathname: '/posts/',
+		},
+		{
+			expected: false,
+			item: posts,
+			label: 'a childless item is not active elsewhere',
+			pathname: '/regions/',
+		},
+	])('$label', ({ expected, item, pathname }) => {
+		expect(isActiveNavigationItem(item, pathname)).toBe(expected);
 	});
 });
 

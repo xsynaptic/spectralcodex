@@ -93,22 +93,6 @@ describe('createHierarchy adjacency', () => {
 describe('createHierarchy containment queries', () => {
 	const tree = createHierarchy(nodes);
 
-	test('isDescendantOf reflects subtree containment', () => {
-		expect(tree.isDescendantOf('taipei', 'taiwan')).toBe(true);
-		expect(tree.isDescendantOf('taipei', 'north')).toBe(true);
-		expect(tree.isDescendantOf('south', 'north')).toBe(false);
-		expect(tree.isDescendantOf('taiwan', 'canada')).toBe(false);
-		expect(tree.isDescendantOf('nope', 'taiwan')).toBe(false);
-		expect(tree.isDescendantOf('taipei', 'nope')).toBe(false); // unknown ancestor, not a throw
-	});
-
-	test('isDescendantOf is inclusive at both ends of the interval', () => {
-		expect(tree.isDescendantOf('taiwan', 'taiwan')).toBe(true); // sits on its own left bound
-		expect(tree.isDescendantOf('south', 'taiwan')).toBe(true); // last descendant, nearest the right bound
-		expect(tree.isDescendantOf('taiwan', 'north')).toBe(false); // ordinal below the interval
-		expect(tree.isDescendantOf('south', 'taipei')).toBe(false); // ordinal above the interval
-	});
-
 	test('commonAncestorOf returns the deepest spanning region', () => {
 		expect(tree.commonAncestorOf(['taipei', 'south'])).toBe('taiwan');
 		expect(tree.commonAncestorOf(['taipei', 'north'])).toBe('north');

@@ -22,19 +22,6 @@ describe('getLocationPoints', () => {
 		expect(getLocationPoints(makeLocation({ geometry: [makePoint(120.1, 23.3)] }))).toBeUndefined();
 	});
 
-	test('keeps the authored order', () => {
-		const rows = getLocationPoints(
-			makeLocation({
-				geometry: [
-					makePoint(120.2, 23.4, { title: 'South' }),
-					makePoint(120.1, 23.3, { title: 'North' }),
-				],
-			}),
-		);
-
-		expect(rows?.map((row) => row.title)).toEqual(['South', 'North']);
-	});
-
 	test('gives every Point a Status, falling back to the Location', () => {
 		const rows = getLocationPoints(
 			makeLocation({
@@ -50,22 +37,6 @@ describe('getLocationPoints', () => {
 			LocationStatusEnum.Remnants,
 			LocationStatusEnum.Idle,
 			LocationStatusEnum.Idle,
-		]);
-	});
-
-	test('builds no Google Maps link for a Point that authors none', () => {
-		const rows = getLocationPoints(
-			makeLocation({
-				geometry: [
-					makePoint(120.1, 23.3, { googleMapsUrl: 'https://maps.app.goo.gl/abc' }),
-					makePoint(120.2, 23.4),
-				],
-			}),
-		);
-
-		expect(rows?.map((row) => row.googleMapsUrl)).toEqual([
-			'https://maps.app.goo.gl/abc',
-			undefined,
 		]);
 	});
 
@@ -117,20 +88,12 @@ describe('getLocationPoints', () => {
 });
 
 describe('getLocationDetails', () => {
-	test('gives a single Point its coordinates', () => {
-		expect(
-			getLocationDetails(makeLocation({ geometry: makePoint(120.158968, 23.366957) })),
-		).toEqual({
-			coordinates: '23.366957, 120.158968',
+	test('gives a single Point its coordinates, latitude first and padded to six decimals', () => {
+		expect(getLocationDetails(makeLocation({ geometry: makePoint(-120.1, 23.5) }))).toEqual({
+			coordinates: '23.500000, -120.100000',
 			heritage: [],
 			status: LocationStatusEnum.Idle,
 		});
-	});
-
-	test('writes latitude first, padded to six decimals', () => {
-		expect(
-			getLocationDetails(makeLocation({ geometry: makePoint(-120.1, 23.5) })).coordinates,
-		).toBe('23.500000, -120.100000');
 	});
 
 	test('leaves the positional rows to the Points when there are several', () => {

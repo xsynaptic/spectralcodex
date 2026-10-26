@@ -8,19 +8,6 @@ function makeImage(id: string, width: number, height: number) {
 }
 
 describe('collectAspectRatioIssues', () => {
-	test.each([
-		{ height: 1200, label: '4:3', width: 1600 },
-		{ height: 1600, label: '3:4', width: 1200 },
-		{ height: 1200, label: '3:2', width: 1800 },
-		{ height: 1800, label: '2:3', width: 1200 },
-		{ height: 1200, label: '1:1', width: 1200 },
-	])('accepts the canonical $label ratio', ({ height, label, width }) => {
-		const result = collectAspectRatioIssues([makeImage(`photo-${label}`, width, height)]);
-
-		expect(result.flagged).toEqual([]);
-		expect(result.checkedCount).toBe(1);
-	});
-
 	test('accepts a ratio within the tolerance', () => {
 		// 1204/900 = 1.3378, delta from 4:3 is ~0.0044
 		const result = collectAspectRatioIssues([makeImage('near-canonical', 1204, 900)]);

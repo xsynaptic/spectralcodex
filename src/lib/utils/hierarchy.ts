@@ -5,14 +5,10 @@ export interface Hierarchy {
 	childrenOf(id: string): ReadonlyArray<string>;
 	// Deepest node whose subtree spans every id (self-inclusive); undefined if they share no root
 	commonAncestorOf(ids: Array<string>): string | undefined;
-	depthOf(id: string): number;
 	// Preorder, self-exclusive
 	descendantsOf(id: string): ReadonlyArray<string>;
-	has(id: string): boolean;
 	// Containment interval per node; a region map filters with its own interval
 	intervalById: ReadonlyMap<string, [number, number]>;
-	// Interval containment; self-inclusive (a node is within its own interval)
-	isDescendantOf(id: string, ancestorId: string): boolean;
 	// Preorder ordinal per node; region membership on a map reads this
 	ordinalById: ReadonlyMap<string, number>;
 	parentOf(id: string): string | undefined;
@@ -25,7 +21,7 @@ export interface Hierarchy {
  * Generic, dependency-free hierarchy index over a flat node list (parent adjacency)
  * A single depth-first walk yields:
  * - adjacency indexes (parent/children/ancestors)
- * - nested-set numbering (ordinal + [left, right] interval + depth)
+ * - nested-set numbering (ordinal + [left, right] interval)
  */
 export interface HierarchyNode {
 	id: string;
@@ -37,10 +33,7 @@ const byId = (idA: string, idB: string): number => idA.localeCompare(idB);
 export function createHierarchy(nodes: Array<HierarchyNode>): Hierarchy {
 	const idSet = new Set(nodes.map((node) => node.id));
 	const { childrenByParent, parentById, roots } = indexAdjacency(nodes, idSet);
-	const { depthById, descendantsById, intervalById, ordinalById } = numberNestedSets(
-		roots,
-		childrenByParent,
-	);
+	const { descendantsById, intervalById, ordinalById } = numberNestedSets(roots, childrenByParent);
 
 	function ancestorsOf(id: string): Array<string> {
 		const ancestors: Array<string> = [];
@@ -60,14 +53,6 @@ export function createHierarchy(nodes: Array<HierarchyNode>): Hierarchy {
 		const group = parent === undefined ? roots : (childrenByParent.get(parent) ?? []);
 
 		return group.filter((siblingId) => siblingId !== id);
-	}
-
-	function isDescendantOf(id: string, ancestorId: string): boolean {
-		const interval = intervalById.get(ancestorId);
-		const ordinal = ordinalById.get(id);
-
-		if (!interval || ordinal === undefined) return false;
-		return ordinal >= interval[0] && ordinal <= interval[1];
 	}
 
 	function commonAncestorOf(ids: Array<string>): string | undefined {
@@ -92,11 +77,8 @@ export function createHierarchy(nodes: Array<HierarchyNode>): Hierarchy {
 		ancestorsOf,
 		childrenOf: (id) => childrenByParent.get(id) ?? [],
 		commonAncestorOf,
-		depthOf: (id) => depthById.get(id) ?? 0,
 		descendantsOf: (id) => descendantsById.get(id) ?? [],
-		has: (id) => idSet.has(id),
 		intervalById,
-		isDescendantOf,
 		ordinalById,
 		parentOf: (id) => parentById.get(id),
 		roots,
@@ -144,13 +126,12 @@ function numberNestedSets(
 ) {
 	const ordinalById = new Map<string, number>();
 	const intervalById = new Map<string, [number, number]>();
-	const depthById = new Map<string, number>();
 	const descendantsById = new Map<string, Array<string>>();
 	const visited = new Set<string>();
 
 	let counter = 1;
 
-	function visit(id: string, depth: number): Array<string> {
+	function visit(id: string): Array<string> {
 		if (visited.has(id)) return []; // Defensive against malformed cycles
 
 		visited.add(id);
@@ -159,13 +140,12 @@ function numberNestedSets(
 
 		counter += 1;
 		ordinalById.set(id, left);
-		depthById.set(id, depth);
 
 		const descendants: Array<string> = [];
 		const children = childrenByParent.get(id) ?? [];
 
 		for (const childId of children) {
-			descendants.push(childId, ...visit(childId, depth + 1));
+			descendants.push(childId, ...visit(childId));
 		}
 		descendantsById.set(id, descendants);
 
@@ -178,8 +158,8 @@ function numberNestedSets(
 	}
 
 	for (const rootId of roots) {
-		visit(rootId, 0);
+		visit(rootId);
 	}
 
-	return { depthById, descendantsById, intervalById, ordinalById };
+	return { descendantsById, intervalById, ordinalById };
 }

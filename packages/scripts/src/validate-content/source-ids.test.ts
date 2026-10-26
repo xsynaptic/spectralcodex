@@ -6,12 +6,6 @@ import { makeEntry } from '#validate-content/validate-test-utils.ts';
 const resourceEntries = [makeEntry({ id: 'existing-resource' })];
 
 describe('collectSourceIdIssues', () => {
-	test('accepts a source id that names a known resource', () => {
-		const entries = [makeEntry({ data: { sources: ['existing-resource'] }, id: 'a-location' })];
-
-		expect(collectSourceIdIssues(entries, resourceEntries)).toEqual([]);
-	});
-
 	test('flags a dangling source id with its location', () => {
 		const entries = [
 			makeEntry({
@@ -26,22 +20,16 @@ describe('collectSourceIdIssues', () => {
 		]);
 	});
 
-	test('skips inline sources, which have no resource entry to name', () => {
-		const entries = [
-			makeEntry({
-				data: { sources: [{ resourceType: 'report', title: 'An uncatalogued report' }] },
-				id: 'a-location',
-			}),
-		];
-
-		expect(collectSourceIdIssues(entries, resourceEntries)).toEqual([]);
-	});
-
-	test('collects every broken id across a mixed sources array', () => {
+	test('collects every broken id across a mixed sources array, skipping known ids and inline sources', () => {
 		const entries = [
 			makeEntry({
 				data: {
-					sources: ['missing-one', { title: 'Inline' }, 'existing-resource', 'missing-two'],
+					sources: [
+						'missing-one',
+						{ resourceType: 'report', title: 'An uncatalogued report' },
+						'existing-resource',
+						'missing-two',
+					],
 				},
 				id: 'a-location',
 			}),

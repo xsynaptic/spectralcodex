@@ -3,7 +3,6 @@ import { describe, expect, test } from 'vitest';
 import {
 	getPreferredSheetRest,
 	getSheetDragLine,
-	getSheetFold,
 	getSheetReleaseRest,
 	getSheetRests,
 	getSheetSlide,
@@ -17,27 +16,21 @@ const lines = { half: 320, lowered: 776, raised: 0 };
 const viewportHeight = 800;
 
 describe('getSheetDragLine', () => {
-	test('a raised sheet follows the pointer down and never rises past its own top', () => {
-		expect(getSheetDragLine({ deltaY: 300, from: 'raised', lines })).toBe(300);
-		expect(getSheetDragLine({ deltaY: -40, from: 'raised', lines })).toBe(0);
-	});
-
-	test('a half sheet moves both ways from the split', () => {
-		expect(getSheetDragLine({ deltaY: -200, from: 'half', lines })).toBe(120);
-		expect(getSheetDragLine({ deltaY: 200, from: 'half', lines })).toBe(520);
-		expect(getSheetDragLine({ deltaY: -900, from: 'half', lines })).toBe(0);
-	});
-
-	test('no sheet is pushed below where a lowered one rests', () => {
-		expect(getSheetDragLine({ deltaY: 5000, from: 'raised', lines })).toBe(776);
-		expect(getSheetDragLine({ deltaY: 900, from: 'half', lines })).toBe(776);
-		expect(getSheetDragLine({ deltaY: 60, from: 'lowered', lines })).toBe(776);
-	});
-
-	test('a lowered sheet follows the pointer up from where it rests', () => {
-		expect(getSheetDragLine({ deltaY: -200, from: 'lowered', lines })).toBe(576);
-		expect(getSheetDragLine({ deltaY: -2000, from: 'lowered', lines })).toBe(0);
-	});
+	test.each([
+		['raised', 300, 300],
+		['raised', -40, 0],
+		['raised', 5000, 776],
+		['half', -200, 120],
+		['half', 200, 520],
+		['lowered', 60, 776],
+		['lowered', -200, 576],
+		['lowered', -2000, 0],
+	] as const)(
+		'a %s sheet dragged %i follows the pointer to %i, between the raised and lowered lines',
+		(from, deltaY, expected) => {
+			expect(getSheetDragLine({ deltaY, from, lines })).toBe(expected);
+		},
+	);
 });
 
 describe('getSheetReleaseRest', () => {
@@ -57,6 +50,9 @@ describe('getSheetReleaseRest', () => {
 		expect(getRest('half', 320 + 160)).toBe('lowered');
 		expect(getRest('lowered', 776 - 159)).toBe('lowered');
 		expect(getRest('lowered', 776 - 160)).toBe('half');
+		expect(getRest('lowered', getSheetDragLine({ deltaY: 400, from: 'lowered', lines }))).toBe(
+			'lowered',
+		);
 	});
 
 	test('a long pull skips half for the rest nearer the release point', () => {
@@ -79,23 +75,12 @@ describe('getSheetReleaseRest', () => {
 		expect(getRest('lowered', 776 - 160, twoRests)).toBe('raised');
 	});
 
-	test('a drag pushed against the clamp stays, having travelled nowhere', () => {
-		expect(getRest('lowered', getSheetDragLine({ deltaY: 400, from: 'lowered', lines }))).toBe(
-			'lowered',
-		);
-	});
-
-	test('a press released inside the tolerance is a tap, whatever line it ended on', () => {
+	test('a tap or a cancelled pointer ignores the line it ended on', () => {
 		const tap = { ...drag, kind: 'tap', linePx: 600 } as const;
 
 		expect(getSheetReleaseRest({ ...tap, from: 'half' })).toBe('lowered');
 		expect(getSheetReleaseRest({ ...tap, from: 'lowered', preferred: 'raised' })).toBe('raised');
-	});
-
-	test('a cancelled pointer stays whatever it did', () => {
-		expect(getSheetReleaseRest({ ...drag, from: 'raised', kind: 'cancel', linePx: 600 })).toBe(
-			'raised',
-		);
+		expect(getSheetReleaseRest({ ...tap, from: 'raised', kind: 'cancel' })).toBe('raised');
 	});
 });
 
@@ -104,30 +89,18 @@ describe('the frame a moving sheet draws', () => {
 	const scrollMaxY = 2000;
 	const slide = { foldPx: scrollY, lines, scrollMaxY, scrollY };
 
-	test('a grab clips the pane where the rest line already cut it', () => {
-		expect(getSheetFold({ linePx: lines.raised, paneTop: -scrollY })).toBe(scrollY);
-		expect(getSheetFold({ linePx: lines.half, paneTop: lines.half - scrollY })).toBe(scrollY);
-		expect(getSheetFold({ linePx: lines.half, paneTop: lines.half })).toBe(0);
-	});
-
-	test('a pane above its rest line folds nothing', () => {
-		expect(getSheetFold({ linePx: lines.half, paneTop: lines.half + 40 })).toBe(0);
-	});
-
-	test('a grab moves nothing: the pane starts untranslated at every rest but lowered', () => {
-		expect(getSheetTranslate({ from: 'raised', linePx: lines.raised, lines })).toBe(0);
-		expect(getSheetTranslate({ from: 'half', linePx: lines.half, lines })).toBe(0);
-		expect(getSheetTranslate({ from: 'lowered', linePx: lines.lowered, lines })).toBe(
-			lines.lowered,
-		);
-	});
-
-	test('a half sheet travels from the split, so its range is shorter by its margin', () => {
-		expect(getSheetTranslate({ from: 'half', linePx: lines.raised, lines })).toBe(-lines.half);
-		expect(getSheetTranslate({ from: 'half', linePx: lines.lowered, lines })).toBe(
-			lines.lowered - lines.half,
-		);
-	});
+	test.each([
+		['raised', lines.raised, 0],
+		['half', lines.half, 0],
+		['lowered', lines.lowered, lines.lowered],
+		['half', lines.raised, -lines.half],
+		['half', lines.lowered, lines.lowered - lines.half],
+	] as const)(
+		'a %s sheet at line %i translates %i, a half sheet travelling from the split',
+		(from, linePx, expected) => {
+			expect(getSheetTranslate({ from, linePx, lines })).toBe(expected);
+		},
+	);
 
 	test('a slide ends where the rest it lands on draws the pane', () => {
 		expect(getSheetSlide({ ...slide, from: 'raised', to: 'lowered' })).toEqual({
@@ -168,74 +141,66 @@ describe('the frame a moving sheet draws', () => {
 });
 
 describe('getSheetTapRest', () => {
-	test('a tap hides the page from either open rest', () => {
-		expect(getSheetTapRest({ from: 'raised', preferred: 'half' })).toBe('lowered');
-		expect(getSheetTapRest({ from: 'half', preferred: 'raised' })).toBe('lowered');
-	});
-
-	test('a tap on a lowered sheet shows the page at the preferred rest', () => {
-		expect(getSheetTapRest({ from: 'lowered', preferred: 'half' })).toBe('half');
-		expect(getSheetTapRest({ from: 'lowered', preferred: 'raised' })).toBe('raised');
+	test.each([
+		['raised', 'half', 'lowered'],
+		['half', 'raised', 'lowered'],
+		['lowered', 'half', 'half'],
+		['lowered', 'raised', 'raised'],
+	] as const)('a tap on a %s sheet, preferring %s, rests at %s', (from, preferred, expected) => {
+		expect(getSheetTapRest({ from, preferred })).toBe(expected);
 	});
 });
 
 describe('getSheetStepRest', () => {
 	const rests = getSheetRests(true);
 
-	test('an arrow key steps one rest, so the keyboard reaches the open rest a tap skips', () => {
-		expect(getSheetStepRest({ direction: 'up', from: 'lowered', rests })).toBe('half');
-		expect(getSheetStepRest({ direction: 'up', from: 'half', rests })).toBe('raised');
-		expect(getSheetStepRest({ direction: 'down', from: 'raised', rests })).toBe('half');
-		expect(getSheetStepRest({ direction: 'down', from: 'half', rests })).toBe('lowered');
-	});
+	test.each([
+		{ direction: 'up', expected: 'half', from: 'lowered', hasHalf: true },
+		{ direction: 'up', expected: 'raised', from: 'half', hasHalf: true },
+		{ direction: 'down', expected: 'half', from: 'raised', hasHalf: true },
+		{ direction: 'down', expected: 'lowered', from: 'half', hasHalf: true },
+		{ direction: 'up', expected: 'raised', from: 'lowered', hasHalf: false },
+		{ direction: 'down', expected: 'lowered', from: 'raised', hasHalf: false },
+	] as const)(
+		'an arrow key $direction from $from (half rest: $hasHalf) steps one rest to $expected',
+		({ direction, expected, from, hasHalf }) => {
+			expect(getSheetStepRest({ direction, from, rests: getSheetRests(hasHalf) })).toBe(expected);
+		},
+	);
 
 	test('a step past either end stays', () => {
 		expect(getSheetStepRest({ direction: 'up', from: 'raised', rests })).toBe('raised');
 		expect(getSheetStepRest({ direction: 'down', from: 'lowered', rests })).toBe('lowered');
 	});
-
-	test('without the half rest a step crosses to the other rest', () => {
-		const twoRests = getSheetRests(false);
-
-		expect(getSheetStepRest({ direction: 'up', from: 'lowered', rests: twoRests })).toBe('raised');
-		expect(getSheetStepRest({ direction: 'down', from: 'raised', rests: twoRests })).toBe(
-			'lowered',
-		);
-	});
 });
 
 describe('getPreferredSheetRest', () => {
-	test('a stored open rest decides every arrival', () => {
-		expect(getPreferredSheetRest({ hasHalf: true, stored: 'raised' })).toBe('raised');
-		expect(getPreferredSheetRest({ hasHalf: true, stored: 'half' })).toBe('half');
-	});
-
-	test('with nothing usable stored every arrival is half', () => {
-		expect(getPreferredSheetRest({ hasHalf: true, stored: undefined })).toBe('half');
-		expect(getPreferredSheetRest({ hasHalf: true, stored: 'lowered' })).toBe('half');
-	});
-
-	test('where the height gate fails every arrival is raised', () => {
-		expect(getPreferredSheetRest({ hasHalf: false, stored: 'half' })).toBe('raised');
-		expect(getPreferredSheetRest({ hasHalf: false, stored: undefined })).toBe('raised');
-	});
+	test.each([
+		[true, 'raised', 'raised'],
+		[true, 'half', 'half'],
+		[true, undefined, 'half'],
+		[true, 'lowered', 'half'],
+		[false, 'half', 'raised'],
+		[false, undefined, 'raised'],
+	] as const)(
+		'with the half rest %s and %s stored, every arrival is %s',
+		(hasHalf, stored, expected) => {
+			expect(getPreferredSheetRest({ hasHalf, stored })).toBe(expected);
+		},
+	);
 });
 
 describe('isSheetArrivalAtStart', () => {
 	const arrival = { hasHash: false, navigationType: 'push', rest: 'half', scrollY: 0 } as const;
 
-	test('a fresh arrival at half starts at the split', () => {
-		expect(isSheetArrivalAtStart(arrival)).toBe(true);
-	});
-
-	test('a place the reader or the address already chose is left alone', () => {
-		expect(isSheetArrivalAtStart({ ...arrival, navigationType: 'traverse' })).toBe(false);
-		expect(isSheetArrivalAtStart({ ...arrival, hasHash: true })).toBe(false);
-		expect(isSheetArrivalAtStart({ ...arrival, scrollY: 300 })).toBe(false);
-	});
-
-	test('only a half sheet has a split to start at', () => {
-		expect(isSheetArrivalAtStart({ ...arrival, rest: 'raised' })).toBe(false);
-		expect(isSheetArrivalAtStart({ ...arrival, rest: 'lowered' })).toBe(false);
+	test.each([
+		['a fresh arrival at half', true, {}],
+		['a traversal', false, { navigationType: 'traverse' }],
+		['an address with a hash', false, { hasHash: true }],
+		['a page already scrolled', false, { scrollY: 300 }],
+		['a raised sheet', false, { rest: 'raised' }],
+		['a lowered sheet', false, { rest: 'lowered' }],
+	] as const)('%s starts at the split: %s', (_label, expected, overrides) => {
+		expect(isSheetArrivalAtStart({ ...arrival, ...overrides })).toBe(expected);
 	});
 });

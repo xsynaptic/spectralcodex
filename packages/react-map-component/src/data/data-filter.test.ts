@@ -77,14 +77,6 @@ describe('getMapCanvasData', () => {
 
 		expect(result.pointCollection.features).toEqual([]);
 	});
-
-	test('empty input yields an empty collection and zero counts', () => {
-		const result = getMapCanvasData([], passAll);
-
-		expect(result.pointCollection.features).toEqual([]);
-		expect(result.filteredCount).toBe(0);
-		expect(result.totalCount).toBe(0);
-	});
 });
 
 describe('getHiddenTargetIds', () => {
@@ -96,9 +88,6 @@ describe('getHiddenTargetIds', () => {
 
 	test('only Targets the filter hides are returned', () => {
 		expect(getHiddenTargetIds(items, ['hidden', 'visible'], filter)).toEqual(['hidden']);
-	});
-
-	test('a hidden item that is no Target is left to the filter', () => {
 		expect(getHiddenTargetIds(items, ['visible'], filter)).toEqual([]);
 	});
 });

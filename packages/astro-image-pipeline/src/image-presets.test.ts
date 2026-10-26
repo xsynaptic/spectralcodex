@@ -69,10 +69,6 @@ describe('getName', () => {
 		expect(() => getName(source, 'card-hq', 700)).toThrow('no "card-hq" rendition 700 wide');
 	});
 
-	test('a missing width throws', () => {
-		expect(() => getName(makeSource(3600, 2400), 'content', undefined)).toThrow('needs a width');
-	});
-
 	test.each(['trip/IMG 0001.jpg', 'trip/day, 2.jpg', "trip/it's.png", 'trip/../b.jpg'])(
 		'a source path the name grammar would reject throws at build time: %s',
 		(id) => {

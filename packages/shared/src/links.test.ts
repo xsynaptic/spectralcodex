@@ -16,23 +16,11 @@ describe('getLinkUrls', () => {
 });
 
 describe('isLinkUrlMatch', () => {
-	test('matches a string pattern anywhere in the url', () => {
-		expect(isLinkUrlMatch('https://www.taipeitimes.com/News/feat/12345', 'taipeitimes.com')).toBe(
-			true,
-		);
-	});
-
-	test('matches when one pattern of an array hits', () => {
-		expect(
-			isLinkUrlMatch('https://nchdb.boch.gov.tw/assets/overview/123', [
-				'bunka.go.jp',
-				'boch.gov.tw',
-			]),
-		).toBe(true);
-	});
-
-	test('does not match an absent pattern or an empty array', () => {
-		expect(isLinkUrlMatch('https://example.com', undefined)).toBe(false);
-		expect(isLinkUrlMatch('https://example.com', [])).toBe(false);
+	test.each<[string, Parameters<typeof isLinkUrlMatch>[1], boolean]>([
+		['https://www.taipeitimes.com/News/feat/12345', 'taipeitimes.com', true],
+		['https://nchdb.boch.gov.tw/assets/overview/123', ['bunka.go.jp', 'boch.gov.tw'], true],
+		['https://example.com', undefined, false],
+	])('%s against %j matches: %s', (linkUrl, matchPattern, isMatch) => {
+		expect(isLinkUrlMatch(linkUrl, matchPattern)).toBe(isMatch);
 	});
 });

@@ -23,11 +23,8 @@ describe('resolveEntry', () => {
 		return resolveEntry({ chronologyImageIndex, contentEntries, filename, indexEntries });
 	}
 
-	test('content entries win first', () => {
+	test('looks up content entries, then index entries', () => {
 		expect(resolve('a-post')).toBe(contentEntry);
-	});
-
-	test('falls through to index entries', () => {
 		expect(resolve('index-posts')).toBe(indexEntry);
 	});
 

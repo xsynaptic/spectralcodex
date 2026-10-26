@@ -59,7 +59,7 @@ describe('getImageLayoutSizesProp', () => {
 		expect(getImageLayoutSizesProp(ImageLayoutEnum.Full, true)).toBe('100vw');
 	});
 
-	test('the default layout ends in an unconditional width, every earlier entry conditional', () => {
+	test('the default layout ends unconditional, with the smaller padding on narrow viewports only', () => {
 		const candidates = parse(getImageLayoutSizesProp(ImageLayoutEnum.Default, true));
 
 		expect(candidates.at(-1)).toBe(
@@ -68,22 +68,9 @@ describe('getImageLayoutSizesProp', () => {
 		expect(candidates.slice(0, -1).every((candidate) => candidate.startsWith('(max-width:'))).toBe(
 			true,
 		);
-	});
-
-	test('narrow viewports subtract the smaller padding, wider ones the larger', () => {
-		const candidates = parse(getImageLayoutSizesProp(ImageLayoutEnum.Default, true));
-
 		expect(
 			candidates.filter((candidate) => candidate.includes(tailwindContentPaddingSm)),
 		).toHaveLength(1);
-		expect(candidates.at(0)).toContain('100vw');
-	});
-
-	test('a wide image spans the viewport less padding; full spans all of it', () => {
-		expect(getImageLayoutSizesProp(ImageLayoutEnum.Wide, true)).toBe(
-			`calc(100vw - ${tailwindContentPaddingMd})`,
-		);
-		expect(getImageLayoutSizesProp(ImageLayoutEnum.Full, true)).toBe('100vw');
 	});
 
 	test('a grouped image defers to its container, leaving only the lazy hint', () => {

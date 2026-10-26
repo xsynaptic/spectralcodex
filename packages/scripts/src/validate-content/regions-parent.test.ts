@@ -4,10 +4,11 @@ import { collectRegionsParentsIssues } from '#validate-content/regions-parent.ts
 import { makeEntry } from '#validate-content/validate-test-utils.ts';
 
 describe('collectRegionsParentsIssues', () => {
-	test('accepts valid parents and entries without a parent', () => {
+	test('accepts a valid deep chain and entries without a parent', () => {
 		const entries = [
 			makeEntry({ id: 'taiwan' }),
 			makeEntry({ data: { parent: 'taiwan' }, id: 'taipei' }),
+			makeEntry({ data: { parent: 'taipei' }, id: 'datong' }),
 		];
 
 		expect(collectRegionsParentsIssues(entries)).toEqual([]);
@@ -49,15 +50,5 @@ describe('collectRegionsParentsIssues', () => {
 		expect(collectRegionsParentsIssues(entries)).toEqual([
 			{ chain: ['one', 'two', 'three', 'one'], location: 'one', reason: 'cycle' },
 		]);
-	});
-
-	test('does not report a valid deep chain as a cycle', () => {
-		const entries = [
-			makeEntry({ id: 'taiwan' }),
-			makeEntry({ data: { parent: 'taiwan' }, id: 'taipei' }),
-			makeEntry({ data: { parent: 'taipei' }, id: 'datong' }),
-		];
-
-		expect(collectRegionsParentsIssues(entries)).toEqual([]);
 	});
 });

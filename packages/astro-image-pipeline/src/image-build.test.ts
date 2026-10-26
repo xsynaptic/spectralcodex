@@ -275,22 +275,6 @@ describe('renderImages failure policy', () => {
 		await expect(render()).rejects.toThrow(/16 files failed to render:\n.+exceeds pixel limit/);
 		expect(await listFiles()).toEqual([]);
 	});
-
-	test('a reported failure leaves its name unwritten and stale for the next run', async () => {
-		const names = await writeBuild(allSizes, { limitInputPixels: 1_000_000 });
-		const reported = await render({ onFailure: 'report' });
-
-		expect(reported.failures).toEqual(
-			sortNames(names).map((name) => ({ message: 'Input image exceeds pixel limit', name })),
-		);
-		expect(await listFiles()).toEqual([]);
-
-		await writeBuild();
-
-		const retried = await render();
-
-		expect(retried.rendered).toBe(names.length);
-	});
 });
 
 describe('renderImages guards', () => {

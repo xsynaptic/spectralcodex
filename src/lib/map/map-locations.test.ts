@@ -20,15 +20,6 @@ function makeLocation(id: string, data: Record<string, unknown> & { title: strin
 }
 
 describe('getLocationFeatureIds', () => {
-	test('uses the entry id for a single-geometry location', () => {
-		const entry = makeLocation('longshan-temple', {
-			geometry: makePoint(121.5, 25),
-			title: 'Longshan Temple',
-		});
-
-		expect(getLocationFeatureIds(entry)).toEqual(['longshan-temple']);
-	});
-
 	test('uses the override id that the page url uses', () => {
 		const entry = makeLocation('wanhua-longshan-temple', {
 			geometry: makePoint(121.5, 25),
@@ -48,57 +39,18 @@ describe('getLocationFeatureIds', () => {
 		expect(getLocationFeatureIds(entry)).toEqual(['bopiliao:0', 'bopiliao:1', 'bopiliao:2']);
 	});
 
-	test('does not suffix a geometry array of one', () => {
-		const entry = makeLocation('bopiliao', {
-			geometry: [makePoint(121.5, 25)],
-			title: 'Bopiliao',
-		});
+	test.each([
+		['a single geometry', makePoint(121.5, 25)],
+		['a geometry array of one', [makePoint(121.5, 25)]],
+	])('does not suffix %s', (_label, geometry) => {
+		const entry = makeLocation('bopiliao', { geometry, title: 'Bopiliao' });
 
 		expect(getLocationFeatureIds(entry)).toEqual(['bopiliao']);
 	});
 });
 
 describe('getLocationFeatures', () => {
-	test('returns nothing for an empty input', () => {
-		expect(getLocationFeatures([])).toEqual([]);
-	});
-
-	test('builds one feature per single-geometry location', () => {
-		const result = getLocationFeatures([
-			makeLocation('longshan-temple', {
-				geometry: makePoint(121.5, 25),
-				title: 'Longshan Temple',
-			}),
-		]);
-
-		expect(result).toHaveLength(1);
-		expect(result[0]?.id).toBe('longshan-temple');
-		expect(result[0]?.geometry).toEqual({ coordinates: [121.5, 25], type: 'Point' });
-		expect(result[0]?.properties.title).toBe('Longshan Temple');
-	});
-
-	test('builds one feature per point, each titled by its Location', () => {
-		const result = getLocationFeatures([
-			makeLocation('bopiliao', {
-				geometry: [
-					makePoint(121.5, 25, { title: 'North Block', title_zh: '北街' }),
-					makePoint(121.51, 25.01, { title: 'South Block' }),
-				],
-				title: 'Bopiliao',
-				title_zh: '剝皮寮',
-			}),
-		]);
-
-		expect(result.map((feature) => feature.id)).toEqual(['bopiliao:0', 'bopiliao:1']);
-		expect(
-			result.map(({ properties }) => [properties.title, properties.titleMultilingualValue]),
-		).toEqual([
-			['Bopiliao', '剝皮寮'],
-			['Bopiliao', '剝皮寮'],
-		]);
-	});
-
-	test('each Point of a Location with several carries its own title and Multilingual Title', () => {
+	test('each Point of a Location with several carries its Location title beside its own', () => {
 		const result = getLocationFeatures([
 			makeLocation('bopiliao', {
 				geometry: [
@@ -117,15 +69,17 @@ describe('getLocationFeatures', () => {
 
 		expect(
 			result.map(({ properties }) => [
+				properties.title,
+				properties.titleMultilingualValue,
 				properties.ownTitle,
 				properties.ownTitleMultilingualLang,
 				properties.ownTitleMultilingualValue,
 			]),
 		).toEqual([
-			['North Block', 'zh', '北街'],
-			['South Block', undefined, undefined],
-			[undefined, undefined, undefined],
-			[undefined, undefined, undefined],
+			['Bopiliao', '剝皮寮', 'North Block', 'zh', '北街'],
+			['Bopiliao', '剝皮寮', 'South Block', undefined, undefined],
+			['Bopiliao', '剝皮寮', undefined, undefined, undefined],
+			['Longshan Temple', undefined, undefined, undefined, undefined],
 		]);
 	});
 
@@ -172,6 +126,7 @@ describe('getLocationFeatures properties', () => {
 
 		const properties = result[0]?.properties;
 
+		expect(result[0]?.geometry).toEqual({ coordinates: [121.5, 25], type: 'Point' });
 		expect(properties?.url).toBe('/locations/longshan-temple/');
 		expect(properties?.googleMapsUrl).toBe('https://maps.app.goo.gl/xYz123');
 		expect(properties?.wikipediaUrl).toBe('https://en.wikipedia.org/wiki/Longshan_Temple');
@@ -190,25 +145,6 @@ describe('getLocationFeatures properties', () => {
 
 		expect(properties?.description).toBe('Point description');
 		expect(properties?.precision).toBe(2);
-	});
-
-	test('omits the image when a point nulls the entry thumbnail', () => {
-		const thumbnail = [{ path: 'thumb-350x233.webp', width: 350 }];
-
-		const result = getLocationFeatures([
-			makeLocation('bopiliao', {
-				_imageThumbnail: thumbnail,
-				geometry: [
-					makePoint(121.5, 25),
-					// eslint-disable-next-line unicorn/no-null -- null deliberately overrides imageFeatured to render no thumbnail
-					makePoint(121.51, 25.01, { _imageThumbnail: null }),
-				],
-				title: 'Bopiliao',
-			}),
-		]);
-
-		expect(result[0]?.properties.popupImageSources).toBe(thumbnail);
-		expect(result[1]?.properties).not.toHaveProperty('popupImageSources');
 	});
 
 	const thumbnail = [{ path: 'thumb-350x233.webp', width: 350 }];
@@ -239,6 +175,7 @@ describe('getLocationFeatures properties', () => {
 
 		expect(properties[0]?.description).toBe('<p>Entry description</p>');
 		expect(properties[0]?.popupImageSources).toBe(thumbnail);
+		expect(properties[3]).not.toHaveProperty('popupImageSources');
 		expect(properties.map((item) => item.own)).toEqual([
 			undefined,
 			MapPopupOwnField.Description,

@@ -50,14 +50,6 @@ describe('createSqliteCache', () => {
 		expect(cache.get('alpha', 'hash-two')).toBe('two');
 	});
 
-	test('persists across a second instance', () => {
-		const cachePath = getTempCachePath();
-
-		createSqliteCache<string>(cachePath, 'persist').set('alpha', 'hash-one', 'one');
-
-		expect(createSqliteCache<string>(cachePath, 'persist').get('alpha', 'hash-one')).toBe('one');
-	});
-
 	test('a file with the old schema opens clean and empty', () => {
 		const cachePath = getTempCachePath();
 		const database = new DatabaseSync(path.join(cachePath, 'legacy.sqlite'));

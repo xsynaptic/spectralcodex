@@ -56,28 +56,20 @@ describe('getObjectiveLocations', () => {
 		expect(ids(await getObjectiveLocations())).toStrictEqual(['rated']);
 	});
 
-	test('a descendant region qualifies as readily as Taiwan itself', async () => {
+	test('one region in Taiwan or below it qualifies; a location with no regions is left out', async () => {
 		setLocations([
 			makeLocation('in-descendant', { objective: 3, regions: [{ id: 'taipei' }] }),
 			makeLocation('in-taiwan', { objective: 3, regions: [{ id: 'taiwan' }] }),
 			makeLocation('elsewhere', { objective: 3, regions: [{ id: 'japan' }] }),
-		]);
-
-		expect(ids(await getObjectiveLocations())).toStrictEqual(['in-descendant', 'in-taiwan']);
-	});
-
-	test('one qualifying region is enough for a location spanning several', async () => {
-		setLocations([
 			makeLocation('straddles', { objective: 2, regions: [{ id: 'japan' }, { id: 'taiwan' }] }),
+			makeLocation('unplaced', { objective: 5, regions: [] }),
 		]);
 
-		expect(ids(await getObjectiveLocations())).toStrictEqual(['straddles']);
-	});
-
-	test('a location with no regions at all is left out', async () => {
-		setLocations([makeLocation('unplaced', { objective: 5, regions: [] })]);
-
-		expect(await getObjectiveLocations()).toStrictEqual([]);
+		expect(ids(await getObjectiveLocations())).toStrictEqual([
+			'in-descendant',
+			'in-taiwan',
+			'straddles',
+		]);
 	});
 });
 

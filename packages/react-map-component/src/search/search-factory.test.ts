@@ -177,30 +177,30 @@ describe('searchMap', () => {
 		});
 	});
 
-	test('a Multilingual Title is its own field, highlighted in its own text', () => {
-		const [result] =
-			searchMap(
-				createSearchIndex([makeRow('temple', 'Temple', { titleMultilingual: '臺南孔廟' })], []),
-				'孔廟',
-			) ?? [];
+	test.each([
+		{
+			query: '孔廟',
+			range: [2, 4],
+			title: 'Temple',
+			titleMultilingual: '臺南孔廟',
+		},
+		{
+			query: 'kinh',
+			range: [0, 4],
+			title: 'Hue Citadel (North Gate)',
+			titleMultilingual: 'Kinh thanh Hue',
+		},
+	])(
+		'a Multilingual Title is its own field, highlighted in its own text: $titleMultilingual',
+		({ query, range, title, titleMultilingual }) => {
+			const [result] =
+				searchMap(createSearchIndex([makeRow('row', title, { titleMultilingual })], []), query) ??
+				[];
 
-		expect(result?.title).toEqual({ text: 'Temple' });
-		expect(result?.titleMultilingual).toEqual({ ranges: [[2, 4]], text: '臺南孔廟' });
-	});
-
-	test('a Multilingual Title in Latin script stays its own field', () => {
-		const [result] =
-			searchMap(
-				createSearchIndex(
-					[makeRow('citadel', 'Hue Citadel (North Gate)', { titleMultilingual: 'Kinh thanh Hue' })],
-					[],
-				),
-				'kinh',
-			) ?? [];
-
-		expect(result?.title).toEqual({ text: 'Hue Citadel (North Gate)' });
-		expect(result?.titleMultilingual).toEqual({ ranges: [[0, 4]], text: 'Kinh thanh Hue' });
-	});
+			expect(result?.title).toEqual({ text: title });
+			expect(result?.titleMultilingual).toEqual({ ranges: [range], text: titleMultilingual });
+		},
+	);
 
 	test('a highlight covers the written characters a folded match came from', () => {
 		const [result] = searchMap(createSearchIndex([makeRow('hoi-an', 'Hội An')], []), 'hoi') ?? [];

@@ -80,9 +80,12 @@ describe('getInitialViewState', () => {
 		}
 	});
 
-	test('falls back to bounds, then to the center, when storage throws', () => {
+	test('ignores a write and falls back to bounds, then to the center, when storage throws', () => {
 		stubBlockedStorage();
 
+		expect(() => {
+			writeSavedViewport('atlas', viewport);
+		}).not.toThrow();
 		expect(getInitialViewState({ bounds, mapId: 'atlas' })).toMatchObject({ bounds });
 		expect(getInitialViewState({ center: [121, 23.5], mapId: 'atlas' })).toMatchObject({
 			latitude: 23.5,
@@ -94,15 +97,5 @@ describe('getInitialViewState', () => {
 		stubBlockedStorage();
 
 		expect(getInitialViewState({ bounds })).toMatchObject({ bounds });
-	});
-});
-
-describe('writeSavedViewport', () => {
-	test('ignores storage that throws', () => {
-		stubBlockedStorage();
-
-		expect(() => {
-			writeSavedViewport('atlas', viewport);
-		}).not.toThrow();
 	});
 });
