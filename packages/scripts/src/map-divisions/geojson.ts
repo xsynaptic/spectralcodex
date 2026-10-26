@@ -4,7 +4,7 @@ import { bbox } from '@turf/bbox';
 import { bboxPolygon } from '@turf/bbox-polygon';
 import { difference } from '@turf/difference';
 import { distance } from '@turf/distance';
-import { feature, featureCollection } from '@turf/helpers';
+import { feature, featureCollection, lengthToDegrees } from '@turf/helpers';
 import { simplify } from '@turf/simplify';
 import { truncate } from '@turf/truncate';
 import { union } from '@turf/union';
@@ -23,7 +23,6 @@ import { safelyCreateDirectory } from '#shared/files.ts';
 const maskToleranceExponent = 0.6;
 const maskToleranceMetresPerKm = 0.34;
 const maskCoordinatePrecision = 6;
-const metresPerDegree = 111_195;
 const worldBounds = [-180, -85, 180, 85] satisfies BBox;
 
 export function convertToFeatureCollection(
@@ -63,7 +62,7 @@ export async function saveDivisionMask(
 	const toleranceMetres = getMaskToleranceMetres(division);
 	const simplified = simplify(division, {
 		highQuality: true,
-		tolerance: toleranceMetres / metresPerDegree,
+		tolerance: lengthToDegrees(toleranceMetres, 'meters'),
 	});
 	const mask = difference(featureCollection([bboxPolygon(worldBounds), simplified]));
 

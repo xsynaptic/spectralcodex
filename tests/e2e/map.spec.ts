@@ -28,7 +28,7 @@ async function recordMapAnswers(page: Page) {
 	return () => page.evaluate(() => (window as { mapAnswers?: Array<string> }).mapAnswers);
 }
 
-async function clickOwnPoint(page: Page, path: string) {
+async function hoverOwnPoint(page: Page, path: string) {
 	await visit(page, path);
 
 	const island = page.locator(
@@ -48,6 +48,11 @@ async function clickOwnPoint(page: Page, path: string) {
 		await expect(canvas).toHaveCSS('cursor', 'pointer', { timeout: 500 });
 	}).toPass({ timeout: 10_000 });
 
+	return { canvas, island, ownPoint };
+}
+
+async function clickOwnPoint(page: Page, path: string) {
+	const { island, ownPoint } = await hoverOwnPoint(page, path);
 	const scrollY = await page.evaluate(() => window.scrollY);
 	const readMapAnswers = await recordMapAnswers(page);
 
@@ -83,6 +88,14 @@ test(
 		expect(await page.evaluate(() => window.scrollY)).toBe(scrollY);
 	},
 );
+
+test('a Point the pointer leaves straight off the map lets go of its hover', async ({ page }) => {
+	const { canvas } = await hoverOwnPoint(page, paths.locationSinglePoint);
+
+	await page.locator('h1').hover();
+
+	await expect(canvas).not.toHaveCSS('cursor', 'pointer');
+});
 
 test('a Region map draws its Division from the versioned mask', async ({ page }) => {
 	const maskResponse = page.waitForResponse((response) =>

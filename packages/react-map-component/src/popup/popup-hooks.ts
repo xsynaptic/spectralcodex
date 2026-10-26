@@ -22,7 +22,7 @@ export type MapPopupItemExtended = MapPopupItem &
 		precision: number | undefined;
 	};
 
-const mapImagePreloadDelayMs = 100;
+const mapHoverPreloadDelayMs = 100;
 
 function useDebouncedValue<T>(value: T, delayMs: number): T {
 	const [debouncedValue, setDebouncedValue] = useState(value);
@@ -63,14 +63,14 @@ export function useMapCanvasPopup() {
 	return { isLoading, popupItem };
 }
 
-export function useMapImagePreload() {
-	const { imageBaseUrl } = useMapConfig();
+export function useMapHoverPreload() {
+	const { host, imageBaseUrl } = useMapConfig();
 	const { current: map } = useMap();
 	const hoveredId = useMapStore((state) => state.hoveredId);
 	const resolve = useClickResolver();
 	const { maxWidthPx } = useMapPopupLayout();
 
-	const debouncedHoveredId = useDebouncedValue(hoveredId, mapImagePreloadDelayMs);
+	const debouncedHoveredId = useDebouncedValue(hoveredId, mapHoverPreloadDelayMs);
 
 	const hoveredSourceItem = useMapRow(debouncedHoveredId);
 	const { data: hoverChunkData } = useMapChunk(hoveredSourceItem?.properties.chunkKey);
@@ -85,6 +85,12 @@ export function useMapImagePreload() {
 			map.getMap(),
 		);
 
+		if (outcome.kind === 'open') {
+			preloadedRef.current.add(debouncedHoveredId);
+			host.prefetch(outcome.url);
+			return;
+		}
+
 		if (outcome.kind !== 'popup') return;
 
 		const popupImageSources = findPopupImageSources(hoverChunkData, debouncedHoveredId);
@@ -98,7 +104,7 @@ export function useMapImagePreload() {
 
 		preloadImage.sizes = getPopupImageSizes(maxWidthPx);
 		preloadImage.srcset = getPopupImageSrcSet(popupImageSources, imageBaseUrl);
-	}, [debouncedHoveredId, hoverChunkData, imageBaseUrl, map, maxWidthPx, resolve]);
+	}, [debouncedHoveredId, host, hoverChunkData, imageBaseUrl, map, maxWidthPx, resolve]);
 }
 
 export function useMapPopupLayout() {

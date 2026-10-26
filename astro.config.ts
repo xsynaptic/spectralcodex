@@ -231,6 +231,7 @@ export default defineConfig({
 			],
 		}),
 	},
+	prefetch: { prefetchAll: true },
 	vite: {
 		build: {
 			// Inlines only the smallest client scripts; anything larger stays a separate file for cache granularity

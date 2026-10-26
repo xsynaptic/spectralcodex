@@ -1,7 +1,9 @@
 import {
 	mapControlEventName,
 	mapOpenEventName,
+	mapPrefetchEventName,
 } from '@spectralcodex/react-map-component/constants';
+import { prefetch } from 'astro:prefetch';
 import { navigate } from 'astro:transitions/client';
 
 import {
@@ -130,6 +132,10 @@ export function startAtlasIntents() {
 				url: event.detail.url,
 			}),
 		);
+	});
+
+	document.addEventListener(mapPrefetchEventName, ({ detail: { url } }) => {
+		prefetch(url);
 	});
 
 	document.addEventListener(mapControlEventName, ({ detail: { name } }) => {

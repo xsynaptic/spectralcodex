@@ -1,3 +1,5 @@
+import * as R from 'remeda';
+
 import type { MapSourceItem } from '#schemas/codec.ts';
 
 export type MapInterval = [number, number];
@@ -55,29 +57,12 @@ function getRegionIndex(rows: ReadonlyArray<MapSourceItem>) {
 	return regionIndex;
 }
 
-function getLowerBound(sorted: ReadonlyArray<number>, value: number) {
-	let low = 0;
-	let high = sorted.length;
-
-	while (low < high) {
-		const middle = (low + high) >>> 1;
-
-		if ((sorted[middle] ?? Infinity) < value) {
-			low = middle + 1;
-		} else {
-			high = middle;
-		}
-	}
-
-	return low;
-}
-
 function selectRegionRows(rows: ReadonlyArray<MapSourceItem>, [left, right]: MapInterval) {
 	const { ordinals, positions } = getRegionIndex(rows);
 	const matched: Array<number> = [];
 
 	for (
-		let pairIndex = getLowerBound(ordinals, left);
+		let pairIndex = R.sortedIndex(ordinals, left);
 		pairIndex < ordinals.length && (ordinals[pairIndex] ?? Infinity) <= right;
 		pairIndex++
 	) {

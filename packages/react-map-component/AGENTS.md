@@ -8,7 +8,7 @@ Imports flow one way, UI to state to base, along the zones in `.fallowrc.jsonc` 
 
 ## State
 
-- Props are read once at mount. A persisted island never receives new ones, so anything that changes afterwards lives in the store or arrives from the host.
+- Props are read once at mount. The Atlas persists the island's wrapper rather than the island, so Astro never hands it new props; anything that changes afterwards lives in the store or arrives from the host.
 - No effect derives store state from other store state. Host changes arrive through `map:sync`, and user actions through their handlers.
 - Every map fetches its dataset's one whole directory file from `/api/map/`, so the HTTP cache shares one copy across pages. Partitions scatter a Theme across many Regions, and inlined rows help only one-page visits.
 - Every payload but a Division mask shares one version hash, since Locations change on most edit days.
@@ -16,7 +16,7 @@ Imports flow one way, UI to state to base, along the zones in `.fallowrc.jsonc` 
 ## Host contract
 
 - The map knows nothing about the page around it: it reads no `location` and uses no viewport media queries (it measures itself with `@container map`). The host decides anything that depends on layout.
-- The host talks to the map through the document (the view attribute with `map:sync`, custom properties on the shell, the site's mode attribute), and the map answers with `map:open`, `map:control` and `map:track` events.
+- The host talks to the map through the document (the view attribute with `map:sync`, custom properties on the shell, the site's mode attribute), and the map answers with `map:open`, `map:prefetch`, `map:control` and `map:track` events.
 - Every click and search pick goes through `resolveClick` in `host/host-click-factory.ts`. The host only routes the URL it gets back.
 - The pulse ring marks only the page being read; a selected Point shows as its enlarged symbol under the popup.
 - The Sheet is a pane translated over the document, keeping its rest and the reader's scroll as two offsets; one built on the document's scroll failed on phones.

@@ -19,7 +19,7 @@ import { getActiveAttribute } from '#lib/active-attribute.ts';
 import { useMapConfig } from '#lib/config.tsx';
 import { useIsDarkMode } from '#lib/dark-mode.ts';
 import { useProtomaps } from '#lib/protomaps.ts';
-import { MapImagePreload, MapPopup } from '#popup/popup.tsx';
+import { MapHoverPreload, MapPopup } from '#popup/popup.tsx';
 import { mapInteractiveLayerIds } from '#source/source-config.ts';
 import { MapSource } from '#source/source.tsx';
 import { MapStoreProvider } from '#store/store.tsx';
@@ -104,7 +104,7 @@ const MapCanvasContainer: FC = function MapCanvasContainer() {
 		>
 			<MapControls />
 			<MapPopup />
-			<MapImagePreload />
+			<MapHoverPreload />
 			<MapCanvasLoading />
 			<MapSource />
 			<MapScopeBar />

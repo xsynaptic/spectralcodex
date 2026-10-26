@@ -18,7 +18,7 @@ import {
 	getPopupImageSrcSet,
 	getTargetPopupItem,
 } from '#popup/popup-factory.ts';
-import { useMapCanvasPopup, useMapImagePreload, useMapPopupLayout } from '#popup/popup-hooks.ts';
+import { useMapCanvasPopup, useMapHoverPreload, useMapPopupLayout } from '#popup/popup-hooks.ts';
 import { selectTargetIds } from '#store/store-factory.ts';
 import { useMapStore } from '#store/store.tsx';
 
@@ -295,8 +295,8 @@ const MapPopupFrame: FC<{
 	);
 };
 
-export const MapImagePreload: FC = function MapImagePreload() {
-	useMapImagePreload();
+export const MapHoverPreload: FC = function MapHoverPreload() {
+	useMapHoverPreload();
 
 	return;
 };

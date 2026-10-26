@@ -1,3 +1,5 @@
+import { LngLatBounds } from 'maplibre-gl';
+
 type Position = [longitude: number, latitude: number];
 
 const targetZoomDefault = 14;
@@ -5,27 +7,14 @@ const targetZoomMax = 17;
 const targetZoomMin = 12;
 const targetInViewZoomMin = 10;
 
-export function getTargetBounds(
-	positions: ReadonlyArray<Position>,
-): [southwest: Position, northeast: Position] | undefined {
-	const [first, ...rest] = positions;
+export function getTargetBounds(positions: ReadonlyArray<Position>) {
+	if (positions.length === 0) return;
 
-	if (!first) return;
+	const bounds = new LngLatBounds();
 
-	let [west, south] = first;
-	let [east, north] = first;
+	for (const position of positions) bounds.extend(position);
 
-	for (const [longitude, latitude] of rest) {
-		west = Math.min(west, longitude);
-		south = Math.min(south, latitude);
-		east = Math.max(east, longitude);
-		north = Math.max(north, latitude);
-	}
-
-	return [
-		[west, south],
-		[east, north],
-	];
+	return bounds.toArray();
 }
 
 export function getTargetZoom(zoom: number, fitZoom: number) {

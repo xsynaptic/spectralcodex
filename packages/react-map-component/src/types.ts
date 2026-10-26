@@ -48,6 +48,7 @@ export interface MapHost {
 	fullscreenContainerId: string | undefined;
 	isHosted: boolean;
 	open: (url: string) => void;
+	prefetch: (url: string) => void;
 	readView: () => MapStoreView;
 	send: (name: MapHostControlName) => void;
 }

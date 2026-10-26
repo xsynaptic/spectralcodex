@@ -159,6 +159,7 @@ export function useMapCanvasEvents() {
 						? {}
 						: {
 								onMouseMove: throttledOnMouseMove.call,
+								onMouseOut: throttledOnMouseMove.call,
 							}),
 				}
 			: {}),

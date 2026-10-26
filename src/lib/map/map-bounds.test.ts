@@ -172,6 +172,17 @@ describe('getMapBounds at world scale', () => {
 		expect(result!.center).toEqual([-175, -12.5]);
 	});
 
+	test('a Target across the antimeridian from the limit joins it across the Pacific', () => {
+		const result = getMapBounds([makePoint('fiji', [175, -15]), makePoint('samoa', [-170, -14])], {
+			targetRows: [makePoint('rarotonga', [-160, -21])],
+		});
+
+		expect(result).toBeDefined();
+		expect(result!.maxBounds[0]).toBeGreaterThan(-180);
+		expect(result!.maxBounds[2] - result!.maxBounds[0]).toBeLessThan(120);
+		expectWithinBounds(result!.maxBounds, 200, -21);
+	});
+
 	test('a pan limit padded past a full world clamps to one world', () => {
 		const result = getMapBounds([
 			makePoint('a', [-150, 0]),

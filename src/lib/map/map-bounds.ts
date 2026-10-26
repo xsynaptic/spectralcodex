@@ -83,12 +83,17 @@ function getLimitNaturalBounds(
 
 	if (!inlierBounds) return targetBounds;
 
-	return [
-		Math.min(inlierBounds[0], targetBounds[0]),
-		Math.min(inlierBounds[1], targetBounds[1]),
-		Math.max(inlierBounds[2], targetBounds[2]),
-		Math.max(inlierBounds[3], targetBounds[3]),
-	];
+	return getMergedBounds(inlierBounds, targetBounds);
+}
+
+// Corners alone find the shortest span while the merged box stays under 180° wide
+function getMergedBounds(...boxes: Array<MapBbox>) {
+	return getPointsBounds(
+		boxes.flatMap(([west, south, east, north]): Array<[number, number]> => [
+			[west, south],
+			[((east + 180) % 360) - 180, north],
+		]),
+	);
 }
 
 function getInlierNaturalBounds(rows: ReadonlyArray<MapSourceItem>) {
@@ -137,12 +142,13 @@ function getBboxCenter([west, south, east, north]: MapBbox): [number, number] {
 	return getTruncatedLngLat([longitude, (south + north) / 2]);
 }
 
+function getNaturalBounds(rows: ReadonlyArray<MapSourceItem>) {
+	return getPointsBounds(rows.map(({ geometry }) => geometry.coordinates));
+}
+
 // East goes past 180 when the shortest span crosses the antimeridian, which MapLibre accepts
-function getNaturalBounds(rows: ReadonlyArray<MapSourceItem>): MapBbox {
-	const [[west, south], [east, north]] = geoBounds({
-		coordinates: rows.map(({ geometry }) => geometry.coordinates),
-		type: 'MultiPoint',
-	});
+function getPointsBounds(coordinates: Array<[number, number]>): MapBbox {
+	const [[west, south], [east, north]] = geoBounds({ coordinates, type: 'MultiPoint' });
 
 	return [west, south, west > east ? east + 360 : east, north];
 }
