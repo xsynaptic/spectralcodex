@@ -26,6 +26,7 @@ import * as R from 'remeda';
 
 import type { Catalog } from '#lib/catalog/catalog-factory.ts';
 import type { ComputedEntry } from '#lib/collections/collections-types.ts';
+import type { MapBbox } from '#lib/map/map-bounds.ts';
 
 import { atlasRegionId, mapBacklinkDistanceLimitKm } from '#constants.ts';
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
@@ -33,6 +34,7 @@ import { getLocationsCollection } from '#lib/collections/locations/locations-dat
 import { getObjectiveLocations } from '#lib/collections/locations/locations-subsets.ts';
 import { getRegionsCollection, getRegionsTree } from '#lib/collections/regions/regions-data.ts';
 import { getMapBacklinksByRowId } from '#lib/map/map-backlinks.ts';
+import { getBoundsWithoutOutliers, getNaturalBounds } from '#lib/map/map-bounds.ts';
 import { assignChunks } from '#lib/map/map-chunks.ts';
 import { hashMapPayloads } from '#lib/map/map-directory-hash.ts';
 import { getMapThemeIndexById } from '#lib/map/map-entry-rules.ts';
@@ -66,12 +68,12 @@ interface MapDatasetContext {
 interface MapDirectoryData {
 	atlasRows: Array<MapSourceItem>;
 	atlasRule: MapFeaturesRule;
+	boundsByRootId: Map<string, MapBbox>;
 	datasets: Record<MapDatasetName, MapDataset>;
 	divisionUrlById: Map<string, string>;
 	globalRule: MapFeaturesRule;
 	mapScopeByKey: Map<string, MapScope>;
 	payloads: Map<string, string>;
-	rootRuleById: Map<string, MapFeaturesRule>;
 }
 
 // No hidden-location filtering needed: only ids present in the (already filtered) source data are looked up
@@ -265,8 +267,17 @@ export const getMapDirectoryData = pMemoize(async (): Promise<MapDirectoryData> 
 	const shared = buildMapDataset(locations, { ...context, prefix: '' });
 	const atlasRule = getRegionMapRule(regionsTree.intervalById, atlasRegionId);
 	const globalRule = getGlobalMapRule(regionsTree.intervalById, regionsTree.roots);
-	const rootRuleById = new Map(
-		regionsTree.roots.map((rootId) => [rootId, getRegionMapRule(regionsTree.intervalById, rootId)]),
+	const boundsByRootId = new Map(
+		regionsTree.roots.flatMap((rootId) => {
+			const rootRule = getRegionMapRule(regionsTree.intervalById, rootId);
+			const rootRows = selectMapRows(shared.directory, rootRule);
+
+			if (rootRows.length === 0) return [];
+
+			const rootBounds = getBoundsWithoutOutliers(rootRows) ?? getNaturalBounds(rootRows);
+
+			return [[rootId, rootBounds] as const];
+		}),
 	);
 	const atlasRows = selectMapRows(shared.directory, atlasRule);
 	const mapScopes = await buildMapScopes(atlasRows);
@@ -309,11 +320,11 @@ export const getMapDirectoryData = pMemoize(async (): Promise<MapDirectoryData> 
 	return {
 		atlasRows,
 		atlasRule,
+		boundsByRootId,
 		datasets,
 		divisionUrlById,
 		globalRule,
 		mapScopeByKey,
 		payloads,
-		rootRuleById,
 	};
 });

@@ -14,16 +14,14 @@ export interface MapBoundsOptions {
 }
 
 interface MapBoundsInput extends MapBoundsOptions {
-	limitRows?: ReadonlyArray<MapSourceItem> | undefined;
+	limitBounds?: MapBbox | undefined;
 	targetRows?: ReadonlyArray<MapSourceItem> | undefined;
 }
 
-type MapBbox = [number, number, number, number];
+export type MapBbox = [number, number, number, number];
 
 const mapBoundsBufferMin = 1;
 const mapLimitsBufferMin = 10;
-
-const inlierBoundsCache = new WeakMap<ReadonlyArray<MapSourceItem>, MapBbox | undefined>();
 
 interface BboxBufferOptions {
 	bufferPercentage: number;
@@ -36,14 +34,14 @@ export function getMapBounds(
 	{
 		boundsBuffer,
 		boundsBufferPercentage = 10,
-		limitRows = rows,
+		limitBounds = getBoundsWithoutOutliers(rows),
 		limitsBuffer,
 		limitsBufferPercentage = 100,
 		targetRows = [],
 	}: MapBoundsInput = {},
 ): undefined | { bounds: MapBbox; center: [number, number]; maxBounds: MapBbox } {
 	const frameRows = getFrameRows(rows, targetRows);
-	const limitNaturalBounds = getLimitNaturalBounds(limitRows, targetRows);
+	const limitNaturalBounds = getLimitNaturalBounds(limitBounds, targetRows);
 
 	if (!limitNaturalBounds || frameRows.length === 0) return;
 
@@ -72,18 +70,16 @@ function getFrameRows(
 }
 
 function getLimitNaturalBounds(
-	limitRows: ReadonlyArray<MapSourceItem>,
+	limitBounds: MapBbox | undefined,
 	targetRows: ReadonlyArray<MapSourceItem>,
 ): MapBbox | undefined {
-	const inlierBounds = getInlierNaturalBounds(limitRows);
-
-	if (targetRows.length === 0) return inlierBounds;
+	if (targetRows.length === 0) return limitBounds;
 
 	const targetBounds = getNaturalBounds(targetRows);
 
-	if (!inlierBounds) return targetBounds;
+	if (!limitBounds) return targetBounds;
 
-	return getMergedBounds(inlierBounds, targetBounds);
+	return getMergedBounds(limitBounds, targetBounds);
 }
 
 // Corners alone find the shortest span while the merged box stays under 180° wide
@@ -96,15 +92,10 @@ function getMergedBounds(...boxes: Array<MapBbox>) {
 	);
 }
 
-function getInlierNaturalBounds(rows: ReadonlyArray<MapSourceItem>) {
-	if (inlierBoundsCache.has(rows)) return inlierBoundsCache.get(rows);
+export function getBoundsWithoutOutliers(rows: ReadonlyArray<MapSourceItem>) {
+	const boundingRows = rows.filter(({ properties }) => properties.outlier !== true);
 
-	const inlierRows = rows.filter(({ properties }) => properties.outlier !== true);
-	const inlierBounds = inlierRows.length > 0 ? getNaturalBounds(inlierRows) : undefined;
-
-	inlierBoundsCache.set(rows, inlierBounds);
-
-	return inlierBounds;
+	return boundingRows.length > 0 ? getNaturalBounds(boundingRows) : undefined;
 }
 
 function getBufferedBbox(
@@ -142,7 +133,7 @@ function getBboxCenter([west, south, east, north]: MapBbox): [number, number] {
 	return getTruncatedLngLat([longitude, (south + north) / 2]);
 }
 
-function getNaturalBounds(rows: ReadonlyArray<MapSourceItem>) {
+export function getNaturalBounds(rows: ReadonlyArray<MapSourceItem>) {
 	return getPointsBounds(rows.map(({ geometry }) => geometry.coordinates));
 }
 

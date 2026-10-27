@@ -125,13 +125,16 @@ describe('getMapBounds', () => {
 		expect(result!.center).toEqual([121.1, 24.1]);
 	});
 
-	test('limit rows narrower than the shown rows give a narrower pan limit', () => {
+	test('a limit box narrower than the shown rows gives a narrower pan limit', () => {
 		const country = [makePoint('a', [121, 24]), makePoint('b', [121.5, 25])];
 		const shownRows = [...country, makePoint('abroad', [139.7, 35.7])];
 
 		const targetRows = country.slice(0, 1);
 		const wide = getMapBounds(shownRows, { targetRows });
-		const narrow = getMapBounds(shownRows, { limitRows: country, targetRows });
+		const narrow = getMapBounds(shownRows, {
+			limitBounds: [121, 24, 121.5, 25],
+			targetRows,
+		});
 
 		expect(wide).toBeDefined();
 		expect(narrow).toBeDefined();
@@ -141,11 +144,14 @@ describe('getMapBounds', () => {
 		expectWithinBounds(narrow!.maxBounds, 121.5, 25);
 	});
 
-	test('an outlier Target outside the limit rows still lies inside the pan limit', () => {
+	test('an outlier Target outside the limit box still lies inside the pan limit', () => {
 		const country = [makePoint('a', [121, 24]), makePoint('b', [121.5, 25])];
 		const islet = makePoint('islet', [118.3, 24.4], true);
 
-		const result = getMapBounds([...country, islet], { limitRows: country, targetRows: [islet] });
+		const result = getMapBounds([...country, islet], {
+			limitBounds: [121, 24, 121.5, 25],
+			targetRows: [islet],
+		});
 
 		expect(result).toBeDefined();
 		expect(result!.center).toEqual([118.3, 24.4]);

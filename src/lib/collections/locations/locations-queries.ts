@@ -55,15 +55,15 @@ export async function createQueryLocationsEntryFunction() {
 	const getFirstRegionByReference = await createFirstRegionByReferenceFunction();
 	const catalog = await getCatalog();
 	const getMapData = await createMapDataFunction();
-	const { globalRule, rootRuleById } = await getMapDirectoryData();
+	const { boundsByRootId, globalRule } = await getMapDirectoryData();
 
 	return function queryLocationsEntry(entry: ComputedEntry<'locations'>) {
 		const regionPrimary = getFirstRegionByReference(entry.data.regions);
 
 		const mapData = getMapData({
 			boundsBuffer: getLocationNearbyRadius(entry.data._nearby),
-			limitRule: regionPrimary
-				? rootRuleById.get(regionPrimary.data._ancestors.at(-1) ?? regionPrimary.id)
+			limitBounds: regionPrimary
+				? boundsByRootId.get(regionPrimary.data._ancestors.at(-1) ?? regionPrimary.id)
 				: undefined,
 			mapId: `${entry.collection}/${entry.id}`,
 			rule: globalRule,

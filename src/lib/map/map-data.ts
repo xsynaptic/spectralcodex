@@ -4,7 +4,7 @@ import type { MapComponentProps } from '@spectralcodex/react-map-component';
 import { selectMapRows } from '@spectralcodex/map-codec';
 import { MAP_PROTOMAPS_API_KEY } from 'astro:env/client';
 
-import type { MapBoundsOptions } from '#lib/map/map-bounds.ts';
+import type { MapBbox, MapBoundsOptions } from '#lib/map/map-bounds.ts';
 import type { MapDatasetName } from '#lib/map/map-directory.ts';
 import type { MapScopeEntry } from '#lib/map/map-entry-rules.ts';
 
@@ -25,7 +25,7 @@ type MapDataOptions = MapBoundsOptions &
 		'bounds' | 'center' | 'mapFeaturesRule' | 'maxBounds' | 'payloadBase' | 'protomapsApiKey'
 	> & {
 		dataset?: MapDatasetName | undefined;
-		limitRule?: MapFeaturesRule | undefined;
+		limitBounds?: MapBbox | undefined;
 		rule: MapFeaturesRule;
 	};
 
@@ -53,7 +53,7 @@ export async function createMapDataFunction() {
 		boundsBuffer,
 		boundsBufferPercentage,
 		dataset = 'shared',
-		limitRule,
+		limitBounds,
 		limitsBuffer,
 		limitsBufferPercentage,
 		rule,
@@ -66,7 +66,7 @@ export async function createMapDataFunction() {
 		const mapBounds = getMapBounds(rows, {
 			boundsBuffer,
 			boundsBufferPercentage,
-			limitRows: limitRule ? selectDatasetRows(dataset, limitRule) : rows,
+			limitBounds,
 			limitsBuffer,
 			limitsBufferPercentage,
 			targetRows,
