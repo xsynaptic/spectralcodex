@@ -83,13 +83,13 @@ async function createNavigationHeaderItems(): Promise<Array<NavigationItem>> {
 			url: getSitePath('locations'),
 		},
 		{
+			title: t('collection.posts.labelPlural'),
+			url: getSitePath('posts'),
+		},
+		{
 			children: regionsMenu,
 			title: 'Regions',
 			url: getSitePath('regions'),
-		},
-		{
-			title: t('collection.posts.labelPlural'),
-			url: getSitePath('posts'),
 		},
 		{
 			children: themesMenu,
