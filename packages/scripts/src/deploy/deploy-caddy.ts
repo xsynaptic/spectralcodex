@@ -1,3 +1,4 @@
+import { formatDuration, log, Refusal, withStatus } from '@xsynaptic/astro-scripts';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { z } from 'zod';
@@ -13,9 +14,6 @@ import {
 	sshCapture,
 	sshCaptureUnchecked,
 } from '#deploy/rsync-exec.ts';
-import { Refusal } from '#shared/cli-command.ts';
-import { formatDuration, log } from '#shared/cli-output.ts';
-import { withStatus } from '#shared/cli-progress.ts';
 
 interface DeployCaddyOptions {
 	dryRun?: boolean;

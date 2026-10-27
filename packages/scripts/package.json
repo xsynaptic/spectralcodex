@@ -4,7 +4,6 @@
 	"description": "Scripts for Spectral Codex",
 	"type": "module",
 	"exports": {
-		"./astro-content": "./src/shared/astro-content.ts",
 		"./og-image": "./src/og-image/inventory-exports.ts"
 	},
 	"imports": {
@@ -56,6 +55,7 @@
 		"@types/geojson": "^7946.0.16",
 		"@types/sanitize-html": "^2.16.2",
 		"@xsynaptic/astro-image-pipeline": "workspace:*",
+		"@xsynaptic/astro-scripts": "^0.1.0",
 		"@xsynaptic/unified-tools": "^5.1.3",
 		"astro": "^7.4.2",
 		"better-sqlite3": "^13.0.3",
@@ -63,7 +63,6 @@
 		"d3-geo": "^3.1.1",
 		"geokdbush": "^2.1.0",
 		"kdbush": "^4.1.0",
-		"ora": "^9.4.1",
 		"p-limit": "^7.3.3",
 		"remeda": "^2.53.0",
 		"sanitize-html": "^2.18.1",

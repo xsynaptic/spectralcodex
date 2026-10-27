@@ -1,3 +1,11 @@
+import {
+	createProgress,
+	formatCount,
+	log,
+	parseNumberOption,
+	withSpinner,
+} from '@xsynaptic/astro-scripts';
+import { getCollectionEntries, withAstroContent } from '@xsynaptic/astro-scripts/astro';
 import chalk from 'chalk';
 import path from 'node:path';
 import pLimit from 'p-limit';
@@ -17,10 +25,7 @@ import {
 import { extractLinksFromEntry } from '#check-links/extract.ts';
 import { printList, printSessionSummary, printStatus } from '#check-links/report.ts';
 import { UrlStatusEnum } from '#check-links/types.ts';
-import { getCollectionEntries, withAstroContent } from '#shared/astro-content.ts';
-import { defineCommand, parseNumberOption, runCommand } from '#shared/cli-command.ts';
-import { formatCount, log } from '#shared/cli-output.ts';
-import { createProgress, withSpinner } from '#shared/cli-progress.ts';
+import { defineCommand, runCommand } from '#shared/command.ts';
 
 const statusLabels: Record<UrlStatus, string> = {
 	[UrlStatusEnum.Blocked]: chalk.cyan('Blocked'),

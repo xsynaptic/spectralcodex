@@ -1,9 +1,8 @@
 import { getCachePaths } from '@spectralcodex/shared/paths';
 import { engineVersions, renderImages } from '@xsynaptic/astro-image-pipeline/node';
+import { createProgress, log } from '@xsynaptic/astro-scripts';
 
-import { defineCommand, runCommand } from '#shared/cli-command.ts';
-import { log } from '#shared/cli-output.ts';
-import { createProgress } from '#shared/cli-progress.ts';
+import { defineCommand, runCommand } from '#shared/command.ts';
 import { createPurgeQueue } from '#shared/purge-queue.ts';
 
 await runCommand(

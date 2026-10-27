@@ -1,8 +1,7 @@
+import { log, Refusal, withSpinner } from '@xsynaptic/astro-scripts';
+
 import { loadDeployConfig } from '#deploy/deploy-config.ts';
 import { sshCaptureUnchecked } from '#deploy/rsync-exec.ts';
-import { Refusal } from '#shared/cli-command.ts';
-import { log } from '#shared/cli-output.ts';
-import { withSpinner } from '#shared/cli-progress.ts';
 
 interface InvokeCacheRefreshOptions {
 	dryRun?: boolean;

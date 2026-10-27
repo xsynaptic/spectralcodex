@@ -1,6 +1,5 @@
+import { log } from '@xsynaptic/astro-scripts';
 import { $ } from 'zx';
-
-import { log } from '#shared/cli-output.ts';
 
 interface GitFileDatesOptions {
 	cwd: string;

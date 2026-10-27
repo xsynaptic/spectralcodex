@@ -2,7 +2,7 @@ import { deployCaddy } from '#deploy/deploy-caddy.ts';
 import { loadDeployConfig } from '#deploy/deploy-config.ts';
 import { ensureSshKeychain } from '#deploy/rsync-exec.ts';
 import { verifyEdge } from '#deploy/verify-edge.ts';
-import { defineCommand, runCommand } from '#shared/cli-command.ts';
+import { defineCommand, runCommand } from '#shared/command.ts';
 
 await runCommand(
 	defineCommand({

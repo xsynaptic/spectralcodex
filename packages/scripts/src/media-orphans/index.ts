@@ -1,9 +1,8 @@
 import { fallbackImageIds } from '@spectralcodex/shared/open-graph-fallback';
+import { formatCount, log, withSpinner } from '@xsynaptic/astro-scripts';
+import { getCollectionEntries, withAstroContent } from '@xsynaptic/astro-scripts/astro';
 
-import { getCollectionEntries, withAstroContent } from '#shared/astro-content.ts';
-import { defineCommand, runCommand } from '#shared/cli-command.ts';
-import { formatCount, log } from '#shared/cli-output.ts';
-import { withSpinner } from '#shared/cli-progress.ts';
+import { defineCommand, runCommand } from '#shared/command.ts';
 import { getEntryImageIds, listMediaImages } from '#shared/image-references.ts';
 
 // OG image fallbacks are referenced indirectly; seed them so they aren't flagged

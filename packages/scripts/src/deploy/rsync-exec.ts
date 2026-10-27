@@ -1,14 +1,6 @@
+import { createStatus, formatBytes, formatCount, log } from '@xsynaptic/astro-scripts';
 import chalk from 'chalk';
 import { $, ProcessOutput } from 'zx';
-
-import {
-	endSpinner,
-	formatBytes,
-	formatCount,
-	log,
-	startSpinner,
-	symbols,
-} from '#shared/cli-output.ts';
 
 export async function ensureSshKeychain() {
 	try {
@@ -110,7 +102,7 @@ function truncateStart(text: string, width: number) {
 }
 
 function createRollingWindow(label: string) {
-	const spinner = startSpinner(label);
+	const status = createStatus(label);
 	const recent: Array<RsyncChange> = [];
 	let count = 0;
 
@@ -120,7 +112,7 @@ function createRollingWindow(label: string) {
 			chalk.gray(`    ${change.kind.padEnd(8)}${truncateStart(change.path, pathWidth)}`),
 		);
 
-		spinner.text = [`${label} · ${formatCount(count)} changed`, ...lines].join('\n');
+		status.update([`${label} · ${formatCount(count)} changed`, ...lines].join('\n'));
 	}
 
 	return {
@@ -131,10 +123,10 @@ function createRollingWindow(label: string) {
 			render();
 		},
 		clear() {
-			endSpinner(spinner);
+			status.stop();
 		},
 		fail() {
-			endSpinner(spinner, symbols.error);
+			status.fail();
 		},
 	};
 }

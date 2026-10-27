@@ -1,7 +1,6 @@
+import { log } from '@xsynaptic/astro-scripts';
 import { existsSync, mkdirSync } from 'node:fs';
 import fs from 'node:fs/promises';
-
-import { log } from '#shared/cli-output.ts';
 
 export function safelyCreateDirectory(dir: string) {
 	if (existsSync(dir)) return;

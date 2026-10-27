@@ -1,9 +1,9 @@
+import type { ContentEntry } from '@xsynaptic/astro-scripts/astro';
+
 import { ImageFeaturedSchema } from '@spectralcodex/shared/schemas';
 import { isImageSource } from '@xsynaptic/astro-image-pipeline/presets';
 import { readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
-
-import type { ContentEntry } from '#shared/astro-content.ts';
 
 import { findComponentTags, getTagProp } from '#shared/component-tags.ts';
 

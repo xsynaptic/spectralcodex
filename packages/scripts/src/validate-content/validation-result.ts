@@ -1,4 +1,4 @@
-import { log } from '#shared/cli-output.ts';
+import { log } from '@xsynaptic/astro-scripts';
 
 export interface EntryReference {
 	collection: string;

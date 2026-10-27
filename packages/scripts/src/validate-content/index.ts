@@ -1,11 +1,11 @@
 import { getCachePaths } from '@spectralcodex/shared/paths';
+import { parseNumberOption, Refusal, withSpinner } from '@xsynaptic/astro-scripts';
+import { getCollectionEntries, withAstroContent } from '@xsynaptic/astro-scripts/astro';
 
-import type { ScriptPaths } from '#shared/cli-command.ts';
+import type { ScriptPaths } from '#shared/command.ts';
 import type { ValidationResult } from '#validate-content/validation-result.ts';
 
-import { getCollectionEntries, withAstroContent } from '#shared/astro-content.ts';
-import { defineCommand, parseNumberOption, Refusal, runCommand } from '#shared/cli-command.ts';
-import { withSpinner } from '#shared/cli-progress.ts';
+import { defineCommand, runCommand } from '#shared/command.ts';
 import { validateEntryIds } from '#validate-content/entry-ids.ts';
 import { validateFrontmatterLinks } from '#validate-content/frontmatter-links.ts';
 import { validateImageAspectRatios } from '#validate-content/image-aspect-ratios.ts';

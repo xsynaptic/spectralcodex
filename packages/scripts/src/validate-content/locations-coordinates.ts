@@ -1,8 +1,9 @@
+import type { ContentEntry } from '@xsynaptic/astro-scripts/astro';
+
 import { booleanPointInPolygon } from '@turf/boolean-point-in-polygon';
 import { point } from '@turf/helpers';
 
 import type { DivisionGeometry } from '#map-divisions/types.ts';
-import type { ContentEntry } from '#shared/astro-content.ts';
 import type { ValidationResult } from '#validate-content/validation-result.ts';
 
 import { getDivisionIds } from '#map-divisions/content.ts';

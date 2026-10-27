@@ -1,20 +1,28 @@
+import type { ContentEntry } from '@xsynaptic/astro-scripts/astro';
+
 import { pipeline } from '@huggingface/transformers';
 import { createSqliteCache } from '@spectralcodex/shared/cache';
 import { ContentCollectionsEnum } from '@spectralcodex/shared/collections';
 import { entryQualityFloor } from '@spectralcodex/shared/entries';
 import { getCachePaths } from '@spectralcodex/shared/paths';
+import {
+	createProgress,
+	formatCount,
+	formatError,
+	log,
+	parseNumberOption,
+	Refusal,
+	withSpinner,
+} from '@xsynaptic/astro-scripts';
+import { getCollectionEntries, withAstroContent } from '@xsynaptic/astro-scripts/astro';
 import { sanitizeMdx } from '@xsynaptic/unified-tools';
 import { readdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { Index, MetricKind, ScalarKind } from 'usearch';
 
-import type { ContentEntry } from '#shared/astro-content.ts';
 import type { SimilarContentMetadata } from '#similar-content/metadata.ts';
 
-import { getCollectionEntries, withAstroContent } from '#shared/astro-content.ts';
-import { defineCommand, parseNumberOption, Refusal, runCommand } from '#shared/cli-command.ts';
-import { formatCount, formatError, log } from '#shared/cli-output.ts';
-import { createProgress, withSpinner } from '#shared/cli-progress.ts';
+import { defineCommand, runCommand } from '#shared/command.ts';
 import { toReferenceIds } from '#shared/entries.ts';
 import { safelyCreateDirectory } from '#shared/files.ts';
 import { calculateMetadataBoost } from '#similar-content/metadata.ts';

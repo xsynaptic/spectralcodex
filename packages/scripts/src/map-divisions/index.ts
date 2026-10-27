@@ -2,6 +2,15 @@ import type { DuckDBConnection } from '@duckdb/node-api';
 import type { GeometryBoundingBox } from '@spectralcodex/shared/schemas';
 
 import { getCachePaths } from '@spectralcodex/shared/paths';
+import {
+	createProgress,
+	formatCount,
+	formatError,
+	log,
+	Refusal,
+	withSpinner,
+} from '@xsynaptic/astro-scripts';
+import { getCollectionEntries, withAstroContent } from '@xsynaptic/astro-scripts/astro';
 import path from 'node:path';
 
 import type { DivisionItem, RegionMetadata } from '#map-divisions/types.ts';
@@ -10,10 +19,7 @@ import { parseRegionData, resolveBoundingBox } from '#map-divisions/content.ts';
 import { fetchDivisionData, initializeDuckDB } from '#map-divisions/duckdb.ts';
 import { convertToFeatureCollection, saveDivisionMask } from '#map-divisions/geojson.ts';
 import { saveSvg } from '#map-divisions/svg.ts';
-import { getCollectionEntries, withAstroContent } from '#shared/astro-content.ts';
-import { defineCommand, Refusal, runCommand } from '#shared/cli-command.ts';
-import { formatCount, formatError, log } from '#shared/cli-output.ts';
-import { createProgress, withSpinner } from '#shared/cli-progress.ts';
+import { defineCommand, runCommand } from '#shared/command.ts';
 import { isExistingFile, safelyCreateDirectory } from '#shared/files.ts';
 
 const stacCatalogUrl = 'https://stac.overturemaps.org/catalog.json';

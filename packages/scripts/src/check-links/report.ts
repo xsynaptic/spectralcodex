@@ -1,3 +1,4 @@
+import { formatCount, log } from '@xsynaptic/astro-scripts';
 import chalk from 'chalk';
 
 import type { UrlByContentRow } from '#check-links/db.ts';
@@ -5,7 +6,6 @@ import type { UrlStatus } from '#check-links/types.ts';
 
 import { getStats, getUrlsByStatusGroupedByContent } from '#check-links/db.ts';
 import { UrlStatusEnum } from '#check-links/types.ts';
-import { log } from '#shared/cli-output.ts';
 
 interface ReportSection {
 	color: (text: string) => string;
@@ -63,14 +63,16 @@ export function printSessionSummary(checked: number, healthy: number, issues: nu
 export function printStatus(): void {
 	const { blocked, error, healthy, missing, pending, redirect, total } = getStats();
 
-	log.data(chalk.magenta('Link check status'));
-	log.data(`  Total URLs:  ${String(total)}`);
-	log.data(`  Healthy:     ${chalk.green(String(healthy))}`);
-	log.data(`  Redirected:  ${chalk.yellow(String(redirect))}`);
-	log.data(`  Missing:     ${chalk.magenta(String(missing))}`);
-	log.data(`  Blocked:     ${chalk.cyan(String(blocked))}`);
-	log.data(`  Error:       ${chalk.red(String(error))}`);
-	log.data(`  Pending:     ${chalk.gray(String(pending))}`);
+	log.title('Link check status');
+	log.summary([
+		['Total URLs', total],
+		['Healthy', healthy],
+		['Redirected', redirect],
+		['Missing', missing],
+		['Blocked', blocked],
+		['Error', error],
+		['Pending', pending],
+	]);
 }
 
 function entryId(contentId: string): string {
@@ -86,14 +88,13 @@ function printSection({ color, formatUrl, label, status }: ReportSection): void 
 
 	if (grouped.size === 0) return;
 
-	log.data('');
-	log.data(color(`--- ${label} (${String(grouped.size)} entries) ---`));
+	log.title(color(`${label} (${formatCount(grouped.size)} entries)`));
 
 	for (const [contentId, rows] of grouped) {
-		log.data(`  ${entryId(contentId)}:`);
+		log.info(`  ${entryId(contentId)}:`);
 
 		for (const row of rows) {
-			log.data(`    - ${formatUrl(row)}`);
+			log.detail(`  - ${formatUrl(row)}`);
 		}
 	}
 }

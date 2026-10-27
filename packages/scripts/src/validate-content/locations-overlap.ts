@@ -1,7 +1,8 @@
+import type { ContentEntry } from '@xsynaptic/astro-scripts/astro';
+
 import { distance as getDistance, around as getPointsAround } from 'geokdbush';
 import GeospatialIndex from 'kdbush';
 
-import type { ContentEntry } from '#shared/astro-content.ts';
 import type { ValidationResult } from '#validate-content/validation-result.ts';
 
 import { LocationGeometrySchema } from '#shared/geometry.ts';

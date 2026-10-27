@@ -1,7 +1,7 @@
 import { loadDeployConfig } from '#deploy/deploy-config.ts';
 import { getOpenGraphSet, getRenditionSet, uploadRenderedSet } from '#deploy/deploy-images.ts';
 import { ensureSshKeychain } from '#deploy/rsync-exec.ts';
-import { defineCommand, runCommand } from '#shared/cli-command.ts';
+import { defineCommand, runCommand } from '#shared/command.ts';
 
 await runCommand(
 	defineCommand({

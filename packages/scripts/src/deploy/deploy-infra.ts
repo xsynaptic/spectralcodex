@@ -1,3 +1,4 @@
+import { formatDuration, log } from '@xsynaptic/astro-scripts';
 import path from 'node:path';
 
 import type { DeployConfig } from '#deploy/deploy-config.ts';
@@ -11,7 +12,6 @@ import {
 	sshExec,
 	sshExecWithInput,
 } from '#deploy/rsync-exec.ts';
-import { formatDuration, log } from '#shared/cli-output.ts';
 
 interface DeployInfraOptions {
 	dryRun?: boolean;

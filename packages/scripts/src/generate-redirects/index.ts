@@ -1,11 +1,10 @@
+import { formatCount, log, Refusal, withSpinner } from '@xsynaptic/astro-scripts';
+import { getCollectionEntries, withAstroContent } from '@xsynaptic/astro-scripts/astro';
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { buildRedirectPairs } from '#generate-redirects/build-redirect-pairs.ts';
-import { getCollectionEntries, withAstroContent } from '#shared/astro-content.ts';
-import { defineCommand, Refusal, runCommand } from '#shared/cli-command.ts';
-import { formatCount, log } from '#shared/cli-output.ts';
-import { withSpinner } from '#shared/cli-progress.ts';
+import { defineCommand, runCommand } from '#shared/command.ts';
 
 await runCommand(
 	defineCommand({

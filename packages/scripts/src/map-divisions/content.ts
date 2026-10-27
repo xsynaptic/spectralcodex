@@ -1,12 +1,11 @@
 import type { GeometryBoundingBox } from '@spectralcodex/shared/schemas';
+import type { ContentEntry } from '@xsynaptic/astro-scripts/astro';
 
 import { GeometryBoundingBoxSchema, GeometryDivisionIdSchema } from '@spectralcodex/shared/schemas';
+import { formatCount, log } from '@xsynaptic/astro-scripts';
 import path from 'node:path';
 
 import type { RegionMetadata } from '#map-divisions/types.ts';
-import type { ContentEntry } from '#shared/astro-content.ts';
-
-import { formatCount, log } from '#shared/cli-output.ts';
 
 export function getDivisionIds(entry: ContentEntry): Array<string> {
 	const divisionId = GeometryDivisionIdSchema.optional().parse(entry.data.divisionId);

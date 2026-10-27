@@ -1,14 +1,19 @@
 import type { CollectionEntry } from 'astro:content';
 
+import {
+	formatCount,
+	log,
+	parseNumberOption,
+	Refusal,
+	withSpinner,
+} from '@xsynaptic/astro-scripts';
+import { withAstroContent } from '@xsynaptic/astro-scripts/astro';
 import chalk from 'chalk';
 import path from 'node:path';
 import * as R from 'remeda';
 
 import { checks } from '#improve-content/checks.ts';
-import { withAstroContent } from '#shared/astro-content.ts';
-import { defineCommand, parseNumberOption, Refusal, runCommand } from '#shared/cli-command.ts';
-import { formatCount, log } from '#shared/cli-output.ts';
-import { withSpinner } from '#shared/cli-progress.ts';
+import { defineCommand, runCommand } from '#shared/command.ts';
 
 const randomDefaultLimit = 50;
 

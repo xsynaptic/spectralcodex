@@ -3,11 +3,11 @@ import type { GeometryBoundingBox } from '@spectralcodex/shared/schemas';
 import type { Geometry } from 'geojson';
 
 import { DuckDBInstance } from '@duckdb/node-api';
+import { formatCount, formatError, log } from '@xsynaptic/astro-scripts';
 
 import type { DivisionGeometry, DivisionItem } from '#map-divisions/types.ts';
 
 import { getDivisionDataCache, saveDivisionDataCache } from '#map-divisions/geojson-cache.ts';
-import { formatCount, formatError, log } from '#shared/cli-output.ts';
 
 interface DivisionRow {
 	areaId: string;

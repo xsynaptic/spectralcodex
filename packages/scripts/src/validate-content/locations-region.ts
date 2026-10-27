@@ -1,6 +1,6 @@
-import path from 'node:path';
+import type { ContentEntry } from '@xsynaptic/astro-scripts/astro';
 
-import type { ContentEntry } from '#shared/astro-content.ts';
+import path from 'node:path';
 
 import { toReferenceIds } from '#shared/entries.ts';
 import { toValidationResult } from '#validate-content/validation-result.ts';

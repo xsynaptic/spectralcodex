@@ -1,6 +1,7 @@
+import type { ContentEntry } from '@xsynaptic/astro-scripts/astro';
+
 import { findStemCollisions } from '@xsynaptic/astro-image-pipeline/presets';
 
-import type { ContentEntry } from '#shared/astro-content.ts';
 import type { ValidationResult } from '#validate-content/validation-result.ts';
 
 import { getEntryImageIds, listMediaImages } from '#shared/image-references.ts';

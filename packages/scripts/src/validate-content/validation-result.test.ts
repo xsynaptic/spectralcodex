@@ -3,13 +3,13 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { reportValidationResult } from '#validate-content/validation-result.ts';
 
 describe('reportValidationResult', () => {
-	// Chalk strips its own styling under vitest, so the lines compare as plain text
 	const lines: Array<string> = [];
 
 	beforeEach(() => {
 		lines.length = 0;
-		vi.spyOn(console, 'error').mockImplementation((line: string) => {
-			lines.push(line);
+		vi.spyOn(process.stderr, 'write').mockImplementation((chunk: string | Uint8Array) => {
+			lines.push(String(chunk).replace(/\n$/, ''));
+			return true;
 		});
 	});
 

@@ -1,9 +1,7 @@
+import { formatCount, log, withSpinner } from '@xsynaptic/astro-scripts';
 import { existsSync, promises as fs } from 'node:fs';
 import path from 'node:path';
 import * as R from 'remeda';
-
-import { formatCount, log } from '#shared/cli-output.ts';
-import { withSpinner } from '#shared/cli-progress.ts';
 
 export type PurgeRequestBody = { files: Array<string> } | { prefixes: Array<string> };
 

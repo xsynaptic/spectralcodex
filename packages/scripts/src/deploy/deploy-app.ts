@@ -1,11 +1,10 @@
 import { openGraphBasePath } from '@spectralcodex/shared/open-graph';
+import { formatDuration, log, withStatus } from '@xsynaptic/astro-scripts';
 import { readdirSync } from 'node:fs';
 import path from 'node:path';
 
 import { loadDeployConfig } from '#deploy/deploy-config.ts';
 import { describeRsyncSummary, rsyncTo, sshExecWithInput } from '#deploy/rsync-exec.ts';
-import { formatDuration, log } from '#shared/cli-output.ts';
-import { withStatus } from '#shared/cli-progress.ts';
 
 interface DeployAppOptions {
 	dryRun?: boolean;

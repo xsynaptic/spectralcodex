@@ -1,5 +1,4 @@
-import { Refusal } from '#shared/cli-command.ts';
-import { log } from '#shared/cli-output.ts';
+import { log, Refusal } from '@xsynaptic/astro-scripts';
 
 export interface DeployConfig {
 	imageBaseUrl: string;

@@ -1,6 +1,7 @@
-import { getCollectionEntries, withAstroContent } from '#shared/astro-content.ts';
-import { defineCommand, runCommand } from '#shared/cli-command.ts';
-import { withSpinner } from '#shared/cli-progress.ts';
+import { withSpinner } from '@xsynaptic/astro-scripts';
+import { getCollectionEntries, withAstroContent } from '@xsynaptic/astro-scripts/astro';
+
+import { defineCommand, runCommand } from '#shared/command.ts';
 import { validateImageAltTitles } from '#validate-content/image-alt.ts';
 import { reportValidationResult } from '#validate-content/validation-result.ts';
 

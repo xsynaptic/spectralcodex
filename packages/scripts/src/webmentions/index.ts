@@ -2,13 +2,12 @@ import type { Webmention } from '@spectralcodex/shared/schemas';
 
 import { getWebmentionsPath } from '@spectralcodex/shared/paths';
 import { WebmentionSchema } from '@spectralcodex/shared/schemas';
+import { formatCount, log, withSpinner } from '@xsynaptic/astro-scripts';
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import sanitizeHtml from 'sanitize-html';
 
-import { defineCommand, runCommand } from '#shared/cli-command.ts';
-import { formatCount, log } from '#shared/cli-output.ts';
-import { withSpinner } from '#shared/cli-progress.ts';
+import { defineCommand, runCommand } from '#shared/command.ts';
 import { isExistingFile, safelyCreateDirectory } from '#shared/files.ts';
 
 const apiUrl = 'https://webmention.io/api/mentions.jf2';

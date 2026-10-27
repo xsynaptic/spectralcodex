@@ -7,6 +7,7 @@ import { featureCollection } from '@turf/helpers';
 import { coordAll } from '@turf/meta';
 import { rewind } from '@turf/rewind';
 import { simplify } from '@turf/simplify';
+import { formatCount, log } from '@xsynaptic/astro-scripts';
 import { geoAzimuthalEqualArea, geoCentroid, geoPath } from 'd3-geo';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -14,7 +15,6 @@ import { optimize } from 'svgo';
 
 import type { DivisionFeatureCollection, DivisionGeometry } from '#map-divisions/types.ts';
 
-import { formatCount, log } from '#shared/cli-output.ts';
 import { safelyCreateDirectory } from '#shared/files.ts';
 
 interface SvgOptions {

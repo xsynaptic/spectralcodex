@@ -1,5 +1,6 @@
 import { getImageCachePaths, readManifest } from '@xsynaptic/astro-image-pipeline/node';
 import { parseImageName } from '@xsynaptic/astro-image-pipeline/presets';
+import { createStatus, formatCount, formatDuration, log } from '@xsynaptic/astro-scripts';
 import { stat } from 'node:fs/promises';
 import path from 'node:path';
 import * as R from 'remeda';
@@ -13,7 +14,6 @@ import {
 	getEdgeProbes,
 	getProbeFailure,
 } from '#deploy/verify-edge-probes.ts';
-import { endSpinner, formatCount, formatDuration, log, startSpinner } from '#shared/cli-output.ts';
 
 // Node's fetch never times out on its own, so a hung connection would stall the deploy
 const requestTimeoutMs = 10_000;
@@ -29,7 +29,7 @@ export async function verifyEdge({
 }): Promise<void> {
 	const start = Date.now();
 	const token = start.toString();
-	const spinner = startSpinner('Verifying edge cache tiers');
+	const status = createStatus('Verifying edge cache tiers');
 
 	const documentProbe = getDocumentProbe({ config, token });
 	const documentResponse = await request(documentProbe);
@@ -44,7 +44,7 @@ export async function verifyEdge({
 		R.isNonNullish,
 	);
 
-	endSpinner(spinner);
+	status.stop();
 
 	if (failures.length > 0) {
 		for (const failure of failures) {
@@ -68,7 +68,7 @@ async function readImageSamples(cachePath: string) {
 
 	if (!manifest) return;
 
-	const samples = R.sample(Object.keys(manifest.files), imageSampleSize).flatMap((name) => {
+	const samples = R.sample(Object.keys(manifest.renditions), imageSampleSize).flatMap((name) => {
 		const parsed = parseImageName(name);
 
 		return parsed ? [{ format: parsed.format, name }] : [];

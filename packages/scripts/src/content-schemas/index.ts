@@ -1,8 +1,8 @@
+import { log, Refusal } from '@xsynaptic/astro-scripts';
 import { copyFileSync, mkdirSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 
-import { defineCommand, Refusal, runCommand } from '#shared/cli-command.ts';
-import { log } from '#shared/cli-output.ts';
+import { defineCommand, runCommand } from '#shared/command.ts';
 
 const schemaDir = '.astro/collections';
 

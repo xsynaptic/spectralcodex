@@ -1,6 +1,6 @@
-import { getPublicId } from '@spectralcodex/shared/entries';
+import type { ContentEntry } from '@xsynaptic/astro-scripts/astro';
 
-import type { ContentEntry } from '#shared/astro-content.ts';
+import { getPublicId } from '@spectralcodex/shared/entries';
 
 import { toValidationResult } from '#validate-content/validation-result.ts';
 

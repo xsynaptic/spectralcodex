@@ -1,18 +1,17 @@
 import type { SitemapLastmod } from '@spectralcodex/shared/sitemap';
+import type { ContentEntry } from '@xsynaptic/astro-scripts/astro';
 
 import { getPublicId } from '@spectralcodex/shared/entries';
 import { getCachePaths } from '@spectralcodex/shared/paths';
 import { getCollectionSegment, joinUrl, siteBasePath } from '@spectralcodex/shared/routing';
+import { formatCount, log, withSpinner } from '@xsynaptic/astro-scripts';
+import { getCollectionEntries, withAstroContent } from '@xsynaptic/astro-scripts/astro';
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { $ } from 'zx';
 
-import type { ContentEntry } from '#shared/astro-content.ts';
-import type { ScriptPaths } from '#shared/cli-command.ts';
+import type { ScriptPaths } from '#shared/command.ts';
 
-import { getCollectionEntries, withAstroContent } from '#shared/astro-content.ts';
-import { formatCount, log } from '#shared/cli-output.ts';
-import { withSpinner } from '#shared/cli-progress.ts';
 import { safelyCreateDirectory } from '#shared/files.ts';
 import { getGitFileDates } from '#sitemap-lastmod/git-file-dates.ts';
 

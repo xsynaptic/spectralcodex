@@ -8,6 +8,7 @@ import { feature, featureCollection, lengthToDegrees } from '@turf/helpers';
 import { simplify } from '@turf/simplify';
 import { truncate } from '@turf/truncate';
 import { union } from '@turf/union';
+import { log } from '@xsynaptic/astro-scripts';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
@@ -17,7 +18,6 @@ import type {
 	DivisionItem,
 } from '#map-divisions/types.ts';
 
-import { log } from '#shared/cli-output.ts';
 import { safelyCreateDirectory } from '#shared/files.ts';
 
 const maskToleranceExponent = 0.6;

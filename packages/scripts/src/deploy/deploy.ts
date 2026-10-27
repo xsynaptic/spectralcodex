@@ -1,3 +1,4 @@
+import { log } from '@xsynaptic/astro-scripts';
 import { $ } from 'zx';
 
 import { deployApp } from '#deploy/deploy-app.ts';
@@ -7,8 +8,7 @@ import { loadDeployConfig, printDeployConfig } from '#deploy/deploy-config.ts';
 import { getOpenGraphSet, getRenditionSet, uploadRenderedSet } from '#deploy/deploy-images.ts';
 import { ensureSshKeychain } from '#deploy/rsync-exec.ts';
 import { verifyEdge } from '#deploy/verify-edge.ts';
-import { defineCommand, runCommand } from '#shared/cli-command.ts';
-import { log } from '#shared/cli-output.ts';
+import { defineCommand, runCommand } from '#shared/command.ts';
 import { generateSitemapLastmod } from '#sitemap-lastmod/index.ts';
 
 await runCommand(

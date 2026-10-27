@@ -2,15 +2,14 @@ import { openGraphBasePath, openGraphImageFormat } from '@spectralcodex/shared/o
 import { getCachePaths } from '@spectralcodex/shared/paths';
 import { getImageCachePaths } from '@xsynaptic/astro-image-pipeline/node';
 import { imageFormats } from '@xsynaptic/astro-image-pipeline/presets';
+import { formatDuration, log, Refusal } from '@xsynaptic/astro-scripts';
 import { readdir } from 'node:fs/promises';
 
 import type { DeployConfig } from '#deploy/deploy-config.ts';
-import type { ScriptPaths } from '#shared/cli-command.ts';
+import type { ScriptPaths } from '#shared/command.ts';
 
 import { requestCloudflarePurge } from '#deploy/cloudflare-purge.ts';
 import { describeRsyncSummary, rsyncTo } from '#deploy/rsync-exec.ts';
-import { Refusal } from '#shared/cli-command.ts';
-import { formatDuration, log } from '#shared/cli-output.ts';
 import { createPurgeQueue } from '#shared/purge-queue.ts';
 
 export interface RenderedSet {
@@ -63,7 +62,7 @@ export function getOpenGraphSet(paths: ScriptPaths, config: DeployConfig): Rende
 		command: 'pnpm og-image',
 		extensions: [openGraphImageFormat],
 		label: 'OpenGraph images',
-		localPath: getCachePaths(paths.cachePath).openGraphPath,
+		localPath: getImageCachePaths(paths.cachePath).openGraphCardsPath,
 		remotePath: `${config.sitePath}/${openGraphBasePath}`,
 		title: 'OpenGraph images',
 	};

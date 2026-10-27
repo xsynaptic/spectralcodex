@@ -1,4 +1,6 @@
-import { defineCommand, Refusal, runCommand } from '#shared/cli-command.ts';
+import { Refusal } from '@xsynaptic/astro-scripts';
+
+import { defineCommand, runCommand } from '#shared/command.ts';
 import { generateSitemapLastmod } from '#sitemap-lastmod/index.ts';
 
 await runCommand(

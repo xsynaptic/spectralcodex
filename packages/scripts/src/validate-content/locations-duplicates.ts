@@ -1,6 +1,7 @@
+import type { ContentEntry } from '@xsynaptic/astro-scripts/astro';
+
 import { z } from 'zod';
 
-import type { ContentEntry } from '#shared/astro-content.ts';
 import type { ValidationIssue } from '#validate-content/validation-result.ts';
 
 import { toValidationResult } from '#validate-content/validation-result.ts';
