@@ -1,7 +1,7 @@
 {
 	"name": "@xsynaptic/astro-image-pipeline",
 	"version": "0.1.0",
-	"description": "Stable-name image derivatives for Astro sites, rendered outside the bundler",
+	"description": "Stable-name image renditions for Astro sites, rendered outside the bundler",
 	"type": "module",
 	"exports": {
 		".": "./src/astro-integration.ts",

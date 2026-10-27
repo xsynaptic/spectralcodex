@@ -13,7 +13,7 @@ import { Refusal } from '#shared/cli-command.ts';
 import { formatDuration, log } from '#shared/cli-output.ts';
 import { createPurgeQueue } from '#shared/purge-queue.ts';
 
-export interface DerivativeSet {
+export interface RenderedSet {
 	command: string;
 	extensions: ReadonlyArray<string>;
 	label: string;
@@ -24,7 +24,7 @@ export interface DerivativeSet {
 	title: string;
 }
 
-interface DerivativeDeployOptions {
+interface RenderedDeployOptions {
 	config: DeployConfig;
 	dryRun?: boolean;
 }
@@ -32,7 +32,7 @@ interface DerivativeDeployOptions {
 const partialDirectory = '.rsync-partial';
 
 // A truncated file at a served path would be cached at the edge for a year, so transfers land whole
-export const derivativeUploadOptions = {
+export const renderedUploadOptions = {
 	compress: false,
 	excludes: ['*.tmp', '.DS_Store'],
 	extraFlags: [
@@ -43,23 +43,23 @@ export const derivativeUploadOptions = {
 	],
 } as const;
 
-export function getImageSet(paths: ScriptPaths, config: DeployConfig): DerivativeSet {
-	const { filesPath, statePath } = getImageCachePaths(paths.cachePath);
+export function getRenditionSet(paths: ScriptPaths, config: DeployConfig): RenderedSet {
+	const { renditionsPath, statePath } = getImageCachePaths(paths.cachePath);
 
 	return {
 		command: 'pnpm render-images',
 		extensions: imageFormats,
-		label: 'images',
-		localPath: filesPath,
+		label: 'renditions',
+		localPath: renditionsPath,
 		purgeBaseUrl: config.imageBaseUrl,
 		remotePath: config.imagesPath,
 		statePath,
-		title: 'Images',
+		title: 'Renditions',
 	};
 }
 
 // The deploy's hostname purge already covers the site host, so cards need no queue of their own
-export function getOpenGraphSet(paths: ScriptPaths, config: DeployConfig): DerivativeSet {
+export function getOpenGraphSet(paths: ScriptPaths, config: DeployConfig): RenderedSet {
 	return {
 		command: 'pnpm og-image',
 		extensions: [openGraphImageFormat],
@@ -79,7 +79,7 @@ async function readLocalNames(localPath: string) {
 	}
 }
 
-async function assertLocalFiles(set: DerivativeSet) {
+async function assertLocalFiles(set: RenderedSet) {
 	const names = await readLocalNames(set.localPath);
 	const hasFiles = names.some((name) =>
 		set.extensions.some((extension) => name.endsWith(`.${extension}`)),
@@ -90,7 +90,7 @@ async function assertLocalFiles(set: DerivativeSet) {
 	}
 }
 
-async function purgeSet(set: DerivativeSet, isDryRun: boolean) {
+async function purgeSet(set: RenderedSet, isDryRun: boolean) {
 	if (set.purgeBaseUrl === undefined) return;
 
 	const queue = await createPurgeQueue(set.statePath);
@@ -103,9 +103,9 @@ async function purgeSet(set: DerivativeSet, isDryRun: boolean) {
 	});
 }
 
-export async function uploadDerivatives(
-	set: DerivativeSet,
-	{ config, dryRun = false }: DerivativeDeployOptions,
+export async function uploadRenderedSet(
+	set: RenderedSet,
+	{ config, dryRun = false }: RenderedDeployOptions,
 ) {
 	await assertLocalFiles(set);
 
@@ -114,7 +114,7 @@ export async function uploadDerivatives(
 	const start = Date.now();
 
 	const summary = await rsyncTo(`${set.localPath}/`, `${config.remoteHost}:${set.remotePath}/`, {
-		...derivativeUploadOptions,
+		...renderedUploadOptions,
 		config,
 		dryRun,
 		label: `Uploading ${set.label}`,

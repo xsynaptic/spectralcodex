@@ -38,9 +38,9 @@ export interface ImageSample {
 const objectivesSessionCookie = 'scx-objectives-session';
 
 const documentCacheControl = 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400';
-const derivativeCacheControl =
+const renderedCacheControl =
 	'public, max-age=2592000, stale-while-revalidate=604800, s-maxage=31536000, no-transform';
-const derivativeNotFoundCacheControl = 'public, max-age=60';
+const renderedNotFoundCacheControl = 'public, max-age=60';
 
 const imageContentTypes = { jpg: 'image/jpeg', webp: 'image/webp' } satisfies Record<
 	ImageFormat,
@@ -127,7 +127,7 @@ function getSiteExpectations(token: string): Array<SiteExpectation> {
 			status: 404,
 		},
 		{
-			cacheControl: derivativeNotFoundCacheControl,
+			cacheControl: renderedNotFoundCacheControl,
 			label: 'missing OpenGraph card',
 			path: `/og/edge-check-${token}.jpg`,
 			status: 404,
@@ -154,7 +154,7 @@ function getDocumentExpectations(html: string) {
 
 	if (openGraphUrl) {
 		expectations.push({
-			cacheControl: derivativeCacheControl,
+			cacheControl: renderedCacheControl,
 			label: 'OpenGraph card',
 			path: new URL(openGraphUrl).pathname,
 			status: 200,
@@ -192,7 +192,7 @@ function getLegacyRedirectProbes(imageBaseUrl: string, imagePath: string, token:
 	const legacyPath = `/${signature}/${String(width)}x${String(height)}/filters:quality(${String(imageQualityByFormat[format])}):format(${format})/${stem}.jpg`;
 
 	const probe: EdgeProbe = {
-		expect: { cacheControl: derivativeCacheControl, location: `/${imagePath}`, status: 301 },
+		expect: { cacheControl: renderedCacheControl, location: `/${imagePath}`, status: 301 },
 		label: 'legacy redirect',
 		method: 'GET',
 		url: `${imageBaseUrl}${legacyPath}`,
@@ -264,7 +264,7 @@ function getImageHostProbes({
 	const sampled = getSampleProbes(imageBaseUrl, samples);
 	const hero: EdgeProbe = {
 		expect: {
-			cacheControl: derivativeCacheControl,
+			cacheControl: renderedCacheControl,
 			contentType: 'image/',
 			isNoSniff: true,
 			status: 200,
@@ -274,7 +274,7 @@ function getImageHostProbes({
 		url: imageUrl,
 	};
 	const missing: EdgeProbe = {
-		expect: { cacheControl: derivativeNotFoundCacheControl, status: 404 },
+		expect: { cacheControl: renderedNotFoundCacheControl, status: 404 },
 		label: 'missing image',
 		method: 'GET',
 		url: `${imageBaseUrl}/edge-check-${token}-450.webp`,

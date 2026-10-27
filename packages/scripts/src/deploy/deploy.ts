@@ -4,7 +4,7 @@ import { deployApp } from '#deploy/deploy-app.ts';
 import { invokeCacheRefresh } from '#deploy/deploy-cache-refresh.ts';
 import { deployCaddy } from '#deploy/deploy-caddy.ts';
 import { loadDeployConfig, printDeployConfig } from '#deploy/deploy-config.ts';
-import { getImageSet, getOpenGraphSet, uploadDerivatives } from '#deploy/deploy-derivatives.ts';
+import { getOpenGraphSet, getRenditionSet, uploadRenderedSet } from '#deploy/deploy-images.ts';
 import { ensureSshKeychain } from '#deploy/rsync-exec.ts';
 import { verifyEdge } from '#deploy/verify-edge.ts';
 import { defineCommand, runCommand } from '#shared/cli-command.ts';
@@ -98,8 +98,8 @@ await runCommand(
 				() => runScript('render-images'),
 				() => runScript('og-image'),
 				test,
-				() => uploadDerivatives(getImageSet(paths, config), { config, dryRun: isDryRun }),
-				() => uploadDerivatives(getOpenGraphSet(paths, config), { config, dryRun: isDryRun }),
+				() => uploadRenderedSet(getRenditionSet(paths, config), { config, dryRun: isDryRun }),
+				() => uploadRenderedSet(getOpenGraphSet(paths, config), { config, dryRun: isDryRun }),
 				() => deployApp({ dryRun: isDryRun, rootPath }),
 				() => deployCaddy({ dryRun: isDryRun, rootPath }),
 				async () => {

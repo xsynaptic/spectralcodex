@@ -25,8 +25,8 @@ export interface ImageManifest {
 export function getImageCachePaths(cachePath: string) {
 	return {
 		devPath: `${cachePath}/img-dev`,
-		filesPath: `${cachePath}/img`,
 		recordsPath: `${cachePath}/img-state/records`,
+		renditionsPath: `${cachePath}/img`,
 		statePath: `${cachePath}/img-state`,
 	};
 }

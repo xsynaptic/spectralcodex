@@ -9,7 +9,7 @@ import type { ImageRenderOptions } from '#image-build.ts';
 import type { ImageManifest } from '#image-state.ts';
 
 import { readFileIfExists } from '#files.ts';
-import { getFileKey, renderImages } from '#image-build.ts';
+import { getRenditionKey, renderImages } from '#image-build.ts';
 import { resolveImageEncoding } from '#image-encoding.ts';
 import { imageManifestVersion, writeBuildId, writeManifest } from '#image-state.ts';
 import { Refusal } from '#refusal.ts';
@@ -38,7 +38,7 @@ const allSizes = [
 
 let root: string;
 let mediaPath: string;
-let filesPath: string;
+let renditionsPath: string;
 let statePath: string;
 let distPath: string;
 let buildCount = 0;
@@ -93,9 +93,9 @@ function sortNames(names: ReadonlyArray<string>) {
 }
 
 async function listFiles() {
-	if (!existsSync(filesPath)) return [];
+	if (!existsSync(renditionsPath)) return [];
 
-	const names = await fs.readdir(filesPath, { recursive: true });
+	const names = await fs.readdir(renditionsPath, { recursive: true });
 
 	return sortNames(names.filter((name) => /\.(?:jpg|webp)$/.test(name)));
 }
@@ -107,7 +107,7 @@ function getDeadPid() {
 beforeEach(async () => {
 	root = await fs.mkdtemp(path.join(tmpdir(), 'image-build-'));
 	mediaPath = path.join(root, 'media');
-	filesPath = path.join(root, 'img');
+	renditionsPath = path.join(root, 'img');
 	statePath = path.join(root, 'img-state');
 	distPath = path.join(root, 'dist');
 
@@ -132,7 +132,7 @@ describe('renderImages', () => {
 
 		for (const name of files) {
 			const [, width, height, format] = /-(\d+)(?:x(\d+))?\.(jpg|webp)$/.exec(name) ?? [];
-			const metadata = await sharp(path.join(filesPath, name)).metadata();
+			const metadata = await sharp(path.join(renditionsPath, name)).metadata();
 
 			expect(metadata.width).toBe(Number(width));
 			if (height) expect(metadata.height).toBe(Number(height));
@@ -173,7 +173,7 @@ describe('renderImages', () => {
 		const past = new Date('2020-01-01');
 		const files = await listFiles();
 
-		for (const name of files) await fs.utimes(path.join(filesPath, name), past, past);
+		for (const name of files) await fs.utimes(path.join(renditionsPath, name), past, past);
 		await fs.rm(path.join(statePath, 'sidecar.json'));
 
 		const counts = await render();
@@ -183,7 +183,7 @@ describe('renderImages', () => {
 		expect(counts.overwritten).toBe(0);
 
 		for (const name of files) {
-			const stats = await fs.stat(path.join(filesPath, name));
+			const stats = await fs.stat(path.join(renditionsPath, name));
 
 			expect(stats.mtimeMs).toBe(past.getTime());
 		}
@@ -253,9 +253,9 @@ describe('renderImages', () => {
 });
 
 // A new key re-renders the whole library (about an hour), so this only changes on purpose
-describe('getFileKey', () => {
+describe('getRenditionKey', () => {
 	test('stays pinned for a fixed input', () => {
-		const key = getFileKey({
+		const key = getRenditionKey({
 			digest: 'a'.repeat(64),
 			encoding: resolveImageEncoding({ jpg: { quality: 85 } }).jpg,
 			engine: 'engine',

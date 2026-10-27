@@ -3,23 +3,23 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 
-import type { DerivativeJob } from '#run-derivatives.ts';
+import type { RenderJob } from '#run-render-jobs.ts';
 
-import { runDerivatives } from '#run-derivatives.ts';
+import { runRenderJobs } from '#run-render-jobs.ts';
 
 let directory: string;
 let statePath: string;
 
-function createJob(name: string, key = 'key'): DerivativeJob {
+function createJob(name: string, key = 'key'): RenderJob {
 	return { key, name, render: () => Promise.resolve(new TextEncoder().encode(name)) };
 }
 
-function run(jobs: ReadonlyArray<DerivativeJob>) {
-	return runDerivatives({ directory, jobs, statePath });
+function run(jobs: ReadonlyArray<RenderJob>) {
+	return runRenderJobs({ directory, jobs, statePath });
 }
 
 beforeEach(async () => {
-	const root = await fs.mkdtemp(path.join(tmpdir(), 'run-derivatives-'));
+	const root = await fs.mkdtemp(path.join(tmpdir(), 'run-render-jobs-'));
 
 	directory = path.join(root, 'files');
 	statePath = path.join(root, 'state');
@@ -29,7 +29,7 @@ afterEach(async () => {
 	await fs.rm(path.dirname(directory), { force: true, recursive: true });
 });
 
-describe('runDerivatives', () => {
+describe('runRenderJobs', () => {
 	test('a recorded key without its file is stale, so a cleared directory redraws', async () => {
 		await run([createJob('a.jpg')]);
 		await fs.rm(path.join(directory, 'a.jpg'));
@@ -53,8 +53,8 @@ describe('runDerivatives', () => {
 			key: 'key',
 			name: 'b.jpg',
 			render: () => Promise.reject(new Error('broken')),
-		} satisfies DerivativeJob;
-		const counts = await runDerivatives({
+		} satisfies RenderJob;
+		const counts = await runRenderJobs({
 			directory,
 			jobs: [createJob('a.jpg'), failing],
 			onFailure: 'report',

@@ -16,7 +16,7 @@
 		"content-schemas": "node --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/content-schemas/index.ts",
 		"deploy-app": "node --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/deploy/deploy-app.cli.ts",
 		"deploy-caddy": "node --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/deploy/deploy-caddy.cli.ts",
-		"deploy-images": "node --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/deploy/deploy-derivatives.cli.ts",
+		"deploy-images": "node --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/deploy/deploy-images.cli.ts",
 		"deploy-infra": "node --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/deploy/deploy-infra.cli.ts",
 		"deploy-site": "NODE_ENV=production node --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/deploy/deploy.ts",
 		"generate-redirects": "node --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/generate-redirects/index.ts",

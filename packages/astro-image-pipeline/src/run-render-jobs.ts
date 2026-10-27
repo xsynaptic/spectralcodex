@@ -7,30 +7,30 @@ import { withRenderLock } from '#render-lock.ts';
 
 const saveInterval = 10_000;
 
-export interface DerivativeJob {
+export interface RenderJob {
 	key: string;
 	name: string;
 	render: () => Promise<Uint8Array>;
 }
 
-interface DerivativeCounts {
+interface RenderCounts {
 	fresh: number;
 	overwritten: number;
 	rendered: number;
 	written: number;
 }
 
-interface DerivativeFailure {
+interface RenderFailure {
 	message: string;
 	name: string;
 }
 
-export interface DerivativeRunOptions {
+export interface RenderJobOptions {
 	concurrency?: number;
 	directory: string;
-	jobs: ReadonlyArray<DerivativeJob>;
+	jobs: ReadonlyArray<RenderJob>;
 	onFailure?: 'report' | 'throw';
-	onProgress?: (progress: DerivativeCounts & { done: number; total: number }) => void;
+	onProgress?: (progress: RenderCounts & { done: number; total: number }) => void;
 	onReplace?: (name: string) => Promise<void>;
 	signal?: AbortSignal;
 	statePath: string;
@@ -41,7 +41,7 @@ export function getDefaultConcurrency() {
 	return Math.min(availableParallelism(), Number(process.env.UV_THREADPOOL_SIZE) || 4);
 }
 
-export function runDerivatives(options: DerivativeRunOptions) {
+export function runRenderJobs(options: RenderJobOptions) {
 	return withRenderLock(options.statePath, () => runJobs(options));
 }
 
@@ -54,8 +54,8 @@ async function runJobs({
 	onReplace,
 	signal,
 	statePath,
-}: DerivativeRunOptions) {
-	const counts: DerivativeCounts = { fresh: 0, overwritten: 0, rendered: 0, written: 0 };
+}: RenderJobOptions) {
+	const counts: RenderCounts = { fresh: 0, overwritten: 0, rendered: 0, written: 0 };
 	const cache = await createFileCache({
 		directory,
 		onReplace: async (name) => {
@@ -67,11 +67,11 @@ async function runJobs({
 	const limit = pLimit(concurrency);
 	const saveLimit = pLimit(1);
 	const save = () => saveLimit(() => cache.save());
-	const failures: Array<DerivativeFailure> = [];
+	const failures: Array<RenderFailure> = [];
 	let done = 0;
 	let lastSave = Date.now();
 
-	async function runJob(job: DerivativeJob) {
+	async function runJob(job: RenderJob) {
 		if (cache.isFresh(job.name, job.key)) {
 			counts.fresh++;
 			return;

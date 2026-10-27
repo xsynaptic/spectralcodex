@@ -31,7 +31,7 @@ await runCommand(
 			progress?.succeed();
 
 			log.summary([
-				['Images', counts.total],
+				['Renditions', counts.total],
 				['Rendered', counts.rendered],
 				['Up to date', counts.fresh],
 				['Written', counts.written],
@@ -41,11 +41,11 @@ await runCommand(
 
 			if (counts.isEngineChanged) {
 				log.warn(
-					'The sharp build changed since the last run, so every image re-rendered; changed files upload and purge on the next deploy',
+					'The sharp build changed since the last run, so every rendition re-rendered; changed renditions upload and purge on the next deploy',
 				);
 			}
 		},
-		summary: 'Render the images the last build published, incrementally',
+		summary: 'Render the renditions the last build published, incrementally',
 		title: `Render images (sharp ${engineVersions.sharp}, vips ${engineVersions.vips})`,
 	}),
 );

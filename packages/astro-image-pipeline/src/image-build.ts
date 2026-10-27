@@ -7,7 +7,7 @@ import sharp from 'sharp';
 
 import type { ImageFormat, ImageName } from '#image-name.ts';
 import type { ImageManifest } from '#image-state.ts';
-import type { DerivativeRunOptions } from '#run-derivatives.ts';
+import type { RenderJobOptions } from '#run-render-jobs.ts';
 import type { SourceFingerprints } from '#source-fingerprints.ts';
 
 import { formatList } from '#format.ts';
@@ -17,17 +17,17 @@ import { isWithinSource } from '#image-presets.ts';
 import { engineId, renderImage } from '#image-render.ts';
 import { getImageCachePaths, readCurrentManifest, readEngine, writeEngine } from '#image-state.ts';
 import { Refusal } from '#refusal.ts';
-import { getDefaultConcurrency, runDerivatives } from '#run-derivatives.ts';
+import { getDefaultConcurrency, runRenderJobs } from '#run-render-jobs.ts';
 import { createSourceFingerprints } from '#source-fingerprints.ts';
 
 export interface ImageRenderOptions extends Pick<
-	DerivativeRunOptions,
+	RenderJobOptions,
 	'onFailure' | 'onProgress' | 'onReplace' | 'signal'
 > {
 	cachePath: string;
 }
 
-interface ImageFile extends ImageName {
+interface ImageRendition extends ImageName {
 	name: string;
 	sourceId: string;
 }
@@ -36,7 +36,7 @@ function sortNames(names: ReadonlyArray<string>) {
 	return names.toSorted((first, second) => first.localeCompare(second));
 }
 
-export function getFileKey({
+export function getRenditionKey({
 	digest,
 	encoding,
 	engine,
@@ -67,15 +67,15 @@ export function getFileKey({
 		.slice(0, 16);
 }
 
-function getManifestFiles(manifest: ImageManifest) {
-	const files: Array<ImageFile> = [];
+function getManifestRenditions(manifest: ImageManifest) {
+	const renditions: Array<ImageRendition> = [];
 	const invalid: Array<string> = [];
 
 	for (const [name, sourceId] of Object.entries(manifest.files)) {
 		const parsed = parseImageName(name);
 
 		if (parsed) {
-			files.push({ ...parsed, name, sourceId });
+			renditions.push({ ...parsed, name, sourceId });
 		} else {
 			invalid.push(name);
 		}
@@ -87,22 +87,22 @@ function getManifestFiles(manifest: ImageManifest) {
 		);
 	}
 
-	return files;
+	return renditions;
 }
 
 async function readSourceDigests(
 	fingerprints: SourceFingerprints,
 	{ mediaPath }: ImageManifest,
-	{ concurrency, files }: { concurrency: number; files: ReadonlyArray<ImageFile> },
+	{ concurrency, renditions }: { concurrency: number; renditions: ReadonlyArray<ImageRendition> },
 ) {
 	const limit = pLimit(concurrency);
 	const digests = new Map<string, string>();
 	const vanished: Array<string> = [];
 	const upscaled: Array<string> = [];
-	const filesBySource = Map.groupBy(files, (file) => file.sourceId);
+	const renditionsBySource = Map.groupBy(renditions, (rendition) => rendition.sourceId);
 
 	await Promise.all(
-		[...filesBySource].map(([sourceId, sourceFiles]) =>
+		[...renditionsBySource].map(([sourceId, sourceRenditions]) =>
 			limit(async () => {
 				const fingerprint = await fingerprints.get(path.resolve(mediaPath, sourceId));
 
@@ -111,10 +111,10 @@ async function readSourceDigests(
 					return;
 				}
 
-				for (const file of sourceFiles) {
-					if (!isWithinSource(file, fingerprint)) {
+				for (const rendition of sourceRenditions) {
+					if (!isWithinSource(rendition, fingerprint)) {
 						upscaled.push(
-							`${file.name} (source ${String(fingerprint.width)}x${String(fingerprint.height)})`,
+							`${rendition.name} (source ${String(fingerprint.width)}x${String(fingerprint.height)})`,
 						);
 					}
 				}
@@ -132,67 +132,67 @@ async function readSourceDigests(
 
 	if (upscaled.length > 0) {
 		throw new Refusal(
-			`${String(upscaled.length)} images are larger than their source; rebuild first:\n${formatList(sortNames(upscaled))}`,
+			`${String(upscaled.length)} renditions are larger than their source; rebuild first:\n${formatList(sortNames(upscaled))}`,
 		);
 	}
 
 	return digests;
 }
 
-function assertEncodedSize(file: ImageFile, info: OutputInfo) {
-	if (info.width === file.width && (file.height ?? info.height) === info.height) return;
+function assertEncodedSize(rendition: ImageRendition, info: OutputInfo) {
+	if (info.width === rendition.width && (rendition.height ?? info.height) === info.height) return;
 
 	throw new Error(`encoded ${String(info.width)}x${String(info.height)}`);
 }
 
-function getManifestFileKey(
-	file: ImageFile,
+function getManifestRenditionKey(
+	rendition: ImageRendition,
 	manifest: ImageManifest,
 	digests: ReadonlyMap<string, string>,
 ) {
-	const digest = digests.get(file.sourceId);
+	const digest = digests.get(rendition.sourceId);
 
-	if (!digest) throw new Error(`no digest was read for source ${file.sourceId}`);
+	if (!digest) throw new Error(`no digest was read for source ${rendition.sourceId}`);
 
-	return getFileKey({
+	return getRenditionKey({
 		digest,
-		encoding: manifest.encoding[file.format],
+		encoding: manifest.encoding[rendition.format],
 		engine: engineId,
-		format: file.format,
-		height: file.height,
-		width: file.width,
+		format: rendition.format,
+		height: rendition.height,
+		width: rendition.width,
 	});
 }
 
-async function renderFile(file: ImageFile, manifest: ImageManifest) {
-	const { data, info } = await renderImage(path.resolve(manifest.mediaPath, file.sourceId), {
+async function encodeRendition(rendition: ImageRendition, manifest: ImageManifest) {
+	const { data, info } = await renderImage(path.resolve(manifest.mediaPath, rendition.sourceId), {
 		encoding: manifest.encoding,
-		format: file.format,
-		height: file.height,
+		format: rendition.format,
+		height: rendition.height,
 		limitInputPixels: manifest.limitInputPixels,
-		width: file.width,
+		width: rendition.width,
 	});
 
-	assertEncodedSize(file, info);
+	assertEncodedSize(rendition, info);
 
 	return data;
 }
 
 async function readImageJobs(cachePath: string, concurrency: number) {
-	const { filesPath, statePath } = getImageCachePaths(cachePath);
+	const { renditionsPath, statePath } = getImageCachePaths(cachePath);
 	const manifest = await readCurrentManifest(statePath);
-	const files = getManifestFiles(manifest);
+	const renditions = getManifestRenditions(manifest);
 	const digests = await readSourceDigests(createSourceFingerprints(cachePath), manifest, {
 		concurrency,
-		files,
+		renditions,
 	});
-	const jobs = files.map((file) => ({
-		key: getManifestFileKey(file, manifest, digests),
-		name: file.name,
-		render: () => renderFile(file, manifest),
+	const jobs = renditions.map((rendition) => ({
+		key: getManifestRenditionKey(rendition, manifest, digests),
+		name: rendition.name,
+		render: () => encodeRendition(rendition, manifest),
 	}));
 
-	return { directory: filesPath, jobs, statePath };
+	return { directory: renditionsPath, jobs, statePath };
 }
 
 export async function renderImages(options: ImageRenderOptions) {
@@ -205,7 +205,7 @@ export async function renderImages(options: ImageRenderOptions) {
 	sharp.concurrency(1);
 	sharp.cache(false);
 
-	const counts = await runDerivatives({ ...options, ...run, concurrency });
+	const counts = await runRenderJobs({ ...options, ...run, concurrency });
 
 	await writeEngine(run.statePath, engineId);
 

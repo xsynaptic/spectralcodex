@@ -63,7 +63,7 @@ export async function verifyEdge({
 }
 
 async function readImageSamples(cachePath: string) {
-	const { filesPath, statePath } = getImageCachePaths(cachePath);
+	const { renditionsPath, statePath } = getImageCachePaths(cachePath);
 	const manifest = await readManifest(statePath);
 
 	if (!manifest) return;
@@ -76,7 +76,7 @@ async function readImageSamples(cachePath: string) {
 
 	return Promise.all(
 		samples.map(async ({ format, name }) => ({
-			byteLength: await getFileSize(path.join(filesPath, name)),
+			byteLength: await getFileSize(path.join(renditionsPath, name)),
 			format,
 			path: name,
 		})),

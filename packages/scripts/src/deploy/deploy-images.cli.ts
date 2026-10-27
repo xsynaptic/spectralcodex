@@ -1,5 +1,5 @@
 import { loadDeployConfig } from '#deploy/deploy-config.ts';
-import { getImageSet, getOpenGraphSet, uploadDerivatives } from '#deploy/deploy-derivatives.ts';
+import { getOpenGraphSet, getRenditionSet, uploadRenderedSet } from '#deploy/deploy-images.ts';
 import { ensureSshKeychain } from '#deploy/rsync-exec.ts';
 import { defineCommand, runCommand } from '#shared/cli-command.ts';
 
@@ -15,11 +15,11 @@ await runCommand(
 
 			const config = loadDeployConfig();
 
-			for (const set of [getImageSet(paths, config), getOpenGraphSet(paths, config)]) {
-				await uploadDerivatives(set, { config, dryRun: values['dry-run'] });
+			for (const set of [getRenditionSet(paths, config), getOpenGraphSet(paths, config)]) {
+				await uploadRenderedSet(set, { config, dryRun: values['dry-run'] });
 			}
 		},
-		summary: 'Upload rendered images and OpenGraph images to the server',
+		summary: 'Upload renditions and OpenGraph cards to the server',
 		title: 'Deploy images',
 	}),
 );

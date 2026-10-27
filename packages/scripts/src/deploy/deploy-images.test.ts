@@ -4,7 +4,7 @@ import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { $ } from 'zx';
 
-import { derivativeUploadOptions } from '#deploy/deploy-derivatives.ts';
+import { renderedUploadOptions } from '#deploy/deploy-images.ts';
 import { buildRsyncArgs } from '#deploy/rsync-exec.ts';
 
 let rootPath: string;
@@ -25,13 +25,13 @@ async function runRsync(options: Omit<Parameters<typeof buildRsyncArgs>[2], 'con
 }
 
 async function syncOutputs() {
-	const output = await runRsync(derivativeUploadOptions);
+	const output = await runRsync(renderedUploadOptions);
 
 	return output.split('\n');
 }
 
 beforeEach(() => {
-	rootPath = mkdtempSync(path.join(os.tmpdir(), 'deploy-derivatives-test-'));
+	rootPath = mkdtempSync(path.join(os.tmpdir(), 'deploy-images-test-'));
 	mkdirSync(path.join(rootPath, 'media/a'), { recursive: true });
 	writeFileSync(path.join(rootPath, 'media/a/b-1-450.jpg'), 'jpeg bytes');
 	writeFileSync(path.join(rootPath, 'media/a/b-1-450x300.webp'), 'webp bytes');
@@ -42,7 +42,7 @@ afterEach(() => {
 	rmSync(rootPath, { force: true, recursive: true });
 });
 
-describe('the derivative upload', () => {
+describe('the rendered upload', () => {
 	test('a second run transfers nothing, so mtimes and ETags stay put', async () => {
 		const first = await syncOutputs();
 

@@ -78,7 +78,7 @@ describe('formatHelp', () => {
 		},
 		positional: { description: 'One check by name', name: 'check' },
 		run: vi.fn(),
-		summary: 'Encode derivatives',
+		summary: 'Encode renditions',
 		title: 'Images',
 	});
 
@@ -87,7 +87,7 @@ describe('formatHelp', () => {
 
 		expect(lines.slice(0, 4)).toEqual([
 			'Images',
-			'Encode derivatives',
+			'Encode renditions',
 			'',
 			'Usage: pnpm render-images [check] [options]',
 		]);

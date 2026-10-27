@@ -44,7 +44,7 @@ function decodeImageName(pathname: string) {
 	}
 }
 
-async function readPreviousFiles(statePath: string) {
+async function readPreviousRenditions(statePath: string) {
 	try {
 		const previous = await readManifest(statePath);
 
@@ -56,7 +56,7 @@ async function readPreviousFiles(statePath: string) {
 	}
 }
 
-async function readRecordedFiles({
+async function readRecordedRenditions({
 	isIncremental,
 	logger,
 	pageCount,
@@ -77,7 +77,7 @@ async function readRecordedFiles({
 			"Incremental build: pages restored from cache record nothing, so the manifest keeps the previous build's names too; names only fall out on a full build",
 		);
 
-		return new Map([...(await readPreviousFiles(statePath)), ...recorded]);
+		return new Map([...(await readPreviousRenditions(statePath)), ...recorded]);
 	}
 
 	if (recorded.size === 0 && pageCount > 0) {
@@ -91,15 +91,15 @@ async function readRecordedFiles({
 
 async function writeBuildManifest({
 	distPath,
-	files,
 	logger,
 	manifest,
+	renditions,
 	statePath,
 }: {
 	distPath: string;
-	files: ReadonlyMap<string, string>;
 	logger: AstroIntegrationLogger;
 	manifest: Pick<ImageManifest, 'encoding' | 'limitInputPixels' | 'mediaPath'>;
+	renditions: ReadonlyMap<string, string>;
 	statePath: string;
 }) {
 	const buildId = randomUUID();
@@ -108,12 +108,14 @@ async function writeBuildManifest({
 		...manifest,
 		buildId,
 		distPath,
-		files: Object.fromEntries(files),
+		files: Object.fromEntries(renditions),
 		version: imageManifestVersion,
 	});
 	await writeBuildId(distPath, buildId);
 
-	logger.info(`${String(files.size)} images from ${String(new Set(files.values()).size)} sources`);
+	logger.info(
+		`${String(renditions.size)} renditions from ${String(new Set(renditions.values()).size)} sources`,
+	);
 }
 
 function createDevImageHandler(
@@ -175,7 +177,7 @@ export default function imagePipeline({
 	}
 
 	const absoluteMediaPath = path.resolve(mediaPath);
-	const { devPath, filesPath, recordsPath, statePath } = getImageCachePaths(
+	const { devPath, recordsPath, renditionsPath, statePath } = getImageCachePaths(
 		path.resolve(cachePath),
 	);
 	let isIncremental = false;
@@ -185,7 +187,7 @@ export default function imagePipeline({
 			'astro:build:done': async ({ dir, logger, pages }) => {
 				try {
 					const distPath = fileURLToPath(dir);
-					const files = await readRecordedFiles({
+					const renditions = await readRecordedRenditions({
 						isIncremental,
 						logger,
 						pageCount: pages.length,
@@ -195,13 +197,13 @@ export default function imagePipeline({
 
 					await writeBuildManifest({
 						distPath,
-						files,
 						logger,
 						manifest: {
 							encoding: pipeline.encoding,
 							limitInputPixels,
 							mediaPath: absoluteMediaPath,
 						},
+						renditions,
 						statePath,
 					});
 				} finally {
@@ -224,7 +226,7 @@ export default function imagePipeline({
 					.digest('hex')
 					.slice(0, 8);
 				const getDevImage = createDevImageResolver({
-					builtPath: (await isBuiltFrom(statePath, absoluteMediaPath)) ? filesPath : undefined,
+					builtPath: (await isBuiltFrom(statePath, absoluteMediaPath)) ? renditionsPath : undefined,
 					cachePath: path.resolve(devPath, mediaPathKey),
 					encoding: pipeline.encoding,
 					limitInputPixels,

@@ -1,7 +1,7 @@
-import type { DerivativeJob, SourceFingerprints } from '@xsynaptic/astro-image-pipeline/node';
+import type { RenderJob, SourceFingerprints } from '@xsynaptic/astro-image-pipeline/node';
 
 import { getCachePaths } from '@spectralcodex/shared/paths';
-import { createSourceFingerprints, runDerivatives } from '@xsynaptic/astro-image-pipeline/node';
+import { createSourceFingerprints, runRenderJobs } from '@xsynaptic/astro-image-pipeline/node';
 import { rmSync } from 'node:fs';
 import path from 'node:path';
 
@@ -90,7 +90,7 @@ async function createCardJobs({
 	renderCard: ReturnType<typeof createRenderer>;
 }) {
 	const getBatchImage = createBatchDecoder(mediaPath);
-	const jobs: Array<DerivativeJob> = [];
+	const jobs: Array<RenderJob> = [];
 
 	for (const batch of batches) {
 		const fingerprint = await fingerprints.get(path.join(mediaPath, batch.imageId));
@@ -137,7 +137,7 @@ async function generateCards({
 		note: () => `${formatCount(latest.rendered)} rendered, ${formatCount(latest.fresh)} cached`,
 		total: jobs.length,
 	});
-	const counts = await runDerivatives({
+	const counts = await runRenderJobs({
 		directory: outputPath,
 		jobs,
 		onFailure: 'report',
