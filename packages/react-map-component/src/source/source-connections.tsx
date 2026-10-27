@@ -9,7 +9,7 @@ import { Layer, Source } from 'react-map-gl/maplibre';
 
 import type { ConnectionCollection } from '#source/source-connections-factory.ts';
 
-import { useDisplayedPositions } from '#canvas/canvas-positions.ts';
+import { useClusterPositions } from '#canvas/canvas-positions.ts';
 import { useIsDarkMode } from '#lib/dark-mode.ts';
 import { MapLayerIdEnum, MapSlotIdEnum, MapSourceIdEnum } from '#source/source-config.ts';
 import {
@@ -80,11 +80,11 @@ function useConnectionCollection(rows: ReadonlyArray<MapSourceItem>) {
 	const subjectId = useMapStore(selectConnectionSubjectId);
 	const connections = useMemo(() => getConnections(rows, subjectId), [rows, subjectId]);
 	const points = useMemo(() => getConnectionPoints(connections), [connections]);
-	const positions = useDisplayedPositions(points, { isClearedOnMove: false });
+	const clusters = useClusterPositions(points);
 
 	return useMemo(
-		() => (positions ? getConnectionCollection(connections, positions) : emptyCollection),
-		[connections, positions],
+		() => (clusters ? getConnectionCollection(connections, clusters) : emptyCollection),
+		[clusters, connections],
 	);
 }
 

@@ -9,7 +9,7 @@ describe('getPopupLayout', () => {
 		expect(getPopupLayout(333).maxWidthPx).toBe(266);
 	});
 
-	test('a wide popup beside a centred Point stays inside the narrowest wide map', () => {
+	test('a wide popup beside a centered Point stays inside the narrowest wide map', () => {
 		const containerWidth = 640;
 		const popupOffset = 16;
 		const pointX = (containerWidth - popupEasePaddingPx) / 2;

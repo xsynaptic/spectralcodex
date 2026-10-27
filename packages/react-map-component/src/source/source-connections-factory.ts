@@ -3,9 +3,9 @@ import type { FeatureCollection, LineString } from 'geojson';
 
 import { getMapRowById, getMapRowUrl } from '@spectralcodex/map-codec';
 
-import type { DisplayedPosition, PositionedPoint } from '#canvas/canvas-positions-factory.ts';
+import type { ClusterPosition, PositionedPoint } from '#lib/clusters-factory.ts';
 
-import { getPositionedPoint } from '#canvas/canvas-positions-factory.ts';
+import { getClusterKey, getPositionedPoint } from '#lib/clusters-factory.ts';
 import { getArcCoordinates } from '#source/source-arc-factory.ts';
 
 export interface Connection {
@@ -128,25 +128,22 @@ export function getConnectionPoints(connections: ReadonlyArray<Connection>) {
 	return [...pointById.values()];
 }
 
-// Location ids never hold `#`, so a cluster key cannot collide with a Point id
-function getDrawnEnd(point: PositionedPoint, position: DisplayedPosition | undefined) {
-	if (position?.kind === 'cluster') {
-		return { coordinates: position.coordinates, key: `#${String(position.clusterId)}` };
-	}
+function getDrawnEnd(point: PositionedPoint, cluster: ClusterPosition | undefined) {
+	if (cluster) return { coordinates: cluster.coordinates, key: getClusterKey(cluster.clusterId) };
 
 	return { coordinates: point.coordinates, key: point.id };
 }
 
 export function getConnectionCollection(
 	connections: ReadonlyArray<Connection>,
-	positions: ReadonlyMap<string, DisplayedPosition>,
+	clusters: ReadonlyMap<string, ClusterPosition>,
 ): ConnectionCollection {
 	const features: ConnectionCollection['features'] = [];
 	const drawnPairs = new Set<string>();
 
 	for (const { from, kind, to } of connections) {
-		const fromEnd = getDrawnEnd(from, positions.get(from.id));
-		const toEnd = getDrawnEnd(to, positions.get(to.id));
+		const fromEnd = getDrawnEnd(from, clusters.get(from.id));
+		const toEnd = getDrawnEnd(to, clusters.get(to.id));
 		const pairKey = getPairKey(fromEnd.key, toEnd.key);
 
 		if (fromEnd.key === toEnd.key || drawnPairs.has(pairKey)) continue;

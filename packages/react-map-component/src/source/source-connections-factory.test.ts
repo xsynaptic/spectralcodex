@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import type { DisplayedPosition } from '#canvas/canvas-positions-factory.ts';
+import type { ClusterPosition } from '#lib/clusters-factory.ts';
 
 import { makeMapSourceItem } from '#lib/map-test-utils.ts';
 import { getConnectionCollection, getConnections } from '#source/source-connections-factory.ts';
@@ -45,8 +45,8 @@ describe('getConnections', () => {
 	});
 });
 
-function clusterAt(clusterId: number, coordinates: [number, number]): DisplayedPosition {
-	return { clusterId, coordinates, kind: 'cluster' };
+function clusterAt(clusterId: number, coordinates: [number, number]): ClusterPosition {
+	return { clusterId, coordinates };
 }
 
 describe('getConnectionCollection', () => {

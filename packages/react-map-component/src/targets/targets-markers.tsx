@@ -4,14 +4,14 @@ import type { FC } from 'react';
 
 import { getMapRowById } from '@spectralcodex/map-codec';
 import { LocationStatusRecords, tailwindColors } from '@spectralcodex/shared/map';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Marker } from 'react-map-gl/maplibre';
 
-import type { DisplayedPosition } from '#canvas/canvas-positions-factory.ts';
+import type { ClusterPosition, PositionedPoint } from '#lib/clusters-factory.ts';
 
-import { useDisplayedPositions } from '#canvas/canvas-positions.ts';
-import { useMapRows } from '#data/data-query.ts';
-import { getClusterHoverId } from '#lib/cluster-hover.ts';
+import { useClusterPositions } from '#canvas/canvas-positions.ts';
+import { useMapCanvasData } from '#data/data-canvas.tsx';
+import { getClusterKey } from '#lib/clusters-factory.ts';
 import { useIsDarkMode } from '#lib/dark-mode.ts';
 import { selectTargetIds } from '#store/store-factory.ts';
 import { useMapStore } from '#store/store.tsx';
@@ -24,8 +24,6 @@ interface TargetMarker {
 	longitude: number;
 }
 
-const emptyRows: ReadonlyArray<MapSourceItem> = [];
-
 function getPointColor(status: LocationStatus | undefined, isDark: boolean) {
 	if (!status) return isDark ? tailwindColors.sky400 : tailwindColors.sky500;
 
@@ -34,58 +32,85 @@ function getPointColor(status: LocationStatus | undefined, isDark: boolean) {
 	return isDark ? record.colorDark : record.color;
 }
 
-function getTargetMarkers(
-	positions: ReadonlyMap<string, DisplayedPosition>,
-	rows: ReadonlyArray<MapSourceItem>,
-	isDark: boolean,
-) {
+function getTargetMarkers({
+	clusters,
+	isDark,
+	rows,
+	targets,
+}: {
+	clusters: ReadonlyMap<string, ClusterPosition>;
+	isDark: boolean;
+	rows: ReadonlyArray<MapSourceItem>;
+	targets: ReadonlyArray<PositionedPoint>;
+}) {
 	const markers = new Map<string, TargetMarker>();
 
-	for (const [id, position] of positions) {
-		const [longitude, latitude] = position.coordinates;
+	for (const { coordinates, id } of targets) {
+		const cluster = clusters.get(id);
 
-		if (position.kind === 'point') {
+		if (!cluster) {
 			const color = getPointColor(getMapRowById(rows, id)?.properties.status, isDark);
+			const [longitude, latitude] = coordinates;
 
 			markers.set(id, { color, id, latitude, longitude });
 			continue;
 		}
 
-		const clusterId = getClusterHoverId(position.clusterId);
+		const clusterKey = getClusterKey(cluster.clusterId);
 		const color = isDark ? tailwindColors.sky400 : tailwindColors.sky500;
+		const [longitude, latitude] = cluster.coordinates;
 
-		markers.set(clusterId, { color, id: clusterId, latitude, longitude });
+		markers.set(clusterKey, { color, id: clusterKey, latitude, longitude });
 	}
 
 	return [...markers.values()];
 }
 
 function useTargetMarkers() {
-	const { data: sourceData } = useMapRows();
+	const { pointCollection } = useMapCanvasData();
 	const targetIds = useMapStore(selectTargetIds);
 	const isDark = useIsDarkMode();
+	const rows = pointCollection.features;
 
-	const targets = useMemo(
-		() => (sourceData ? getTargetPoints(sourceData, targetIds) : []),
-		[sourceData, targetIds],
-	);
-
-	const positions = useDisplayedPositions(targets, { isClearedOnMove: true });
+	const targets = useMemo(() => getTargetPoints(rows, targetIds), [rows, targetIds]);
+	const clusters = useClusterPositions(targets);
 
 	return useMemo(
-		() => (positions ? getTargetMarkers(positions, sourceData ?? emptyRows, isDark) : []),
-		[isDark, positions, sourceData],
+		() => (clusters ? getTargetMarkers({ clusters, isDark, rows, targets }) : []),
+		[clusters, isDark, rows, targets],
 	);
 }
+
+const pulseDurationMs = 2000;
+
+// Rings mount at different moments, so each backdates its pulse to the page clock's phase
+function getPulseDelay() {
+	return `-${String(Math.round(performance.now() % pulseDurationMs))}ms`;
+}
+
+const MapPulseRing: FC<{ color: string }> = function MapPulseRing({ color }) {
+	const [animationDelay] = useState(getPulseDelay);
+
+	return (
+		<div className="map-pulse-ring-frame">
+			<span
+				className="map-pulse-ring"
+				style={{
+					animationDelay,
+					animationDuration: `${String(pulseDurationMs)}ms`,
+					borderColor: color,
+				}}
+			/>
+		</div>
+	);
+};
 
 export const MapTargetMarkers: FC = function MapTargetMarkers() {
 	const markers = useTargetMarkers();
 
 	return markers.map(({ color, id, latitude, longitude }) => (
 		<Marker anchor="center" key={id} latitude={latitude} longitude={longitude}>
-			<div className="map-pulse-ring-frame">
-				<span className="map-pulse-ring" style={{ borderColor: color }} />
-			</div>
+			<MapPulseRing color={color} />
 		</Marker>
 	));
 };

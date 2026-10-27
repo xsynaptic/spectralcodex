@@ -40,5 +40,3 @@ export const mapInteractiveLayerIds = [
 	MapLayerIdEnum.Points,
 	MapLayerIdEnum.PointsImage,
 ] as const;
-
-export const pointClusterRadius = 13;

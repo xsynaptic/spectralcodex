@@ -16,13 +16,9 @@ import { Layer, Source } from 'react-map-gl/maplibre';
 
 import type { MapRowCollection } from '#data/data-filter.ts';
 
+import { pointClusterOptions } from '#lib/clusters-factory.ts';
 import { useIsDarkMode } from '#lib/dark-mode.ts';
-import {
-	MapLayerIdEnum,
-	MapSlotIdEnum,
-	MapSourceIdEnum,
-	pointClusterRadius,
-} from '#source/source-config.ts';
+import { MapLayerIdEnum, MapSlotIdEnum, MapSourceIdEnum } from '#source/source-config.ts';
 
 // Hover/select visuals read feature-state (set imperatively) so these paint specs never rebuild per interaction
 const hoverStateExpression = [
@@ -254,10 +250,10 @@ export const MapSourcePoints: FC<{
 
 		return {
 			cluster: interactive,
-			clusterMaxZoom: 14, // Max zoom to cluster points on
-			clusterMinPoints: 2, // Minimum number of points to cluster
+			clusterMaxZoom: pointClusterOptions.maxZoom,
+			clusterMinPoints: pointClusterOptions.minPoints,
 			clusterProperties,
-			clusterRadius: pointClusterRadius,
+			clusterRadius: pointClusterOptions.radius,
 		};
 	}, [interactive]);
 

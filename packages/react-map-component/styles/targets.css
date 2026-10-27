@@ -24,7 +24,7 @@
 	border-style: solid;
 	border-width: 2px;
 	border-radius: var(--map-radius-full);
-	animation: target-pulse-ring 2s ease-out infinite;
+	animation: target-pulse-ring ease-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
