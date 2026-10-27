@@ -7,8 +7,6 @@ import { withSpinner } from '#shared/cli-progress.ts';
 
 export type PurgeRequestBody = { files: Array<string> } | { prefixes: Array<string> };
 
-const purgeQueueFile = 'purge-queue.txt';
-
 // Cloudflare's Free plan takes at most 100 URLs per purge call
 const purgeBatchSize = 100;
 
@@ -22,8 +20,7 @@ function getPurgePrefix(baseUrl: string) {
 }
 
 // Appended before each overwrite lands, so a run killed after the rename still leaves the purge queued
-export async function createPurgeQueue(statePath: string) {
-	const filePath = path.join(statePath, purgeQueueFile);
+export async function createPurgeQueue(filePath: string) {
 	const data = existsSync(filePath) ? await fs.readFile(filePath, 'utf8') : '';
 	const queued = new Set(data.split('\n').filter(Boolean));
 
@@ -41,7 +38,7 @@ export async function createPurgeQueue(statePath: string) {
 			if (queued.has(name)) return;
 
 			queued.add(name);
-			await fs.mkdir(statePath, { recursive: true });
+			await fs.mkdir(path.dirname(filePath), { recursive: true });
 			await fs.appendFile(filePath, `${name}\n`);
 		},
 		async drain({

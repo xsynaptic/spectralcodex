@@ -11,9 +11,10 @@ import { createPurgeQueue } from '#shared/purge-queue.ts';
 const baseUrl = 'https://img.example.com/media';
 
 let statePath: string;
+let queuePath: string;
 
 async function queueNames(count: number) {
-	const queue = await createPurgeQueue(statePath);
+	const queue = await createPurgeQueue(queuePath);
 	const names = R.times(count, (index) => `a/image-${String(index)}-450.jpg`);
 
 	for (const name of names) await queue.add(name);
@@ -22,7 +23,7 @@ async function queueNames(count: number) {
 }
 
 async function readQueuedCount() {
-	const queue = await createPurgeQueue(statePath);
+	const queue = await createPurgeQueue(queuePath);
 
 	return queue.size;
 }
@@ -39,6 +40,7 @@ function createRecorder(onRequest?: (index: number) => Promise<void>) {
 
 beforeEach(async () => {
 	statePath = await fs.mkdtemp(path.join(tmpdir(), 'purge-queue-'));
+	queuePath = path.join(statePath, 'purge-queue.txt');
 	vi.spyOn(console, 'error').mockImplementation(R.doNothing());
 });
 

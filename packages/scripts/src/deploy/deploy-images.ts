@@ -18,9 +18,8 @@ export interface RenderedSet {
 	extensions: ReadonlyArray<string>;
 	label: string;
 	localPath: string;
-	purgeBaseUrl?: string;
+	purge?: { baseUrl: string; queuePath: string };
 	remotePath: string;
-	statePath: string;
 	title: string;
 }
 
@@ -44,16 +43,16 @@ export const renderedUploadOptions = {
 } as const;
 
 export function getRenditionSet(paths: ScriptPaths, config: DeployConfig): RenderedSet {
-	const { renditionsPath, statePath } = getImageCachePaths(paths.cachePath);
-
 	return {
 		command: 'pnpm render-images',
 		extensions: imageFormats,
 		label: 'renditions',
-		localPath: renditionsPath,
-		purgeBaseUrl: config.imageBaseUrl,
+		localPath: getImageCachePaths(paths.cachePath).renditionsPath,
+		purge: {
+			baseUrl: config.imageBaseUrl,
+			queuePath: getCachePaths(paths.cachePath).imagePurgeQueuePath,
+		},
 		remotePath: config.imagesPath,
-		statePath,
 		title: 'Renditions',
 	};
 }
@@ -66,7 +65,6 @@ export function getOpenGraphSet(paths: ScriptPaths, config: DeployConfig): Rende
 		label: 'OpenGraph images',
 		localPath: getCachePaths(paths.cachePath).openGraphPath,
 		remotePath: `${config.sitePath}/${openGraphBasePath}`,
-		statePath: getCachePaths(paths.cachePath).openGraphStatePath,
 		title: 'OpenGraph images',
 	};
 }
@@ -91,12 +89,12 @@ async function assertLocalFiles(set: RenderedSet) {
 }
 
 async function purgeSet(set: RenderedSet, isDryRun: boolean) {
-	if (set.purgeBaseUrl === undefined) return;
+	if (set.purge === undefined) return;
 
-	const queue = await createPurgeQueue(set.statePath);
+	const queue = await createPurgeQueue(set.purge.queuePath);
 
 	await queue.drain({
-		baseUrl: set.purgeBaseUrl,
+		baseUrl: set.purge.baseUrl,
 		dryRun: isDryRun,
 		label: set.label,
 		request: requestCloudflarePurge,

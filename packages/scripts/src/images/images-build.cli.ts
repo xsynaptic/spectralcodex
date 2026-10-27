@@ -1,8 +1,5 @@
-import {
-	engineVersions,
-	getImageCachePaths,
-	renderImages,
-} from '@xsynaptic/astro-image-pipeline/node';
+import { getCachePaths } from '@spectralcodex/shared/paths';
+import { engineVersions, renderImages } from '@xsynaptic/astro-image-pipeline/node';
 
 import { defineCommand, runCommand } from '#shared/cli-command.ts';
 import { log } from '#shared/cli-output.ts';
@@ -14,7 +11,7 @@ await runCommand(
 		interrupted: 'progress is saved and the next run resumes',
 		name: 'render-images',
 		async run({ paths, signal }) {
-			const purgeQueue = await createPurgeQueue(getImageCachePaths(paths.cachePath).statePath);
+			const purgeQueue = await createPurgeQueue(getCachePaths(paths.cachePath).imagePurgeQueuePath);
 			let progress: ReturnType<typeof createProgress> | undefined;
 
 			const counts = await renderImages({
