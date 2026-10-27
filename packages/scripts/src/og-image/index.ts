@@ -4,7 +4,7 @@ import {
 } from '@spectralcodex/shared/open-graph';
 import { getCachePaths } from '@spectralcodex/shared/paths';
 import { getImageCachePaths, renderOpenGraphCards } from '@xsynaptic/astro-image-pipeline/node';
-import { createProgress, formatCount, log, Refusal, withSpinner } from '@xsynaptic/astro-scripts';
+import { createProgress, formatCount, log, UserError, withSpinner } from '@xsynaptic/astro-scripts';
 import { rmSync } from 'node:fs';
 
 import type { ScriptPaths } from '#shared/command.ts';
@@ -66,7 +66,7 @@ async function generateCards({
 	});
 
 	if (counts.total === 0) {
-		throw new Refusal('The last build recorded no OpenGraph cards; check getOpenGraphCardPath');
+		throw new UserError('The last build recorded no OpenGraph cards; check getOpenGraphCardPath');
 	}
 
 	for (const { message, name } of counts.failures) log.error(`${name}: ${message}`);
@@ -88,7 +88,7 @@ async function generateCards({
 	log.detail(`Output: ${outputPath}`);
 
 	if (counts.failures.length > 0) {
-		throw new Refusal(`${formatCount(counts.failures.length)} card(s) failed`);
+		throw new UserError(`${formatCount(counts.failures.length)} card(s) failed`);
 	}
 }
 

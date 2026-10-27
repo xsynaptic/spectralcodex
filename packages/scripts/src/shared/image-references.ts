@@ -1,4 +1,4 @@
-import type { ContentEntry } from '@xsynaptic/astro-scripts/astro';
+import type { ContentEntry } from '@xsynaptic/astro-scripts';
 
 import { ImageFeaturedSchema } from '@spectralcodex/shared/schemas';
 import { isImageSource } from '@xsynaptic/astro-image-pipeline/presets';

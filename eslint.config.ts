@@ -89,7 +89,7 @@ export default getConfig(
 					'error',
 					...restrictedSyntaxDefaults,
 					{
-						message: '`runCommand` owns exit codes; throw a `Refusal` instead',
+						message: '`runCommand` owns exit codes; throw a `UserError` instead',
 						selector: "CallExpression[callee.object.name='process'][callee.property.name='exit']",
 					},
 				],

@@ -1,4 +1,4 @@
-import type { ContentEntry } from '@xsynaptic/astro-scripts/astro';
+import type { ContentEntry } from '@xsynaptic/astro-scripts';
 
 import type { ValidationResult } from '#validate-content/validation-result.ts';
 

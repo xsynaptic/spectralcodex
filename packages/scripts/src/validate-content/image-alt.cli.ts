@@ -1,5 +1,4 @@
-import { withSpinner } from '@xsynaptic/astro-scripts';
-import { getCollectionEntries, withAstroContent } from '@xsynaptic/astro-scripts/astro';
+import { getCollectionEntries, withAstroContent, withSpinner } from '@xsynaptic/astro-scripts';
 
 import { defineCommand, runCommand } from '#shared/command.ts';
 import { validateImageAltTitles } from '#validate-content/image-alt.ts';

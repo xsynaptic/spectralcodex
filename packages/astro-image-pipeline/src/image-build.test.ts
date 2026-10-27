@@ -12,7 +12,7 @@ import { readFileIfExists } from '#files.ts';
 import { getRenditionKey, renderImages } from '#image-build.ts';
 import { resolveImageEncoding } from '#image-encoding.ts';
 import { imageManifestVersion, writeBuildId, writeManifest } from '#image-state.ts';
-import { Refusal } from '#refusal.ts';
+import { UserError } from '#user-error.ts';
 
 const sourceId = 'gallery/source-1.jpg';
 const stem = 'gallery/source-1';
@@ -279,7 +279,7 @@ describe('renderImages guards', () => {
 		await writeBuild();
 		await writeBuildId(distPath, 'another-build');
 
-		await expect(render()).rejects.toThrow(Refusal);
+		await expect(render()).rejects.toThrow(UserError);
 		expect(await listFiles()).toEqual([]);
 	});
 

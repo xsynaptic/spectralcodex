@@ -6,11 +6,12 @@ import {
 	createProgress,
 	formatCount,
 	formatError,
+	getCollectionEntries,
 	log,
-	Refusal,
+	UserError,
+	withAstroContent,
 	withSpinner,
 } from '@xsynaptic/astro-scripts';
-import { getCollectionEntries, withAstroContent } from '@xsynaptic/astro-scripts/astro';
 import path from 'node:path';
 
 import type { DivisionItem, RegionMetadata } from '#map-divisions/types.ts';
@@ -265,7 +266,7 @@ await runCommand(
 				log.detail(`Output: ${cachePath}`);
 
 				if (counts.failed > 0) {
-					throw new Refusal(`${formatCount(counts.failed)} region(s) failed to process`);
+					throw new UserError(`${formatCount(counts.failed)} region(s) failed to process`);
 				}
 			} finally {
 				db.disconnectSync();

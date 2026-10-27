@@ -1,4 +1,4 @@
-import type { ContentEntry } from '@xsynaptic/astro-scripts/astro';
+import type { ContentEntry } from '@xsynaptic/astro-scripts';
 
 import { readFileSync } from 'node:fs';
 import path from 'node:path';

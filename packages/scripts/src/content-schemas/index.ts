@@ -1,4 +1,4 @@
-import { log, Refusal } from '@xsynaptic/astro-scripts';
+import { log, UserError } from '@xsynaptic/astro-scripts';
 import { copyFileSync, mkdirSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 
@@ -16,7 +16,7 @@ await runCommand(
 			const schemaFiles = readdirSync(sourcePath).filter((file) => file.endsWith('.schema.json'));
 
 			if (schemaFiles.length === 0) {
-				throw new Refusal(`No schemas in ${schemaDir}; run \`astro sync\` first`);
+				throw new UserError(`No schemas in ${schemaDir}; run \`astro sync\` first`);
 			}
 
 			mkdirSync(targetPath, { recursive: true });

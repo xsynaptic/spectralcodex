@@ -22,7 +22,7 @@ import {
 	writeBuildId,
 	writeManifest,
 } from '#image-state.ts';
-import { Refusal } from '#refusal.ts';
+import { UserError } from '#user-error.ts';
 
 export type { ImageSourceResolver } from '#image-sources.ts';
 
@@ -50,7 +50,7 @@ async function readPreviousManifest(cachePath: string) {
 	try {
 		return await readManifest(cachePath);
 	} catch (error) {
-		if (error instanceof Refusal) return;
+		if (error instanceof UserError) return;
 
 		throw error;
 	}

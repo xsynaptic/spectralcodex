@@ -1,4 +1,4 @@
-import type { ContentEntry } from '@xsynaptic/astro-scripts/astro';
+import type { ContentEntry } from '@xsynaptic/astro-scripts';
 
 import { booleanPointInPolygon } from '@turf/boolean-point-in-polygon';
 import { point } from '@turf/helpers';

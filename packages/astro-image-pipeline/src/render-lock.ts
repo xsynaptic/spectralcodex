@@ -2,7 +2,7 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 
 import { readFileIfExists } from '#files.ts';
-import { Refusal } from '#refusal.ts';
+import { UserError } from '#user-error.ts';
 
 async function didClaimLock(lockPath: string) {
 	try {
@@ -46,14 +46,14 @@ async function acquireRenderLock(directory: string) {
 	const holder = await readLockHolder(lockPath);
 
 	if (holder !== undefined && isProcessAlive(holder)) {
-		throw new Refusal(`Another render (pid ${String(holder)}) holds ${lockPath}`);
+		throw new UserError(`Another render (pid ${String(holder)}) holds ${lockPath}`);
 	}
 
 	await fs.rm(lockPath, { force: true });
 
 	if (await didClaimLock(lockPath)) return lockPath;
 
-	throw new Refusal(`Another render took over the stale lock at ${lockPath}`);
+	throw new UserError(`Another render took over the stale lock at ${lockPath}`);
 }
 
 // The lock sits beside the output directory, which is rsynced whole

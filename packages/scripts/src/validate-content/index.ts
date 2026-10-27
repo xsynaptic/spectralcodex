@@ -1,6 +1,11 @@
 import { getCachePaths } from '@spectralcodex/shared/paths';
-import { parseNumberOption, Refusal, withSpinner } from '@xsynaptic/astro-scripts';
-import { getCollectionEntries, withAstroContent } from '@xsynaptic/astro-scripts/astro';
+import {
+	getCollectionEntries,
+	parseNumberOption,
+	UserError,
+	withAstroContent,
+	withSpinner,
+} from '@xsynaptic/astro-scripts';
 
 import type { ScriptPaths } from '#shared/command.ts';
 import type { ValidationResult } from '#validate-content/validation-result.ts';
@@ -137,7 +142,7 @@ await runCommand(
 			if (checkName && selected.length === 0) {
 				const names = validations.map((validation) => validation.name).join(', ');
 
-				throw new Refusal(`Unknown check "${checkName}"; choose from ${names}`);
+				throw new UserError(`Unknown check "${checkName}"; choose from ${names}`);
 			}
 
 			let failureCount = 0;
@@ -154,7 +159,7 @@ await runCommand(
 
 			// Subcommands are for inspection; only a full run gates deployment
 			if (!checkName && failureCount > 0) {
-				throw new Refusal(`${String(failureCount)} of ${String(selected.length)} checks failed`);
+				throw new UserError(`${String(failureCount)} of ${String(selected.length)} checks failed`);
 			}
 		},
 		summary: 'Check content references, images, Locations and Regions before a build',

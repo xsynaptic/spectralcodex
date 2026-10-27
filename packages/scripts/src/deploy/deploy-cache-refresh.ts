@@ -1,4 +1,4 @@
-import { log, Refusal, withSpinner } from '@xsynaptic/astro-scripts';
+import { log, UserError, withSpinner } from '@xsynaptic/astro-scripts';
 
 import { loadDeployConfig } from '#deploy/deploy-config.ts';
 import { sshCaptureUnchecked } from '#deploy/rsync-exec.ts';
@@ -28,7 +28,7 @@ export async function invokeCacheRefresh(options: InvokeCacheRefreshOptions): Pr
 			const result = await sshCaptureUnchecked(config, command);
 
 			if (result.exitCode !== 0) {
-				throw new Refusal(`Cache refresh failed to launch\n${result.stderr.trim()}`);
+				throw new UserError(`Cache refresh failed to launch\n${result.stderr.trim()}`);
 			}
 		},
 		() => 'Cache refresh launched',

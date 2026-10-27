@@ -1,5 +1,11 @@
-import { formatCount, log, Refusal, withSpinner } from '@xsynaptic/astro-scripts';
-import { getCollectionEntries, withAstroContent } from '@xsynaptic/astro-scripts/astro';
+import {
+	formatCount,
+	getCollectionEntries,
+	log,
+	UserError,
+	withAstroContent,
+	withSpinner,
+} from '@xsynaptic/astro-scripts';
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
 
@@ -35,7 +41,7 @@ await runCommand(
 			if (collisions.length > 0) {
 				for (const collision of collisions) log.error(`Former id collision: ${collision}`);
 
-				throw new Refusal(`${String(collisions.length)} former id collision(s); nothing written`);
+				throw new UserError(`${String(collisions.length)} former id collision(s); nothing written`);
 			}
 
 			for (const note of skipped) log.warn(`Skipped ${note}`);

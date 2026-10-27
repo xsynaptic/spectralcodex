@@ -4,10 +4,10 @@ import {
 	formatCount,
 	log,
 	parseNumberOption,
-	Refusal,
+	UserError,
+	withAstroContent,
 	withSpinner,
 } from '@xsynaptic/astro-scripts';
-import { withAstroContent } from '@xsynaptic/astro-scripts/astro';
 import chalk from 'chalk';
 import path from 'node:path';
 import * as R from 'remeda';
@@ -82,7 +82,7 @@ await runCommand(
 
 			const check = checks[checkName];
 
-			if (!check) throw new Refusal(`Unknown check "${checkName}"; choose from ${checkNames}`);
+			if (!check) throw new UserError(`Unknown check "${checkName}"; choose from ${checkNames}`);
 
 			const limit =
 				values.limit === undefined ? undefined : parseNumberOption(values.limit, 'limit');

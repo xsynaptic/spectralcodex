@@ -1,11 +1,16 @@
 import type { SitemapLastmod } from '@spectralcodex/shared/sitemap';
-import type { ContentEntry } from '@xsynaptic/astro-scripts/astro';
+import type { ContentEntry } from '@xsynaptic/astro-scripts';
 
 import { getPublicId } from '@spectralcodex/shared/entries';
 import { getCachePaths } from '@spectralcodex/shared/paths';
 import { getCollectionSegment, joinUrl, siteBasePath } from '@spectralcodex/shared/routing';
-import { formatCount, log, withSpinner } from '@xsynaptic/astro-scripts';
-import { getCollectionEntries, withAstroContent } from '@xsynaptic/astro-scripts/astro';
+import {
+	formatCount,
+	getCollectionEntries,
+	log,
+	withAstroContent,
+	withSpinner,
+} from '@xsynaptic/astro-scripts';
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { $ } from 'zx';

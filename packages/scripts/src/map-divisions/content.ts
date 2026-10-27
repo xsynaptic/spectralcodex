@@ -1,5 +1,5 @@
 import type { GeometryBoundingBox } from '@spectralcodex/shared/schemas';
-import type { ContentEntry } from '@xsynaptic/astro-scripts/astro';
+import type { ContentEntry } from '@xsynaptic/astro-scripts';
 
 import { GeometryBoundingBoxSchema, GeometryDivisionIdSchema } from '@spectralcodex/shared/schemas';
 import { formatCount, log } from '@xsynaptic/astro-scripts';

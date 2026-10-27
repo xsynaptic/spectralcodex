@@ -2,7 +2,7 @@ import { openGraphBasePath, openGraphImageFormat } from '@spectralcodex/shared/o
 import { getCachePaths } from '@spectralcodex/shared/paths';
 import { getImageCachePaths } from '@xsynaptic/astro-image-pipeline/node';
 import { imageFormats } from '@xsynaptic/astro-image-pipeline/presets';
-import { formatDuration, log, Refusal } from '@xsynaptic/astro-scripts';
+import { formatDuration, log, UserError } from '@xsynaptic/astro-scripts';
 import { readdir } from 'node:fs/promises';
 
 import type { DeployConfig } from '#deploy/deploy-config.ts';
@@ -83,7 +83,7 @@ async function assertLocalFiles(set: RenderedSet) {
 	);
 
 	if (!hasFiles) {
-		throw new Refusal(`No ${set.label} in ${set.localPath}; run \`${set.command}\` first`);
+		throw new UserError(`No ${set.label} in ${set.localPath}; run \`${set.command}\` first`);
 	}
 }
 

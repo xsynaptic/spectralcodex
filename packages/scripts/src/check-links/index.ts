@@ -2,11 +2,12 @@ import { getCachePaths } from '@spectralcodex/shared/paths';
 import {
 	createProgress,
 	formatCount,
+	getCollectionEntries,
 	log,
 	parseNumberOption,
+	withAstroContent,
 	withSpinner,
 } from '@xsynaptic/astro-scripts';
-import { getCollectionEntries, withAstroContent } from '@xsynaptic/astro-scripts/astro';
 import chalk from 'chalk';
 import pLimit from 'p-limit';
 

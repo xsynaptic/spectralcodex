@@ -1,4 +1,4 @@
-import { formatDuration, log, Refusal, withStatus } from '@xsynaptic/astro-scripts';
+import { formatDuration, log, UserError, withStatus } from '@xsynaptic/astro-scripts';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { z } from 'zod';
@@ -162,7 +162,7 @@ async function sshCaptureOrRefuse(
 		const reason =
 			extractCaddyError(result.stderr) || `exited with code ${String(result.exitCode)}`;
 
-		throw new Refusal(`${failureMessage}\n${reason}`);
+		throw new UserError(`${failureMessage}\n${reason}`);
 	}
 
 	return result.stdout.trim();

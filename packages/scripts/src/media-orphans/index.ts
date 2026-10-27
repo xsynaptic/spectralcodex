@@ -1,6 +1,11 @@
 import { fallbackImageIds } from '@spectralcodex/shared/open-graph-fallback';
-import { formatCount, log, withSpinner } from '@xsynaptic/astro-scripts';
-import { getCollectionEntries, withAstroContent } from '@xsynaptic/astro-scripts/astro';
+import {
+	formatCount,
+	getCollectionEntries,
+	log,
+	withAstroContent,
+	withSpinner,
+} from '@xsynaptic/astro-scripts';
 
 import { defineCommand, runCommand } from '#shared/command.ts';
 import { getEntryImageIds, listMediaImages } from '#shared/image-references.ts';

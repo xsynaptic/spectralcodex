@@ -2,7 +2,7 @@ import type { APIRequestContext } from '@playwright/test';
 
 import { expect, test } from '@playwright/test';
 import { getPublicId } from '@spectralcodex/shared/entries';
-import { getCollectionEntries, withAstroContent } from '@xsynaptic/astro-scripts/astro';
+import { getCollectionEntries, withAstroContent } from '@xsynaptic/astro-scripts';
 
 import { contentManifestPath, isDev } from '#e2e/constants.ts';
 

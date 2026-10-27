@@ -1,4 +1,4 @@
-import type { ContentEntry } from '@xsynaptic/astro-scripts/astro';
+import type { ContentEntry } from '@xsynaptic/astro-scripts';
 
 import { pipeline } from '@huggingface/transformers';
 import { createSqliteCache } from '@spectralcodex/shared/cache';
@@ -9,12 +9,13 @@ import {
 	createProgress,
 	formatCount,
 	formatError,
+	getCollectionEntries,
 	log,
 	parseNumberOption,
-	Refusal,
+	UserError,
+	withAstroContent,
 	withSpinner,
 } from '@xsynaptic/astro-scripts';
-import { getCollectionEntries, withAstroContent } from '@xsynaptic/astro-scripts/astro';
 import { sanitizeMdx } from '@xsynaptic/unified-tools';
 import { readdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
@@ -273,7 +274,7 @@ async function getContentEntries(): Promise<Array<EmbeddableEntry>> {
 		entries.push({ ...entry, digest: String(entry.digest) });
 	}
 
-	if (entries.length === 0) throw new Refusal('No content found');
+	if (entries.length === 0) throw new UserError('No content found');
 
 	return entries;
 }
@@ -359,7 +360,7 @@ await runCommand(
 				signal,
 			});
 
-			if (embeddings.length === 0) throw new Refusal('No embeddings generated');
+			if (embeddings.length === 0) throw new UserError('No embeddings generated');
 
 			const similarContentItems = calculateSimilarities(embeddings, {
 				minScore: parseNumberOption(values['min-score'], 'min-score'),

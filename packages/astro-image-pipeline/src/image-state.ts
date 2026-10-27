@@ -5,7 +5,7 @@ import type { ResolvedImageEncoding } from '#image-encoding.ts';
 import type { OpenGraphCard } from '#open-graph-cards.ts';
 
 import { readFileIfExists, readJsonFile, writeJsonFile } from '#files.ts';
-import { Refusal } from '#refusal.ts';
+import { UserError } from '#user-error.ts';
 
 const imageManifestFile = 'manifest.json';
 const imageBuildIdFile = 'image-build-id.txt';
@@ -43,7 +43,7 @@ export async function readManifest(cachePath: string) {
 	if (!manifest) return;
 
 	if (!isCurrentManifest(manifest)) {
-		throw new Refusal(
+		throw new UserError(
 			`The image manifest ${manifestPath} is version ${String(manifest.version ?? 1)}, not ${String(imageManifestVersion)}; rebuild first`,
 		);
 	}
@@ -54,12 +54,12 @@ export async function readManifest(cachePath: string) {
 export async function readCurrentManifest(cachePath: string) {
 	const manifest = await readManifest(cachePath);
 
-	if (!manifest) throw new Refusal(`No image manifest in ${cachePath}; build first`);
+	if (!manifest) throw new UserError(`No image manifest in ${cachePath}; build first`);
 
 	const distBuildId = await readBuildId(manifest.distPath);
 
 	if (distBuildId !== manifest.buildId) {
-		throw new Refusal(
+		throw new UserError(
 			`Manifest build ${manifest.buildId} does not match ${manifest.distPath} (${distBuildId ?? 'no build id'}); rebuild first`,
 		);
 	}

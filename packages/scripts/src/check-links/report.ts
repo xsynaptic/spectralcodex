@@ -1,7 +1,7 @@
-import { formatCount, log } from '@xsynaptic/astro-scripts';
+import { log } from '@xsynaptic/astro-scripts';
 import chalk from 'chalk';
 
-import type { UrlByContentRow } from '#check-links/db.ts';
+import type { LinkCheckStats, UrlByContentRow } from '#check-links/db.ts';
 import type { UrlStatus } from '#check-links/types.ts';
 
 import { getStats, getUrlsByStatusGroupedByContent } from '#check-links/db.ts';
@@ -61,18 +61,7 @@ export function printSessionSummary(checked: number, healthy: number, issues: nu
 }
 
 export function printStatus(): void {
-	const { blocked, error, healthy, missing, pending, redirect, total } = getStats();
-
-	log.title('Link check status');
-	log.summary([
-		['Total URLs', total],
-		['Healthy', healthy],
-		['Redirected', redirect],
-		['Missing', missing],
-		['Blocked', blocked],
-		['Error', error],
-		['Pending', pending],
-	]);
+	log.data(getStats(), formatStatus);
 }
 
 function entryId(contentId: string): string {
@@ -83,18 +72,50 @@ function entryId(contentId: string): string {
 	return contentId.slice(slash + 1);
 }
 
-function printSection({ color, formatUrl, label, status }: ReportSection): void {
-	const grouped = getUrlsByStatusGroupedByContent(status);
+function formatSection(
+	{ color, formatUrl, label }: ReportSection,
+	entries: Record<string, Array<UrlByContentRow>>,
+): string {
+	const lines = ['', color(`--- ${label} (${String(Object.keys(entries).length)} entries) ---`)];
+
+	for (const [contentId, rows] of Object.entries(entries)) {
+		lines.push(`  ${entryId(contentId)}:`);
+
+		for (const row of rows) {
+			lines.push(`    - ${formatUrl(row)}`);
+		}
+	}
+
+	return lines.join('\n');
+}
+
+function formatStatus({
+	blocked,
+	error,
+	healthy,
+	missing,
+	pending,
+	redirect,
+	total,
+}: LinkCheckStats): string {
+	return [
+		chalk.magenta('Link check status'),
+		`  Total URLs:  ${String(total)}`,
+		`  Healthy:     ${chalk.green(String(healthy))}`,
+		`  Redirected:  ${chalk.yellow(String(redirect))}`,
+		`  Missing:     ${chalk.magenta(String(missing))}`,
+		`  Blocked:     ${chalk.cyan(String(blocked))}`,
+		`  Error:       ${chalk.red(String(error))}`,
+		`  Pending:     ${chalk.gray(String(pending))}`,
+	].join('\n');
+}
+
+function printSection(section: ReportSection): void {
+	const grouped = getUrlsByStatusGroupedByContent(section.status);
 
 	if (grouped.size === 0) return;
 
-	log.title(color(`${label} (${formatCount(grouped.size)} entries)`));
-
-	for (const [contentId, rows] of grouped) {
-		log.info(`  ${entryId(contentId)}:`);
-
-		for (const row of rows) {
-			log.detail(`  - ${formatUrl(row)}`);
-		}
-	}
+	log.data({ entries: Object.fromEntries(grouped), status: section.status }, ({ entries }) =>
+		formatSection(section, entries),
+	);
 }

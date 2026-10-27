@@ -42,7 +42,7 @@ export interface UrlByContentRow {
 	url: string;
 }
 
-interface LinkCheckStats {
+export interface LinkCheckStats {
 	blocked: number;
 	error: number;
 	healthy: number;

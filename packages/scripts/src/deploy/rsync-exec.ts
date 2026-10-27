@@ -1,6 +1,8 @@
+import type { ProcessOutput } from 'zx';
+
 import { createStatus, formatBytes, formatCount, log } from '@xsynaptic/astro-scripts';
 import chalk from 'chalk';
-import { $, ProcessOutput } from 'zx';
+import { $ } from 'zx';
 
 export async function ensureSshKeychain() {
 	try {
@@ -153,12 +155,6 @@ function collectRsyncLine(summary: RsyncSummary, line: string) {
 	return;
 }
 
-function reportRsyncFailure(error: unknown) {
-	if (!(error instanceof ProcessOutput)) return;
-
-	for (const line of readStderrLines(error)) log.detail(line);
-}
-
 export async function rsyncTo(
 	source: Array<string> | string,
 	destination: string,
@@ -179,7 +175,6 @@ export async function rsyncTo(
 		}
 	} catch (error) {
 		window.fail();
-		reportRsyncFailure(error);
 		throw error;
 	}
 

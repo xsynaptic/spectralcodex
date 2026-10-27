@@ -1,4 +1,4 @@
-import { Refusal } from '@xsynaptic/astro-scripts';
+import { UserError } from '@xsynaptic/astro-scripts';
 
 import { defineCommand, runCommand } from '#shared/command.ts';
 import { generateSitemapLastmod } from '#sitemap-lastmod/index.ts';
@@ -12,7 +12,7 @@ await runCommand(
 		async run({ paths, values }) {
 			const siteUrl = values['site-url'] ?? process.env.PROD_SERVER_URL;
 
-			if (!siteUrl) throw new Refusal('Missing site URL: pass --site-url or set PROD_SERVER_URL');
+			if (!siteUrl) throw new UserError('Missing site URL: pass --site-url or set PROD_SERVER_URL');
 
 			await generateSitemapLastmod({ paths, siteUrl });
 		},

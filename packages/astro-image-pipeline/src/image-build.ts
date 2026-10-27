@@ -16,10 +16,10 @@ import { parseImageName } from '#image-name.ts';
 import { isWithinSource } from '#image-presets.ts';
 import { engineId, renderImage } from '#image-render.ts';
 import { getImageCachePaths, readCurrentManifest } from '#image-state.ts';
-import { Refusal } from '#refusal.ts';
 import { hashRenderKey } from '#render-key.ts';
 import { getDefaultConcurrency, runRenderJobs } from '#run-render-jobs.ts';
 import { createSourceFingerprints } from '#source-fingerprints.ts';
+import { UserError } from '#user-error.ts';
 
 export interface ImageRenderOptions extends Pick<
 	RenderJobOptions,
@@ -78,7 +78,7 @@ function getManifestRenditions(manifest: ImageManifest) {
 	}
 
 	if (invalid.length > 0) {
-		throw new Refusal(
+		throw new UserError(
 			`${String(invalid.length)} manifest names are outside the grammar; rebuild first:\n${formatList(sortNames(invalid))}`,
 		);
 	}
@@ -121,13 +121,13 @@ async function readSourceDigests(
 	);
 
 	if (vanished.length > 0) {
-		throw new Refusal(
+		throw new UserError(
 			`${String(vanished.length)} sources vanished since the build; rebuild first:\n${formatList(sortNames(vanished))}`,
 		);
 	}
 
 	if (upscaled.length > 0) {
-		throw new Refusal(
+		throw new UserError(
 			`${String(upscaled.length)} renditions are larger than their source; rebuild first:\n${formatList(sortNames(upscaled))}`,
 		);
 	}

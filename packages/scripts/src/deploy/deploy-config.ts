@@ -1,4 +1,4 @@
-import { log, Refusal } from '@xsynaptic/astro-scripts';
+import { log, UserError } from '@xsynaptic/astro-scripts';
 
 export interface DeployConfig {
 	imageBaseUrl: string;
@@ -63,7 +63,7 @@ export function printDeployConfig(config: DeployConfig) {
 export function requireEnv(name: string): string {
 	const value = process.env[name];
 	if (!value) {
-		throw new Refusal(`Missing required environment variable: ${name}`);
+		throw new UserError(`Missing required environment variable: ${name}`);
 	}
 	return value;
 }
@@ -90,5 +90,5 @@ function readRequiredEnvVars(): Record<RequiredEnvVar, string> {
 		log.detail(`  ${line}`);
 	}
 
-	throw new Refusal(`Missing required environment variables: ${missing.join(', ')}`);
+	throw new UserError(`Missing required environment variables: ${missing.join(', ')}`);
 }

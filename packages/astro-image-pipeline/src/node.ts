@@ -3,8 +3,8 @@ export { engineVersions, openImageSource, readSourceSize } from '#image-render.t
 export { getImageCachePaths, readManifest } from '#image-state.ts';
 export type { OpenGraphCardRenderOptions, OpenGraphCardSource } from '#open-graph-build.ts';
 export { renderOpenGraphCards } from '#open-graph-build.ts';
-export { Refusal } from '#refusal.ts';
 export type { RenderJob } from '#run-render-jobs.ts';
 export { runRenderJobs } from '#run-render-jobs.ts';
 export type { SourceFingerprints } from '#source-fingerprints.ts';
 export { createSourceFingerprints } from '#source-fingerprints.ts';
+export { UserError } from '#user-error.ts';
