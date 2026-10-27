@@ -59,12 +59,12 @@ export function getRenditionSet(paths: ScriptPaths, config: DeployConfig): Rende
 // The deploy's hostname purge already covers the site host, so cards need no queue of their own
 export function getOpenGraphSet(paths: ScriptPaths, config: DeployConfig): RenderedSet {
 	return {
-		command: 'pnpm og-image',
+		command: 'pnpm render-opengraph',
 		extensions: [openGraphImageFormat],
-		label: 'OpenGraph images',
+		label: 'OpenGraph cards',
 		localPath: getImageCachePaths(paths.cachePath).openGraphCardsPath,
 		remotePath: `${config.sitePath}/${openGraphBasePath}`,
-		title: 'OpenGraph images',
+		title: 'OpenGraph cards',
 	};
 }
 

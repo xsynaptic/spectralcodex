@@ -8,14 +8,18 @@ import type { OpenGraphCardRenderOptions, OpenGraphCardSource } from '#open-grap
 import type { OpenGraphCard } from '#open-graph-cards.ts';
 
 import { resolveImageEncoding } from '#image-encoding.ts';
-import { imageManifestVersion, writeBuildId, writeManifest } from '#image-state.ts';
+import {
+	getImageCachePaths,
+	imageManifestVersion,
+	writeBuildId,
+	writeManifest,
+} from '#image-state.ts';
 import { renderOpenGraphCards } from '#open-graph-build.ts';
 
 let root: string;
 let mediaPath: string;
 let distPath: string;
 let directory: string;
-let statePath: string;
 
 const cards: Record<string, OpenGraphCard> = {
 	'atlas.jpg': { input: { title: 'Atlas' } },
@@ -30,10 +34,10 @@ async function writeBuild() {
 		buildId: 'build',
 		distPath,
 		encoding: resolveImageEncoding(),
-		files: {},
 		limitInputPixels: 268_402_689,
 		mediaPath,
 		openGraphCards: cards,
+		renditions: {},
 		version: imageManifestVersion,
 	});
 	await writeBuildId(distPath, 'build');
@@ -49,13 +53,11 @@ function render(options: Partial<OpenGraphCardRenderOptions<string>> = {}) {
 	return renderOpenGraphCards<string>({
 		cachePath: root,
 		decode: createDecode(),
-		directory,
 		onFailure: 'report',
 		render: (input, decoded) =>
 			Promise.resolve(
 				new TextEncoder().encode(`${JSON.stringify(input.title)}|${decoded ?? 'none'}`),
 			),
-		statePath,
 		templateVersion: 'template-1',
 		...options,
 	});
@@ -65,8 +67,7 @@ beforeEach(async () => {
 	root = await fs.mkdtemp(path.join(tmpdir(), 'open-graph-build-'));
 	mediaPath = path.join(root, 'media');
 	distPath = path.join(root, 'dist');
-	directory = path.join(root, 'og');
-	statePath = path.join(root, 'og-state');
+	directory = getImageCachePaths(root).openGraphCardsPath;
 	await fs.mkdir(mediaPath);
 	await fs.mkdir(distPath);
 	await sharp({ create: { background: '#336699', channels: 3, height: 40, width: 60 } })

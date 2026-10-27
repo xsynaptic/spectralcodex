@@ -90,7 +90,7 @@ describe('imagePipeline recording', () => {
 
 		const manifest = await readManifest(path.join(root, 'img-state'));
 
-		expect(manifest?.files).toStrictEqual({
+		expect(manifest?.renditions).toStrictEqual({
 			'a/b-600x400.webp': 'a/b.jpg',
 			'c-600x400.webp': 'elsewhere/c.jpg',
 		});
@@ -130,7 +130,7 @@ describe('imagePipeline recording', () => {
 
 		const manifest = await readManifest(path.join(root, 'img-state'));
 
-		expect(manifest?.files).toStrictEqual({ 'a/b-600x400.webp': 'a/b.jpg' });
+		expect(manifest?.renditions).toStrictEqual({ 'a/b-600x400.webp': 'a/b.jpg' });
 	});
 
 	test('a second build in the same process records its own names', async () => {
@@ -148,7 +148,7 @@ describe('imagePipeline recording', () => {
 
 		const manifest = await readManifest(path.join(root, 'img-state'));
 
-		expect(manifest?.files).toStrictEqual({ 'c-600x400.webp': 'c.jpg' });
+		expect(manifest?.renditions).toStrictEqual({ 'c-600x400.webp': 'c.jpg' });
 	});
 
 	test('nothing is recorded outside a build', () => {

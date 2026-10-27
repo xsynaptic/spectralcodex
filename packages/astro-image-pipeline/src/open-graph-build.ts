@@ -16,7 +16,7 @@ export interface OpenGraphCardSource extends OpenGraphCardImage {
 
 export interface OpenGraphCardRenderOptions<Decoded> extends Pick<
 	RenderJobOptions,
-	'concurrency' | 'directory' | 'onFailure' | 'onProgress' | 'onReplace' | 'signal' | 'statePath'
+	'concurrency' | 'onFailure' | 'onProgress' | 'onReplace' | 'signal'
 > {
 	cachePath: string;
 	decode: (source: OpenGraphCardSource) => Promise<Decoded>;
@@ -121,7 +121,9 @@ export async function renderOpenGraphCards<Decoded>({
 	...options
 }: OpenGraphCardRenderOptions<Decoded>) {
 	const resolvedCachePath = path.resolve(cachePath);
-	const manifest = await readCurrentManifest(getImageCachePaths(resolvedCachePath).statePath);
+	const { openGraphCardsPath, openGraphCardsStatePath, statePath } =
+		getImageCachePaths(resolvedCachePath);
+	const manifest = await readCurrentManifest(statePath);
 	const groups = groupByImage(manifest.openGraphCards);
 	const jobs = await createCardJobs({
 		cachePath: resolvedCachePath,
@@ -131,7 +133,12 @@ export async function renderOpenGraphCards<Decoded>({
 		render,
 		templateVersion,
 	});
-	const counts = await runRenderJobs({ ...options, jobs });
+	const counts = await runRenderJobs({
+		...options,
+		directory: openGraphCardsPath,
+		jobs,
+		statePath: openGraphCardsStatePath,
+	});
 
 	return { ...counts, sources: groups.filter((group) => group.image).length };
 }

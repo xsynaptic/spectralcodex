@@ -9,7 +9,7 @@ function pickFrom(id: string, options: ReadonlyArray<string>): string {
 	return options[hash % options.length]!;
 }
 
-// Single source of truth, consumed by the media-orphans and og-image scripts
+// Single source of truth, consumed by the media-orphans and render-opengraph scripts
 export const fallbackImageIds: Record<string, ReadonlyArray<string> | string> = {
 	'alishan-forest-railway': 'taiwan/chiayi/zhuqi/zhuqi-jiaoliping-railway-station-1.jpg',
 	atlas: 'taiwan/kaohsiung/kaohsiung-1.jpg',

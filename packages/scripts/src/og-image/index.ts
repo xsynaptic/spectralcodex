@@ -2,18 +2,16 @@ import {
 	openGraphBlurTreatment,
 	OpenGraphCardTitlesSchema,
 } from '@spectralcodex/shared/open-graph';
-import { getCachePaths } from '@spectralcodex/shared/paths';
-import { renderOpenGraphCards } from '@xsynaptic/astro-image-pipeline/node';
+import { getImageCachePaths, renderOpenGraphCards } from '@xsynaptic/astro-image-pipeline/node';
+import { createProgress, formatCount, log, Refusal, withSpinner } from '@xsynaptic/astro-scripts';
 import { rmSync } from 'node:fs';
 
-import type { ScriptPaths } from '#shared/cli-command.ts';
+import type { ScriptPaths } from '#shared/command.ts';
 
 import { loadOpenGraphFonts } from '#og-image/fonts.ts';
 import { createRenderer, processImage } from '#og-image/generate.ts';
 import { templateVersion } from '#og-image/template-version.ts';
-import { defineCommand, Refusal, runCommand } from '#shared/cli-command.ts';
-import { formatCount, log } from '#shared/cli-output.ts';
-import { createProgress, withSpinner } from '#shared/cli-progress.ts';
+import { defineCommand, runCommand } from '#shared/command.ts';
 
 async function generateCards({
 	isClearCache,
@@ -24,13 +22,11 @@ async function generateCards({
 	paths: ScriptPaths;
 	signal: AbortSignal;
 }) {
-	const { openGraphPath: outputPath, openGraphStatePath: statePath } = getCachePaths(
-		paths.cachePath,
-	);
+	const { openGraphCardsPath: outputPath } = getImageCachePaths(paths.cachePath);
 
 	if (isClearCache) {
 		rmSync(outputPath, { force: true, recursive: true });
-		log.warn('Cleared OG image output');
+		log.warn('Cleared OpenGraph cards');
 	}
 
 	const fonts = await withSpinner(
@@ -49,7 +45,6 @@ async function generateCards({
 				imageInput: source.path,
 				isBlurred: source.treatment === openGraphBlurTreatment,
 			}),
-		directory: outputPath,
 		onFailure: 'report',
 		onProgress(update) {
 			latest = update;
@@ -65,7 +60,6 @@ async function generateCards({
 		},
 		render: (input, image) => renderCard(OpenGraphCardTitlesSchema.parse(input), image),
 		signal,
-		statePath,
 		templateVersion,
 	});
 
@@ -99,7 +93,7 @@ async function generateCards({
 await runCommand(
 	defineCommand({
 		interrupted: 'finished cards are saved and the next run resumes',
-		name: 'og-image',
+		name: 'render-opengraph',
 		options: {
 			'clear-cache': {
 				default: false,
@@ -115,6 +109,6 @@ await runCommand(
 			});
 		},
 		summary: 'Render the OpenGraph cards the last build recorded, incrementally',
-		title: 'OpenGraph images',
+		title: 'Render OpenGraph cards',
 	}),
 );

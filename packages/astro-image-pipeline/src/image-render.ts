@@ -1,3 +1,5 @@
+import type { SharpInput, SharpOptions } from 'sharp';
+
 import { createHash } from 'node:crypto';
 import sharp from 'sharp';
 
@@ -13,6 +15,10 @@ export const engineId = createHash('sha256')
 	.digest('hex')
 	.slice(0, 8);
 
+export function openImageSource(input: SharpInput, options?: Omit<SharpOptions, 'autoOrient'>) {
+	return sharp(input, { ...options, autoOrient: true });
+}
+
 interface ImageRender {
 	encoding: ResolvedImageEncoding;
 	format: ImageFormat;
@@ -25,7 +31,7 @@ export async function renderImage(
 	source: string,
 	{ encoding, format, height, limitInputPixels, width }: ImageRender,
 ) {
-	let stage = sharp(source, { limitInputPixels }).autoOrient();
+	let stage = openImageSource(source, { limitInputPixels });
 
 	if (width !== undefined && height !== undefined) {
 		stage = stage.resize({ fastShrinkOnLoad: false, fit: 'cover', height, width });
@@ -41,7 +47,7 @@ export async function renderImage(
 }
 
 export async function readSourceSize(sourcePath: string) {
-	const { autoOrient } = await sharp(sourcePath).metadata();
+	const { autoOrient } = await openImageSource(sourcePath).metadata();
 
 	return { height: autoOrient.height, width: autoOrient.width } satisfies ImageDimensions;
 }

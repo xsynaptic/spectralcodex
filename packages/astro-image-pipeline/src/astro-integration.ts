@@ -80,7 +80,7 @@ async function readRecorded({
 
 		return {
 			cards: new Map([...Object.entries(previous?.openGraphCards ?? {}), ...recorded.cards]),
-			renditions: new Map([...Object.entries(previous?.files ?? {}), ...recorded.renditions]),
+			renditions: new Map([...Object.entries(previous?.renditions ?? {}), ...recorded.renditions]),
 		};
 	}
 
@@ -112,8 +112,8 @@ async function writeBuildManifest({
 		...manifest,
 		buildId,
 		distPath,
-		files: Object.fromEntries(renditions),
 		openGraphCards: Object.fromEntries(cards),
+		renditions: Object.fromEntries(renditions),
 		version: imageManifestVersion,
 	});
 	await writeBuildId(distPath, buildId);

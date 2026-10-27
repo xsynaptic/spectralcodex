@@ -2,7 +2,7 @@ import type { OpenGraphCardTitles } from '@spectralcodex/shared/open-graph';
 import type { Font } from 'takumi-js';
 
 import { openGraphImageHeight, openGraphImageWidth } from '@spectralcodex/shared/open-graph';
-import sharp from 'sharp';
+import { openImageSource } from '@xsynaptic/astro-image-pipeline/node';
 import { render, setGlyphCacheMaxBytes } from 'takumi-js';
 import { Renderer } from 'takumi-js/node';
 
@@ -62,7 +62,7 @@ export async function probeLuminanceTop(imageInput: string): Promise<number> {
 	const width = 120;
 	const height = 64;
 
-	const image = await sharp(imageInput)
+	const image = await openImageSource(imageInput)
 		.resize({ fit: 'cover', height, position: 'top', width })
 		.ensureAlpha()
 		.raw()
@@ -79,7 +79,7 @@ export async function processImage({
 	imageInput: string;
 	isBlurred: boolean;
 }): Promise<ProcessedImage> {
-	const pipeline = sharp(imageInput).resize({
+	const pipeline = openImageSource(imageInput).resize({
 		fit: 'cover',
 		height: openGraphImageHeight,
 		position: 'top',

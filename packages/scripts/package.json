@@ -22,7 +22,7 @@
 		"improve-content": "node --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/improve-content/index.ts",
 		"map-divisions": "node --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/map-divisions/index.ts",
 		"media-orphans": "node --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/media-orphans/index.ts",
-		"og-image": "UV_THREADPOOL_SIZE=10 node --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env --import tsx ./src/og-image/index.ts",
+		"render-opengraph": "UV_THREADPOOL_SIZE=10 node --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env --import tsx ./src/og-image/index.ts",
 		"render-images": "UV_THREADPOOL_SIZE=10 node --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/images/images-build.cli.ts",
 		"similar-content": "node --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/similar-content/index.ts",
 		"sitemap-lastmod": "node --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/sitemap-lastmod/index.cli.ts",

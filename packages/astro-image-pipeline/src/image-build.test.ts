@@ -56,10 +56,10 @@ async function writeBuild(
 		buildId: `build-${String(++buildCount)}`,
 		distPath,
 		encoding: resolveImageEncoding({ jpg: { quality: 85 }, webp: { quality: 70 } }),
-		files: Object.fromEntries(names.map((name) => [name, sourceId])),
 		limitInputPixels,
 		mediaPath,
 		openGraphCards: {},
+		renditions: Object.fromEntries(names.map((name) => [name, sourceId])),
 		version: imageManifestVersion,
 	} satisfies ImageManifest;
 
@@ -286,7 +286,7 @@ describe('renderImages guards', () => {
 			JSON.stringify({ buildId: 'old', files: {} }),
 		);
 
-		await expect(render()).rejects.toThrow(/version 1, not 3; rebuild first/);
+		await expect(render()).rejects.toThrow(/version 1, not 4; rebuild first/);
 	});
 
 	test('refuses a manifest from another build than dist', async () => {

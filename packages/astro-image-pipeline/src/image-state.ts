@@ -11,22 +11,24 @@ const imageManifestFile = 'manifest.json';
 const imageBuildIdFile = 'image-build-id.txt';
 const engineFile = 'engine.txt';
 
-export const imageManifestVersion = 3;
+export const imageManifestVersion = 4;
 
 export interface ImageManifest {
 	buildId: string;
 	distPath: string;
 	encoding: ResolvedImageEncoding;
-	files: Record<string, string>;
 	limitInputPixels: number;
 	mediaPath: string;
 	openGraphCards: Record<string, OpenGraphCard>;
+	renditions: Record<string, string>;
 	version: typeof imageManifestVersion;
 }
 
 export function getImageCachePaths(cachePath: string) {
 	return {
 		devPath: `${cachePath}/img-dev`,
+		openGraphCardsPath: `${cachePath}/img-cards`,
+		openGraphCardsStatePath: `${cachePath}/img-cards-state`,
 		recordsPath: `${cachePath}/img-state/records`,
 		renditionsPath: `${cachePath}/img`,
 		statePath: `${cachePath}/img-state`,

@@ -66,7 +66,7 @@ function getManifestRenditions(manifest: ImageManifest) {
 	const renditions: Array<ImageRendition> = [];
 	const invalid: Array<string> = [];
 
-	for (const [name, sourceId] of Object.entries(manifest.files)) {
+	for (const [name, sourceId] of Object.entries(manifest.renditions)) {
 		const parsed = parseImageName(name);
 
 		if (parsed) {

@@ -14,8 +14,6 @@ export function getCachePaths(cachePath: string) {
 	return {
 		divisionsPath: path.join(cachePath, 'divisions'),
 		imagePurgeQueuePath: path.join(cachePath, 'img-purge-queue.txt'),
-		openGraphPath: path.join(cachePath, 'og-image'),
-		openGraphStatePath: path.join(cachePath, 'og-image-state'),
 		similarContentPath: path.join(cachePath, 'similar-content.json'),
 		sitemapLastmodPath: path.join(cachePath, 'sitemap-lastmod.json'),
 	};

@@ -96,7 +96,7 @@ await runCommand(
 				},
 				build,
 				() => runScript('render-images'),
-				() => runScript('og-image'),
+				() => runScript('render-opengraph'),
 				test,
 				() => uploadRenderedSet(getRenditionSet(paths, config), { config, dryRun: isDryRun }),
 				() => uploadRenderedSet(getOpenGraphSet(paths, config), { config, dryRun: isDryRun }),

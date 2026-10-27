@@ -27,7 +27,7 @@
 		"lint-css-fix": "stylelint \"{src,packages}/**/*.{css,astro}\" --fix",
 		"map-divisions": "pnpm -F @spectralcodex/scripts map-divisions",
 		"media-orphans": "pnpm -F @spectralcodex/scripts media-orphans",
-		"og-image": "pnpm -F @spectralcodex/scripts og-image",
+		"render-opengraph": "pnpm -F @spectralcodex/scripts render-opengraph",
 		"render-images": "pnpm -F @spectralcodex/scripts render-images",
 		"similar-content": "pnpm -F @spectralcodex/scripts similar-content",
 		"stryker": "stryker run",

@@ -3,11 +3,10 @@ import type { SourceFingerprints } from '@xsynaptic/astro-image-pipeline/node';
 import type { Buffer } from 'node:buffer';
 
 import { createSqliteCache } from '@spectralcodex/shared/cache';
-import { createSourceFingerprints } from '@xsynaptic/astro-image-pipeline/node';
+import { createSourceFingerprints, openImageSource } from '@xsynaptic/astro-image-pipeline/node';
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { promises as fs } from 'node:fs';
 import { hash } from 'ohash';
-import sharp from 'sharp';
 
 import type { ImageFitOption, ImagePlaceholderProps } from '#lib/image/image-types.ts';
 
@@ -54,7 +53,7 @@ async function createImagePlaceholderFunction({
 				position,
 			},
 		});
-		const contentHash = hash({ source: sourceVersion, version: 1 });
+		const contentHash = hash({ source: sourceVersion, version: 2 });
 
 		const cachedDataUrl = cache.get(cacheKey, contentHash);
 
@@ -97,7 +96,7 @@ async function generatePlaceholderDataUrl({
 
 	const { height, width } = getPlaceholderDimensions(aspectRatio, pixelCount);
 
-	const placeholderBuffer = await sharp(imageBuffer, { failOn: 'error' })
+	const placeholderBuffer = await openImageSource(imageBuffer, { failOn: 'error' })
 		.resize(width, height, { fit, position })
 		.toFormat('webp', { quality: 10 })
 		.modulate({ brightness: 1, saturation: 1.2 })
