@@ -2,6 +2,7 @@ import type { GeoJSONSource, MapGeoJSONFeature, Source } from 'maplibre-gl';
 import type { MapCallbacks, MapLayerMouseEvent, ViewStateChangeEvent } from 'react-map-gl/maplibre';
 
 import { GeometryTypeEnum } from '@spectralcodex/shared/map';
+import { GPUInitializationError } from 'maplibre-gl';
 import { useCallback, useEffect, useMemo, useRef, useSyncExternalStore } from 'react';
 import * as R from 'remeda';
 
@@ -92,12 +93,16 @@ const canvasErrorMessageMaxLength = 100;
 
 // Tile URLs carry the Protomaps key in their query string
 function getCanvasErrorData(error: Error) {
-	const probe = document.createElement('canvas');
-
 	return {
 		message: error.message.replaceAll(/\?\S*/g, '').slice(0, canvasErrorMessageMaxLength),
-		webgl: Boolean(probe.getContext('webgl2') ?? probe.getContext('webgl')),
+		webgl: hasWebglContext(),
 	};
+}
+
+function hasWebglContext() {
+	const probe = document.createElement('canvas');
+
+	return Boolean(probe.getContext('webgl2') ?? probe.getContext('webgl'));
 }
 
 function subscribeHover(callback: () => void) {
@@ -115,7 +120,7 @@ function canHover() {
 	return matchMedia(hoverQuery).matches;
 }
 
-export function useMapCanvasEvents() {
+export function useMapCanvasEvents(onUnsupported: () => void) {
 	const { isLoading: isSourceDataLoading } = useMapRows();
 
 	const { isInteractive, mapId } = useMapConfig();
@@ -144,6 +149,14 @@ export function useMapCanvasEvents() {
 		// Style, tile, and sprite failures leave onLoad unfired; clear the spinner rather than hang
 		onError: ({ error }) => {
 			setCanvasLoading(false);
+
+			if (error instanceof GPUInitializationError) {
+				onUnsupported();
+				trackMap({ data: { webgl: hasWebglContext() }, name: 'map-unsupported' });
+
+				return;
+			}
+
 			trackMapErrorOnce('canvas', () => getCanvasErrorData(error));
 			console.warn('[Map]', error.message);
 		},

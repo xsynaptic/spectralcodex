@@ -47,28 +47,36 @@ const hostControls = {
 	},
 } as const satisfies Record<MapHostControlName, HostControlSpec>;
 
+export const HostControlButton: FC<{ name: MapHostControlName }> = function HostControlButton({
+	name,
+}) {
+	const { host, messages } = useMapConfig();
+	const trackMap = useTrackMap();
+
+	const { icon, labelKey, viewBox } = hostControls[name];
+	const label = messages[labelKey];
+
+	return (
+		<button
+			aria-label={label}
+			className={getHostControlClassName(name)}
+			onClick={() => {
+				host.send(name);
+				trackMap({ name: `map-${name}` });
+			}}
+			title={label}
+			type="button"
+		>
+			<MapControlIcon viewBox={viewBox}>{icon}</MapControlIcon>
+		</button>
+	);
+};
+
 export const HostControl: FC<{ name: MapHostControlName; position: ControlPosition }> =
 	function HostControl({ name, position }) {
-		const { host, messages } = useMapConfig();
-		const trackMap = useTrackMap();
-
-		const { icon, labelKey, viewBox } = hostControls[name];
-		const label = messages[labelKey];
-
 		return (
 			<CustomControlPortal position={position}>
-				<button
-					aria-label={label}
-					className={getHostControlClassName(name)}
-					onClick={() => {
-						host.send(name);
-						trackMap({ name: `map-${name}` });
-					}}
-					title={label}
-					type="button"
-				>
-					<MapControlIcon viewBox={viewBox}>{icon}</MapControlIcon>
-				</button>
+				<HostControlButton name={name} />
 			</CustomControlPortal>
 		);
 	};

@@ -73,6 +73,7 @@ type MapTrackName =
 	| 'map-search-pick'
 	| 'map-search-query'
 	| 'map-sheet-toggle'
+	| 'map-unsupported'
 	| `map-${MapHostControlName}`;
 
 export interface MapTrackDetail {

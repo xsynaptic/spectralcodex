@@ -1101,6 +1101,31 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 					<p class={captionClass}>No Location carries geometry, so the map has nothing to draw.</p>
 				)}
 			</Specimen>
+			<Specimen
+				name="section-map, no WebGL2"
+				note="This page hides WebGL from the canvas here, so MapLibre throws its <code>GPUInitializationError</code> and the map shows what a reader without WebGL2 gets."
+				source="packages/react-map-component/src/canvas/canvas-unsupported.tsx"
+			>
+				<script is:inline>
+					HTMLCanvasElement.prototype.getContext = new Proxy(
+						HTMLCanvasElement.prototype.getContext,
+						{
+							apply(getContext, canvas, [type, ...options]) {
+								if (type.startsWith('webgl') && canvas.closest('[data-inventory-no-webgl]')) return;
+
+								return Reflect.apply(getContext, canvas, [type, ...options]);
+							},
+						},
+					);
+				</script>
+				{sampleMapData.hasGeodata ? (
+					<div data-inventory-no-webgl="">
+						<MapComponent mapComponentProps={sampleMapData.props} />
+					</div>
+				) : (
+					<p class={captionClass}>No Location carries geometry, so the map has nothing to draw.</p>
+				)}
+			</Specimen>
 		</Section>
 		<Section note="Components tied to one collection, rendered from real Entries." title="Domain">
 			<Specimen

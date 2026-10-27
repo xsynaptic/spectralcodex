@@ -11,6 +11,7 @@ import { useMapCanvasEvents } from '#canvas/canvas-events.ts';
 import { MapSelectionFeatureState } from '#canvas/canvas-feature-state.tsx';
 import { MapHoverLabel } from '#canvas/canvas-hover-label.tsx';
 import { MapCanvasMode } from '#canvas/canvas-mode.tsx';
+import { MapCanvasUnsupported } from '#canvas/canvas-unsupported.tsx';
 import { getInitialViewState } from '#canvas/canvas-viewport.ts';
 import { MapScopeBar } from '#controls/controls-scope.tsx';
 import { MapControls } from '#controls/controls.tsx';
@@ -93,13 +94,18 @@ const MapCanvasContainer: FC = function MapCanvasContainer() {
 			transition: { delay: 0, duration: 0 },
 		};
 	});
-	const canvasEvents = useMapCanvasEvents();
+	const [isUnsupported, setIsUnsupported] = useState(false);
+	const canvasEvents = useMapCanvasEvents(() => {
+		setIsUnsupported(true);
+	});
 
 	const [initialViewState] = useState(() =>
 		getInitialViewState({ bounds, center, mapId, maxBounds, zoom }),
 	);
 
 	useHostViewSync();
+
+	if (isUnsupported) return <MapCanvasUnsupported />;
 
 	return (
 		<ReactMapGlMap

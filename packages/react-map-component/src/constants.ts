@@ -56,6 +56,7 @@ export const defaultMapMessages = {
 	searchResult: 'result',
 	searchResults: 'results',
 	showAll: 'Show All',
+	unsupportedMessage: "This map needs WebGL2, which this browser doesn't support.",
 	wikipediaAriaLabel: 'Wikipedia',
 } as const;
 

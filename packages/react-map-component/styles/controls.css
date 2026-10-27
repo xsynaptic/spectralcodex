@@ -175,6 +175,12 @@
 	border-bottom-left-radius: var(--map-radius-xs);
 }
 
+.map-unsupported-message {
+	max-width: 20rem;
+	padding: 0.5rem 0.75rem;
+	font-family: var(--map-font-sans);
+}
+
 /* MapLibre's forced-colours attribution icon targets a `::after` its markup no longer draws */
 @media (forced-colors: active) and (prefers-color-scheme: dark) {
 	.maplibregl-ctrl-attrib-button {

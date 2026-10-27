@@ -32,3 +32,7 @@
 astro-island:not([ssr]) + .map-loading .map-loading-label {
 	display: none;
 }
+
+astro-island:has(.map-unsupported) + .map-loading {
+	display: none;
+}
