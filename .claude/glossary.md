@@ -118,7 +118,9 @@ Map Scope, Map Filter, Map Target and Map View keep the prefix everywhere outsid
 
 **Hero**: The Featured Images promoted to the header display at the top of an Entry's page. Regions, Themes, and Series promote all of their Featured Images; Posts and the other editorial collections opt in per image, in authored order. _Avoid_: banner, splash, masthead.
 
-**Rendition**: One encoded copy of an Image at a single width and format, produced by a preset for a particular display. An Image yields many Renditions; an OpenGraph card is not one, since it is drawn from an Entry rather than encoded from an Image. _Avoid_: derivative, file, variant, size, image (the Image is the photograph a Rendition comes from).
+**Rendition**: One encoded copy of an Image at a single width and format, produced by a preset for a particular display. An Image yields many Renditions. An OpenGraph Card is not a Rendition: it is drawn for a page, not encoded from an Image. _Avoid_: derivative, file, variant, size, image (the Image is the photograph a Rendition comes from).
+
+**OpenGraph Card**: The picture shown when a page is shared: the page's title over an Image that represents it. _Avoid_: OG image, social image, thumbnail, preview (a Preview is a listing summary).
 
 ### Multilingual
 
