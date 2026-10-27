@@ -17,37 +17,25 @@ fi
 echo "=== Phase 2: Server Setup (as $USER) ==="
 echo ""
 
-# Find attached volume
-VOLUME_PATH=$(find /mnt -maxdepth 1 -type d -name "volume_*" 2>/dev/null | head -1)
-
-if [ -z "$VOLUME_PATH" ]; then
-  echo "Error: No DigitalOcean volume found in /mnt"
-  echo "Please attach a storage volume in the DO console and re-run"
-  exit 1
-fi
-
-echo "Found volume: $VOLUME_PATH"
-
 # Create server directories
 echo "Creating directories..."
 sudo mkdir -p /opt/server/caddy
 sudo mkdir -p /opt/server/certs
-sudo mkdir -p "$VOLUME_PATH/data/umami"
-sudo mkdir -p "$VOLUME_PATH/backups"
+sudo install -d -m 755 /srv/spectralcodex
+sudo install -d -o $USER -g $USER /srv/spectralcodex/img /srv/umami /srv/umami/data /srv/umami/backups
 
 # Set permissions
 echo "Setting permissions..."
 sudo chown -R $USER:$USER /opt/server
-sudo chown -R $USER:$USER "$VOLUME_PATH/data"
-sudo chown -R $USER:$USER "$VOLUME_PATH/backups"
 
 # Generate Umami secrets for local deploy/.env
 # The server .env is owned by `pnpm deploy-infra`, which overwrites on every deploy, so we only emit secrets to copy locally
 echo "Generating Umami secrets..."
 echo ""
 echo "IMPORTANT: Copy these into your local deploy/.env"
-echo "UMAMI_DATA_PATH=$VOLUME_PATH/data/umami"
-echo "UMAMI_BACKUP_PATH=$VOLUME_PATH/backups"
+echo "DEPLOY_MEDIA_PATH=/srv/spectralcodex"
+echo "UMAMI_DATA_PATH=/srv/umami/data"
+echo "UMAMI_BACKUP_PATH=/srv/umami/backups"
 echo "UMAMI_DB_PASSWORD=$(openssl rand -hex 32)"
 echo "UMAMI_APP_SECRET=$(openssl rand -hex 32)"
 
