@@ -24,6 +24,7 @@ import { getAtlasScopePage } from '#lib/atlas/atlas-data.ts';
 import { getPostStructuredData } from '#lib/collections/posts/posts-structured-data.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { createEntryCardFunction } from '#lib/utils/seo-cards.ts';
 import { getSeoArticleProps, getSeoImageProps } from '#lib/utils/seo.ts';
 
 interface Props {
@@ -43,7 +44,8 @@ const themeIds = entry.data.themes?.map(({ id }) => id);
 
 const { Content } = await render(entry);
 
-const seoImage = getSeoImageProps({ alt: entry.data.title, id: entry.id });
+const getEntryCard = await createEntryCardFunction();
+const seoImage = getSeoImageProps({ alt: entry.data.title, card: getEntryCard(entry) });
 
 const atlas = await getAtlasScopePage(entry);
 ---

@@ -9,7 +9,9 @@ strictDepBuilds: true
 minimumReleaseAgeExclude:
   - '@xsynaptic/*'
   - '@astrojs/*'
+  - '@takumi-rs/*'
   - astro
+  - takumi-js
 
 # TypeScript 7 native binaries for fallow's type-aware mode, which this project does not use
 ignoredOptionalDependencies:

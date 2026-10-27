@@ -1,40 +1,28 @@
-import type { RenderJob, SourceFingerprints } from '@xsynaptic/astro-image-pipeline/node';
-
+import {
+	openGraphBlurTreatment,
+	OpenGraphCardTitlesSchema,
+} from '@spectralcodex/shared/open-graph';
 import { getCachePaths } from '@spectralcodex/shared/paths';
-import { createSourceFingerprints, runRenderJobs } from '@xsynaptic/astro-image-pipeline/node';
+import { renderOpenGraphCards } from '@xsynaptic/astro-image-pipeline/node';
 import { rmSync } from 'node:fs';
-import path from 'node:path';
 
-import type { ImageBatch } from '#og-image/batch.ts';
-import type { ProcessedImage } from '#og-image/generate.ts';
 import type { ScriptPaths } from '#shared/cli-command.ts';
 
-import { batchEntriesBySourceImage } from '#og-image/batch.ts';
-import { getBuiltEntries } from '#og-image/built-entries.ts';
 import { loadOpenGraphFonts } from '#og-image/fonts.ts';
 import { createRenderer, processImage } from '#og-image/generate.ts';
-import { getCardName, getOutputCacheKey } from '#og-image/output-cache.ts';
+import { templateVersion } from '#og-image/template-version.ts';
 import { defineCommand, Refusal, runCommand } from '#shared/cli-command.ts';
 import { formatCount, log } from '#shared/cli-output.ts';
 import { createProgress, withSpinner } from '#shared/cli-progress.ts';
-import { isExistingFile } from '#shared/files.ts';
 
-function assertResolvedEntries(unresolved: Array<string>) {
-	if (unresolved.length === 0) return;
-
-	for (const filename of unresolved) log.error(`Unresolved OG image ID: ${filename}`);
-
-	throw new Refusal(
-		`${formatCount(unresolved.length)} filename(s) referenced by dist could not be resolved to a content entry, index page, or chronology pattern`,
-	);
-}
-
-async function prepareCards({
+async function generateCards({
 	isClearCache,
 	paths,
+	signal,
 }: {
 	isClearCache: boolean;
 	paths: ScriptPaths;
+	signal: AbortSignal;
 }) {
 	const { openGraphPath: outputPath, openGraphStatePath: statePath } = getCachePaths(
 		paths.cachePath,
@@ -50,116 +38,52 @@ async function prepareCards({
 		loadOpenGraphFonts,
 		(loaded) => `Loaded ${String(loaded.length)} font variants`,
 	);
-
-	const { entries, unresolved } = await withSpinner('Reading built pages', () =>
-		getBuiltEntries({ distPath: paths.distPath }),
-	);
-
-	assertResolvedEntries(unresolved);
-
-	return { entries, outputPath, renderCard: createRenderer({ fonts }), statePath };
-}
-
-async function decodeBatchImage(batch: ImageBatch, mediaPath: string) {
-	const imagePath = path.join(mediaPath, batch.imageId);
-
-	if (!(await isExistingFile(imagePath))) throw new Error(`Missing image: ${batch.imageId}`);
-
-	return processImage({ imageInput: imagePath, isFallback: batch.isFallback });
-}
-
-function createBatchDecoder(mediaPath: string) {
-	let current: undefined | { batch: ImageBatch; image: Promise<ProcessedImage> };
-
-	return function getBatchImage(batch: ImageBatch) {
-		if (current?.batch !== batch) current = { batch, image: decodeBatchImage(batch, mediaPath) };
-
-		return current.image;
-	};
-}
-
-async function createCardJobs({
-	batches,
-	fingerprints,
-	mediaPath,
-	renderCard,
-}: {
-	batches: ReadonlyArray<ImageBatch>;
-	fingerprints: SourceFingerprints;
-	mediaPath: string;
-	renderCard: ReturnType<typeof createRenderer>;
-}) {
-	const getBatchImage = createBatchDecoder(mediaPath);
-	const jobs: Array<RenderJob> = [];
-
-	for (const batch of batches) {
-		const fingerprint = await fingerprints.get(path.join(mediaPath, batch.imageId));
-
-		for (const entry of batch.entries) {
-			jobs.push({
-				key: getOutputCacheKey({
-					digest: entry.digest,
-					imageDigest: fingerprint?.sha256,
-					imageId: batch.imageId,
-				}),
-				name: getCardName(entry.id),
-				render: async () => renderCard(entry, await getBatchImage(batch)),
-			});
-		}
-	}
-
-	return jobs;
-}
-
-async function generateCards({
-	isClearCache,
-	paths,
-	signal,
-}: {
-	isClearCache: boolean;
-	paths: ScriptPaths;
-	signal: AbortSignal;
-}) {
-	const { entries, outputPath, renderCard, statePath } = await prepareCards({
-		isClearCache,
-		paths,
-	});
-	const batches = batchEntriesBySourceImage(entries);
-	const jobs = await createCardJobs({
-		batches,
-		fingerprints: createSourceFingerprints(paths.cachePath),
-		mediaPath: paths.mediaPath,
-		renderCard,
-	});
+	const renderCard = createRenderer({ fonts });
+	let progress: ReturnType<typeof createProgress> | undefined;
 	let latest = { fresh: 0, rendered: 0 };
-	const progress = createProgress({
-		label: 'Rendering',
-		note: () => `${formatCount(latest.rendered)} rendered, ${formatCount(latest.fresh)} cached`,
-		total: jobs.length,
-	});
-	const counts = await runRenderJobs({
+
+	const counts = await renderOpenGraphCards({
+		cachePath: paths.cachePath,
+		decode: (source) =>
+			processImage({
+				imageInput: source.path,
+				isBlurred: source.treatment === openGraphBlurTreatment,
+			}),
 		directory: outputPath,
-		jobs,
 		onFailure: 'report',
 		onProgress(update) {
 			latest = update;
+			progress =
+				progress ??
+				createProgress({
+					label: 'Rendering',
+					note: () =>
+						`${formatCount(latest.rendered)} rendered, ${formatCount(latest.fresh)} cached`,
+					total: update.total,
+				});
 			progress.tick();
 		},
+		render: (input, image) => renderCard(OpenGraphCardTitlesSchema.parse(input), image),
 		signal,
 		statePath,
+		templateVersion,
 	});
+
+	if (counts.total === 0) {
+		throw new Refusal('The last build recorded no OpenGraph cards; check getOpenGraphCardPath');
+	}
 
 	for (const { message, name } of counts.failures) log.error(`${name}: ${message}`);
 
 	if (counts.failures.length > 0) {
-		progress.warn();
+		progress?.warn();
 	} else {
-		progress.succeed();
+		progress?.succeed();
 	}
 
 	log.summary([
-		['Entries', entries.length],
-		['Source images', batches.length],
+		['Cards', counts.total],
+		['Source images', counts.sources],
 		['Rendered', counts.rendered],
 		['Cached', counts.fresh],
 		['Written', counts.written],
@@ -190,7 +114,7 @@ await runCommand(
 				signal,
 			});
 		},
-		summary: 'Render an OpenGraph card for every page in dist, incrementally',
+		summary: 'Render the OpenGraph cards the last build recorded, incrementally',
 		title: 'OpenGraph images',
 	}),
 );

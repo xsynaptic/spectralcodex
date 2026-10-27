@@ -1,4 +1,6 @@
-import { getOpenGraphPath } from '@spectralcodex/shared/open-graph';
+import type { PageOpenGraphCard } from '@spectralcodex/shared/open-graph';
+
+import { getOpenGraphCardPath } from '@spectralcodex/shared/open-graph';
 
 import { getAbsoluteUrl, getBasePath } from '#lib/utils/routing.ts';
 
@@ -22,9 +24,9 @@ export function getSeoArticleProps({
 	};
 }
 
-export function getSeoImageProps({ alt, id }: { alt: string; id: string }) {
+export function getSeoImageProps({ alt, card }: { alt: string; card: PageOpenGraphCard }) {
 	return {
 		alt,
-		url: getAbsoluteUrl(getBasePath(getOpenGraphPath(id))),
+		url: getAbsoluteUrl(getBasePath(getOpenGraphCardPath(card))),
 	};
 }

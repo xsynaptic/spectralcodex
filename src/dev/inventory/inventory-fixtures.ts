@@ -1,7 +1,7 @@
-import type { OpenGraphMetadataItem } from '@spectralcodex/scripts/og-image';
+import type { OpenGraphCardTitles } from '@spectralcodex/shared/open-graph';
 import type { Page } from 'astro';
 
-import { probeLuminanceTop, toOpenGraphEntryItem } from '@spectralcodex/scripts/og-image';
+import { probeLuminanceTop } from '@spectralcodex/scripts/og-image';
 import { ImageSizeEnum } from '@spectralcodex/shared/images';
 import path from 'node:path';
 
@@ -28,6 +28,7 @@ import { ImageLayoutEnum } from '#lib/image/image-types.ts';
 import { createMapDataFunction } from '#lib/map/map-data.ts';
 import { getLocationsMapRule } from '#lib/map/map-locations.ts';
 import { getDayKey } from '#lib/utils/date.ts';
+import { createEntryCardFunction } from '#lib/utils/seo-cards.ts';
 import { sanitizeImageAltAttribute } from '#lib/utils/text.ts';
 
 export const sampleUrl = '/inventory/';
@@ -375,12 +376,13 @@ export const sampleChronologyYears = ['2019', '2021', '2023', '2024', '2025', '2
 
 export const sampleChronologyMonths = ['02', '05', '09', '11'];
 
-interface OpenGraphCard {
-	entry: OpenGraphMetadataItem;
+interface OpenGraphSample {
 	imagePath: string;
+	isBlurred: boolean;
+	titles: OpenGraphCardTitles;
 }
 
-interface SampleOpenGraphCard extends OpenGraphCard {
+interface SampleOpenGraphCard extends OpenGraphSample {
 	key: string;
 }
 
@@ -444,21 +446,32 @@ const openGraphTitleSamples = [
 ];
 
 async function createSampleOpenGraphCards() {
-	const [posts, locations, images, sampleImages] = await Promise.all([
+	const [posts, locations, images, sampleImages, getEntryCard] = await Promise.all([
 		getPostsCollection(),
 		getLocationsCollection(),
 		getImagesCollection(),
 		getSampleImages(),
+		createEntryCardFunction(),
 	]);
 
-	const candidates = [...posts.entries, ...locations.entries].flatMap<OpenGraphCard>((entry) => {
-		const item = toOpenGraphEntryItem({ collection: entry.collection, entry });
-		const image = item ? images.entriesMap.get(item.imageFeaturedId) : undefined;
+	const candidates = [...posts.entries, ...locations.entries].flatMap<OpenGraphSample>((entry) => {
+		const card = getEntryCard(entry);
+		const image = images.entriesMap.get(card.image.id);
 
-		return item && image ? [{ entry: item, imagePath: path.resolve(image.data.path) }] : [];
+		return image
+			? [
+					{
+						imagePath: path.resolve(image.data.path),
+						isBlurred: card.image.isBlurred,
+						titles: card.titles,
+					},
+				]
+			: [];
 	});
 
-	const groundCandidates = candidates.filter(({ entry }) => !entry.isFallback && !entry.titleZh);
+	const groundCandidates = candidates.filter(
+		({ isBlurred, titles }) => !isBlurred && !titles.titleZh,
+	);
 
 	const ranked = await Promise.all(
 		groundCandidates.slice(0, openGraphLuminanceSampleCount).map(async (candidate) => ({
@@ -472,10 +485,11 @@ async function createSampleOpenGraphCards() {
 	const titleImage = sampleImages.landscape[0];
 
 	const titleCards = titleImage
-		? openGraphTitleSamples.map(({ key, ...title }) => ({
-				entry: { collection: 'inventory', id: key, isFallback: false, ...title },
+		? openGraphTitleSamples.map(({ key, ...titles }) => ({
 				imagePath: path.resolve(titleImage.data.path),
+				isBlurred: false,
 				key,
+				titles,
 			}))
 		: [];
 
@@ -485,12 +499,15 @@ async function createSampleOpenGraphCards() {
 		...titleCards,
 		...toOpenGraphCard(
 			'image-fallback',
-			candidates.find(({ entry }) => entry.isFallback),
+			candidates.find(({ isBlurred }) => isBlurred),
 		),
 	];
 }
 
-function toOpenGraphCard(key: string, card: OpenGraphCard | undefined): Array<SampleOpenGraphCard> {
+function toOpenGraphCard(
+	key: string,
+	card: OpenGraphSample | undefined,
+): Array<SampleOpenGraphCard> {
 	return card ? [{ key, ...card }] : [];
 }
 

@@ -39,7 +39,13 @@ describe('getSeoImageProps', () => {
 	test('builds an absolute, base-prefixed card URL from a flattened id', () => {
 		vi.stubEnv('BASE_URL', '/preview/');
 
-		expect(getSeoImageProps({ alt: 'Alt', id: 'taiwan/taipei/some-location' }).url).toBe(
+		const card = {
+			id: 'taiwan/taipei/some-location',
+			image: { id: 'taiwan/taipei/some-location-1.jpg', isBlurred: false },
+			titles: { title: 'Some Location' },
+		};
+
+		expect(getSeoImageProps({ alt: 'Alt', card }).url).toBe(
 			`${site}/preview/og/taiwan-taipei-some-location.jpg`,
 		);
 	});

@@ -2,6 +2,7 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 
 import type { ResolvedImageEncoding } from '#image-encoding.ts';
+import type { OpenGraphCard } from '#open-graph-cards.ts';
 
 import { readFileIfExists, readJsonFile, writeJsonFile } from '#files.ts';
 import { Refusal } from '#refusal.ts';
@@ -10,7 +11,7 @@ const imageManifestFile = 'manifest.json';
 const imageBuildIdFile = 'image-build-id.txt';
 const engineFile = 'engine.txt';
 
-export const imageManifestVersion = 2;
+export const imageManifestVersion = 3;
 
 export interface ImageManifest {
 	buildId: string;
@@ -19,6 +20,7 @@ export interface ImageManifest {
 	files: Record<string, string>;
 	limitInputPixels: number;
 	mediaPath: string;
+	openGraphCards: Record<string, OpenGraphCard>;
 	version: typeof imageManifestVersion;
 }
 

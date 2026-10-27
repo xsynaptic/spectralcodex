@@ -1,12 +1,14 @@
 import type * as NodeFs from 'node:fs';
 
+import type { OpenGraphCard } from '#open-graph-cards.ts';
+
 export const imageRecordsVariable = 'XSYNAPTIC_IMAGE_RECORDS';
 
 interface ImageRecorder {
 	descriptor: number;
 	directory: string;
 	fs: typeof NodeFs;
-	sources: Map<string, string>;
+	lines: Set<string>;
 }
 
 let recorder: ImageRecorder | undefined;
@@ -20,10 +22,10 @@ function openRecorder(directory: string): ImageRecorder {
 		'a',
 	);
 
-	return { descriptor, directory, fs, sources: new Map() };
+	return { descriptor, directory, fs, lines: new Set() };
 }
 
-export function recordImageName(name: string, sourcePath: string) {
+function writeRecord(record: object) {
 	if (typeof process === 'undefined') return;
 
 	const directory = process.env[imageRecordsVariable];
@@ -36,8 +38,18 @@ export function recordImageName(name: string, sourcePath: string) {
 		recorder = openRecorder(directory);
 	}
 
-	if (recorder.sources.get(name) === sourcePath) return;
+	const line = JSON.stringify(record);
 
-	recorder.sources.set(name, sourcePath);
-	recorder.fs.writeSync(recorder.descriptor, `${JSON.stringify({ name, sourcePath })}\n`);
+	if (recorder.lines.has(line)) return;
+
+	recorder.lines.add(line);
+	recorder.fs.writeSync(recorder.descriptor, `${line}\n`);
+}
+
+export function recordImageName(name: string, sourcePath: string) {
+	writeRecord({ name, sourcePath });
+}
+
+export function recordOpenGraphCard(name: string, card: OpenGraphCard) {
+	writeRecord({ card, kind: 'open-graph-card', name });
 }

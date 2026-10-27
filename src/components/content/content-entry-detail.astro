@@ -10,11 +10,10 @@ import ImageHero from '#components/image/image-hero.astro';
 import MainSite from '#components/main/main-site.astro';
 import TextMultilingual from '#components/parts/text-multilingual.astro';
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
-import { formatTitleMultilingual, getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
+import { getMultilingualContent } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedGroup, getImageFeaturedId } from '#lib/image/image-featured.ts';
-import { getDescriptionRenderedText } from '#lib/utils/description-data.ts';
+import { createEntryMetaFunction } from '#lib/utils/seo-cards.ts';
 import { buildEntryBreadcrumbSchema } from '#lib/utils/seo-structured-data.ts';
-import { getSeoImageProps } from '#lib/utils/seo.ts';
 
 interface Props {
 	atlas?: AtlasPageProps | undefined;
@@ -27,6 +26,7 @@ const { atlas, breadcrumbRegions, entry } = Astro.props;
 const titleMultilingual = getMultilingualContent({ data: entry.data, prop: 'title' })?.primary;
 
 const catalog = await getCatalog();
+const getEntryMeta = await createEntryMetaFunction();
 
 const imageFeaturedGroup = getImageFeaturedGroup({
 	getCaption: catalog.getCaption,
@@ -42,12 +42,7 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 	atlas={atlas}
 	hasHeroImage={hasHeroImage}
 	meta={{
-		description: getDescriptionRenderedText(entry),
-		image: getSeoImageProps({
-			alt: entry.data.title,
-			id: entry.id,
-		}),
-		title: formatTitleMultilingual(entry.data.title, titleMultilingual),
+		...getEntryMeta(entry, titleMultilingual),
 	}}
 	schemas={[
 		buildEntryBreadcrumbSchema({

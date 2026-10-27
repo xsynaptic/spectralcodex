@@ -4,7 +4,7 @@ import {
 	fallbackImageIds,
 	getFallbackImageId,
 	resolveFallbackImageId,
-} from '#og-image/fallback.ts';
+} from '#open-graph-fallback.ts';
 
 function optionsFor(key: string): Array<string> {
 	const value = fallbackImageIds[key];

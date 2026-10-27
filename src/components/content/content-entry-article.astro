@@ -1,6 +1,4 @@
 ---
-import { getPublicId } from '@spectralcodex/shared/entries';
-
 import type { MetaProps } from '#components/types.ts';
 import type { AtlasPageProps } from '#lib/atlas/atlas-data.ts';
 import type { ComputedEntry } from '#lib/collections/collections-types.ts';
@@ -14,10 +12,8 @@ import MainSite from '#components/main/main-site.astro';
 import SectionAuthor from '#components/sections/section-author.astro';
 import { MicroformatClassNames } from '#components/types.ts';
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
-import { formatTitleMultilingual } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedHeroGroup, getImageFeaturedId } from '#lib/image/image-featured.ts';
-import { getDescriptionRenderedText } from '#lib/utils/description-data.ts';
-import { getSeoImageProps } from '#lib/utils/seo.ts';
+import { createEntryMetaFunction } from '#lib/utils/seo-cards.ts';
 
 interface Props {
 	atlas?: AtlasPageProps | undefined;
@@ -31,6 +27,7 @@ interface Props {
 const { atlas, entry, meta, schemas, titleMultilingual, titleMultilingualAdditional } = Astro.props;
 
 const catalog = await getCatalog();
+const getEntryMeta = await createEntryMetaFunction();
 const imageFeaturedHeroGroup = getImageFeaturedHeroGroup({
 	getCaption: catalog.getCaption,
 	imageFeatured: entry.data.imageFeatured,
@@ -44,12 +41,7 @@ const hasHeroImage = !!imageFeaturedHeroGroup && imageFeaturedHeroGroup.length >
 	atlas={atlas}
 	hasHeroImage={hasHeroImage}
 	meta={{
-		description: getDescriptionRenderedText(entry),
-		image: getSeoImageProps({
-			alt: entry.data.title,
-			id: getPublicId(entry),
-		}),
-		title: formatTitleMultilingual(entry.data.title, titleMultilingual),
+		...getEntryMeta(entry, titleMultilingual),
 		...meta,
 	}}
 	schemas={schemas}

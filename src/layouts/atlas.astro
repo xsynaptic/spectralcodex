@@ -9,6 +9,7 @@ import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { formatTitleMultilingual } from '#lib/i18n/i18n-utils.ts';
 import { getSitePath } from '#lib/utils/routing.ts';
+import { getIndexCard } from '#lib/utils/seo-cards.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
 
 const { props: atlasMapProps } = await getAtlasMapData();
@@ -24,7 +25,14 @@ const titleMultilingual = { lang: langCodeZh, value: t('atlas.title', langCodeZh
 	atlas={{ page: atlasPage.map }}
 	meta={{
 		description: t('atlas.description'),
-		image: getSeoImageProps({ alt: t('atlas.title'), id: 'index-atlas' }),
+		image: getSeoImageProps({
+			alt: t('atlas.title'),
+			card: getIndexCard({
+				key: 'atlas',
+				title: t('atlas.title'),
+				titleZh: titleMultilingual.value,
+			}),
+		}),
 		preloadUrls: atlasMapProps
 			? [getMapPayloadUrl(atlasMapProps.payloadBase, mapPayloadName.directory)]
 			: undefined,

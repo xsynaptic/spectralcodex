@@ -9,6 +9,7 @@ import { fileURLToPath } from 'node:url';
 import type { ResolvedImageEncoding } from '#image-encoding.ts';
 import type { ImageSourceResolver } from '#image-sources.ts';
 import type { ImageManifest } from '#image-state.ts';
+import type { OpenGraphCard } from '#open-graph-cards.ts';
 
 import { createDevImageResolver } from '#dev-resolver.ts';
 import { imageRecordsVariable } from '#image-recorder.ts';
@@ -44,19 +45,17 @@ function decodeImageName(pathname: string) {
 	}
 }
 
-async function readPreviousRenditions(statePath: string) {
+async function readPreviousManifest(statePath: string) {
 	try {
-		const previous = await readManifest(statePath);
-
-		return Object.entries(previous?.files ?? {});
+		return await readManifest(statePath);
 	} catch (error) {
-		if (error instanceof Refusal) return [];
+		if (error instanceof Refusal) return;
 
 		throw error;
 	}
 }
 
-async function readRecordedRenditions({
+async function readRecorded({
 	isIncremental,
 	logger,
 	pageCount,
@@ -77,10 +76,15 @@ async function readRecordedRenditions({
 			"Incremental build: pages restored from cache record nothing, so the manifest keeps the previous build's names too; names only fall out on a full build",
 		);
 
-		return new Map([...(await readPreviousRenditions(statePath)), ...recorded]);
+		const previous = await readPreviousManifest(statePath);
+
+		return {
+			cards: new Map([...Object.entries(previous?.openGraphCards ?? {}), ...recorded.cards]),
+			renditions: new Map([...Object.entries(previous?.files ?? {}), ...recorded.renditions]),
+		};
 	}
 
-	if (recorded.size === 0 && pageCount > 0) {
+	if (recorded.renditions.size === 0 && pageCount > 0) {
 		throw new Error(
 			`No image names were recorded while building ${String(pageCount)} pages; build image URLs with getName at render time, in a runtime that has node:fs`,
 		);
@@ -93,13 +97,13 @@ async function writeBuildManifest({
 	distPath,
 	logger,
 	manifest,
-	renditions,
+	recorded: { cards, renditions },
 	statePath,
 }: {
 	distPath: string;
 	logger: AstroIntegrationLogger;
 	manifest: Pick<ImageManifest, 'encoding' | 'limitInputPixels' | 'mediaPath'>;
-	renditions: ReadonlyMap<string, string>;
+	recorded: { cards: ReadonlyMap<string, OpenGraphCard>; renditions: ReadonlyMap<string, string> };
 	statePath: string;
 }) {
 	const buildId = randomUUID();
@@ -109,12 +113,13 @@ async function writeBuildManifest({
 		buildId,
 		distPath,
 		files: Object.fromEntries(renditions),
+		openGraphCards: Object.fromEntries(cards),
 		version: imageManifestVersion,
 	});
 	await writeBuildId(distPath, buildId);
 
 	logger.info(
-		`${String(renditions.size)} renditions from ${String(new Set(renditions.values()).size)} sources`,
+		`${String(renditions.size)} renditions from ${String(new Set(renditions.values()).size)} sources, ${String(cards.size)} OpenGraph cards`,
 	);
 }
 
@@ -181,17 +186,18 @@ export default function imagePipeline({
 		path.resolve(cachePath),
 	);
 	let isIncremental = false;
+	let buildRecordsPath = recordsPath;
 
 	return {
 		hooks: {
 			'astro:build:done': async ({ dir, logger, pages }) => {
 				try {
 					const distPath = fileURLToPath(dir);
-					const renditions = await readRecordedRenditions({
+					const recorded = await readRecorded({
 						isIncremental,
 						logger,
 						pageCount: pages.length,
-						recordsPath,
+						recordsPath: buildRecordsPath,
 						statePath,
 					});
 
@@ -203,7 +209,7 @@ export default function imagePipeline({
 							limitInputPixels,
 							mediaPath: absoluteMediaPath,
 						},
-						renditions,
+						recorded,
 						statePath,
 					});
 				} finally {
@@ -214,8 +220,8 @@ export default function imagePipeline({
 				if (command !== 'build') return;
 
 				isIncremental = config.experimental.incrementalBuild;
-				await resetImageRecords(recordsPath);
-				process.env[imageRecordsVariable] = recordsPath;
+				buildRecordsPath = await resetImageRecords(recordsPath);
+				process.env[imageRecordsVariable] = buildRecordsPath;
 			},
 			'astro:server:setup': async ({ logger, server }) => {
 				// An absolute base URL means dev fetches images from the live host

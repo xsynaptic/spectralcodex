@@ -1,4 +1,5 @@
-import { fallbackImageIds } from '#og-image/fallback.ts';
+import { fallbackImageIds } from '@spectralcodex/shared/open-graph-fallback';
+
 import { getCollectionEntries, withAstroContent } from '#shared/astro-content.ts';
 import { defineCommand, runCommand } from '#shared/cli-command.ts';
 import { formatCount, log } from '#shared/cli-output.ts';

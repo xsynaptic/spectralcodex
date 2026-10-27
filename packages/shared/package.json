@@ -14,6 +14,7 @@
 		"./links": "./src/links.ts",
 		"./map": "./src/map/index.ts",
 		"./open-graph": "./src/open-graph.ts",
+		"./open-graph-fallback": "./src/open-graph-fallback.ts",
 		"./paths": "./src/paths.ts",
 		"./routing": "./src/routing.ts",
 		"./schemas": "./src/schemas/index.ts",

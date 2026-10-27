@@ -8,6 +8,7 @@ import MainSite from '#components/main/main-site.astro';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getImageFeaturedGroupByCatalog } from '#lib/image/image-featured.ts';
 import { getSitePath } from '#lib/utils/routing.ts';
+import { getIndexCard } from '#lib/utils/seo-cards.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
 
 interface Props {
@@ -25,10 +26,7 @@ const title = t('chronology.index.title');
 <MainSite
 	meta={{
 		description: t('chronology.index.description'),
-		image: getSeoImageProps({
-			alt: title,
-			id: 'index-chronology',
-		}),
+		image: getSeoImageProps({ alt: title, card: getIndexCard({ key: 'chronology', title }) }),
 		title,
 	}}
 >

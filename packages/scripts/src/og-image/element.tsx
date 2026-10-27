@@ -1,8 +1,9 @@
+import type { OpenGraphCardTitles } from '@spectralcodex/shared/open-graph';
+
 import { openGraphImageHeight, openGraphImageWidth } from '@spectralcodex/shared/open-graph';
 import { Bitmap } from 'takumi-js/helpers/jsx';
 
 import type { ProcessedImage } from '#og-image/generate.ts';
-import type { OpenGraphMetadataItem } from '#og-image/types.ts';
 
 const isShowBranding = true as boolean;
 
@@ -104,7 +105,7 @@ const scriptStyles = {
 	},
 } as const;
 
-export function getOpenGraphElement(entry: OpenGraphMetadataItem, image?: ProcessedImage) {
+export function getOpenGraphElement(titles: OpenGraphCardTitles, image?: ProcessedImage) {
 	return (
 		<div
 			style={{
@@ -142,6 +143,7 @@ export function getOpenGraphElement(entry: OpenGraphMetadataItem, image?: Proces
 					flexDirection: 'column',
 					height: '100%',
 					justifyContent: 'flex-end',
+					position: 'relative',
 					textAlign: 'center',
 					width: '100%',
 				}}
@@ -149,11 +151,11 @@ export function getOpenGraphElement(entry: OpenGraphMetadataItem, image?: Proces
 				{isShowBranding ? <TitleSite luminance={image?.luminanceTop} /> : undefined}
 				<TitleMultilingual
 					luminance={image?.luminanceBottom}
-					titleJa={entry.titleJa}
-					titleTh={entry.titleTh}
-					titleZh={entry.titleZh}
+					titleJa={titles.titleJa}
+					titleTh={titles.titleTh}
+					titleZh={titles.titleZh}
 				/>
-				<Title luminance={image?.luminanceBottom} title={entry.title} />
+				<Title luminance={image?.luminanceBottom} title={titles.title} />
 			</div>
 		</div>
 	);
@@ -181,6 +183,9 @@ function Title({ luminance, title }: { luminance?: number | undefined; title: st
 	return (
 		<div
 			style={{
+				filter: isInverted
+					? 'drop-shadow(0px 0px 6px rgb(240, 240, 245, 0.8))'
+					: 'drop-shadow(1px 1px 6px rgb(24, 24, 27, 0.4))',
 				fontFamily: 'Lora',
 				fontSize: '40px',
 				fontWeight: 700,
@@ -189,9 +194,6 @@ function Title({ luminance, title }: { luminance?: number | undefined; title: st
 				maxWidth: `${String(openGraphImageWidth)}px`,
 				padding: '0 100px 60px', // Looser side margins for longer text
 				textOverflow: 'ellipsis',
-				textShadow: isInverted
-					? '0px 0px 6px rgb(240, 240, 245, 0.8)'
-					: '1px 1px 6px rgb(24, 24, 27, 0.4)',
 				...fillStyles(
 					isInverted,
 					'rgb(24, 24, 27)',
@@ -224,13 +226,13 @@ function TitleMultilingual({
 		<div
 			lang={lang}
 			style={{
+				filter: isInverted
+					? 'drop-shadow(0px 0px 4px rgb(220, 220, 225, 0.7))'
+					: 'drop-shadow(1px 1px 4px rgb(12, 12, 14, 0.6))',
 				lineClamp: 1,
 				maxWidth: `${String(openGraphImageWidth)}px`,
 				padding: '0 100px', // Looser side margins for longer text
 				textOverflow: 'ellipsis',
-				textShadow: isInverted
-					? '0px 0px 4px rgb(220, 220, 225, 0.7)'
-					: '1px 1px 4px rgb(12, 12, 14, 0.6)',
 				...scriptStyles,
 				...fillStyles(
 					isInverted,

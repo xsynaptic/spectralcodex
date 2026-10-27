@@ -1,4 +1,5 @@
 ---
+import type { CatalogItem } from '#lib/catalog/catalog-types.ts';
 import type {
 	ChronologyDailyCounts,
 	ChronologyMonthlyItem,
@@ -12,7 +13,9 @@ import MainSite from '#components/main/main-site.astro';
 import Anchor from '#components/parts/anchor.astro';
 import { createChronologyImageFeaturedGroupFunction } from '#lib/collections/chronology/chronology-queries.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { getImageFeaturedGroupByCatalog } from '#lib/image/image-featured.ts';
 import { getSitePath } from '#lib/utils/routing.ts';
+import { getChronologyCard } from '#lib/utils/seo-cards.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
 import { formatStringTemplate } from '#lib/utils/text.ts';
 
@@ -20,10 +23,17 @@ interface Props {
 	chronologyDailyData: Record<string, ChronologyDailyCounts>;
 	chronologyMonthlyData: Array<ChronologyMonthlyItem>;
 	chronologyYear: string;
+	chronologyYearHighlights: Array<CatalogItem> | undefined;
 	chronologyYears: Array<string>;
 }
 
-const { chronologyDailyData, chronologyMonthlyData, chronologyYear, chronologyYears } = Astro.props;
+const {
+	chronologyDailyData,
+	chronologyMonthlyData,
+	chronologyYear,
+	chronologyYearHighlights,
+	chronologyYears,
+} = Astro.props;
 
 const getChronologyImageFeaturedGroup = await createChronologyImageFeaturedGroupFunction();
 
@@ -37,7 +47,11 @@ const title = formatStringTemplate(t('chronology.yearly.title'), { date: chronol
 		description: formatStringTemplate(t('chronology.yearly.description'), { date: chronologyYear }),
 		image: getSeoImageProps({
 			alt: title,
-			id: chronologyYear,
+			card: getChronologyCard({
+				id: chronologyYear,
+				imageId: getImageFeaturedGroupByCatalog({ items: chronologyYearHighlights })?.[0]?.id,
+				title,
+			}),
 		}),
 		title,
 	}}

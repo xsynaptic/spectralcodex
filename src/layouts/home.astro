@@ -17,6 +17,7 @@ import { getCatalogStats } from '#lib/catalog/catalog-stats.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getImageFeaturedGroupByCatalog } from '#lib/image/image-featured.ts';
 import { getSitePath } from '#lib/utils/routing.ts';
+import { getIndexCard } from '#lib/utils/seo-cards.ts';
 import { buildAuthorSchema, buildWebSiteSchema } from '#lib/utils/seo-structured-data.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
 import { renderMarkdownInline } from '#lib/utils/text.ts';
@@ -51,7 +52,7 @@ const hasHeroImage = !!imageFeaturedGroup && imageFeaturedGroup.length > 0;
 	meta={{
 		image: getSeoImageProps({
 			alt: t('site.title'),
-			id: 'index-homepage',
+			card: getIndexCard({ key: 'homepage', title: '' }),
 		}),
 	}}
 	schemas={[buildWebSiteSchema(), buildAuthorSchema()]}

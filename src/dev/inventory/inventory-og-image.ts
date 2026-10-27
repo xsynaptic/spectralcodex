@@ -28,13 +28,13 @@ export const getStaticPaths = (async () => {
 export const GET = (async ({ props: { card } }) => {
 	const image = await processImage({
 		imageInput: card.imagePath,
-		isFallback: card.entry.isFallback,
+		isBlurred: card.isBlurred,
 	});
 
 	const render = await getRenderCard();
 
 	// Takumi returns a Uint8Array that may be backed by a SharedArrayBuffer, which Response rejects
-	return new Response(new Uint8Array(await render(card.entry, image)), {
+	return new Response(new Uint8Array(await render(card.titles, image)), {
 		headers: { 'cache-control': 'no-store', 'content-type': 'image/jpeg' },
 	});
 }) satisfies APIRoute<InferGetStaticPropsType<typeof getStaticPaths>>;

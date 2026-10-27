@@ -10,3 +10,10 @@ export {
 } from '#image-name.ts';
 export type { CoverPresetName, ImagePreset, ImageSource } from '#image-presets.ts';
 export { defineImagePipeline } from '#image-presets.ts';
+export type {
+	OpenGraphCard,
+	OpenGraphCardImage,
+	OpenGraphCardInput,
+	OpenGraphCardValue,
+} from '#open-graph-cards.ts';
+export { defineOpenGraphCards } from '#open-graph-cards.ts';

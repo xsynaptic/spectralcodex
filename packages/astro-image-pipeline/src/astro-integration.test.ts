@@ -11,12 +11,15 @@ import { resolveImageEncoding } from '#image-encoding.ts';
 import { defineImagePipeline } from '#image-presets.ts';
 import { imageRecordsVariable } from '#image-recorder.ts';
 import { readManifest } from '#image-state.ts';
+import { defineOpenGraphCards } from '#open-graph-cards.ts';
 
 type Hooks = AstroIntegration['hooks'];
 
 const pipeline = defineImagePipeline({
 	presets: { card: { aspectRatio: 3 / 2, fit: 'cover', format: 'webp', widths: [600] } },
 });
+
+const openGraphCards = defineOpenGraphCards({ format: 'jpg' });
 
 let root: string;
 
@@ -130,9 +133,110 @@ describe('imagePipeline recording', () => {
 		expect(manifest?.files).toStrictEqual({ 'a/b-600x400.webp': 'a/b.jpg' });
 	});
 
+	test('a second build in the same process records its own names', async () => {
+		const first = createIntegration();
+
+		await startBuild(first.hooks);
+		pipeline.getName({ height: 1000, id: 'a/b.jpg', width: 1500 }, 'card', 600);
+		await finishBuild(first.hooks);
+
+		const second = createIntegration();
+
+		await startBuild(second.hooks);
+		pipeline.getName({ height: 1000, id: 'c.jpg', width: 1500 }, 'card', 600);
+		await finishBuild(second.hooks);
+
+		const manifest = await readManifest(path.join(root, 'img-state'));
+
+		expect(manifest?.files).toStrictEqual({ 'c-600x400.webp': 'c.jpg' });
+	});
+
 	test('nothing is recorded outside a build', () => {
 		pipeline.getName({ height: 1000, id: 'a/b.jpg', width: 1500 }, 'card', 600);
 
 		expect(existsSync(path.join(root, 'img-state/records'))).toBe(false);
+	});
+});
+
+describe('imagePipeline OpenGraph card recording', () => {
+	test('the same card recorded with keys in another order is one card, stored canonically', async () => {
+		const { hooks } = createIntegration();
+
+		await startBuild(hooks);
+		pipeline.getName({ height: 1000, id: 'a/b.jpg', width: 1500 }, 'card', 600);
+		openGraphCards.getCardName({
+			id: 'posts-a',
+			image: { id: 'a/b.jpg' },
+			input: Object.fromEntries([
+				['title', 'A'],
+				['collection', 'posts'],
+				['titleZh', undefined],
+			]),
+		});
+		openGraphCards.getCardName({
+			id: 'posts-a',
+			image: { id: 'a/b.jpg' },
+			input: { collection: 'posts', title: 'A' },
+		});
+		await finishBuild(hooks);
+
+		const manifest = await readManifest(path.join(root, 'img-state'));
+		const card = manifest?.openGraphCards['posts-a.jpg'];
+
+		expect(card).toStrictEqual({
+			image: { id: 'a/b.jpg' },
+			input: { collection: 'posts', title: 'A' },
+		});
+		expect(Object.keys(card?.input ?? {})).toStrictEqual(['collection', 'title']);
+	});
+
+	test('one card name recorded with different input fails the build', async () => {
+		const { hooks } = createIntegration();
+
+		await startBuild(hooks);
+		pipeline.getName({ height: 1000, id: 'a/b.jpg', width: 1500 }, 'card', 600);
+		openGraphCards.getCardName({ id: 'posts-a', input: { title: 'A' } });
+		openGraphCards.getCardName({ id: 'posts-a', input: { title: 'B' } });
+
+		await expect(finishBuild(hooks)).rejects.toThrow(
+			/1 OpenGraph cards were recorded with different input/,
+		);
+	});
+
+	test('one card name recorded with a different treatment fails the build', async () => {
+		const { hooks } = createIntegration();
+
+		await startBuild(hooks);
+		pipeline.getName({ height: 1000, id: 'a/b.jpg', width: 1500 }, 'card', 600);
+		openGraphCards.getCardName({ id: 'posts-a', image: { id: 'a/b.jpg' }, input: { title: 'A' } });
+		openGraphCards.getCardName({
+			id: 'posts-a',
+			image: { id: 'a/b.jpg', treatment: 'blur' },
+			input: { title: 'A' },
+		});
+
+		await expect(finishBuild(hooks)).rejects.toThrow(/recorded with different input/);
+	});
+
+	test('an incremental build keeps the previous cards beside the ones it records', async () => {
+		const full = createIntegration();
+
+		await startBuild(full.hooks);
+		pipeline.getName({ height: 1000, id: 'a/b.jpg', width: 1500 }, 'card', 600);
+		openGraphCards.getCardName({ id: 'posts-a', input: { title: 'A' } });
+		await finishBuild(full.hooks);
+
+		const incremental = createIntegration();
+
+		await startBuild(incremental.hooks, { isIncremental: true });
+		openGraphCards.getCardName({ id: 'posts-b', input: { title: 'B' } });
+		await finishBuild(incremental.hooks);
+
+		const manifest = await readManifest(path.join(root, 'img-state'));
+
+		expect(manifest?.openGraphCards).toStrictEqual({
+			'posts-a.jpg': { input: { title: 'A' } },
+			'posts-b.jpg': { input: { title: 'B' } },
+		});
 	});
 });

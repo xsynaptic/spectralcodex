@@ -1,6 +1,5 @@
 import type { OutputInfo } from 'sharp';
 
-import { createHash } from 'node:crypto';
 import path from 'node:path';
 import pLimit from 'p-limit';
 import sharp from 'sharp';
@@ -17,6 +16,7 @@ import { isWithinSource } from '#image-presets.ts';
 import { engineId, renderImage } from '#image-render.ts';
 import { getImageCachePaths, readCurrentManifest, readEngine, writeEngine } from '#image-state.ts';
 import { Refusal } from '#refusal.ts';
+import { hashRenderKey } from '#render-key.ts';
 import { getDefaultConcurrency, runRenderJobs } from '#run-render-jobs.ts';
 import { createSourceFingerprints } from '#source-fingerprints.ts';
 
@@ -51,20 +51,15 @@ export function getRenditionKey({
 	height?: number | undefined;
 	width: number;
 }) {
-	return createHash('sha256')
-		.update(
-			[
-				digest,
-				format,
-				serializeEncoding(encoding),
-				width,
-				height ?? '',
-				imageRenderRevision,
-				engine,
-			].join(':'),
-		)
-		.digest('hex')
-		.slice(0, 16);
+	return hashRenderKey([
+		digest,
+		format,
+		serializeEncoding(encoding),
+		width,
+		height ?? '',
+		imageRenderRevision,
+		engine,
+	]);
 }
 
 function getManifestRenditions(manifest: ImageManifest) {

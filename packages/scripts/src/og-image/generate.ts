@@ -1,11 +1,10 @@
+import type { OpenGraphCardTitles } from '@spectralcodex/shared/open-graph';
 import type { Font } from 'takumi-js';
 
 import { openGraphImageHeight, openGraphImageWidth } from '@spectralcodex/shared/open-graph';
 import sharp from 'sharp';
 import { render, setGlyphCacheMaxBytes } from 'takumi-js';
 import { Renderer } from 'takumi-js/node';
-
-import type { OpenGraphMetadataItem } from '#og-image/types.ts';
 
 import { getOpenGraphElement } from '#og-image/element.tsx';
 
@@ -44,10 +43,10 @@ export function createRenderer({ fonts }: { fonts: Array<Font> }) {
 	const renderer = new Renderer();
 
 	return async function renderOpenGraphImage(
-		entry: OpenGraphMetadataItem,
+		titles: OpenGraphCardTitles,
 		image?: ProcessedImage,
 	): Promise<Uint8Array> {
-		return render(getOpenGraphElement(entry, image), {
+		return render(getOpenGraphElement(titles, image), {
 			fonts,
 			format: 'jpeg',
 			height: openGraphImageHeight,
@@ -75,10 +74,10 @@ export async function probeLuminanceTop(imageInput: string): Promise<number> {
 // Raw RGBA hands off to Takumi without an encode, and luminance reads the same buffer
 export async function processImage({
 	imageInput,
-	isFallback,
+	isBlurred,
 }: {
 	imageInput: string;
-	isFallback: boolean;
+	isBlurred: boolean;
 }): Promise<ProcessedImage> {
 	const pipeline = sharp(imageInput).resize({
 		fit: 'cover',
@@ -87,7 +86,7 @@ export async function processImage({
 		width: openGraphImageWidth,
 	});
 
-	if (isFallback) {
+	if (isBlurred) {
 		pipeline.blur(16);
 	}
 

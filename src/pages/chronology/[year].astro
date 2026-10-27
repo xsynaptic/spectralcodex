@@ -5,7 +5,8 @@ import ChronologyYearly from '#layouts/chronology-yearly.astro';
 import { getChronologyData } from '#lib/collections/chronology/chronology-data.ts';
 
 export const getStaticPaths = (async () => {
-	const { chronologyDailyData, chronologyYearlyData, chronologyYears } = await getChronologyData();
+	const { chronologyDailyData, chronologyIndexData, chronologyYearlyData, chronologyYears } =
+		await getChronologyData();
 
 	return Object.entries(chronologyYearlyData).map(([chronologyYear, chronologyMonthlyData]) => ({
 		params: { year: chronologyYear },
@@ -13,6 +14,7 @@ export const getStaticPaths = (async () => {
 			chronologyDailyData: chronologyDailyData[chronologyYear] ?? {},
 			chronologyMonthlyData,
 			chronologyYear,
+			chronologyYearHighlights: chronologyIndexData[chronologyYear]?.highlights,
 			chronologyYears,
 		},
 	}));

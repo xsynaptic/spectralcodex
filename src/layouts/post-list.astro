@@ -18,6 +18,7 @@ import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { getPagination } from '#lib/utils/pagination.ts';
 import { getContentPath } from '#lib/utils/routing.ts';
+import { getIndexCard } from '#lib/utils/seo-cards.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
 import { renderMarkdownInline } from '#lib/utils/text.ts';
 
@@ -36,10 +37,7 @@ const description = t('collection.posts.description');
 <MainSite
 	meta={{
 		description,
-		image: getSeoImageProps({
-			alt: title,
-			id: 'index-posts',
-		}),
+		image: getSeoImageProps({ alt: title, card: getIndexCard({ key: 'posts', title }) }),
 		title,
 	}}
 >
