@@ -12,6 +12,7 @@ Imports flow one way, UI to state to base, along the zones in `.fallowrc.jsonc` 
 - No effect derives store state from other store state. Host changes arrive through `map:sync`, and user actions through their handlers.
 - Every map fetches its dataset's one whole directory file from `/api/map/`, so the HTTP cache shares one copy across pages. Partitions scatter a Theme across many Regions, and inlined rows help only one-page visits.
 - Every payload but a Division mask shares one version hash, since Locations change on most edit days.
+- Lines and pulse rings place Points through `lib/clusters-factory.ts`, a main-thread copy of MapLibre's cluster index. It copies three facts from MapLibre's `geojson_source.ts` (radius ×16 into tile units, extent 8192, clustering at `floor(zoom)`); recheck them on a MapLibre major upgrade.
 
 ## Host contract
 
