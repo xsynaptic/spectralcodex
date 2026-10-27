@@ -1,0 +1,25 @@
+.map-label,
+.map-label-count {
+	font-family: var(--map-font-label);
+	font-weight: 500;
+	line-height: 1.2;
+	pointer-events: none;
+	paint-order: stroke fill;
+}
+
+.map-label {
+	max-width: 20em;
+	padding-bottom: 0.9em;
+	font-size: 11px;
+	text-align: center;
+	line-break: strict;
+	word-break: keep-all;
+	text-wrap: balance;
+	overflow-wrap: anywhere;
+	-webkit-text-stroke-width: 2.4px;
+}
+
+.map-label-count {
+	font-size: 12px;
+	-webkit-text-stroke-width: 2px;
+}

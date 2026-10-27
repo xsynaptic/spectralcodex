@@ -24,16 +24,9 @@ export const MapSelectionFeatureState: FC = function MapSelectionFeatureState() 
 			if (state.select !== isSelected) map.setFeatureState(target, { select: isSelected });
 		}
 
-		// Toggling dark mode re-adds every source, diffed or not, which wipes feature-state
-		function onStyleData() {
-			setSelect(true);
-		}
-
 		setSelect(true);
-		map.on('styledata', onStyleData);
 
 		return () => {
-			map.off('styledata', onStyleData);
 			setSelect(false);
 		};
 	}, [map, selectedId]);

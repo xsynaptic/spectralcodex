@@ -2,14 +2,13 @@ import { modeAttribute, modeChangedEventName } from '@spectralcodex/shared/const
 
 import { useDocumentEventValue } from '#lib/document-event.ts';
 
-function isDocumentDark() {
-	return document.documentElement.getAttribute(modeAttribute) === 'dark';
+export function isDocumentDark() {
+	return (
+		typeof document !== 'undefined' &&
+		document.documentElement.getAttribute(modeAttribute) === 'dark'
+	);
 }
 
 export function useIsDarkMode() {
-	return useDocumentEventValue(
-		modeChangedEventName,
-		isDocumentDark,
-		typeof document !== 'undefined' && isDocumentDark(),
-	);
+	return useDocumentEventValue(modeChangedEventName, isDocumentDark, isDocumentDark());
 }

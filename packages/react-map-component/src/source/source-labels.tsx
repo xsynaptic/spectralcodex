@@ -1,14 +1,22 @@
 import type { FC } from 'react';
 import type { SymbolLayerSpecification } from 'react-map-gl/maplibre';
 
+import { tailwindColors } from '@spectralcodex/shared/map';
 import { memo, useMemo } from 'react';
 import { Layer } from 'react-map-gl/maplibre';
 
 import { useIsDarkMode } from '#lib/dark-mode.ts';
-import { MapLayerIdEnum, MapSourceIdEnum } from '#source/source-config.ts';
-import { getPointsLabelPaint } from '#source/source-hover.tsx';
+import { MapLayerIdEnum, MapSlotIdEnum, MapSourceIdEnum } from '#source/source-config.ts';
 import { selectTargetIds } from '#store/store-factory.ts';
 import { useMapStore } from '#store/store.tsx';
+
+export function getPointsLabelPaint(isDarkMode: boolean) {
+	return {
+		'text-color': isDarkMode ? tailwindColors.zinc200 : tailwindColors.zinc700,
+		'text-halo-color': isDarkMode ? 'rgba(0, 0, 0, 0.4)' : 'rgba(255, 255, 255, 0.8)',
+		'text-halo-width': 1.2,
+	} satisfies SymbolLayerSpecification['paint'];
+}
 
 function getTargetsLabelLayerStyle({
 	isDarkMode,
@@ -49,5 +57,11 @@ export const MapSourceLabels: FC = memo(function MapSourceLabels() {
 		[isDarkMode, targetIds],
 	);
 
-	return <Layer key={MapLayerIdEnum.TargetsLabel} {...targetsLabelLayerStyle} />;
+	return (
+		<Layer
+			beforeId={MapSlotIdEnum.Labels}
+			key={MapLayerIdEnum.TargetsLabel}
+			{...targetsLabelLayerStyle}
+		/>
+	);
 });

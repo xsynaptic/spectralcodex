@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 
 import { LngLatBounds } from 'maplibre-gl';
-import { memo, useEffect, useLayoutEffect, useState } from 'react';
+import { memo, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Map as ReactMapGlMap, useMap } from 'react-map-gl/maplibre';
 
 import type { MapComponentProps } from '#types.ts';
@@ -9,6 +9,7 @@ import type { MapComponentProps } from '#types.ts';
 import '#canvas/canvas-worker.ts';
 import { useMapCanvasEvents } from '#canvas/canvas-events.ts';
 import { MapSelectionFeatureState } from '#canvas/canvas-feature-state.tsx';
+import { MapHoverLabel } from '#canvas/canvas-hover-label.tsx';
 import { getInitialViewState } from '#canvas/canvas-viewport.ts';
 import { MapScopeBar } from '#controls/controls-scope.tsx';
 import { MapControls } from '#controls/controls.tsx';
@@ -17,10 +18,10 @@ import { useIsMapLoading } from '#data/data-query.ts';
 import { useHostViewSync } from '#host/host-view.ts';
 import { getActiveAttribute } from '#lib/active-attribute.ts';
 import { useMapConfig } from '#lib/config.tsx';
-import { useIsDarkMode } from '#lib/dark-mode.ts';
-import { useProtomaps } from '#lib/protomaps.ts';
+import { isDocumentDark, useIsDarkMode } from '#lib/dark-mode.ts';
+import { getBasemapStyle, setBasemapMode } from '#lib/protomaps.ts';
 import { MapHoverPreload, MapPopup } from '#popup/popup.tsx';
-import { mapInteractiveLayerIds } from '#source/source-config.ts';
+import { mapInteractiveLayerIds, mapSlotLayers } from '#source/source-config.ts';
 import { MapSource } from '#source/source.tsx';
 import { MapStoreProvider } from '#store/store.tsx';
 import { MapTargets } from '#targets/targets.tsx';
@@ -62,7 +63,24 @@ const MapRootMarker: FC = function MapRootMarker() {
 	return;
 };
 
-// Style diffing stays off; the diff throws away our sources anyway and loses the selection
+const MapBasemapMode: FC<{ initialIsDarkMode: boolean }> = function MapBasemapMode({
+	initialIsDarkMode,
+}) {
+	const { current: map } = useMap();
+	const { baseMapTheme, languages, protomapsApiKey } = useMapConfig();
+	const isDarkMode = useIsDarkMode();
+	const appliedIsDarkMode = useRef(initialIsDarkMode);
+
+	useEffect(() => {
+		if (!map || !protomapsApiKey || appliedIsDarkMode.current === isDarkMode) return;
+
+		appliedIsDarkMode.current = isDarkMode;
+		setBasemapMode(map.getMap(), { baseMapTheme, isDarkMode, languages });
+	}, [map, baseMapTheme, isDarkMode, languages, protomapsApiKey]);
+
+	return;
+};
+
 const MapCanvasContainer: FC = function MapCanvasContainer() {
 	const {
 		baseMapTheme,
@@ -77,7 +95,17 @@ const MapCanvasContainer: FC = function MapCanvasContainer() {
 		style,
 		zoom,
 	} = useMapConfig();
-	const protomapsStyleSpec = useProtomaps({ baseMapTheme, languages, protomapsApiKey });
+	const [initialIsDarkMode] = useState(isDocumentDark);
+	const [initialStyleSpec] = useState(() => {
+		const basemapStyle = getBasemapStyle({
+			baseMapTheme,
+			isDarkMode: initialIsDarkMode,
+			languages,
+			protomapsApiKey,
+		});
+
+		return { ...basemapStyle, layers: [...basemapStyle.layers, ...mapSlotLayers] };
+	});
 	const canvasEvents = useMapCanvasEvents();
 
 	const [initialViewState] = useState(() =>
@@ -89,24 +117,25 @@ const MapCanvasContainer: FC = function MapCanvasContainer() {
 	return (
 		<ReactMapGlMap
 			attributionControl={false}
-			fadeDuration={0}
+			fadeDuration={100}
 			hash={hash ?? false}
 			initialViewState={initialViewState}
 			interactive={isInteractive}
 			interactiveLayerIds={[...mapInteractiveLayerIds]}
-			mapStyle={protomapsStyleSpec}
+			mapStyle={initialStyleSpec}
 			maxZoom={19}
 			minZoom={4}
 			renderWorldCopies={isBeyondAntimeridian(bounds) || isBeyondAntimeridian(maxBounds)}
 			style={{ height: 'auto', ...style }}
-			styleDiffing={false}
 			{...canvasEvents}
 		>
+			<MapBasemapMode initialIsDarkMode={initialIsDarkMode} />
 			<MapControls />
 			<MapPopup />
 			<MapHoverPreload />
 			<MapCanvasLoading />
 			<MapSource />
+			<MapHoverLabel />
 			<MapScopeBar />
 			<MapTargets />
 			<MapSelectionFeatureState />

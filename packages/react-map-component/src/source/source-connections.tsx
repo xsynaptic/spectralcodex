@@ -11,7 +11,7 @@ import type { ConnectionCollection } from '#source/source-connections-factory.ts
 
 import { useDisplayedPositions } from '#canvas/canvas-positions.ts';
 import { useIsDarkMode } from '#lib/dark-mode.ts';
-import { MapLayerIdEnum, MapSourceIdEnum } from '#source/source-config.ts';
+import { MapLayerIdEnum, MapSlotIdEnum, MapSourceIdEnum } from '#source/source-config.ts';
 import {
 	getConnectionCollection,
 	getConnectionPoints,
@@ -96,8 +96,8 @@ export const MapSourceConnections: FC<{ rows: ReadonlyArray<MapSourceItem> }> = 
 
 		return (
 			<Source data={data} id={MapSourceIdEnum.ConnectionCollection} type="geojson">
-				<Layer {...layerStyles.band} />
-				<Layer {...layerStyles.line} />
+				<Layer beforeId={MapSlotIdEnum.Connections} {...layerStyles.band} />
+				<Layer beforeId={MapSlotIdEnum.Connections} {...layerStyles.line} />
 			</Source>
 		);
 	},

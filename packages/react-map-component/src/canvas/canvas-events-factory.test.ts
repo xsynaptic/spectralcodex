@@ -76,7 +76,7 @@ describe('getCanvasClickHit', () => {
 	);
 
 	test('a Point on an unhandled layer is the empty map', () => {
-		expect(getCanvasClickHit(makeClickInput({ layerId: MapLayerIdEnum.PointsLabel }))).toEqual(
+		expect(getCanvasClickHit(makeClickInput({ layerId: MapLayerIdEnum.TargetsLabel }))).toEqual(
 			empty,
 		);
 	});

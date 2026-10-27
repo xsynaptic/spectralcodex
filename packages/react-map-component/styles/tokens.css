@@ -48,6 +48,7 @@
 	--map-font-base: 'Helvetica Neue', arial, helvetica, sans-serif;
 	--map-font-display: ui-sans-serif, system-ui, sans-serif;
 	--map-font-sans: ui-sans-serif, system-ui, sans-serif;
+	--map-font-label: var(--map-font-base);
 	--map-surface: light-dark(#fff, var(--map-color-neutral-800));
 	--map-surface-hover: light-dark(rgb(0 0 0 / 5%), rgb(255 255 255 / 6%));
 	--map-surface-active: light-dark(rgb(0 0 0 / 10%), rgb(255 255 255 / 8%));

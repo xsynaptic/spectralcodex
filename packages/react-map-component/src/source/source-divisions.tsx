@@ -8,7 +8,7 @@ import { memo, useEffect, useMemo, useState } from 'react';
 import { Layer, Source } from 'react-map-gl/maplibre';
 
 import { useIsDarkMode } from '#lib/dark-mode.ts';
-import { MapLayerIdEnum, MapSourceIdEnum } from '#source/source-config.ts';
+import { MapLayerIdEnum, MapSlotIdEnum, MapSourceIdEnum } from '#source/source-config.ts';
 
 const emptyFeatureCollection: FeatureCollection<never, never> = {
 	features: [],
@@ -101,9 +101,9 @@ export const MapSourceDivisions: FC<{ data: MapDivisionMask | undefined }> = mem
 				id={MapSourceIdEnum.DivisionCollection}
 				type="geojson"
 			>
-				<Layer {...divisionStyle.mask} />
-				<Layer {...divisionStyle.halo} />
-				<Layer {...divisionStyle.outline} />
+				<Layer beforeId={MapSlotIdEnum.Divisions} {...divisionStyle.mask} />
+				<Layer beforeId={MapSlotIdEnum.Divisions} {...divisionStyle.halo} />
+				<Layer beforeId={MapSlotIdEnum.Divisions} {...divisionStyle.outline} />
 			</Source>
 		);
 	},

@@ -1,6 +1,6 @@
 import type { ExpressionSpecification } from 'maplibre-gl';
 import type { FC } from 'react';
-import type { CircleLayerSpecification } from 'react-map-gl/maplibre';
+import type { CircleLayerSpecification, SymbolLayerSpecification } from 'react-map-gl/maplibre';
 
 import {
 	LocationStatusEnum,
@@ -17,8 +17,12 @@ import { Layer, Source } from 'react-map-gl/maplibre';
 import type { MapRowCollection } from '#data/data-filter.ts';
 
 import { useIsDarkMode } from '#lib/dark-mode.ts';
-import { MapLayerIdEnum, MapSourceIdEnum, pointClusterRadius } from '#source/source-config.ts';
-import { getClustersLabelLayerStyle } from '#source/source-hover.tsx';
+import {
+	MapLayerIdEnum,
+	MapSlotIdEnum,
+	MapSourceIdEnum,
+	pointClusterRadius,
+} from '#source/source-config.ts';
 
 // Hover/select visuals read feature-state (set imperatively) so these paint specs never rebuild per interaction
 const hoverStateExpression = [
@@ -60,6 +64,29 @@ const clusterRampDeep = [
 	150,
 	tailwindColors.sky400,
 ] satisfies ExpressionSpecification;
+
+export const clustersLabelPaint = {
+	'text-color': tailwindColors.sky50,
+	'text-halo-color': 'rgba(0, 0, 0, 0.2)',
+	'text-halo-width': 1,
+} satisfies SymbolLayerSpecification['paint'];
+
+function getClustersLabelLayerStyle() {
+	return {
+		filter: ['has', 'point_count'],
+		id: MapLayerIdEnum.ClustersLabel,
+		layout: {
+			'text-allow-overlap': true,
+			'text-field': '{point_count_abbreviated}',
+			'text-font': ['Noto Sans Medium'],
+			'text-ignore-placement': true,
+			'text-size': 10,
+		},
+		paint: { ...clustersLabelPaint, 'text-opacity': ['case', hoverStateExpression, 0, 1] },
+		source: MapSourceIdEnum.PointCollection,
+		type: 'symbol',
+	} satisfies SymbolLayerSpecification;
+}
 
 function getClustersLayerStyle(isDarkMode: boolean) {
 	return {
@@ -201,7 +228,7 @@ function useMapSourcePointsStyle() {
 	return useMemo(
 		() => ({
 			clusters: getClustersLayerStyle(isDarkMode),
-			clustersLabel: getClustersLabelLayerStyle(MapSourceIdEnum.PointCollection),
+			clustersLabel: getClustersLabelLayerStyle(),
 			points: getPointsLayerStyle(isDarkMode),
 			pointsImage: getPointsImageLayerStyle(),
 			pointsTarget: getPointsTargetLayerStyle(isDarkMode),
@@ -243,11 +270,15 @@ export const MapSourcePoints: FC<{
 			type="geojson"
 			{...clusterConfig}
 		>
-			{interactive ? <Layer {...pointsStyle.clusters} /> : undefined}
-			{interactive ? <Layer {...pointsStyle.clustersLabel} /> : undefined}
-			<Layer {...pointsStyle.pointsTarget} />
-			<Layer {...pointsStyle.points} />
-			<Layer {...pointsStyle.pointsImage} />
+			{interactive ? (
+				<Layer beforeId={MapSlotIdEnum.Points} {...pointsStyle.clusters} />
+			) : undefined}
+			{interactive ? (
+				<Layer beforeId={MapSlotIdEnum.Points} {...pointsStyle.clustersLabel} />
+			) : undefined}
+			<Layer beforeId={MapSlotIdEnum.Points} {...pointsStyle.pointsTarget} />
+			<Layer beforeId={MapSlotIdEnum.Points} {...pointsStyle.points} />
+			<Layer beforeId={MapSlotIdEnum.Points} {...pointsStyle.pointsImage} />
 		</Source>
 	);
 });
