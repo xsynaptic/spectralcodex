@@ -1,3 +1,4 @@
+import { getCachePaths } from '@spectralcodex/shared/paths';
 import { getImageCachePaths, readManifest } from '@xsynaptic/astro-image-pipeline/node';
 import { parseImageName } from '@xsynaptic/astro-image-pipeline/presets';
 import { createStatus, formatCount, formatDuration, log } from '@xsynaptic/astro-scripts';
@@ -63,8 +64,9 @@ export async function verifyEdge({
 }
 
 async function readImageSamples(cachePath: string) {
-	const { renditionsPath, statePath } = getImageCachePaths(cachePath);
-	const manifest = await readManifest(statePath);
+	const { imagesPath } = getCachePaths(cachePath);
+	const { renditionsPath } = getImageCachePaths(imagesPath);
+	const manifest = await readManifest(imagesPath);
 
 	if (!manifest) return;
 

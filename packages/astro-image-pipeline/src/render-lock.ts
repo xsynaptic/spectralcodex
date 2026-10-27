@@ -4,8 +4,6 @@ import path from 'node:path';
 import { readFileIfExists } from '#files.ts';
 import { Refusal } from '#refusal.ts';
 
-const renderLockFile = 'render.lock';
-
 async function didClaimLock(lockPath: string) {
 	try {
 		const handle = await fs.open(lockPath, 'wx');
@@ -38,10 +36,10 @@ async function readLockHolder(lockPath: string) {
 	return Number.isSafeInteger(pid) && pid > 0 ? pid : undefined;
 }
 
-async function acquireRenderLock(statePath: string) {
-	const lockPath = path.join(statePath, renderLockFile);
+async function acquireRenderLock(directory: string) {
+	const lockPath = `${directory}.lock`;
 
-	await fs.mkdir(statePath, { recursive: true });
+	await fs.mkdir(path.dirname(lockPath), { recursive: true });
 
 	if (await didClaimLock(lockPath)) return lockPath;
 
@@ -58,8 +56,9 @@ async function acquireRenderLock(statePath: string) {
 	throw new Refusal(`Another render took over the stale lock at ${lockPath}`);
 }
 
-export async function withRenderLock<Result>(statePath: string, run: () => Promise<Result>) {
-	const lockPath = await acquireRenderLock(statePath);
+// The lock sits beside the output directory, which is rsynced whole
+export async function withRenderLock<Result>(directory: string, run: () => Promise<Result>) {
+	const lockPath = await acquireRenderLock(directory);
 
 	try {
 		return await run();

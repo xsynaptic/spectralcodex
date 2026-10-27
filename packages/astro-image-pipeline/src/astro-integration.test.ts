@@ -88,12 +88,13 @@ describe('imagePipeline recording', () => {
 		);
 		await finishBuild(hooks);
 
-		const manifest = await readManifest(path.join(root, 'img-state'));
+		const manifest = await readManifest(root);
 
 		expect(manifest?.renditions).toStrictEqual({
 			'a/b-600x400.webp': 'a/b.jpg',
 			'c-600x400.webp': 'elsewhere/c.jpg',
 		});
+		expect(existsSync(path.join(root, 'records'))).toBe(false);
 		expect(process.env[imageRecordsVariable]).toBeUndefined();
 	});
 
@@ -105,6 +106,7 @@ describe('imagePipeline recording', () => {
 		pipeline.getName({ height: 1000, id: 'a/b.png', width: 1500 }, 'card', 600);
 
 		await expect(finishBuild(hooks)).rejects.toThrow(/recorded from more than one source/);
+		expect(existsSync(path.join(root, 'records'))).toBe(true);
 	});
 
 	test('pages built with nothing recorded fail the build', async () => {
@@ -113,7 +115,7 @@ describe('imagePipeline recording', () => {
 		await startBuild(hooks);
 
 		await expect(finishBuild(hooks)).rejects.toThrow(/No image names were recorded/);
-		expect(existsSync(path.join(root, 'img-state/manifest.json'))).toBe(false);
+		expect(existsSync(path.join(root, 'manifest.json'))).toBe(false);
 	});
 
 	test('an incremental build that renders no page keeps the previous names', async () => {
@@ -128,7 +130,7 @@ describe('imagePipeline recording', () => {
 		await startBuild(incremental.hooks, { isIncremental: true });
 		await finishBuild(incremental.hooks);
 
-		const manifest = await readManifest(path.join(root, 'img-state'));
+		const manifest = await readManifest(root);
 
 		expect(manifest?.renditions).toStrictEqual({ 'a/b-600x400.webp': 'a/b.jpg' });
 	});
@@ -146,7 +148,7 @@ describe('imagePipeline recording', () => {
 		pipeline.getName({ height: 1000, id: 'c.jpg', width: 1500 }, 'card', 600);
 		await finishBuild(second.hooks);
 
-		const manifest = await readManifest(path.join(root, 'img-state'));
+		const manifest = await readManifest(root);
 
 		expect(manifest?.renditions).toStrictEqual({ 'c-600x400.webp': 'c.jpg' });
 	});
@@ -154,7 +156,7 @@ describe('imagePipeline recording', () => {
 	test('nothing is recorded outside a build', () => {
 		pipeline.getName({ height: 1000, id: 'a/b.jpg', width: 1500 }, 'card', 600);
 
-		expect(existsSync(path.join(root, 'img-state/records'))).toBe(false);
+		expect(existsSync(path.join(root, 'records'))).toBe(false);
 	});
 });
 
@@ -180,7 +182,7 @@ describe('imagePipeline OpenGraph card recording', () => {
 		});
 		await finishBuild(hooks);
 
-		const manifest = await readManifest(path.join(root, 'img-state'));
+		const manifest = await readManifest(root);
 		const card = manifest?.openGraphCards['posts-a.jpg'];
 
 		expect(card).toStrictEqual({
@@ -232,7 +234,7 @@ describe('imagePipeline OpenGraph card recording', () => {
 		openGraphCards.getCardName({ id: 'posts-b', input: { title: 'B' } });
 		await finishBuild(incremental.hooks);
 
-		const manifest = await readManifest(path.join(root, 'img-state'));
+		const manifest = await readManifest(root);
 
 		expect(manifest?.openGraphCards).toStrictEqual({
 			'posts-a.jpg': { input: { title: 'A' } },

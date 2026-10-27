@@ -3,28 +3,25 @@ import path from 'node:path';
 
 import { readFileIfExists, readJsonFile, writeJsonFile } from '#files.ts';
 
-const sidecarFile = 'sidecar.json';
-
 interface FileCacheRecord {
 	key: string;
 }
 
-interface FileCacheSidecar {
+// Renaming `files` would orphan every recorded key and re-render the whole library
+interface RenderKeys {
 	files: Record<string, FileCacheRecord>;
 }
 
 export async function createFileCache({
 	directory,
 	onReplace,
-	statePath,
 }: {
 	directory: string;
 	onReplace?: (name: string) => Promise<void>;
-	statePath: string;
 }) {
-	const sidecarPath = path.join(statePath, sidecarFile);
-	const sidecar = await readJsonFile<FileCacheSidecar>(sidecarPath);
-	const records = new Map(Object.entries(sidecar?.files ?? {}));
+	const keysPath = `${directory}-keys.json`;
+	const stored = await readJsonFile<RenderKeys>(keysPath);
+	const records = new Map(Object.entries(stored?.files ?? {}));
 
 	function filePath(name: string) {
 		return path.join(directory, name);
@@ -36,11 +33,11 @@ export async function createFileCache({
 		},
 
 		async save() {
-			await writeJsonFile(sidecarPath, {
+			await writeJsonFile(keysPath, {
 				files: Object.fromEntries(
 					[...records].toSorted(([first], [second]) => first.localeCompare(second)),
 				),
-			} satisfies FileCacheSidecar);
+			} satisfies RenderKeys);
 		},
 
 		// Identical bytes keep the old file and its mtime, so rsync has nothing to send

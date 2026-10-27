@@ -39,7 +39,7 @@ const allSizes = [
 let root: string;
 let mediaPath: string;
 let renditionsPath: string;
-let statePath: string;
+let keysPath: string;
 let distPath: string;
 let buildCount = 0;
 
@@ -63,7 +63,7 @@ async function writeBuild(
 		version: imageManifestVersion,
 	} satisfies ImageManifest;
 
-	await writeManifest(statePath, manifest);
+	await writeManifest(root, manifest);
 	await writeBuildId(distPath, manifest.buildId);
 
 	return names;
@@ -108,12 +108,11 @@ function getDeadPid() {
 beforeEach(async () => {
 	root = await fs.mkdtemp(path.join(tmpdir(), 'image-build-'));
 	mediaPath = path.join(root, 'media');
-	renditionsPath = path.join(root, 'img');
-	statePath = path.join(root, 'img-state');
+	renditionsPath = path.join(root, 'renditions');
+	keysPath = `${renditionsPath}-keys.json`;
 	distPath = path.join(root, 'dist');
 
 	await fs.mkdir(path.join(mediaPath, path.dirname(sourceId)), { recursive: true });
-	await fs.mkdir(statePath);
 	await fs.mkdir(distPath);
 	await writeSource(1500, 1000);
 });
@@ -175,7 +174,7 @@ describe('renderImages', () => {
 		const files = await listFiles();
 
 		for (const name of files) await fs.utimes(path.join(renditionsPath, name), past, past);
-		await fs.rm(path.join(statePath, 'sidecar.json'));
+		await fs.rm(keysPath);
 
 		const counts = await render();
 
@@ -228,28 +227,15 @@ describe('renderImages', () => {
 		expect(counts.rendered).toBe(0);
 	});
 
-	test('a change of sharp build is reported by the first run to complete', async () => {
+	test('a completed render clears the renders dev made for itself', async () => {
+		const devFile = path.join(root, 'dev', 'media-key', `${stem}-450.jpg`);
+
 		await writeBuild();
+		await fs.mkdir(path.dirname(devFile), { recursive: true });
+		await fs.writeFile(devFile, 'dev');
 		await render();
 
-		const controller = new AbortController();
-
-		await fs.writeFile(path.join(statePath, 'engine.txt'), 'other\n');
-		await expect(
-			renderImages({
-				cachePath: root,
-				onProgress: () => {
-					controller.abort();
-				},
-				signal: controller.signal,
-			}),
-		).rejects.toThrow();
-
-		const changed = await render();
-		const settled = await render();
-
-		expect(changed.isEngineChanged).toBe(true);
-		expect(settled.isEngineChanged).toBe(false);
+		expect(existsSync(path.join(root, 'dev'))).toBe(false);
 	});
 });
 
@@ -282,7 +268,7 @@ describe('renderImages guards', () => {
 	test('refuses a manifest from before the current version', async () => {
 		await writeBuild();
 		await fs.writeFile(
-			path.join(statePath, 'manifest.json'),
+			path.join(root, 'manifest.json'),
 			JSON.stringify({ buildId: 'old', files: {} }),
 		);
 
@@ -314,7 +300,7 @@ describe('renderImages guards', () => {
 	});
 
 	test('refuses while a live process holds the lock, and leaves its lock in place', async () => {
-		const lockPath = path.join(statePath, 'render.lock');
+		const lockPath = `${renditionsPath}.lock`;
 
 		await writeBuild();
 		await fs.writeFile(lockPath, String(process.pid));
@@ -327,7 +313,7 @@ describe('renderImages guards', () => {
 	});
 
 	test('takes over a lock whose holder is dead, then releases it', async () => {
-		const lockPath = path.join(statePath, 'render.lock');
+		const lockPath = `${renditionsPath}.lock`;
 
 		await writeBuild();
 		await fs.writeFile(lockPath, String(getDeadPid()));

@@ -8,21 +8,19 @@ import type { RenderJob } from '#run-render-jobs.ts';
 import { runRenderJobs } from '#run-render-jobs.ts';
 
 let directory: string;
-let statePath: string;
 
 function createJob(name: string, key = 'key'): RenderJob {
 	return { key, name, render: () => Promise.resolve(new TextEncoder().encode(name)) };
 }
 
 function run(jobs: ReadonlyArray<RenderJob>) {
-	return runRenderJobs({ directory, jobs, statePath });
+	return runRenderJobs({ directory, jobs });
 }
 
 beforeEach(async () => {
 	const root = await fs.mkdtemp(path.join(tmpdir(), 'run-render-jobs-'));
 
 	directory = path.join(root, 'files');
-	statePath = path.join(root, 'state');
 });
 
 afterEach(async () => {
@@ -58,7 +56,6 @@ describe('runRenderJobs', () => {
 			directory,
 			jobs: [createJob('a.jpg'), failing],
 			onFailure: 'report',
-			statePath,
 		});
 
 		expect(counts.failures).toEqual([{ message: 'broken', name: 'b.jpg' }]);

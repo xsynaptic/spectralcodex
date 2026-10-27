@@ -10,11 +10,12 @@ await runCommand(
 		interrupted: 'progress is saved and the next run resumes',
 		name: 'render-images',
 		async run({ paths, signal }) {
-			const purgeQueue = await createPurgeQueue(getCachePaths(paths.cachePath).imagePurgeQueuePath);
+			const { imagePurgeQueuePath, imagesPath } = getCachePaths(paths.cachePath);
+			const purgeQueue = await createPurgeQueue(imagePurgeQueuePath);
 			let progress: ReturnType<typeof createProgress> | undefined;
 
 			const counts = await renderImages({
-				cachePath: paths.cachePath,
+				cachePath: imagesPath,
 				onProgress({ total }) {
 					if (!progress) progress = createProgress({ label: 'Rendering', total });
 
@@ -34,12 +35,6 @@ await runCommand(
 				['Overwritten', counts.overwritten],
 				['Purge queue', purgeQueue.size],
 			]);
-
-			if (counts.isEngineChanged) {
-				log.warn(
-					'The sharp build changed since the last run, so every rendition re-rendered; changed renditions upload and purge on the next deploy',
-				);
-			}
 		},
 		summary: 'Render the renditions the last build published, incrementally',
 		title: `Render images (sharp ${engineVersions.sharp}, vips ${engineVersions.vips})`,

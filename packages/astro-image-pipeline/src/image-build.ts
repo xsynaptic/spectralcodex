@@ -1,5 +1,6 @@
 import type { OutputInfo } from 'sharp';
 
+import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import pLimit from 'p-limit';
 import sharp from 'sharp';
@@ -14,7 +15,7 @@ import { imageRenderRevision, serializeEncoding } from '#image-encoding.ts';
 import { parseImageName } from '#image-name.ts';
 import { isWithinSource } from '#image-presets.ts';
 import { engineId, renderImage } from '#image-render.ts';
-import { getImageCachePaths, readCurrentManifest, readEngine, writeEngine } from '#image-state.ts';
+import { getImageCachePaths, readCurrentManifest } from '#image-state.ts';
 import { Refusal } from '#refusal.ts';
 import { hashRenderKey } from '#render-key.ts';
 import { getDefaultConcurrency, runRenderJobs } from '#run-render-jobs.ts';
@@ -174,8 +175,8 @@ async function encodeRendition(rendition: ImageRendition, manifest: ImageManifes
 }
 
 async function readImageJobs(cachePath: string, concurrency: number) {
-	const { renditionsPath, statePath } = getImageCachePaths(cachePath);
-	const manifest = await readCurrentManifest(statePath);
+	const { renditionsPath } = getImageCachePaths(cachePath);
+	const manifest = await readCurrentManifest(cachePath);
 	const renditions = getManifestRenditions(manifest);
 	const digests = await readSourceDigests(createSourceFingerprints(cachePath), manifest, {
 		concurrency,
@@ -187,14 +188,13 @@ async function readImageJobs(cachePath: string, concurrency: number) {
 		render: () => encodeRendition(rendition, manifest),
 	}));
 
-	return { directory: renditionsPath, jobs, statePath };
+	return { directory: renditionsPath, jobs };
 }
 
 export async function renderImages(options: ImageRenderOptions) {
 	const cachePath = path.resolve(options.cachePath);
 	const concurrency = getDefaultConcurrency();
 	const run = await readImageJobs(cachePath, concurrency);
-	const engine = await readEngine(run.statePath);
 
 	// Process-wide; the job pool supplies the parallelism instead of libvips threads
 	sharp.concurrency(1);
@@ -202,7 +202,8 @@ export async function renderImages(options: ImageRenderOptions) {
 
 	const counts = await runRenderJobs({ ...options, ...run, concurrency });
 
-	await writeEngine(run.statePath, engineId);
+	// Dev serves built renditions first, so its own renders are spare once a render completes
+	await fs.rm(getImageCachePaths(cachePath).devPath, { force: true, recursive: true });
 
-	return { ...counts, isEngineChanged: engine !== undefined && engine !== engineId };
+	return counts;
 }

@@ -12,8 +12,10 @@ interface ContentPathsEnv {
 
 export function getCachePaths(cachePath: string) {
 	return {
+		checkLinksPath: path.join(cachePath, 'check-links.sqlite'),
 		divisionsPath: path.join(cachePath, 'divisions'),
-		imagePurgeQueuePath: path.join(cachePath, 'img-purge-queue.txt'),
+		imagePurgeQueuePath: path.join(cachePath, 'image-purge-queue.txt'),
+		imagesPath: path.join(cachePath, 'images'),
 		similarContentPath: path.join(cachePath, 'similar-content.json'),
 		sitemapLastmodPath: path.join(cachePath, 'sitemap-lastmod.json'),
 	};

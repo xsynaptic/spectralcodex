@@ -2,7 +2,7 @@ import type { AstroIntegration, AstroIntegrationLogger } from 'astro';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 
 import { createHash, randomUUID } from 'node:crypto';
-import { readFile } from 'node:fs/promises';
+import { readFile, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -28,6 +28,7 @@ export type { ImageSourceResolver } from '#image-sources.ts';
 
 export interface ImagePipelineOptions {
 	baseUrl: string;
+	// Owned whole by the pipeline; keep site files elsewhere
 	cachePath: string;
 	limitInputPixels?: number;
 	mediaPath: string;
@@ -45,9 +46,9 @@ function decodeImageName(pathname: string) {
 	}
 }
 
-async function readPreviousManifest(statePath: string) {
+async function readPreviousManifest(cachePath: string) {
 	try {
-		return await readManifest(statePath);
+		return await readManifest(cachePath);
 	} catch (error) {
 		if (error instanceof Refusal) return;
 
@@ -56,17 +57,17 @@ async function readPreviousManifest(statePath: string) {
 }
 
 async function readRecorded({
+	cachePath,
 	isIncremental,
 	logger,
 	pageCount,
 	recordsPath,
-	statePath,
 }: {
+	cachePath: string;
 	isIncremental: boolean;
 	logger: AstroIntegrationLogger;
 	pageCount: number;
 	recordsPath: string;
-	statePath: string;
 }) {
 	const recorded = await readImageRecords(recordsPath);
 
@@ -76,7 +77,7 @@ async function readRecorded({
 			"Incremental build: pages restored from cache record nothing, so the manifest keeps the previous build's names too; names only fall out on a full build",
 		);
 
-		const previous = await readPreviousManifest(statePath);
+		const previous = await readPreviousManifest(cachePath);
 
 		return {
 			cards: new Map([...Object.entries(previous?.openGraphCards ?? {}), ...recorded.cards]),
@@ -94,21 +95,21 @@ async function readRecorded({
 }
 
 async function writeBuildManifest({
+	cachePath,
 	distPath,
 	logger,
 	manifest,
 	recorded: { cards, renditions },
-	statePath,
 }: {
+	cachePath: string;
 	distPath: string;
 	logger: AstroIntegrationLogger;
 	manifest: Pick<ImageManifest, 'encoding' | 'limitInputPixels' | 'mediaPath'>;
 	recorded: { cards: ReadonlyMap<string, OpenGraphCard>; renditions: ReadonlyMap<string, string> };
-	statePath: string;
 }) {
 	const buildId = randomUUID();
 
-	await writeManifest(statePath, {
+	await writeManifest(cachePath, {
 		...manifest,
 		buildId,
 		distPath,
@@ -157,9 +158,9 @@ function createDevImageHandler(
 	};
 }
 
-async function isBuiltFrom(statePath: string, mediaPath: string) {
+async function isBuiltFrom(cachePath: string, mediaPath: string) {
 	try {
-		const manifest = await readManifest(statePath);
+		const manifest = await readManifest(cachePath);
 
 		return manifest?.mediaPath === mediaPath;
 	} catch {
@@ -182,9 +183,8 @@ export default function imagePipeline({
 	}
 
 	const absoluteMediaPath = path.resolve(mediaPath);
-	const { devPath, recordsPath, renditionsPath, statePath } = getImageCachePaths(
-		path.resolve(cachePath),
-	);
+	const absoluteCachePath = path.resolve(cachePath);
+	const { devPath, recordsPath, renditionsPath } = getImageCachePaths(absoluteCachePath);
 	let isIncremental = false;
 	let buildRecordsPath = recordsPath;
 
@@ -194,14 +194,15 @@ export default function imagePipeline({
 				try {
 					const distPath = fileURLToPath(dir);
 					const recorded = await readRecorded({
+						cachePath: absoluteCachePath,
 						isIncremental,
 						logger,
 						pageCount: pages.length,
 						recordsPath: buildRecordsPath,
-						statePath,
 					});
 
 					await writeBuildManifest({
+						cachePath: absoluteCachePath,
 						distPath,
 						logger,
 						manifest: {
@@ -210,8 +211,8 @@ export default function imagePipeline({
 							mediaPath: absoluteMediaPath,
 						},
 						recorded,
-						statePath,
 					});
+					await rm(recordsPath, { force: true, recursive: true });
 				} finally {
 					Reflect.deleteProperty(process.env, imageRecordsVariable);
 				}
@@ -232,7 +233,9 @@ export default function imagePipeline({
 					.digest('hex')
 					.slice(0, 8);
 				const getDevImage = createDevImageResolver({
-					builtPath: (await isBuiltFrom(statePath, absoluteMediaPath)) ? renditionsPath : undefined,
+					builtPath: (await isBuiltFrom(absoluteCachePath, absoluteMediaPath))
+						? renditionsPath
+						: undefined,
 					cachePath: path.resolve(devPath, mediaPathKey),
 					encoding: pipeline.encoding,
 					limitInputPixels,

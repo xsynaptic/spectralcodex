@@ -46,7 +46,7 @@ export function getRenditionSet(paths: ScriptPaths, config: DeployConfig): Rende
 		command: 'pnpm render-images',
 		extensions: imageFormats,
 		label: 'renditions',
-		localPath: getImageCachePaths(paths.cachePath).renditionsPath,
+		localPath: getImageCachePaths(getCachePaths(paths.cachePath).imagesPath).renditionsPath,
 		purge: {
 			baseUrl: config.imageBaseUrl,
 			queuePath: getCachePaths(paths.cachePath).imagePurgeQueuePath,
@@ -62,7 +62,7 @@ export function getOpenGraphSet(paths: ScriptPaths, config: DeployConfig): Rende
 		command: 'pnpm render-opengraph',
 		extensions: [openGraphImageFormat],
 		label: 'OpenGraph cards',
-		localPath: getImageCachePaths(paths.cachePath).openGraphCardsPath,
+		localPath: getImageCachePaths(getCachePaths(paths.cachePath).imagesPath).openGraphCardsPath,
 		remotePath: `${config.sitePath}/${openGraphBasePath}`,
 		title: 'OpenGraph cards',
 	};

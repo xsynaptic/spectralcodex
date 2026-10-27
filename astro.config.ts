@@ -194,7 +194,7 @@ export default defineConfig({
 		atlas(),
 		imagePipeline({
 			baseUrl: IMAGE_BASE_URL,
-			cachePath: CUSTOM_CACHE_PATH,
+			cachePath: getCachePaths(CUSTOM_CACHE_PATH).imagesPath,
 			mediaPath: CONTENT_MEDIA_PATH,
 			pipeline: imagePipelineConfig,
 		}),

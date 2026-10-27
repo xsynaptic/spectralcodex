@@ -30,7 +30,7 @@ const cards: Record<string, OpenGraphCard> = {
 };
 
 async function writeBuild() {
-	await writeManifest(path.join(root, 'img-state'), {
+	await writeManifest(root, {
 		buildId: 'build',
 		distPath,
 		encoding: resolveImageEncoding(),

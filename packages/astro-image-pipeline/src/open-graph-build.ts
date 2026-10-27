@@ -121,9 +121,8 @@ export async function renderOpenGraphCards<Decoded>({
 	...options
 }: OpenGraphCardRenderOptions<Decoded>) {
 	const resolvedCachePath = path.resolve(cachePath);
-	const { openGraphCardsPath, openGraphCardsStatePath, statePath } =
-		getImageCachePaths(resolvedCachePath);
-	const manifest = await readCurrentManifest(statePath);
+	const { openGraphCardsPath } = getImageCachePaths(resolvedCachePath);
+	const manifest = await readCurrentManifest(resolvedCachePath);
 	const groups = groupByImage(manifest.openGraphCards);
 	const jobs = await createCardJobs({
 		cachePath: resolvedCachePath,
@@ -137,7 +136,6 @@ export async function renderOpenGraphCards<Decoded>({
 		...options,
 		directory: openGraphCardsPath,
 		jobs,
-		statePath: openGraphCardsStatePath,
 	});
 
 	return { ...counts, sources: groups.filter((group) => group.image).length };

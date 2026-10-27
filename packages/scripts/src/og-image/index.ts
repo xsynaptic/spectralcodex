@@ -2,6 +2,7 @@ import {
 	openGraphBlurTreatment,
 	OpenGraphCardTitlesSchema,
 } from '@spectralcodex/shared/open-graph';
+import { getCachePaths } from '@spectralcodex/shared/paths';
 import { getImageCachePaths, renderOpenGraphCards } from '@xsynaptic/astro-image-pipeline/node';
 import { createProgress, formatCount, log, Refusal, withSpinner } from '@xsynaptic/astro-scripts';
 import { rmSync } from 'node:fs';
@@ -22,7 +23,8 @@ async function generateCards({
 	paths: ScriptPaths;
 	signal: AbortSignal;
 }) {
-	const { openGraphCardsPath: outputPath } = getImageCachePaths(paths.cachePath);
+	const { imagesPath } = getCachePaths(paths.cachePath);
+	const { openGraphCardsPath: outputPath } = getImageCachePaths(imagesPath);
 
 	if (isClearCache) {
 		rmSync(outputPath, { force: true, recursive: true });
@@ -39,7 +41,7 @@ async function generateCards({
 	let latest = { fresh: 0, rendered: 0 };
 
 	const counts = await renderOpenGraphCards({
-		cachePath: paths.cachePath,
+		cachePath: imagesPath,
 		decode: (source) =>
 			processImage({
 				imageInput: source.path,

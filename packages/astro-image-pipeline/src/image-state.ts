@@ -9,7 +9,6 @@ import { Refusal } from '#refusal.ts';
 
 const imageManifestFile = 'manifest.json';
 const imageBuildIdFile = 'image-build-id.txt';
-const engineFile = 'engine.txt';
 
 export const imageManifestVersion = 4;
 
@@ -26,12 +25,10 @@ export interface ImageManifest {
 
 export function getImageCachePaths(cachePath: string) {
 	return {
-		devPath: `${cachePath}/img-dev`,
-		openGraphCardsPath: `${cachePath}/img-cards`,
-		openGraphCardsStatePath: `${cachePath}/img-cards-state`,
-		recordsPath: `${cachePath}/img-state/records`,
-		renditionsPath: `${cachePath}/img`,
-		statePath: `${cachePath}/img-state`,
+		devPath: `${cachePath}/dev`,
+		openGraphCardsPath: `${cachePath}/cards`,
+		recordsPath: `${cachePath}/records`,
+		renditionsPath: `${cachePath}/renditions`,
 	};
 }
 
@@ -39,26 +36,25 @@ function isCurrentManifest(manifest: { version?: number }): manifest is ImageMan
 	return manifest.version === imageManifestVersion;
 }
 
-export async function readManifest(statePath: string) {
-	const manifest = await readJsonFile<{ version?: number }>(
-		path.join(statePath, imageManifestFile),
-	);
+export async function readManifest(cachePath: string) {
+	const manifestPath = path.join(cachePath, imageManifestFile);
+	const manifest = await readJsonFile<{ version?: number }>(manifestPath);
 
 	if (!manifest) return;
 
 	if (!isCurrentManifest(manifest)) {
 		throw new Refusal(
-			`The image manifest in ${statePath} is version ${String(manifest.version ?? 1)}, not ${String(imageManifestVersion)}; rebuild first`,
+			`The image manifest ${manifestPath} is version ${String(manifest.version ?? 1)}, not ${String(imageManifestVersion)}; rebuild first`,
 		);
 	}
 
 	return manifest;
 }
 
-export async function readCurrentManifest(statePath: string) {
-	const manifest = await readManifest(statePath);
+export async function readCurrentManifest(cachePath: string) {
+	const manifest = await readManifest(cachePath);
 
-	if (!manifest) throw new Refusal(`No image manifest in ${statePath}; build first`);
+	if (!manifest) throw new Refusal(`No image manifest in ${cachePath}; build first`);
 
 	const distBuildId = await readBuildId(manifest.distPath);
 
@@ -71,8 +67,8 @@ export async function readCurrentManifest(statePath: string) {
 	return manifest;
 }
 
-export async function writeManifest(statePath: string, manifest: ImageManifest) {
-	await writeJsonFile(path.join(statePath, imageManifestFile), manifest);
+export async function writeManifest(cachePath: string, manifest: ImageManifest) {
+	await writeJsonFile(path.join(cachePath, imageManifestFile), manifest);
 }
 
 async function readBuildId(outputPath: string) {
@@ -83,15 +79,4 @@ async function readBuildId(outputPath: string) {
 
 export async function writeBuildId(outputPath: string, buildId: string) {
 	await fs.writeFile(path.join(outputPath, imageBuildIdFile), buildId);
-}
-
-export async function readEngine(statePath: string) {
-	const data = await readFileIfExists(path.join(statePath, engineFile));
-
-	return data?.toString('utf8').trim();
-}
-
-export async function writeEngine(statePath: string, engineId: string) {
-	await fs.mkdir(statePath, { recursive: true });
-	await fs.writeFile(path.join(statePath, engineFile), `${engineId}\n`);
 }

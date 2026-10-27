@@ -96,11 +96,20 @@ export default getConfig(
 			},
 		},
 		{
-			files: ['packages/scripts/src/shared/cli-*.ts'],
+			files: ['src/**/*', 'packages/scripts/**/*'],
 			rules: {
-				'no-console': 'off',
-				'no-restricted-syntax': ['error', ...restrictedSyntaxDefaults],
-				'unicorn/no-process-exit': 'off',
+				'no-restricted-imports': [
+					'error',
+					{
+						paths: [
+							{
+								message:
+									'Open images with `openImageSource` from `@xsynaptic/astro-image-pipeline/node` so photos taken sideways come out upright',
+								name: 'sharp',
+							},
+						],
+					},
+				],
 			},
 		},
 		getBrowserConfig(['src/components/**/*']),

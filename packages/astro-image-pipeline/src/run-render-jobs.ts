@@ -33,7 +33,6 @@ export interface RenderJobOptions {
 	onProgress?: (progress: RenderCounts & { done: number; total: number }) => void;
 	onReplace?: (name: string) => Promise<void>;
 	signal?: AbortSignal;
-	statePath: string;
 }
 
 // sharp runs each job on a libuv thread, so jobs beyond the pool size would only queue
@@ -42,7 +41,7 @@ export function getDefaultConcurrency() {
 }
 
 export function runRenderJobs(options: RenderJobOptions) {
-	return withRenderLock(options.statePath, () => runJobs(options));
+	return withRenderLock(options.directory, () => runJobs(options));
 }
 
 async function runJobs({
@@ -53,7 +52,6 @@ async function runJobs({
 	onProgress,
 	onReplace,
 	signal,
-	statePath,
 }: RenderJobOptions) {
 	const counts: RenderCounts = { fresh: 0, overwritten: 0, rendered: 0, written: 0 };
 	const cache = await createFileCache({
@@ -62,7 +60,6 @@ async function runJobs({
 			counts.overwritten++;
 			await onReplace?.(name);
 		},
-		statePath,
 	});
 	const limit = pLimit(concurrency);
 	const saveLimit = pLimit(1);

@@ -1,3 +1,4 @@
+import { getCachePaths } from '@spectralcodex/shared/paths';
 import {
 	createProgress,
 	formatCount,
@@ -7,7 +8,6 @@ import {
 } from '@xsynaptic/astro-scripts';
 import { getCollectionEntries, withAstroContent } from '@xsynaptic/astro-scripts/astro';
 import chalk from 'chalk';
-import path from 'node:path';
 import pLimit from 'p-limit';
 
 import type { UrlStatus } from '#check-links/types.ts';
@@ -209,7 +209,7 @@ await runCommand(
 			status: { default: false, description: 'Print stored totals and exit', type: 'boolean' },
 		},
 		async run({ paths, signal, values }) {
-			openDatabase(path.join(paths.cachePath, 'check-links.db'));
+			openDatabase(getCachePaths(paths.cachePath).checkLinksPath);
 
 			try {
 				if (values.status) {
