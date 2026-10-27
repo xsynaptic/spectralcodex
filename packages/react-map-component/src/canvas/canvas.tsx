@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 
 import { LngLatBounds } from 'maplibre-gl';
-import { memo, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { memo, useEffect, useLayoutEffect, useState } from 'react';
 import { Map as ReactMapGlMap, useMap } from 'react-map-gl/maplibre';
 
 import type { MapComponentProps } from '#types.ts';
@@ -10,6 +10,7 @@ import '#canvas/canvas-worker.ts';
 import { useMapCanvasEvents } from '#canvas/canvas-events.ts';
 import { MapSelectionFeatureState } from '#canvas/canvas-feature-state.tsx';
 import { MapHoverLabel } from '#canvas/canvas-hover-label.tsx';
+import { MapCanvasMode } from '#canvas/canvas-mode.tsx';
 import { getInitialViewState } from '#canvas/canvas-viewport.ts';
 import { MapScopeBar } from '#controls/controls-scope.tsx';
 import { MapControls } from '#controls/controls.tsx';
@@ -19,7 +20,7 @@ import { useHostViewSync } from '#host/host-view.ts';
 import { getActiveAttribute } from '#lib/active-attribute.ts';
 import { useMapConfig } from '#lib/config.tsx';
 import { isDocumentDark, useIsDarkMode } from '#lib/dark-mode.ts';
-import { getBasemapStyle, setBasemapMode } from '#lib/protomaps.ts';
+import { getBasemapStyle } from '#lib/protomaps.ts';
 import { MapHoverPreload, MapPopup } from '#popup/popup.tsx';
 import { mapInteractiveLayerIds, mapSlotLayers } from '#source/source-config.ts';
 import { MapSource } from '#source/source.tsx';
@@ -63,24 +64,6 @@ const MapRootMarker: FC = function MapRootMarker() {
 	return;
 };
 
-const MapBasemapMode: FC<{ initialIsDarkMode: boolean }> = function MapBasemapMode({
-	initialIsDarkMode,
-}) {
-	const { current: map } = useMap();
-	const { baseMapTheme, languages, protomapsApiKey } = useMapConfig();
-	const isDarkMode = useIsDarkMode();
-	const appliedIsDarkMode = useRef(initialIsDarkMode);
-
-	useEffect(() => {
-		if (!map || !protomapsApiKey || appliedIsDarkMode.current === isDarkMode) return;
-
-		appliedIsDarkMode.current = isDarkMode;
-		setBasemapMode(map.getMap(), { baseMapTheme, isDarkMode, languages });
-	}, [map, baseMapTheme, isDarkMode, languages, protomapsApiKey]);
-
-	return;
-};
-
 const MapCanvasContainer: FC = function MapCanvasContainer() {
 	const {
 		baseMapTheme,
@@ -104,7 +87,11 @@ const MapCanvasContainer: FC = function MapCanvasContainer() {
 			protomapsApiKey,
 		});
 
-		return { ...basemapStyle, layers: [...basemapStyle.layers, ...mapSlotLayers] };
+		return {
+			...basemapStyle,
+			layers: [...basemapStyle.layers, ...mapSlotLayers],
+			transition: { delay: 0, duration: 0 },
+		};
 	});
 	const canvasEvents = useMapCanvasEvents();
 
@@ -129,7 +116,7 @@ const MapCanvasContainer: FC = function MapCanvasContainer() {
 			style={{ height: 'auto', ...style }}
 			{...canvasEvents}
 		>
-			<MapBasemapMode initialIsDarkMode={initialIsDarkMode} />
+			<MapCanvasMode initialIsDarkMode={initialIsDarkMode} />
 			<MapControls />
 			<MapPopup />
 			<MapHoverPreload />
