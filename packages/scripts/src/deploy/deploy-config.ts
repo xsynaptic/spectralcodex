@@ -29,7 +29,7 @@ const exampleEnvLines = [
 	'DEPLOY_REMOTE_PATH=/opt/server',
 	'DEPLOY_SITE_PATH=/var/www/spectralcodex',
 	'PROD_SERVER_URL=https://example.com/',
-	'DEPLOY_MEDIA_PATH=/mnt/storage/spectralcodex',
+	'DEPLOY_MEDIA_PATH=/srv/spectralcodex',
 	'IMAGE_BASE_URL=https://img.example.com',
 ];
 
