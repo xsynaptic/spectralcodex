@@ -1,10 +1,9 @@
-import type { ContentEntry } from '@xsynaptic/astro-scripts';
+import type { ContentEntry, ValidationIssue } from '@xsynaptic/astro-scripts';
 
-import type { ValidationIssue } from '#validate-content/validation-result.ts';
+import { toValidationResult } from '@xsynaptic/astro-scripts';
 
 import { findComponentTags, getTagProp } from '#shared/component-tags.ts';
 import { getBodyLineOffset } from '#validate-content/body-line-offset.ts';
-import { toValidationResult } from '#validate-content/validation-result.ts';
 
 // A required prop missing here throws while the component renders, naming only the page path
 const requiredProps: Record<string, string> = { Img: 'src', Link: 'id' };

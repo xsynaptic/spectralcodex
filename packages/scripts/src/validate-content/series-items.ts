@@ -1,8 +1,6 @@
-import type { ContentEntry } from '@xsynaptic/astro-scripts';
+import type { ContentEntry, ValidationIssue } from '@xsynaptic/astro-scripts';
 
-import type { ValidationIssue } from '#validate-content/validation-result.ts';
-
-import { toValidationResult } from '#validate-content/validation-result.ts';
+import { toValidationResult } from '@xsynaptic/astro-scripts';
 
 /**
  * Series items are plain strings because a series mixes collections, so `reference()` cannot serve them

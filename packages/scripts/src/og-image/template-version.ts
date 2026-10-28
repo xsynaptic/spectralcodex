@@ -1,31 +1,17 @@
 import { openGraphImageHeight, openGraphImageWidth } from '@spectralcodex/shared/open-graph';
 import { createHash } from 'node:crypto';
-import { existsSync, readFileSync } from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { readFileSync } from 'node:fs';
+import { findPackageJSON } from 'node:module';
 
 // Everything that decides a card's pixels; hashed so a template edit can never be forgotten
 const templateFiles = ['element.tsx', 'fonts.ts', 'generate.ts'];
 
 function readTakumiVersion() {
-	let directory = path.dirname(fileURLToPath(import.meta.resolve('takumi-js')));
+	const packagePath = findPackageJSON('takumi-js', import.meta.url);
 
-	while (directory !== path.dirname(directory)) {
-		const packagePath = path.join(directory, 'package.json');
+	if (!packagePath) throw new Error('Could not find the installed takumi-js package');
 
-		if (existsSync(packagePath)) {
-			const { name, version } = JSON.parse(readFileSync(packagePath, 'utf8')) as {
-				name?: string;
-				version?: string;
-			};
-
-			if (name === 'takumi-js' && version) return version;
-		}
-
-		directory = path.dirname(directory);
-	}
-
-	throw new Error('Could not read the installed takumi-js version');
+	return (JSON.parse(readFileSync(packagePath, 'utf8')) as { version: string }).version;
 }
 
 function hashTemplate() {

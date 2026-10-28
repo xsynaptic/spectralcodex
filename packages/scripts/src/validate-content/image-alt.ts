@@ -1,6 +1,4 @@
-import type { ContentEntry } from '@xsynaptic/astro-scripts';
-
-import type { ValidationResult } from '#validate-content/validation-result.ts';
+import type { ContentEntry, ValidationResult } from '@xsynaptic/astro-scripts';
 
 export function validateImageAltTitles(imageEntries: Array<ContentEntry>) {
 	const issues = imageEntries
@@ -9,8 +7,8 @@ export function validateImageAltTitles(imageEntries: Array<ContentEntry>) {
 
 			return typeof title !== 'string' || title.trim() === '';
 		})
-		.map((imageEntry) => ({ message: `${imageEntry.id}: empty EXIF title` }))
-		.toSorted((issueA, issueB) => issueA.message.localeCompare(issueB.message));
+		.map((imageEntry) => ({ location: imageEntry.id, message: 'empty EXIF title' }))
+		.toSorted((issueA, issueB) => issueA.location.localeCompare(issueB.location));
 
 	if (issues.length === 0) {
 		return {

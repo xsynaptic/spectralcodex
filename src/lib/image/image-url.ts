@@ -1,5 +1,5 @@
 import type { ImagePresetName } from '@spectralcodex/shared/images';
-import type { ImageSource } from '@xsynaptic/astro-image-pipeline/presets';
+import type { ImageSource } from '@xsynaptic/astro-image-pipeline/names';
 
 import { getImageName } from '@spectralcodex/shared/images';
 import { IMAGE_BASE_URL } from 'astro:env/server';

@@ -1,11 +1,9 @@
-import type { ContentEntry } from '@xsynaptic/astro-scripts';
+import type { ContentEntry, ValidationResult } from '@xsynaptic/astro-scripts';
 
-import { findStemCollisions } from '@xsynaptic/astro-image-pipeline/presets';
-
-import type { ValidationResult } from '#validate-content/validation-result.ts';
+import { findStemCollisions } from '@xsynaptic/astro-image-pipeline/names';
+import { toValidationResult } from '@xsynaptic/astro-scripts';
 
 import { getEntryImageIds, listMediaImages } from '#shared/image-references.ts';
-import { toValidationResult } from '#validate-content/validation-result.ts';
 
 interface MissingImageIssue {
 	imageId: string;
@@ -29,10 +27,12 @@ export function validateImageReferences(entries: Array<ContentEntry>, mediaPath:
 	return toValidationResult(
 		[
 			...missing.map(({ imageId, location }) => ({
-				message: `${location}: missing image "${imageId}"`,
+				location,
+				message: `missing image "${imageId}"`,
 			})),
 			...collisions.map((files) => ({
-				message: `${files.join(', ')}: one stem, so their image names collide`,
+				location: files.join(', '),
+				message: 'one stem, so their image names collide',
 			})),
 		],
 		{

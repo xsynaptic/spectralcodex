@@ -1,6 +1,6 @@
 import { getCachePaths } from '@spectralcodex/shared/paths';
-import { getImageCachePaths, readManifest } from '@xsynaptic/astro-image-pipeline/node';
-import { parseImageName } from '@xsynaptic/astro-image-pipeline/presets';
+import { parseImageName } from '@xsynaptic/astro-image-pipeline/names';
+import { findDistManifest, getImageCachePaths } from '@xsynaptic/astro-image-pipeline/node';
 import { createStatus, formatCount, formatDuration, log } from '@xsynaptic/astro-scripts';
 import { stat } from 'node:fs/promises';
 import path from 'node:path';
@@ -8,6 +8,7 @@ import * as R from 'remeda';
 
 import type { DeployConfig } from '#deploy/deploy-config.ts';
 import type { EdgeProbe } from '#deploy/verify-edge-probes.ts';
+import type { ScriptPaths } from '#shared/command.ts';
 
 import {
 	describeProbe,
@@ -22,11 +23,11 @@ const requestTimeoutMs = 10_000;
 const imageSampleSize = 20;
 
 export async function verifyEdge({
-	cachePath,
 	config,
+	paths,
 }: {
-	cachePath: string;
 	config: DeployConfig;
+	paths: ScriptPaths;
 }): Promise<void> {
 	const start = Date.now();
 	const token = start.toString();
@@ -39,7 +40,7 @@ export async function verifyEdge({
 		await getProbeFailure(documentProbe, documentResponse),
 	);
 	const html = documentResponse.status === 200 ? await documentResponse.text() : undefined;
-	const samples = html === undefined ? undefined : await readImageSamples(cachePath);
+	const samples = html === undefined ? undefined : await readImageSamples(paths);
 	const edge = getEdgeProbes({ config, html, samples, token });
 	const failures = [documentFailure, ...edge.failures, ...(await runProbes(edge.probes))].filter(
 		R.isNonNullish,
@@ -63,10 +64,10 @@ export async function verifyEdge({
 	);
 }
 
-async function readImageSamples(cachePath: string) {
-	const { imagesPath } = getCachePaths(cachePath);
+async function readImageSamples(paths: ScriptPaths) {
+	const { imagesPath } = getCachePaths(paths.cachePath);
 	const { renditionsPath } = getImageCachePaths(imagesPath);
-	const manifest = await readManifest(imagesPath);
+	const manifest = await findDistManifest({ cachePath: imagesPath, distPath: paths.distPath });
 
 	if (!manifest) return;
 

@@ -1,5 +1,5 @@
 import type { ImagePresetName } from '@spectralcodex/shared/images';
-import type { ImageSource } from '@xsynaptic/astro-image-pipeline/presets';
+import type { ImageSource } from '@xsynaptic/astro-image-pipeline/names';
 import type { HTMLAttributes } from 'astro/types';
 
 export const ImageFitOptionEnum = {

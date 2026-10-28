@@ -30,9 +30,9 @@ describe('validateLocationsOverlap', () => {
 		const result = validateLocationsOverlap(entries, 10);
 
 		expect(result.status).toBe('warn');
-		expect(result.issues.map((issue) => issue.message)).toEqual([
-			expect.stringMatching(/^c: overlaps d \(2\.\dm\)$/),
-			expect.stringMatching(/^a: overlaps b \(5\.\dm\)$/),
+		expect(result.issues.map(({ location, message }) => [location, message])).toEqual([
+			['c', expect.stringMatching(/^overlaps d \(2\.\dm\)$/)],
+			['a', expect.stringMatching(/^overlaps b \(5\.\dm\)$/)],
 		]);
 		expect(result.summary).toBe('Found 2 overlap(s) (checked 4 locations, 4 points)');
 	});

@@ -1,8 +1,12 @@
-import { getCollectionEntries, withAstroContent, withSpinner } from '@xsynaptic/astro-scripts';
+import {
+	getCollectionEntries,
+	reportValidationResult,
+	withAstroContent,
+	withSpinner,
+} from '@xsynaptic/astro-scripts';
 
 import { runCommand } from '#shared/command.ts';
 import { validateImageAltTitles } from '#validate-content/image-alt.ts';
-import { reportValidationResult } from '#validate-content/validation-result.ts';
 
 // On demand only; untitled images are an authoring backlog, not a deployment gate
 await runCommand({

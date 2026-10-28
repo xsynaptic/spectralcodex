@@ -1,6 +1,6 @@
 import type { ContentEntry } from '@xsynaptic/astro-scripts';
 
-import { toValidationResult } from '#validate-content/validation-result.ts';
+import { toValidationResult } from '@xsynaptic/astro-scripts';
 
 interface AllowedRatio {
 	label: string;

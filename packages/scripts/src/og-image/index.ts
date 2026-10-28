@@ -3,7 +3,10 @@ import {
 	OpenGraphCardTitlesSchema,
 } from '@spectralcodex/shared/open-graph';
 import { getCachePaths } from '@spectralcodex/shared/paths';
-import { getImageCachePaths, renderOpenGraphCards } from '@xsynaptic/astro-image-pipeline/node';
+import {
+	getImageCachePaths,
+	prepareOpenGraphCardRender,
+} from '@xsynaptic/astro-image-pipeline/node';
 import { createProgress, formatCount, log, UserError, withSpinner } from '@xsynaptic/astro-scripts';
 import { rmSync } from 'node:fs';
 
@@ -37,49 +40,49 @@ async function generateCards({
 		(loaded) => `Loaded ${String(loaded.length)} font variants`,
 	);
 	const renderCard = createRenderer({ fonts });
-	let progress: ReturnType<typeof createProgress> | undefined;
-	let latest = { fresh: 0, rendered: 0 };
-
-	const counts = await renderOpenGraphCards({
+	const render = await prepareOpenGraphCardRender({
 		cachePath: imagesPath,
 		decode: (source) =>
 			processImage({
-				imageInput: source.path,
+				imageInput: source.filePath,
 				isBlurred: source.treatment === openGraphBlurTreatment,
 			}),
-		onFailure: 'report',
-		onProgress(update) {
-			latest = update;
-			progress =
-				progress ??
-				createProgress({
-					label: 'Rendering',
-					note: () =>
-						`${formatCount(latest.rendered)} rendered, ${formatCount(latest.fresh)} cached`,
-					total: update.total,
-				});
-			progress.tick();
-		},
+		distPath: paths.distPath,
 		render: (input, image) => renderCard(OpenGraphCardTitlesSchema.parse(input), image),
-		signal,
 		templateVersion,
 	});
 
-	if (counts.total === 0) {
+	if (render.total === 0) {
 		throw new UserError('The last build recorded no OpenGraph cards; check getOpenGraphCardPath');
 	}
+
+	let latest = { fresh: 0, rendered: 0 };
+	const progress = createProgress({
+		label: 'Rendering',
+		note: () => `${formatCount(latest.rendered)} rendered, ${formatCount(latest.fresh)} cached`,
+		total: render.total,
+	});
+
+	const counts = await render.run({
+		onFailure: 'report',
+		onProgress: (update) => {
+			latest = update;
+			progress.tick();
+		},
+		signal,
+	});
 
 	for (const { message, name } of counts.failures) log.error(`${name}: ${message}`);
 
 	if (counts.failures.length > 0) {
-		progress?.warn();
+		progress.warn();
 	} else {
-		progress?.succeed();
+		progress.succeed();
 	}
 
 	log.summary([
 		['Cards', counts.total],
-		['Source images', counts.sources],
+		['Source images', render.sources],
 		['Rendered', counts.rendered],
 		['Cached', counts.fresh],
 		['Written', counts.written],

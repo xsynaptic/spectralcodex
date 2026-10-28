@@ -3,7 +3,7 @@ import type { GeometryBoundingBox } from '@spectralcodex/shared/schemas';
 import type { Geometry } from 'geojson';
 
 import { DuckDBInstance } from '@duckdb/node-api';
-import { formatCount, formatError, log } from '@xsynaptic/astro-scripts';
+import { formatCount, formatError, log, withStep } from '@xsynaptic/astro-scripts';
 
 import type { DivisionGeometry, DivisionItem } from '#map-divisions/types.ts';
 
@@ -32,9 +32,10 @@ export async function fetchDivisionData({
 
 	if (uncachedIds.size === 0) return divisionsById;
 
-	log.step(`Querying Overture Maps for ${formatCount(uncachedIds.size)} uncached divisions...`);
-
-	const rows = await runDivisionQuery(db, buildQuery(overtureUrl, uncachedIds, selectionBBox));
+	const rows = await withStep(
+		`Querying Overture Maps for ${formatCount(uncachedIds.size)} uncached divisions`,
+		() => runDivisionQuery(db, buildQuery(overtureUrl, uncachedIds, selectionBBox)),
+	);
 
 	if (rows.length === 0) {
 		log.warn('No division data found for any division IDs');

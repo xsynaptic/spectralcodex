@@ -31,7 +31,9 @@ describe('validateImageFeaturedLinks', () => {
 		];
 
 		expect(validateImageFeaturedLinks(entries, validTargets)).toEqual({
-			issues: [{ message: 'posts/a-post.mdx: unmatched imageFeatured link "missing-place"' }],
+			issues: [
+				{ location: 'posts/a-post.mdx', message: 'unmatched imageFeatured link "missing-place"' },
+			],
 			status: 'fail',
 			summary: 'Found 1 unmatched imageFeatured link(s)',
 		});

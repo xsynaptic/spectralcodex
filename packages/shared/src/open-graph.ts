@@ -1,4 +1,4 @@
-import { defineOpenGraphCards } from '@xsynaptic/astro-image-pipeline/presets';
+import { getCardName } from '@xsynaptic/astro-image-pipeline/names';
 import { z } from 'zod';
 
 // Minimum dimensions recommended by Facebook (1.91:1 aspect ratio)
@@ -25,18 +25,21 @@ export interface PageOpenGraphCard {
 	titles: OpenGraphCardTitles;
 }
 
-const openGraphCards = defineOpenGraphCards({ format: openGraphImageFormat });
-
 export function getOpenGraphId(id: string): string {
 	return id.replaceAll('/', '-');
 }
 
 export function getOpenGraphCardPath({ id, image, titles }: PageOpenGraphCard): string {
-	const name = openGraphCards.getCardName({
-		id: getOpenGraphId(id),
-		image: image.isBlurred ? { id: image.id, treatment: openGraphBlurTreatment } : { id: image.id },
-		input: titles,
-	});
+	const name = getCardName(
+		{
+			id: getOpenGraphId(id),
+			image: image.isBlurred
+				? { id: image.id, treatment: openGraphBlurTreatment }
+				: { id: image.id },
+			input: titles,
+		},
+		{ format: openGraphImageFormat },
+	);
 
 	return `${openGraphBasePath}/${name}`;
 }

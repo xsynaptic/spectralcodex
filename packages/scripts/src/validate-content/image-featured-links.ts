@@ -1,7 +1,8 @@
 import type { ContentEntry } from '@xsynaptic/astro-scripts';
 
+import { toValidationResult } from '@xsynaptic/astro-scripts';
+
 import { parseImageFeatured } from '#shared/image-references.ts';
-import { toValidationResult } from '#validate-content/validation-result.ts';
 
 export function validateImageFeaturedLinks(
 	entries: Array<ContentEntry>,
@@ -27,7 +28,8 @@ export function validateImageFeaturedLinks(
 
 	return toValidationResult(
 		unmatchedLinks.map(({ file, link }) => ({
-			message: `${file}: unmatched imageFeatured link "${link}"`,
+			location: file,
+			message: `unmatched imageFeatured link "${link}"`,
 		})),
 		{
 			fail: `Found ${unmatchedLinks.length.toString()} unmatched imageFeatured link(s)`,

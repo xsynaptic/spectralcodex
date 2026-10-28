@@ -1,4 +1,4 @@
-import { formatDuration, log } from '@xsynaptic/astro-scripts';
+import { log } from '@xsynaptic/astro-scripts';
 import path from 'node:path';
 
 import type { DeployConfig } from '#deploy/deploy-config.ts';
@@ -76,11 +76,8 @@ export async function deployInfra(options: DeployInfraOptions): Promise<void> {
 	const deployDir = path.join(rootPath, 'deploy');
 	const remotePath = config.remotePath;
 
-	log.step('Deploying infrastructure...');
 	log.detail(`To: ${config.remoteHost}:${remotePath}/`);
 	if (dryRun) log.warn('Dry run');
-
-	const start = Date.now();
 
 	const image = await readComposeCaddyImage(deployDir);
 	const caddyChanges = await syncCaddyConfig({ config, deployDir, dryRun, image });
@@ -92,13 +89,13 @@ export async function deployInfra(options: DeployInfraOptions): Promise<void> {
 
 	if (dryRun) {
 		log.warn(`Dry run; skipping remote commands and the ${remotePath}/.env write`);
-		log.success(`Infrastructure synced in ${formatDuration(Date.now() - start)}`);
+		log.success('Infrastructure synced');
 		return;
 	}
 
 	await updateRemoteServices(config, serverEnv);
 
-	log.success(`Infrastructure deployed in ${formatDuration(Date.now() - start)}`);
+	log.success('Infrastructure deployed');
 }
 
 async function syncInfraFiles({

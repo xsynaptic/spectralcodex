@@ -41,7 +41,7 @@ describe('validateImageReferences', () => {
 
 		expect(result.status).toBe('fail');
 		expect(result.issues).toStrictEqual([
-			{ message: 'a/b.jpg, a/b.png: one stem, so their image names collide' },
+			{ location: 'a/b.jpg, a/b.png', message: 'one stem, so their image names collide' },
 		]);
 	});
 });

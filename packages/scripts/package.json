@@ -26,6 +26,7 @@
 		"render-images": "UV_THREADPOOL_SIZE=10 node --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/images/images-build.cli.ts",
 		"similar-content": "node --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/similar-content/index.ts",
 		"sitemap-lastmod": "node --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/sitemap-lastmod/index.cli.ts",
+		"sweep-images": "node --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/images/images-sweep.cli.ts",
 		"validate-content": "node --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/validate-content/index.ts",
 		"validate-image-alt": "node --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/validate-content/image-alt.cli.ts",
 		"webmentions": "node --env-file-if-exists=../../.env --env-file-if-exists=../../deploy/.env ./src/webmentions/index.ts"
@@ -54,8 +55,8 @@
 		"@types/d3-geo": "^3.1.1",
 		"@types/geojson": "^7946.0.16",
 		"@types/sanitize-html": "^2.16.2",
-		"@xsynaptic/astro-image-pipeline": "^0.1.0",
-		"@xsynaptic/astro-scripts": "^0.2.1",
+		"@xsynaptic/astro-image-pipeline": "^0.4.1",
+		"@xsynaptic/astro-scripts": "^0.8.0",
 		"@xsynaptic/unified-tools": "^5.1.3",
 		"astro": "^7.4.2",
 		"better-sqlite3": "^13.0.3",

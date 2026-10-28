@@ -1,7 +1,7 @@
 import type { ContentEntry } from '@xsynaptic/astro-scripts';
 
 import { ImageFeaturedSchema } from '@spectralcodex/shared/schemas';
-import { isImageSource } from '@xsynaptic/astro-image-pipeline/presets';
+import { isImageSource } from '@xsynaptic/astro-image-pipeline/names';
 import { readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 

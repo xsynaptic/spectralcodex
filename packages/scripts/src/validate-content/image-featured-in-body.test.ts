@@ -31,7 +31,7 @@ describe('validateImageFeaturedInBody', () => {
 		];
 
 		expect(validateImageFeaturedInBody(entries)).toEqual({
-			issues: [{ message: 'posts/a-post.mdx: featured image(s) not in body: two.jpg' }],
+			issues: [{ location: 'posts/a-post.mdx', message: 'featured image(s) not in body: two.jpg' }],
 			status: 'fail',
 			summary: 'Found 1 entries with featured images missing from body content',
 		});

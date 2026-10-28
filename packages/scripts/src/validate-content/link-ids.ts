@@ -1,10 +1,9 @@
-import type { ContentEntry } from '@xsynaptic/astro-scripts';
+import type { ContentEntry, ValidationIssue } from '@xsynaptic/astro-scripts';
 
-import type { ValidationIssue } from '#validate-content/validation-result.ts';
+import { toValidationResult } from '@xsynaptic/astro-scripts';
 
 import { findComponentTags, getTagProp } from '#shared/component-tags.ts';
 import { getBodyLineOffset } from '#validate-content/body-line-offset.ts';
-import { toValidationResult } from '#validate-content/validation-result.ts';
 
 interface LinkIdIssue {
 	id: string;

@@ -2,13 +2,12 @@ import { getCachePaths } from '@spectralcodex/shared/paths';
 import {
 	getCollectionEntries,
 	parseNumberOption,
-	UserError,
+	runValidations,
 	withAstroContent,
 	withSpinner,
 } from '@xsynaptic/astro-scripts';
 
 import type { ScriptPaths } from '#shared/command.ts';
-import type { ValidationResult } from '#validate-content/validation-result.ts';
 
 import { runCommand } from '#shared/command.ts';
 import { validateEntryIds } from '#validate-content/entry-ids.ts';
@@ -29,7 +28,6 @@ import { validateReferences } from '#validate-content/references.ts';
 import { validateRegionsParents } from '#validate-content/regions-parent.ts';
 import { validateSeriesItems } from '#validate-content/series-items.ts';
 import { validateSourceIds } from '#validate-content/source-ids.ts';
-import { reportValidationResult } from '#validate-content/validation-result.ts';
 
 async function loadEntries() {
 	return withAstroContent(async (content) => ({
@@ -47,7 +45,28 @@ async function loadEntries() {
 	}));
 }
 
-function getValidations(
+const checkNames = [
+	'entry-ids',
+	'references',
+	'mdx',
+	'link-ids',
+	'series-items',
+	'source-ids',
+	'frontmatter-links',
+	'images',
+	'image-aspect-ratios',
+	'image-featured-in-body',
+	'image-featured-links',
+	'image-featured-missing',
+	'location-duplicates',
+	'location-point-titles',
+	'location-regions',
+	'location-overlap',
+	'region-parents',
+	'location-coordinates',
+] as const;
+
+function getChecks(
 	{ allEntries, imageEntries }: Awaited<ReturnType<typeof loadEntries>>,
 	{ paths, rootPath, threshold }: { paths: ScriptPaths; rootPath: string; threshold: number },
 ) {
@@ -60,61 +79,31 @@ function getValidations(
 	const resourceEntries = entriesFrom('resources');
 	const locationEntries = entriesFrom('locations');
 
-	return [
-		{ name: 'entry-ids', run: () => validateEntryIds(allEntries) },
-		{
-			name: 'references',
-			run: () => validateReferences(allEntries, { skipCollections: ['images'] }),
-		},
-		{ name: 'mdx', run: () => validateMdxComponents(allEntries, rootPath) },
-		{ name: 'link-ids', run: () => validateLinkIds(allEntries, metadataEntries, rootPath) },
-		{
-			name: 'series-items',
-			run: () => validateSeriesItems(entriesFrom('series'), metadataEntries),
-		},
-		{ name: 'source-ids', run: () => validateSourceIds(allEntries, resourceEntries) },
-		{
-			name: 'frontmatter-links',
-			run: () => validateFrontmatterLinks(allEntries, resourceEntries),
-		},
-		{
-			name: 'images',
-			run: () => validateImageReferences(allEntries, paths.mediaPath),
-		},
-		{
-			name: 'image-aspect-ratios',
-			run: () => validateImageAspectRatios(imageEntries, { showStats: true }),
-		},
-		{
-			name: 'image-featured-in-body',
-			run: () => validateImageFeaturedInBody(bodyContentEntries),
-		},
-		{
-			name: 'image-featured-links',
-			run: () => validateImageFeaturedLinks(allEntries, metadataEntries),
-		},
-		{
-			name: 'image-featured-missing',
-			run: () => validateImageFeaturedMissing(bodyContentEntries),
-		},
-		{ name: 'location-duplicates', run: () => validateLocationsDuplicates(locationEntries) },
-		{ name: 'location-point-titles', run: () => validateLocationsPointTitles(locationEntries) },
-		{ name: 'location-regions', run: () => validateLocationsRegions(locationEntries) },
-		{
-			name: 'location-overlap',
-			run: () => validateLocationsOverlap(locationEntries, threshold),
-		},
-		{ name: 'region-parents', run: () => validateRegionsParents(entriesFrom('regions')) },
-		{
-			name: 'location-coordinates',
-			run: () =>
-				validateLocationsCoordinates(
-					locationEntries,
-					entriesFrom('regions'),
-					getCachePaths(paths.cachePath).divisionsPath,
-				),
-		},
-	] satisfies Array<{ name: string; run: () => Promise<ValidationResult> | ValidationResult }>;
+	return {
+		'entry-ids': () => validateEntryIds(allEntries),
+		'frontmatter-links': () => validateFrontmatterLinks(allEntries, resourceEntries),
+		'image-aspect-ratios': () => validateImageAspectRatios(imageEntries, { showStats: true }),
+		'image-featured-in-body': () => validateImageFeaturedInBody(bodyContentEntries),
+		'image-featured-links': () => validateImageFeaturedLinks(allEntries, metadataEntries),
+		'image-featured-missing': () => validateImageFeaturedMissing(bodyContentEntries),
+		images: () => validateImageReferences(allEntries, paths.mediaPath),
+		'link-ids': () => validateLinkIds(allEntries, metadataEntries, rootPath),
+		'location-coordinates': () =>
+			validateLocationsCoordinates(
+				locationEntries,
+				entriesFrom('regions'),
+				getCachePaths(paths.cachePath).divisionsPath,
+			),
+		'location-duplicates': () => validateLocationsDuplicates(locationEntries),
+		'location-overlap': () => validateLocationsOverlap(locationEntries, threshold),
+		'location-point-titles': () => validateLocationsPointTitles(locationEntries),
+		'location-regions': () => validateLocationsRegions(locationEntries),
+		mdx: () => validateMdxComponents(allEntries, rootPath),
+		references: () => validateReferences(allEntries, { skipCollections: ['images'] }),
+		'region-parents': () => validateRegionsParents(entriesFrom('regions')),
+		'series-items': () => validateSeriesItems(entriesFrom('series'), metadataEntries),
+		'source-ids': () => validateSourceIds(allEntries, resourceEntries),
+	};
 }
 
 await runCommand({
@@ -126,41 +115,22 @@ await runCommand({
 			type: 'string',
 		},
 	},
-	positional: { description: 'Run one check by name; omit to run all', name: 'check' },
-	async run({ paths, positionals, rootPath, signal, values }) {
+	positional: {
+		choices: checkNames,
+		description: 'Run one check by name; omit to run all',
+		name: 'check',
+	},
+	async run({ paths, positionals, rootPath, values }) {
 		const [checkName] = positionals;
 		const entries = await withSpinner('Loading content', loadEntries);
-		const validations = getValidations(entries, {
+		const checks = getChecks(entries, {
 			paths,
 			rootPath,
 			threshold: parseNumberOption(values.threshold, 'threshold'),
 		});
-		const selected = checkName
-			? validations.filter((validation) => validation.name === checkName)
-			: validations;
-
-		if (checkName && selected.length === 0) {
-			const names = validations.map((validation) => validation.name).join(', ');
-
-			throw new UserError(`Unknown check "${checkName}"; choose from ${names}`);
-		}
-
-		let failureCount = 0;
-
-		for (const validation of selected) {
-			signal.throwIfAborted();
-
-			const result = await validation.run();
-
-			reportValidationResult(result);
-
-			if (result.status === 'fail') failureCount++;
-		}
 
 		// Subcommands are for inspection; only a full run gates deployment
-		if (!checkName && failureCount > 0) {
-			throw new UserError(`${String(failureCount)} of ${String(selected.length)} checks failed`);
-		}
+		await runValidations(checkNames, checks, { only: checkName });
 	},
 	summary: 'Check content references, images, Locations and Regions before a build',
 	title: 'Validate content',

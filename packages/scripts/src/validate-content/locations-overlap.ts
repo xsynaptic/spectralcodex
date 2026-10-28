@@ -1,9 +1,7 @@
-import type { ContentEntry } from '@xsynaptic/astro-scripts';
+import type { ContentEntry, ValidationResult } from '@xsynaptic/astro-scripts';
 
 import { distance as getDistance, around as getPointsAround } from 'geokdbush';
 import GeospatialIndex from 'kdbush';
-
-import type { ValidationResult } from '#validate-content/validation-result.ts';
 
 import { LocationGeometrySchema } from '#shared/geometry.ts';
 
@@ -35,7 +33,8 @@ export function validateLocationsOverlap(entries: Array<ContentEntry>, threshold
 
 	return {
 		issues: overlaps.map((overlap) => ({
-			message: `${overlap.idA}: overlaps ${overlap.idB} (${overlap.distance.toFixed(1)}m)`,
+			location: overlap.idA,
+			message: `overlaps ${overlap.idB} (${overlap.distance.toFixed(1)}m)`,
 		})),
 		status: 'warn',
 		summary: `Found ${String(overlaps.length)} overlap(s) (${scope})`,

@@ -4,7 +4,7 @@ import node from '@astrojs/node';
 import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 import { astroCacheDir } from '@spectralcodex/shared/constants';
-import { imagePipelineConfig } from '@spectralcodex/shared/images';
+import { imageQualityByFormat } from '@spectralcodex/shared/images';
 import { getUrlPathIndexing } from '@spectralcodex/shared/indexing';
 import {
 	contentDataPathDefault,
@@ -195,8 +195,11 @@ export default defineConfig({
 		imagePipeline({
 			baseUrl: IMAGE_BASE_URL,
 			cachePath: getCachePaths(CUSTOM_CACHE_PATH).imagesPath,
+			encoding: {
+				jpg: { quality: imageQualityByFormat.jpg },
+				webp: { quality: imageQualityByFormat.webp },
+			},
 			mediaPath: CONTENT_MEDIA_PATH,
-			pipeline: imagePipelineConfig,
 		}),
 		compressor({
 			gzip: false,
@@ -236,7 +239,7 @@ export default defineConfig({
 		build: {
 			// Inlines only the smallest client scripts; anything larger stays a separate file for cache granularity
 			assetsInlineLimit: 1024,
-			rollupOptions: {
+			rolldownOptions: {
 				output: {
 					chunkFileNames: 'js/c-[hash].js',
 					entryFileNames: 'js/a-[hash].js',

@@ -1,5 +1,4 @@
-import { log } from '@xsynaptic/astro-scripts';
-import { $ } from 'zx';
+import { log, runChild, withStep } from '@xsynaptic/astro-scripts';
 
 import { deployApp } from '#deploy/deploy-app.ts';
 import { invokeCacheRefresh } from '#deploy/deploy-cache-refresh.ts';
@@ -30,18 +29,17 @@ await runCommand({
 
 		await ensureSshKeychain();
 
-		async function runRoot(label: string, args: Array<string>) {
-			log.step(label);
-			await $({ cwd: rootPath, stdio: 'inherit' })`pnpm ${args}`;
+		async function runRoot(text: string, args: Array<string>) {
+			await runChild(text, ['pnpm', ...args], { cwd: rootPath });
 		}
 
-		async function runScript(name: string) {
-			await $({ cwd: rootPath, stdio: 'inherit' })`pnpm -F @spectralcodex/scripts ${name}`;
+		async function runScript(text: string, name: string) {
+			await runChild(text, ['pnpm', '--silent', '-C', 'packages/scripts', name], { cwd: rootPath });
 		}
 
 		// Content scripts read the store `astro sync` writes, so it has to run first
 		async function sync() {
-			await runRoot('Syncing content...', ['astro', 'sync', '--mode', 'production']);
+			await runRoot('Syncing content', ['astro', 'sync', '--mode', 'production']);
 		}
 
 		// A webmention.io outage must not block a deploy; the build falls back to the committed data
@@ -52,7 +50,7 @@ await runCommand({
 			}
 
 			try {
-				await runScript('webmentions');
+				await runScript('Fetching webmentions', 'webmentions');
 			} catch (error) {
 				if (signal.aborted) throw error;
 
@@ -66,7 +64,7 @@ await runCommand({
 				return;
 			}
 
-			await runRoot('Building...', ['astro', 'build']);
+			await runRoot('Building', ['astro', 'build']);
 		}
 
 		async function test() {
@@ -75,33 +73,29 @@ await runCommand({
 				return;
 			}
 
-			await runRoot('Running E2E smoke tests...', [
-				'--silent',
-				'test-e2e-smoke',
-				'--reporter=line',
-			]);
+			await runRoot('Running E2E smoke tests', ['--silent', 'test-e2e-smoke', '--reporter=line']);
 		}
 
 		const steps: Array<() => Promise<void>> = [
 			sync,
-			() => runScript('validate-content'),
-			() => runScript('generate-redirects'),
-			() => runScript('similar-content'),
+			() => runScript('Validating content', 'validate-content'),
+			() => runScript('Generating redirects', 'generate-redirects'),
+			() => runScript('Finding similar content', 'similar-content'),
 			webmentions,
-			async () => {
-				log.step('Sitemap lastmod');
-				await generateSitemapLastmod({ paths, rootPath, siteUrl: config.siteUrl });
-			},
+			() =>
+				withStep('Sitemap lastmod', () =>
+					generateSitemapLastmod({ paths, rootPath, siteUrl: config.siteUrl }),
+				),
 			build,
-			() => runScript('render-images'),
-			() => runScript('render-opengraph'),
+			() => runScript('Rendering images', 'render-images'),
+			() => runScript('Rendering OpenGraph cards', 'render-opengraph'),
 			test,
 			() => uploadRenderedSet(getRenditionSet(paths, config), { config, dryRun: isDryRun }),
 			() => uploadRenderedSet(getOpenGraphSet(paths, config), { config, dryRun: isDryRun }),
 			() => deployApp({ dryRun: isDryRun, rootPath }),
 			() => deployCaddy({ dryRun: isDryRun, rootPath }),
 			async () => {
-				if (!isDryRun) await verifyEdge({ cachePath: paths.cachePath, config });
+				if (!isDryRun) await verifyEdge({ config, paths });
 			},
 			() => invokeCacheRefresh({ dryRun: isDryRun }),
 		];

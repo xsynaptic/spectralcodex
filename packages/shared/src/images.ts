@@ -1,10 +1,15 @@
 import type {
-	CoverPresetName,
+	ImageDimensions,
 	ImageFormat,
-	ImagePreset,
-} from '@xsynaptic/astro-image-pipeline/presets';
+	ImageSize,
+	ImageSource,
+} from '@xsynaptic/astro-image-pipeline/names';
 
-import { defineImagePipeline } from '@xsynaptic/astro-image-pipeline/presets';
+import {
+	fitWithinSource,
+	getSizedName,
+	isWithinSource,
+} from '@xsynaptic/astro-image-pipeline/names';
 
 export const ImageSizeEnum = {
 	ExtraExtraExtraLarge: 3600,
@@ -32,6 +37,27 @@ export const imageQualityByFormat = {
 	webp: 70,
 } as const satisfies Record<ImageFormat, number>;
 
+interface ImagePresetCover {
+	aspectRatio: number;
+	fit: 'cover';
+	format: ImageFormat;
+	widths: ReadonlyArray<number>;
+}
+
+interface ImagePresetNative {
+	fit: 'native';
+	format: ImageFormat;
+	widths: ReadonlyArray<number>;
+}
+
+interface ImagePresetWidth {
+	fit: 'width';
+	format: ImageFormat;
+	widths: ReadonlyArray<number>;
+}
+
+type ImagePreset = ImagePresetCover | ImagePresetNative | ImagePresetWidth;
+
 export const imagePresets = {
 	author: { fit: 'width', format: 'webp', widths: imageWidths.slice(0, 4) },
 	card: { aspectRatio: 3 / 2, fit: 'cover', format: 'webp', widths: imageWidths.slice(0, 4) },
@@ -45,18 +71,65 @@ export const imagePresets = {
 
 export type ImagePresetName = keyof typeof imagePresets;
 
-export type ImageCoverPresetName = CoverPresetName<typeof imagePresets>;
+export type ImageCoverPresetName = {
+	[Name in ImagePresetName]: (typeof imagePresets)[Name] extends ImagePresetCover ? Name : never;
+}[ImagePresetName];
 
-export const imagePipelineConfig = defineImagePipeline({
-	encoding: {
-		jpg: { quality: imageQualityByFormat.jpg },
-		webp: { quality: imageQualityByFormat.webp },
-	},
-	presets: imagePresets,
-});
+function getPresetSize(preset: ImagePreset, width: number, source: ImageDimensions): ImageSize {
+	switch (preset.fit) {
+		case 'cover': {
+			return { height: Math.round(width / preset.aspectRatio), width };
+		}
+		case 'native': {
+			return { height: Math.round((width * source.height) / source.width), width };
+		}
+		case 'width': {
+			return { width };
+		}
+	}
+}
 
-export const {
-	getName: getImageName,
-	getSize: getImagePresetSize,
-	getWidths: getImagePresetWidths,
-} = imagePipelineConfig;
+function resolvePresetSize(preset: ImagePreset, width: number, source: ImageDimensions) {
+	for (const presetWidth of preset.widths) {
+		const size = fitWithinSource(getPresetSize(preset, presetWidth, source), source);
+
+		if (size.width === width) return size;
+	}
+
+	return;
+}
+
+export function getImagePresetWidths(presetName: ImagePresetName, source: ImageDimensions) {
+	const preset: ImagePreset = imagePresets[presetName];
+
+	return preset.widths.filter((width) =>
+		isWithinSource(getPresetSize(preset, width, source), source),
+	);
+}
+
+export function getImagePresetSize(
+	presetName: ImagePresetName,
+	width: number,
+	source: ImageDimensions,
+) {
+	return fitWithinSource(getPresetSize(imagePresets[presetName], width, source), source);
+}
+
+export function getImageName(
+	source: ImageSource,
+	presetName: ImagePresetName,
+	width: number | undefined,
+) {
+	if (width === undefined) throw new Error(`Image ${source.id} needs a width for "${presetName}"`);
+
+	const preset: ImagePreset = imagePresets[presetName];
+	const size = resolvePresetSize(preset, width, source);
+
+	if (!size) {
+		throw new Error(
+			`Image ${source.id} (${String(source.width)}x${String(source.height)}) has no "${presetName}" rendition ${String(width)} wide`,
+		);
+	}
+
+	return getSizedName(source, { format: preset.format, ...size });
+}

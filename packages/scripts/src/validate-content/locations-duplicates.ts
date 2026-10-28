@@ -1,10 +1,7 @@
-import type { ContentEntry } from '@xsynaptic/astro-scripts';
+import type { ContentEntry, ValidationIssue } from '@xsynaptic/astro-scripts';
 
+import { toValidationResult } from '@xsynaptic/astro-scripts';
 import { z } from 'zod';
-
-import type { ValidationIssue } from '#validate-content/validation-result.ts';
-
-import { toValidationResult } from '#validate-content/validation-result.ts';
 
 const duplicateFields = [
 	'title',
@@ -28,13 +25,16 @@ export function validateLocationsDuplicates(entries: Array<ContentEntry>) {
 			if (typeof value !== 'string') continue;
 			if (!isDuplicate(seenByField.get(field)!, value)) continue;
 
-			issues.push({ message: `${entry.id}: duplicate ${field} "${value}"` });
+			issues.push({ location: entry.id, message: `duplicate ${field} "${value}"` });
 		}
 
 		const googleMapsLink = getGoogleMapsLink(entry.data.links);
 
 		if (googleMapsLink && isDuplicate(seenGoogleMapsLinks, googleMapsLink)) {
-			issues.push({ message: `${entry.id}: duplicate Google Maps link "${googleMapsLink}"` });
+			issues.push({
+				location: entry.id,
+				message: `duplicate Google Maps link "${googleMapsLink}"`,
+			});
 		}
 	}
 

@@ -1,7 +1,7 @@
 import { openGraphBasePath, openGraphImageFormat } from '@spectralcodex/shared/open-graph';
 import { getCachePaths } from '@spectralcodex/shared/paths';
+import { imageFormats } from '@xsynaptic/astro-image-pipeline/names';
 import { getImageCachePaths } from '@xsynaptic/astro-image-pipeline/node';
-import { imageFormats } from '@xsynaptic/astro-image-pipeline/presets';
 import { formatDuration, log, UserError } from '@xsynaptic/astro-scripts';
 import { readdir } from 'node:fs/promises';
 
@@ -27,7 +27,7 @@ interface RenderedDeployOptions {
 	dryRun?: boolean;
 }
 
-const partialDirectory = '.rsync-partial';
+export const partialDirectory = '.rsync-partial';
 
 // A truncated file at a served path would be cached at the edge for a year, so transfers land whole
 export const renderedUploadOptions = {

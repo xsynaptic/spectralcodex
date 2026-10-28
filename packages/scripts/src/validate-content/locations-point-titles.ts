@@ -1,10 +1,7 @@
-import type { ContentEntry } from '@xsynaptic/astro-scripts';
+import type { ContentEntry, ValidationIssue } from '@xsynaptic/astro-scripts';
 
+import { toValidationResult } from '@xsynaptic/astro-scripts';
 import { z } from 'zod';
-
-import type { ValidationIssue } from '#validate-content/validation-result.ts';
-
-import { toValidationResult } from '#validate-content/validation-result.ts';
 
 const PointsSchema = z.array(z.record(z.string(), z.unknown())).min(2);
 

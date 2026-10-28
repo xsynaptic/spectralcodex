@@ -24,7 +24,7 @@ describe('validateLocationsDuplicates', () => {
 		];
 
 		expect(validateLocationsDuplicates(entries)).toEqual({
-			issues: [{ message: 'b: duplicate title "Same Theater"' }],
+			issues: [{ location: 'b', message: 'duplicate title "Same Theater"' }],
 			status: 'fail',
 			summary: 'Found 1 duplicate(s)',
 		});
@@ -38,7 +38,7 @@ describe('validateLocationsDuplicates', () => {
 		];
 
 		expect(validateLocationsDuplicates(entries).issues).toEqual([
-			{ message: `b: duplicate Google Maps link "${url}"` },
+			{ location: 'b', message: `duplicate Google Maps link "${url}"` },
 		]);
 	});
 });

@@ -1,8 +1,7 @@
 import type { ContentEntry } from '@xsynaptic/astro-scripts';
 
 import { getPublicId } from '@spectralcodex/shared/entries';
-
-import { toValidationResult } from '#validate-content/validation-result.ts';
+import { toValidationResult } from '@xsynaptic/astro-scripts';
 
 interface DuplicateIdIssue {
 	id: string;

@@ -1,4 +1,4 @@
-import type { ImageSource } from '@xsynaptic/astro-image-pipeline/presets';
+import type { ImageSource } from '@xsynaptic/astro-image-pipeline/names';
 import type { CollectionEntry } from 'astro:content';
 
 import pMemoize from 'p-memoize';

@@ -16,7 +16,7 @@ describe('validateImageFeaturedMissing', () => {
 		];
 
 		expect(validateImageFeaturedMissing(entries)).toEqual({
-			issues: [{ message: 'posts/a-post.mdx: body has images but no imageFeatured' }],
+			issues: [{ location: 'posts/a-post.mdx', message: 'body has images but no imageFeatured' }],
 			status: 'fail',
 			summary: 'Found 1 entries with body images but no imageFeatured',
 		});

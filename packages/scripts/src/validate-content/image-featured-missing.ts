@@ -1,7 +1,8 @@
 import type { ContentEntry } from '@xsynaptic/astro-scripts';
 
+import { toValidationResult } from '@xsynaptic/astro-scripts';
+
 import { getEntryImageIds } from '#shared/image-references.ts';
-import { toValidationResult } from '#validate-content/validation-result.ts';
 
 export function validateImageFeaturedMissing(entries: Array<ContentEntry>) {
 	const files = entries
@@ -13,7 +14,7 @@ export function validateImageFeaturedMissing(entries: Array<ContentEntry>) {
 		.map((entry) => entry.filePath ?? entry.id);
 
 	return toValidationResult(
-		files.map((file) => ({ message: `${file}: body has images but no imageFeatured` })),
+		files.map((file) => ({ location: file, message: 'body has images but no imageFeatured' })),
 		{
 			fail: `Found ${files.length.toString()} entries with body images but no imageFeatured`,
 			pass: 'Entries with body images all set imageFeatured',

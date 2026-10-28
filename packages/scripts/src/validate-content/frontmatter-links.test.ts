@@ -39,7 +39,12 @@ describe('validateFrontmatterLinks', () => {
 		];
 
 		expect(validateFrontmatterLinks(entries, resourceEntries)).toEqual({
-			issues: [{ message: 'locations/a-location.mdx: unmatched link "https://example.test/page"' }],
+			issues: [
+				{
+					location: 'locations/a-location.mdx',
+					message: 'unmatched link "https://example.test/page"',
+				},
+			],
 			status: 'fail',
 			summary: 'Found 1 unmatched frontmatter link(s)',
 		});

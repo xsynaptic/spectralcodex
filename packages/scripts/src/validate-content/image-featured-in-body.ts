@@ -1,7 +1,8 @@
 import type { ContentEntry } from '@xsynaptic/astro-scripts';
 
+import { toValidationResult } from '@xsynaptic/astro-scripts';
+
 import { getEntryImageIds } from '#shared/image-references.ts';
-import { toValidationResult } from '#validate-content/validation-result.ts';
 
 export function validateImageFeaturedInBody(entries: Array<ContentEntry>) {
 	const orphans: Array<{ file: string; missingIds: Array<string> }> = [];
@@ -22,7 +23,8 @@ export function validateImageFeaturedInBody(entries: Array<ContentEntry>) {
 
 	return toValidationResult(
 		orphans.map(({ file, missingIds }) => ({
-			message: `${file}: featured image(s) not in body: ${missingIds.join(', ')}`,
+			location: file,
+			message: `featured image(s) not in body: ${missingIds.join(', ')}`,
 		})),
 		{
 			fail: `Found ${orphans.length.toString()} entries with featured images missing from body content`,
