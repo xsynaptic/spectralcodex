@@ -55,6 +55,7 @@ describe('getEdgeProbes', () => {
 		});
 		expect(findProbe(probes, 'image sample')).toMatchObject({
 			expect: { byteLength: 4096, contentType: 'image/jpeg', status: 200 },
+			method: 'HEAD',
 			url: 'https://img.example.com/a/temple-1-450.jpg',
 		});
 	});
@@ -154,46 +155,55 @@ const heroHeaders = {
 	'x-content-type-options': 'nosniff',
 };
 
+const sampleProbe: EdgeProbe = {
+	expect: { byteLength: 4, contentType: 'image/jpeg', status: 200 },
+	label: 'image sample',
+	method: 'HEAD',
+	url: 'https://img.example.com/a/temple-1-450.jpg',
+};
+
+function getSampleResponse(headers: Record<string, string>) {
+	return new Response(undefined, { headers: { 'content-type': 'image/jpeg', ...headers } });
+}
+
 describe('getProbeFailure', () => {
-	test('a response matching every expectation passes', async () => {
-		expect(
-			await getProbeFailure(heroProbe, new Response('', { headers: heroHeaders })),
-		).toBeUndefined();
+	test('a response matching every expectation passes', () => {
+		expect(getProbeFailure(heroProbe, new Response('', { headers: heroHeaders }))).toBeUndefined();
 	});
 
-	test('a session cookie fails any probe, image host included', async () => {
+	test('a session cookie fails any probe, image host included', () => {
 		const response = new Response('', {
 			headers: { ...heroHeaders, 'set-cookie': 'scx-objectives-session=abc; HttpOnly' },
 		});
 
-		expect(await getProbeFailure(heroProbe, response)).toBe('response sets scx-objectives-session');
+		expect(getProbeFailure(heroProbe, response)).toBe('response sets scx-objectives-session');
 	});
 
-	test('the first mismatch is reported', async () => {
-		expect(await getProbeFailure(heroProbe, new Response('', { status: 404 }))).toBe(
+	test('the first mismatch is reported', () => {
+		expect(getProbeFailure(heroProbe, new Response('', { status: 404 }))).toBe(
 			'expected status 200, got 404',
 		);
 		expect(
-			await getProbeFailure(
+			getProbeFailure(
 				heroProbe,
 				new Response('', { headers: { ...heroHeaders, 'cache-control': 'no-store' } }),
 			),
 		).toBe('expected "public, max-age=60", got "no-store"');
 		expect(
-			await getProbeFailure(
+			getProbeFailure(
 				heroProbe,
 				new Response('', { headers: { ...heroHeaders, 'content-type': 'text/html' } }),
 			),
 		).toBe('expected content type image/, got "text/html"');
 		expect(
-			await getProbeFailure(
+			getProbeFailure(
 				heroProbe,
 				new Response('', { headers: { ...heroHeaders, 'x-content-type-options': '' } }),
 			),
 		).toBe('expected X-Content-Type-Options nosniff');
 	});
 
-	test('a cf-cache-status expectation fails when the header is absent', async () => {
+	test('a cf-cache-status expectation fails when the header is absent', () => {
 		const gate: EdgeProbe = {
 			expect: { cacheControl: 'private, no-store', cfCacheStatus: 'DYNAMIC', status: 401 },
 			label: 'objectives gate',
@@ -205,12 +215,12 @@ describe('getProbeFailure', () => {
 			status: 401,
 		});
 
-		expect(await getProbeFailure(gate, response)).toBe(
+		expect(getProbeFailure(gate, response)).toBe(
 			'expected cf-cache-status "DYNAMIC", got "(absent)"',
 		);
 	});
 
-	test('a redirect location resolves against the probe URL', async () => {
+	test('a redirect location resolves against the probe URL', () => {
 		const legacy: EdgeProbe = {
 			expect: { location: '/a/temple-1-1200x675.webp', status: 301 },
 			label: 'legacy redirect',
@@ -219,7 +229,7 @@ describe('getProbeFailure', () => {
 		};
 
 		expect(
-			await getProbeFailure(
+			getProbeFailure(
 				legacy,
 				new Response(undefined, {
 					headers: { location: '/a/temple-1-1200x675.webp' },
@@ -228,25 +238,22 @@ describe('getProbeFailure', () => {
 			),
 		).toBeUndefined();
 		expect(
-			await getProbeFailure(
+			getProbeFailure(
 				legacy,
 				new Response(undefined, { headers: { location: '/a/temple-1-1200.webp' }, status: 301 }),
 			),
 		).toBe('expected location /a/temple-1-1200x675.webp, got /a/temple-1-1200.webp');
 	});
 
-	test('a sample fails when its body length differs from the local file', async () => {
-		const sample: EdgeProbe = {
-			expect: { byteLength: 4, contentType: 'image/jpeg', status: 200 },
-			label: 'image sample',
-			method: 'GET',
-			url: 'https://img.example.com/a/temple-1-450.jpg',
-		};
-		const headers = { 'content-type': 'image/jpeg' };
-
-		expect(await getProbeFailure(sample, new Response('abcd', { headers }))).toBeUndefined();
-		expect(await getProbeFailure(sample, new Response('abc', { headers }))).toBe(
-			'expected 4 bytes, got 3',
+	test('a sample fails when its content length differs from the local file', () => {
+		expect(
+			getProbeFailure(sampleProbe, getSampleResponse({ 'content-length': '4' })),
+		).toBeUndefined();
+		expect(getProbeFailure(sampleProbe, getSampleResponse({ 'content-length': '3' }))).toBe(
+			'expected content-length 4, got "3"',
+		);
+		expect(getProbeFailure(sampleProbe, getSampleResponse({}))).toBe(
+			'expected content-length 4, got "(absent)"',
 		);
 	});
 });

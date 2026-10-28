@@ -1,7 +1,7 @@
 import { getCachePaths } from '@spectralcodex/shared/paths';
 import { parseImageName } from '@xsynaptic/astro-image-pipeline/names';
 import { findDistManifest, getImageCachePaths } from '@xsynaptic/astro-image-pipeline/node';
-import { fetchWithRetry, formatCount, log, withStep } from '@xsynaptic/astro-scripts';
+import { fetchWithRetry, formatCount, formatError, log, withStep } from '@xsynaptic/astro-scripts';
 import { stat } from 'node:fs/promises';
 import path from 'node:path';
 import * as R from 'remeda';
@@ -28,7 +28,7 @@ async function runEdgeProbes(paths: ScriptPaths, config: DeployConfig) {
 	const documentResponse = await request(documentProbe);
 	const documentFailure = labelFailure(
 		documentProbe,
-		await getProbeFailure(documentProbe, documentResponse),
+		getProbeFailure(documentProbe, documentResponse),
 	);
 	const html = documentResponse.status === 200 ? await documentResponse.text() : undefined;
 	const samples = html === undefined ? undefined : await readImageSamples(paths);
@@ -96,11 +96,20 @@ async function getFileSize(filePath: string) {
 }
 
 async function runProbes(probes: ReadonlyArray<EdgeProbe>) {
-	const failures = await Promise.all(
-		probes.map(async (probe) => getProbeFailure(probe, await request(probe))),
+	const results = await Promise.allSettled(
+		probes.map(async (probe) => labelFailure(probe, getProbeFailure(probe, await request(probe)))),
 	);
 
-	return probes.map((probe, index) => labelFailure(probe, failures[index]));
+	return results.map((result) => {
+		if (result.status === 'fulfilled') return result.value;
+		if (isAbortError(result.reason)) throw result.reason;
+
+		return formatError(result.reason);
+	});
+}
+
+function isAbortError(error: unknown) {
+	return error instanceof DOMException && error.name === 'AbortError';
 }
 
 function labelFailure(probe: EdgeProbe, failure: string | undefined) {

@@ -27,7 +27,7 @@
 	},
 	"private": true,
 	"dependencies": {
-		"@xsynaptic/astro-image-pipeline": "^0.7.0",
+		"@xsynaptic/astro-image-pipeline": "^0.8.0",
 		"zod": "^4.6.7"
 	}
 }

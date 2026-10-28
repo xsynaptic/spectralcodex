@@ -1,3 +1,5 @@
+import { fetchWithRetry } from '@xsynaptic/astro-scripts';
+
 import type { UrlRow, UrlStatus } from '#check-links/types.ts';
 
 import { UrlStatusEnum } from '#check-links/types.ts';
@@ -29,9 +31,9 @@ interface CheckResult {
 }
 
 // Redirects are handled manually so the real 301/302 status code survives
-export async function checkUrl(row: UrlRow, signal: AbortSignal): Promise<CheckResult> {
+export async function checkUrl(row: UrlRow): Promise<CheckResult> {
 	try {
-		const response = await fetchStatus(row.url, signal);
+		const response = await fetchStatus(row.url);
 
 		// Status and headers are all we read; cancel the body so undici releases the connection
 		void response.body?.cancel();
@@ -48,22 +50,23 @@ export async function checkUrl(row: UrlRow, signal: AbortSignal): Promise<CheckR
 	}
 }
 
-async function fetchStatus(url: string, signal: AbortSignal): Promise<Response> {
-	const response = await fetchWithTimeout(url, 'HEAD', signal);
+async function fetchStatus(url: string): Promise<Response> {
+	const response = await fetchMethod(url, 'HEAD');
 
 	if (!headRetryStatusCodes.has(response.status)) return response;
 
 	void response.body?.cancel();
 
-	return fetchWithTimeout(url, 'GET', signal);
+	return fetchMethod(url, 'GET');
 }
 
-function fetchWithTimeout(url: string, method: string, signal: AbortSignal): Promise<Response> {
-	return fetch(url, {
+function fetchMethod(url: string, method: string): Promise<Response> {
+	return fetchWithRetry(url, {
 		headers: requestHeaders,
+		label: method,
 		method,
 		redirect: 'manual',
-		signal: AbortSignal.any([signal, AbortSignal.timeout(timeoutMs)]),
+		timeoutMs,
 	});
 }
 

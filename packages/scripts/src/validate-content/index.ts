@@ -92,6 +92,7 @@ function getChecks(
 		'link-ids': () =>
 			checkComponentTargets(allEntries, {
 				component: 'Link',
+				label: 'Link ID',
 				prop: 'id',
 				rootPath,
 				targets: metadataEntries.map((entry) => entry.id),

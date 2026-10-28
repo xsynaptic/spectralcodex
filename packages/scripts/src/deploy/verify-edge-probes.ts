@@ -220,7 +220,7 @@ function getSampleProbes(imageBaseUrl: string, samples: ReadonlyArray<ImageSampl
 				status: 200,
 			},
 			label: 'image sample',
-			method: 'GET',
+			method: 'HEAD',
 			url: `${imageBaseUrl}/${sample.path}`,
 		});
 	}
@@ -326,9 +326,14 @@ function readLocation(headers: Headers, url: string) {
 function getHeaderFailure({ expect, url }: EdgeProbe, headers: Headers) {
 	const cacheControl = readHeader(headers, 'cache-control');
 	const cfCacheStatus = readHeader(headers, 'cf-cache-status');
+	const contentLength = readHeader(headers, 'content-length');
 	const contentType = readHeader(headers, 'content-type');
 	const location = readLocation(headers, url);
 	const checks = [
+		{
+			isMatch: expect.byteLength === undefined || contentLength === String(expect.byteLength),
+			message: `expected content-length ${String(expect.byteLength)}, got "${contentLength}"`,
+		},
 		{
 			isMatch: expect.cacheControl === undefined || cacheControl === expect.cacheControl,
 			message: `expected "${String(expect.cacheControl)}", got "${cacheControl}"`,
@@ -354,7 +359,7 @@ function getHeaderFailure({ expect, url }: EdgeProbe, headers: Headers) {
 	return checks.find((check) => !check.isMatch)?.message;
 }
 
-export async function getProbeFailure(probe: EdgeProbe, response: Response) {
+export function getProbeFailure(probe: EdgeProbe, response: Response) {
 	if (response.headers.get('set-cookie')?.includes(objectivesSessionCookie)) {
 		return `response sets ${objectivesSessionCookie}`;
 	}
@@ -363,15 +368,5 @@ export async function getProbeFailure(probe: EdgeProbe, response: Response) {
 		return `expected status ${String(probe.expect.status)}, got ${String(response.status)}`;
 	}
 
-	const headerFailure = getHeaderFailure(probe, response.headers);
-
-	if (headerFailure !== undefined) return headerFailure;
-
-	if (probe.expect.byteLength === undefined) return;
-
-	const { byteLength } = await response.arrayBuffer();
-
-	if (byteLength === probe.expect.byteLength) return;
-
-	return `expected ${String(probe.expect.byteLength)} bytes, got ${String(byteLength)}`;
+	return getHeaderFailure(probe, response.headers);
 }

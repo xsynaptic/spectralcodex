@@ -134,7 +134,7 @@ async function checkUrls(
 				if (signal.aborted) return;
 
 				await getDomainLimit(getDomain(row.url))(async () => {
-					const result = await checkUrl(row, signal);
+					const result = await checkUrl(row);
 
 					if (signal.aborted) return;
 
@@ -161,6 +161,8 @@ async function checkUrls(
 					if (isIssue || isRecovery) {
 						log.info(`${statusLabels[result.status]} ${chalk.gray(row.url)}`);
 					}
+
+					if (result.errorMessage !== undefined) log.detail(result.errorMessage);
 				});
 			}),
 		),
