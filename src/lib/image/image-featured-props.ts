@@ -1,14 +1,13 @@
 import type { ImageCoverPresetName } from '@spectralcodex/shared/images';
 
-import { imagePresets } from '@spectralcodex/shared/images';
+import { getImagePresetSize } from '@spectralcodex/shared/images';
 
 import type { ImageComponentProps, ImagePlaceholderProps } from '#lib/image/image-types.ts';
 
 import { getImageByIdFunction, getImageSource } from '#lib/collections/images/images-data.ts';
-import { ImageFitOptionEnum } from '#lib/image/image-types.ts';
 import { sanitizeImageAltAttribute } from '#lib/utils/text.ts';
 
-const fit = ImageFitOptionEnum.Cover;
+const priorityPlaceholderPixels = 1600;
 
 interface ImageFeaturedPropsOptions {
 	alt?: string;
@@ -33,20 +32,21 @@ export async function getImageFeaturedProps({
 
 	if (!imageId || !imageEntry) return { imageProps: undefined, placeholderProps: undefined };
 
+	const imageSource = getImageSource(imageEntry);
+	const size = getImagePresetSize(preset, width, imageSource);
+
 	return {
 		imageProps: {
 			alt: sanitizeImageAltAttribute(alt ?? imageEntry.data.title),
-			imageSource: getImageSource(imageEntry),
+			imageSource,
 			preset,
 			priority,
 			sizes,
 			width,
 		} satisfies ImageComponentProps,
 		placeholderProps: {
-			aspectRatio: imagePresets[preset].aspectRatio,
-			fit,
-			highQuality: priority,
 			imageId,
+			request: priority ? { pixels: priorityPlaceholderPixels, size } : { size },
 		} satisfies ImagePlaceholderProps,
 	};
 }

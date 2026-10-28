@@ -89,10 +89,7 @@ async function getImageProps() {
 			sizes: getImageLayoutSizesProp(layout, priority, context),
 			width: isFeed ? feedWidth : width,
 		} satisfies ImageComponentProps,
-		placeholderProps: {
-			aspectRatio: imageEntry.data.width / imageEntry.data.height,
-			imageId,
-		} satisfies ImagePlaceholderProps,
+		placeholderProps: { imageId } satisfies ImagePlaceholderProps,
 	};
 }
 

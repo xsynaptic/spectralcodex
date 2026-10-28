@@ -1,3 +1,5 @@
+import type { ImageFeaturedObject } from '@spectralcodex/shared/schemas';
+
 import { describe, expect, test } from 'vitest';
 
 import type { CatalogCaption } from '#lib/catalog/catalog-types.ts';
@@ -32,7 +34,7 @@ describe('getImageFeaturedGroup', () => {
 	test('a linked image takes the entry id and url alongside the caption', () => {
 		const group = getImageFeaturedGroup({
 			getCaption,
-			imageFeatured: [{ id: 'a.jpg', link: 'xiluo-theater' }],
+			imageFeatured: [{ id: 'a.jpg', link: 'xiluo-theater' } satisfies ImageFeaturedObject],
 		});
 
 		expect(group).toStrictEqual([

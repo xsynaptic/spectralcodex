@@ -122,8 +122,6 @@ function getSampleUrl(fragment: string) {
 }
 
 export function createSampleImageProps(entry: ComputedEntry<'images'>) {
-	const aspectRatio = entry.data.width / entry.data.height;
-
 	return {
 		imageProps: {
 			alt: sanitizeImageAltAttribute(entry.data.title),
@@ -132,7 +130,7 @@ export function createSampleImageProps(entry: ComputedEntry<'images'>) {
 			sizes: getImageLayoutSizesProp(ImageLayoutEnum.Default),
 			width: ImageSizeEnum.Medium,
 		} satisfies ImageComponentProps,
-		placeholderProps: { aspectRatio, imageId: entry.id } satisfies ImagePlaceholderProps,
+		placeholderProps: { imageId: entry.id } satisfies ImagePlaceholderProps,
 	};
 }
 

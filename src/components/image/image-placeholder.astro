@@ -1,9 +1,11 @@
 ---
 import type { HTMLTag, Polymorphic } from 'astro/types';
 
+import { getPlaceholder } from '@xsynaptic/astro-image-pipeline/node';
+
 import type { ImagePlaceholderProps } from '#lib/image/image-types.ts';
 
-import { getImagePlaceholderFunction } from '#components/image/image-placeholder.ts';
+import { getImageByIdFunction, getImageSource } from '#lib/collections/images/images-data.ts';
 
 // A standardized image placeholder component with a fallback image when no placeholder is passed
 type Props<Tag extends HTMLTag = HTMLTag> = Polymorphic<{
@@ -13,9 +15,19 @@ type Props<Tag extends HTMLTag = HTMLTag> = Polymorphic<{
 
 const { as: Tag = 'div', class: className, placeholderProps, ...props } = Astro.props;
 
-const getImagePlaceholder = await getImagePlaceholderFunction();
+const getImageById = await getImageByIdFunction();
 
-const placeholder = placeholderProps ? await getImagePlaceholder(placeholderProps) : undefined;
+async function getPlaceholderUrl() {
+	if (!placeholderProps) return;
+
+	const imageEntry = getImageById(placeholderProps.imageId);
+
+	if (!imageEntry) return;
+
+	return getPlaceholder(getImageSource(imageEntry), placeholderProps.request);
+}
+
+const placeholder = await getPlaceholderUrl();
 ---
 
 <Tag
