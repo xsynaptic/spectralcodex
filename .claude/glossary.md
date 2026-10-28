@@ -120,6 +120,8 @@ Map Scope, Map Filter, Map Target and Map View keep the prefix everywhere outsid
 
 **Rendition**: One encoded copy of an Image at a single width and format, produced by a preset for a particular display. An Image yields many Renditions. An OpenGraph Card is not a Rendition: it is drawn for a page, not encoded from an Image. _Avoid_: derivative, file, variant, size, image (the Image is the photograph a Rendition comes from).
 
+**Placeholder**: A tiny, coarse copy of an Image inlined into the page while its Rendition loads; never a file of its own, so not a Rendition. _Avoid_: thumbnail, preview (a Preview is a listing summary).
+
 **OpenGraph Card**: The picture shown when a page is shared: the page's title over an Image that represents it. _Avoid_: OG image, social image, thumbnail, preview (a Preview is a listing summary).
 
 ### Multilingual
