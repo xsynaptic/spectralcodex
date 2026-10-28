@@ -20,7 +20,7 @@ import { parseRegionData, resolveBoundingBox } from '#map-divisions/content.ts';
 import { fetchDivisionData, initializeDuckDB } from '#map-divisions/duckdb.ts';
 import { convertToFeatureCollection, saveDivisionMask } from '#map-divisions/geojson.ts';
 import { saveSvg } from '#map-divisions/svg.ts';
-import { defineCommand, runCommand } from '#shared/command.ts';
+import { runCommand } from '#shared/command.ts';
 import { isExistingFile, safelyCreateDirectory } from '#shared/files.ts';
 
 const stacCatalogUrl = 'https://stac.overturemaps.org/catalog.json';
@@ -203,76 +203,74 @@ async function processRegions(
 	return counts;
 }
 
-await runCommand(
-	defineCommand({
-		name: 'map-divisions',
-		options: {
-			regenerate: {
-				default: false,
-				description: 'Rebuild every mask and SVG, even when cached',
-				short: 'r',
-				type: 'boolean',
-			},
+await runCommand({
+	name: 'map-divisions',
+	options: {
+		regenerate: {
+			default: false,
+			description: 'Rebuild every mask and SVG, even when cached',
+			short: 'r',
+			type: 'boolean',
 		},
-		async run({ paths, signal, values }) {
-			const { divisionsPath: cachePath } = getCachePaths(paths.cachePath);
+	},
+	async run({ paths, signal, values }) {
+		const { divisionsPath: cachePath } = getCachePaths(paths.cachePath);
 
-			const regionEntries = await withSpinner('Loading content', () =>
-				withAstroContent((content) => getCollectionEntries(content, ['regions'])),
-			);
+		const regionEntries = await withSpinner('Loading content', () =>
+			withAstroContent((content) => getCollectionEntries(content, ['regions'])),
+		);
 
-			const { allRegions, regionsWithDivisionIds } = parseRegionData(regionEntries);
+		const { allRegions, regionsWithDivisionIds } = parseRegionData(regionEntries);
 
-			if (regionsWithDivisionIds.length === 0) {
-				log.warn('No regions with division IDs found');
-				return;
-			}
+		if (regionsWithDivisionIds.length === 0) {
+			log.warn('No regions with division IDs found');
+			return;
+		}
 
-			safelyCreateDirectory(cachePath);
+		safelyCreateDirectory(cachePath);
 
-			const processingNeeds = await collectProcessingNeeds(regionsWithDivisionIds, {
+		const processingNeeds = await collectProcessingNeeds(regionsWithDivisionIds, {
+			cachePath,
+			isRegenerate: values.regenerate,
+		});
+		const cachedCount = regionsWithDivisionIds.length - processingNeeds.length;
+
+		if (processingNeeds.length === 0) {
+			log.success(`All ${formatCount(cachedCount)} regions already cached`);
+			return;
+		}
+
+		const version = await withSpinner(
+			'Resolving the latest Overture Maps release',
+			() => resolveLatestRelease(signal),
+			(resolved) => `Overture Maps release ${resolved}`,
+		);
+		const db = await withSpinner('Initializing DuckDB', initializeDuckDB);
+
+		try {
+			const counts = await processRegions(processingNeeds, {
 				cachePath,
-				isRegenerate: values.regenerate,
+				db,
+				overtureUrl: `${s3Base}/${version}/`,
+				regionsById: new Map(allRegions.map((region) => [region.id, region])),
+				signal,
 			});
-			const cachedCount = regionsWithDivisionIds.length - processingNeeds.length;
 
-			if (processingNeeds.length === 0) {
-				log.success(`All ${formatCount(cachedCount)} regions already cached`);
-				return;
+			log.summary([
+				['Regions', regionsWithDivisionIds.length],
+				['Processed', counts.processed],
+				['Already cached', cachedCount],
+				['Failed', counts.failed],
+			]);
+			log.detail(`Output: ${cachePath}`);
+
+			if (counts.failed > 0) {
+				throw new UserError(`${formatCount(counts.failed)} region(s) failed to process`);
 			}
-
-			const version = await withSpinner(
-				'Resolving the latest Overture Maps release',
-				() => resolveLatestRelease(signal),
-				(resolved) => `Overture Maps release ${resolved}`,
-			);
-			const db = await withSpinner('Initializing DuckDB', initializeDuckDB);
-
-			try {
-				const counts = await processRegions(processingNeeds, {
-					cachePath,
-					db,
-					overtureUrl: `${s3Base}/${version}/`,
-					regionsById: new Map(allRegions.map((region) => [region.id, region])),
-					signal,
-				});
-
-				log.summary([
-					['Regions', regionsWithDivisionIds.length],
-					['Processed', counts.processed],
-					['Already cached', cachedCount],
-					['Failed', counts.failed],
-				]);
-				log.detail(`Output: ${cachePath}`);
-
-				if (counts.failed > 0) {
-					throw new UserError(`${formatCount(counts.failed)} region(s) failed to process`);
-				}
-			} finally {
-				db.disconnectSync();
-			}
-		},
-		summary: 'Fetch Overture Maps division boundaries and render each Region’s mask and SVG',
-		title: 'Map divisions',
-	}),
-);
+		} finally {
+			db.disconnectSync();
+		}
+	},
+	summary: 'Fetch Overture Maps division boundaries and render each Region’s mask and SVG',
+	title: 'Map divisions',
+});

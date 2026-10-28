@@ -22,16 +22,17 @@ import { getGitFileDates } from '#sitemap-lastmod/git-file-dates.ts';
 
 interface SitemapLastmodOptions {
 	paths: ScriptPaths;
+	rootPath: string;
 	siteUrl: string;
 }
 
-export async function generateSitemapLastmod({ paths, siteUrl }: SitemapLastmodOptions) {
+export async function generateSitemapLastmod({ paths, rootPath, siteUrl }: SitemapLastmodOptions) {
 	const collectionsPath = paths.contentDataPath;
 	const outputPath = getCachePaths(paths.cachePath).sitemapLastmodPath;
 
 	const gitMap = await withSpinner('Reading git log', async () => {
 		const topLevel = await $({ cwd: collectionsPath })`git rev-parse --show-toplevel`;
-		const keyPrefix = path.relative(paths.rootPath, topLevel.stdout.trim());
+		const keyPrefix = path.relative(rootPath, topLevel.stdout.trim());
 
 		return getGitFileDates({
 			cwd: collectionsPath,
@@ -57,7 +58,7 @@ export async function generateSitemapLastmod({ paths, siteUrl }: SitemapLastmodO
 	);
 
 	const { missingDateCount, resolvedCount, urls } = resolveUrls(entries, gitMap, {
-		contentPathPrefix: `${path.relative(paths.rootPath, collectionsPath)}/`,
+		contentPathPrefix: `${path.relative(rootPath, collectionsPath)}/`,
 		siteUrl,
 	});
 

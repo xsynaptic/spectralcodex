@@ -12,7 +12,7 @@ import type { ScriptPaths } from '#shared/command.ts';
 import { loadOpenGraphFonts } from '#og-image/fonts.ts';
 import { createRenderer, processImage } from '#og-image/generate.ts';
 import { templateVersion } from '#og-image/template-version.ts';
-import { defineCommand, runCommand } from '#shared/command.ts';
+import { runCommand } from '#shared/command.ts';
 
 async function generateCards({
 	isClearCache,
@@ -92,25 +92,23 @@ async function generateCards({
 	}
 }
 
-await runCommand(
-	defineCommand({
-		interrupted: 'finished cards are saved and the next run resumes',
-		name: 'render-opengraph',
-		options: {
-			'clear-cache': {
-				default: false,
-				description: 'Delete every card and render from scratch',
-				type: 'boolean',
-			},
+await runCommand({
+	interrupted: 'finished cards are saved and the next run resumes',
+	name: 'render-opengraph',
+	options: {
+		'clear-cache': {
+			default: false,
+			description: 'Delete every card and render from scratch',
+			type: 'boolean',
 		},
-		async run({ paths, signal, values }) {
-			await generateCards({
-				isClearCache: values['clear-cache'],
-				paths,
-				signal,
-			});
-		},
-		summary: 'Render the OpenGraph cards the last build recorded, incrementally',
-		title: 'Render OpenGraph cards',
-	}),
-);
+	},
+	async run({ paths, signal, values }) {
+		await generateCards({
+			isClearCache: values['clear-cache'],
+			paths,
+			signal,
+		});
+	},
+	summary: 'Render the OpenGraph cards the last build recorded, incrementally',
+	title: 'Render OpenGraph cards',
+});

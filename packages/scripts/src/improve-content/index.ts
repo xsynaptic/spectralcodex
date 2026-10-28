@@ -13,7 +13,7 @@ import path from 'node:path';
 import * as R from 'remeda';
 
 import { checks } from '#improve-content/checks.ts';
-import { defineCommand, runCommand } from '#shared/command.ts';
+import { runCommand } from '#shared/command.ts';
 
 const randomDefaultLimit = 50;
 
@@ -55,65 +55,62 @@ function selectEntries(
 	);
 }
 
-await runCommand(
-	defineCommand({
-		name: 'improve-content',
-		options: {
-			limit: { description: 'Show at most this many entries', type: 'string' },
-			random: {
-				default: false,
-				description: `Shuffle the matches (shows ${String(randomDefaultLimit)} unless --limit is set)`,
-				type: 'boolean',
-			},
-			threshold: {
-				default: '100',
-				description: 'Body length in characters under which an entry counts as a stub',
-				type: 'string',
-			},
+await runCommand({
+	name: 'improve-content',
+	options: {
+		limit: { description: 'Show at most this many entries', type: 'string' },
+		random: {
+			default: false,
+			description: `Shuffle the matches (shows ${String(randomDefaultLimit)} unless --limit is set)`,
+			type: 'boolean',
 		},
-		positional: { description: `Check to run: ${checkNames}`, name: 'check' },
-		async run({ paths, positionals, values }) {
-			const [checkName] = positionals;
-
-			if (!checkName) {
-				log.info(`Available checks: ${checkNames}`);
-				return;
-			}
-
-			const check = checks[checkName];
-
-			if (!check) throw new UserError(`Unknown check "${checkName}"; choose from ${checkNames}`);
-
-			const limit =
-				values.limit === undefined ? undefined : parseNumberOption(values.limit, 'limit');
-			const collectionsRoot = path.relative(paths.rootPath, paths.contentDataPath);
-
-			const entries = await withSpinner('Loading content', () =>
-				withAstroContent(({ getCollection }) => getCollection('locations')),
-			);
-
-			const matched = check(entries, {
-				threshold: parseNumberOption(values.threshold, 'threshold'),
-			});
-
-			const selected = selectEntries(matched, {
-				collectionsRoot,
-				isRandom: values.random,
-				limit,
-			});
-
-			for (const entry of selected) log.data(formatEntryLine(entry, collectionsRoot));
-
-			if (matched.length === 0) {
-				log.warn(`No entries matched (check: ${checkName})`);
-				return;
-			}
-
-			log.info(
-				`Showing ${formatCount(selected.length)} of ${formatCount(matched.length)} matched (check: ${checkName})`,
-			);
+		threshold: {
+			default: '100',
+			description: 'Body length in characters under which an entry counts as a stub',
+			type: 'string',
 		},
-		summary: 'List Locations a content check flags for improvement, one per line on stdout',
-		title: 'Improve content',
-	}),
-);
+	},
+	positional: { description: `Check to run: ${checkNames}`, name: 'check' },
+	async run({ paths, positionals, rootPath, values }) {
+		const [checkName] = positionals;
+
+		if (!checkName) {
+			log.info(`Available checks: ${checkNames}`);
+			return;
+		}
+
+		const check = checks[checkName];
+
+		if (!check) throw new UserError(`Unknown check "${checkName}"; choose from ${checkNames}`);
+
+		const limit = values.limit === undefined ? undefined : parseNumberOption(values.limit, 'limit');
+		const collectionsRoot = path.relative(rootPath, paths.contentDataPath);
+
+		const entries = await withSpinner('Loading content', () =>
+			withAstroContent(({ getCollection }) => getCollection('locations')),
+		);
+
+		const matched = check(entries, {
+			threshold: parseNumberOption(values.threshold, 'threshold'),
+		});
+
+		const selected = selectEntries(matched, {
+			collectionsRoot,
+			isRandom: values.random,
+			limit,
+		});
+
+		for (const entry of selected) log.data(formatEntryLine(entry, collectionsRoot));
+
+		if (matched.length === 0) {
+			log.warn(`No entries matched (check: ${checkName})`);
+			return;
+		}
+
+		log.info(
+			`Showing ${formatCount(selected.length)} of ${formatCount(matched.length)} matched (check: ${checkName})`,
+		);
+	},
+	summary: 'List Locations a content check flags for improvement, one per line on stdout',
+	title: 'Improve content',
+});

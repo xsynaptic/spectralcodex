@@ -162,7 +162,7 @@ async function sshCaptureOrRefuse(
 		const reason =
 			extractCaddyError(result.stderr) || `exited with code ${String(result.exitCode)}`;
 
-		throw new UserError(`${failureMessage}\n${reason}`);
+		throw new UserError(failureMessage, { detail: reason });
 	}
 
 	return result.stdout.trim();

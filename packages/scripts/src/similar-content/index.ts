@@ -23,7 +23,7 @@ import { Index, MetricKind, ScalarKind } from 'usearch';
 
 import type { SimilarContentMetadata } from '#similar-content/metadata.ts';
 
-import { defineCommand, runCommand } from '#shared/command.ts';
+import { runCommand } from '#shared/command.ts';
 import { toReferenceIds } from '#shared/entries.ts';
 import { safelyCreateDirectory } from '#shared/files.ts';
 import { calculateMetadataBoost } from '#similar-content/metadata.ts';
@@ -314,67 +314,65 @@ function querySimilarItems(
 	return candidates.filter((candidate) => candidate.score >= minScore).slice(0, resultCount);
 }
 
-await runCommand(
-	defineCommand({
-		interrupted: 'embeddings generated so far are cached',
-		name: 'similar-content',
-		options: {
-			'character-limit': {
-				default: '2500',
-				description: 'Characters of each entry fed to the model',
-				type: 'string',
-			},
-			'clear-cache': {
-				default: false,
-				description: 'Delete the embedding cache and exit',
-				type: 'boolean',
-			},
-			'min-score': {
-				default: '0.4',
-				description: 'Lowest similarity score kept',
-				type: 'string',
-			},
-			'result-count': {
-				default: '20',
-				description: 'Similar items kept per entry',
-				type: 'string',
-			},
+await runCommand({
+	interrupted: 'embeddings generated so far are cached',
+	name: 'similar-content',
+	options: {
+		'character-limit': {
+			default: '2500',
+			description: 'Characters of each entry fed to the model',
+			type: 'string',
 		},
-		async run({ paths, signal, values }) {
-			safelyCreateDirectory(paths.cachePath);
-
-			if (values['clear-cache']) {
-				clearCache(paths.cachePath);
-				return;
-			}
-
-			const entries = await withSpinner(
-				'Loading content',
-				getContentEntries,
-				(loaded) => `Loaded ${formatCount(loaded.length)} entries`,
-			);
-
-			const embeddings = await generateEmbeddings(entries, {
-				cachePath: paths.cachePath,
-				characterLimit: parseNumberOption(values['character-limit'], 'character-limit'),
-				signal,
-			});
-
-			if (embeddings.length === 0) throw new UserError('No embeddings generated');
-
-			const similarContentItems = calculateSimilarities(embeddings, {
-				minScore: parseNumberOption(values['min-score'], 'min-score'),
-				resultCount: parseNumberOption(values['result-count'], 'result-count'),
-			});
-			const outputPath = getCachePaths(paths.cachePath).similarContentPath;
-
-			writeFileSync(outputPath, JSON.stringify(similarContentItems));
-
-			log.success(
-				`Similar content for ${formatCount(Object.keys(similarContentItems).length)} items → ${outputPath}`,
-			);
+		'clear-cache': {
+			default: false,
+			description: 'Delete the embedding cache and exit',
+			type: 'boolean',
 		},
-		summary: 'Embed Posts and Locations and write each one’s most similar entries',
-		title: 'Similar content',
-	}),
-);
+		'min-score': {
+			default: '0.4',
+			description: 'Lowest similarity score kept',
+			type: 'string',
+		},
+		'result-count': {
+			default: '20',
+			description: 'Similar items kept per entry',
+			type: 'string',
+		},
+	},
+	async run({ paths, signal, values }) {
+		safelyCreateDirectory(paths.cachePath);
+
+		if (values['clear-cache']) {
+			clearCache(paths.cachePath);
+			return;
+		}
+
+		const entries = await withSpinner(
+			'Loading content',
+			getContentEntries,
+			(loaded) => `Loaded ${formatCount(loaded.length)} entries`,
+		);
+
+		const embeddings = await generateEmbeddings(entries, {
+			cachePath: paths.cachePath,
+			characterLimit: parseNumberOption(values['character-limit'], 'character-limit'),
+			signal,
+		});
+
+		if (embeddings.length === 0) throw new UserError('No embeddings generated');
+
+		const similarContentItems = calculateSimilarities(embeddings, {
+			minScore: parseNumberOption(values['min-score'], 'min-score'),
+			resultCount: parseNumberOption(values['result-count'], 'result-count'),
+		});
+		const outputPath = getCachePaths(paths.cachePath).similarContentPath;
+
+		writeFileSync(outputPath, JSON.stringify(similarContentItems));
+
+		log.success(
+			`Similar content for ${formatCount(Object.keys(similarContentItems).length)} items → ${outputPath}`,
+		);
+	},
+	summary: 'Embed Posts and Locations and write each one’s most similar entries',
+	title: 'Similar content',
+});

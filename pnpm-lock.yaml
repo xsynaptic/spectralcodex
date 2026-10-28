@@ -258,14 +258,14 @@ importers:
         specifier: ^1.1.0
         version: 1.1.0(astro@7.4.2(@astrojs/markdown-remark@7.3.1(supports-color@10.2.2))(@types/node@25.9.2)(esbuild@0.28.0)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))
       '@xsynaptic/astro-image-loader':
-        specifier: ^1.3.0
-        version: 1.3.0(astro@7.4.2(@astrojs/markdown-remark@7.3.1(supports-color@10.2.2))(@types/node@25.9.2)(esbuild@0.28.0)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(exiftool-vendored@39.0.1)(sharp@0.35.5(@types/node@25.9.2))(zod@4.6.7)
+        specifier: ^1.4.0
+        version: 1.4.0(astro@7.4.2(@astrojs/markdown-remark@7.3.1(supports-color@10.2.2))(@types/node@25.9.2)(esbuild@0.28.0)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(exiftool-vendored@39.0.1)(sharp@0.35.5(@types/node@25.9.2))(zod@4.6.7)
       '@xsynaptic/astro-image-pipeline':
-        specifier: workspace:*
-        version: link:packages/astro-image-pipeline
+        specifier: ^0.1.0
+        version: 0.1.0(astro@7.4.2(@astrojs/markdown-remark@7.3.1(supports-color@10.2.2))(@types/node@25.9.2)(esbuild@0.28.0)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(sharp@0.35.5(@types/node@25.9.2))
       '@xsynaptic/astro-scripts':
-        specifier: ^0.2.0
-        version: 0.2.0(astro@7.4.2(@astrojs/markdown-remark@7.3.1(supports-color@10.2.2))(@types/node@25.9.2)(esbuild@0.28.0)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vite@8.3.5(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))
+        specifier: ^0.2.1
+        version: 0.2.1(astro@7.4.2(@astrojs/markdown-remark@7.3.1(supports-color@10.2.2))(@types/node@25.9.2)(esbuild@0.28.0)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vite@8.3.5(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))
       '@xsynaptic/eslint-config':
         specifier: ^6.7.0
         version: 6.7.0(@emnapi/core@1.11.3)(@emnapi/runtime@1.11.3)(@typescript-eslint/parser@8.71.2(eslint@10.13.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint-plugin-jsx-a11y@6.10.2(eslint@10.13.0(jiti@2.7.0)(supports-color@10.2.2)))(eslint@10.13.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)
@@ -327,8 +327,8 @@ importers:
         specifier: ^39.0.1
         version: 39.0.1
       fallow:
-        specifier: ^3.35.0
-        version: 3.35.0
+        specifier: ^3.36.0
+        version: 3.36.0
       geokdbush:
         specifier: ^2.1.0
         version: 2.1.0
@@ -360,8 +360,8 @@ importers:
         specifier: ^0.8.1
         version: 0.8.1(prettier-plugin-astro@1.1.2(prettier@3.9.10))(prettier@3.9.10)
       remeda:
-        specifier: ^2.53.0
-        version: 2.53.0
+        specifier: ^2.54.1
+        version: 2.54.1
       satteri:
         specifier: ^0.10.5
         version: 0.10.5
@@ -386,22 +386,6 @@ importers:
       zod:
         specifier: ^4.6.7
         version: 4.6.7
-
-  packages/astro-image-pipeline:
-    dependencies:
-      p-limit:
-        specifier: ^7.3.3
-        version: 7.3.3
-    devDependencies:
-      astro:
-        specifier: ^7.4.2
-        version: 7.4.2(@astrojs/markdown-remark@7.3.1(supports-color@10.2.2))(@types/node@25.9.2)(esbuild@0.28.0)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0)
-      sharp:
-        specifier: 0.35.5
-        version: 0.35.5(@types/node@25.9.2)
-      vitest:
-        specifier: ^4.1.12
-        version: 4.1.12(@types/node@25.9.2)(vite@8.3.5(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))
 
   packages/content:
     devDependencies:
@@ -433,8 +417,8 @@ importers:
         specifier: workspace:*
         version: link:../shared
       remeda:
-        specifier: ^2.53.0
-        version: 2.53.0
+        specifier: ^2.54.1
+        version: 2.54.1
       zod:
         specifier: ^4.6.7
         version: 4.6.7
@@ -457,8 +441,8 @@ importers:
         specifier: ^5.104.5
         version: 5.104.5(@types/react@19.3.0)(react@19.3.1)
       maplibre-gl:
-        specifier: ^6.15.0
-        version: 6.15.0
+        specifier: ^6.16.0
+        version: 6.16.0
       react:
         specifier: ^19.3.1
         version: 19.3.1
@@ -467,10 +451,10 @@ importers:
         version: 19.3.1(react@19.3.1)
       react-map-gl:
         specifier: ^8.1.3
-        version: 8.1.3(maplibre-gl@6.15.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        version: 8.1.3(maplibre-gl@6.16.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       remeda:
-        specifier: ^2.53.0
-        version: 2.53.0
+        specifier: ^2.54.1
+        version: 2.54.1
       zustand:
         specifier: ^5.0.16
         version: 5.0.16(@types/react@19.3.0)(react@19.3.1)
@@ -557,11 +541,11 @@ importers:
         specifier: ^2.16.2
         version: 2.16.2
       '@xsynaptic/astro-image-pipeline':
-        specifier: workspace:*
-        version: link:../astro-image-pipeline
+        specifier: ^0.1.0
+        version: 0.1.0(astro@7.4.2(@astrojs/markdown-remark@7.3.1(supports-color@10.2.2))(@types/node@25.9.2)(esbuild@0.28.0)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(sharp@0.35.5(@types/node@25.9.2))
       '@xsynaptic/astro-scripts':
-        specifier: ^0.2.0
-        version: 0.2.0(astro@7.4.2(@astrojs/markdown-remark@7.3.1(supports-color@10.2.2))(@types/node@25.9.2)(esbuild@0.28.0)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vite@8.3.5(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))
+        specifier: ^0.2.1
+        version: 0.2.1(astro@7.4.2(@astrojs/markdown-remark@7.3.1(supports-color@10.2.2))(@types/node@25.9.2)(esbuild@0.28.0)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vite@8.3.5(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))
       '@xsynaptic/unified-tools':
         specifier: ^5.1.3
         version: 5.1.3(supports-color@10.2.2)
@@ -587,8 +571,8 @@ importers:
         specifier: ^7.3.3
         version: 7.3.3
       remeda:
-        specifier: ^2.53.0
-        version: 2.53.0
+        specifier: ^2.54.1
+        version: 2.54.1
       sanitize-html:
         specifier: ^2.18.1
         version: 2.18.1
@@ -620,8 +604,8 @@ importers:
   packages/shared:
     dependencies:
       '@xsynaptic/astro-image-pipeline':
-        specifier: workspace:*
-        version: link:../astro-image-pipeline
+        specifier: ^0.1.0
+        version: 0.1.0(astro@7.4.2(@astrojs/markdown-remark@7.3.1(supports-color@10.2.2))(@types/node@25.9.2)(esbuild@0.28.0)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(sharp@0.35.5(@types/node@25.9.2))
       zod:
         specifier: ^4.6.7
         version: 4.6.7
@@ -1588,43 +1572,43 @@ packages:
     resolution: {integrity: sha512-IkO+/KEUvwbVpiURZg+P7zF74z5Jxe0UgJxVni+RtoHQ6IZieXaO02kmadomap/q+l6bc/jdPGGqTjhuZnuz1Q==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24}
 
-  '@fallow-cli/darwin-arm64@3.35.0':
-    resolution: {integrity: sha512-8WJjjyQzX3DPD995516todTtFfagGTS0r9ACzNCqLBOcV/6ftnOxdGuNwwH3yz4g2ZKPrPDK0ml/NbJeUhN72g==}
+  '@fallow-cli/darwin-arm64@3.36.0':
+    resolution: {integrity: sha512-ekkNR+XUhYa6/Lbkzqf0p8TUFjR2ybLk7E5bnNUD1X2hGB/sFXnGxFUhkVbFBwV5IOqpekynEvabxSs7w7w04w==}
     cpu: [arm64]
     os: [darwin]
 
-  '@fallow-cli/darwin-x64@3.35.0':
-    resolution: {integrity: sha512-Bkr69eim2UwmzzPWyyzD5lREBnnuBcAMLVxU8gIsTArGg3ab9wiNujqVi8KkhnuTDuyBL4HQ5sxumMNA1VfSgA==}
+  '@fallow-cli/darwin-x64@3.36.0':
+    resolution: {integrity: sha512-V5TFOxV9A4RsuDqQMFmu0v3HcGIltc7asEJCzV9a0adN3y4gVH0ow9rShEr7PyMURq2hFSQOjrHRJ5n6uh0BOQ==}
     cpu: [x64]
     os: [darwin]
 
-  '@fallow-cli/linux-arm64-gnu@3.35.0':
-    resolution: {integrity: sha512-+B8lTPg0z8G5HaM+nSNQjxtLtW66ZVu9EOTrOzLn04YghjmZas1uxul+IkWBAFIOYhXFBvbtafMuETuKCaBUAg==}
+  '@fallow-cli/linux-arm64-gnu@3.36.0':
+    resolution: {integrity: sha512-u/0vHzw0Sv36/S4fjPZ/ODXc5JntMLcn7OyU89W5B3G8hY6B04D1HO32IW4PCxsN/DtURGoag1dj617ch0mtnQ==}
     cpu: [arm64]
     os: [linux]
 
-  '@fallow-cli/linux-arm64-musl@3.35.0':
-    resolution: {integrity: sha512-aGk3tS+AMqiClIq2BgU/QCDHxAokUXtyDAmiAIRW05nWi6ghT/Kmyn85CMgAJA56DypYFz7Zujx/F5JYJ70yIA==}
+  '@fallow-cli/linux-arm64-musl@3.36.0':
+    resolution: {integrity: sha512-mQpo8wUoc0wk/3TDOmoRbtPPlaLD0I9vcSgeDx3zbTMwO5XDLTEoekR+iPGAUU6nC6wiV6RHBoWAXSuMmTiyKA==}
     cpu: [arm64]
     os: [linux]
 
-  '@fallow-cli/linux-x64-gnu@3.35.0':
-    resolution: {integrity: sha512-oUm4F8IvlP26IxLbIi51D40ewOr+4skkJXcU3XzjTOTEffLOXtrqbgCpdy8JLYqgIUAtFWeMzEbw4EU+rKA59Q==}
+  '@fallow-cli/linux-x64-gnu@3.36.0':
+    resolution: {integrity: sha512-wT47AXN4lYx0JYzHT3ItgGh0tOIECj/Yz6U0Ce0AyPRaVmVHAxDp/FYbozCNS3g7ZxUd9DLl5WjIp1BC2Mb6+Q==}
     cpu: [x64]
     os: [linux]
 
-  '@fallow-cli/linux-x64-musl@3.35.0':
-    resolution: {integrity: sha512-6oyAyp2QbICW/xhCxSxvyfCWJDoVKGmPblFsfCb/h+11VSI/D1HyP8C8kWGS/rkMDgmJUlrUC8L0MVnfphbRLA==}
+  '@fallow-cli/linux-x64-musl@3.36.0':
+    resolution: {integrity: sha512-SXwNiJ7zabpyJ2dCMHLcNukpNlSPBhxvZbS9HoIEhGJLp1wdHHZjSTEjKAoW2pJEniDheZ6TTUwDPb2AnnJYeA==}
     cpu: [x64]
     os: [linux]
 
-  '@fallow-cli/win32-arm64-msvc@3.35.0':
-    resolution: {integrity: sha512-ZMI/4/jn2GVtc9bF+ltvRmz2n53tP0eU59uKQrAfLWd92bEUKNEtuQgqHyuc/mmZKpouXsl+pWvN7UWRwGc9MA==}
+  '@fallow-cli/win32-arm64-msvc@3.36.0':
+    resolution: {integrity: sha512-IY+yqek3X7y3j+pS0Vp3s3MOJqDi6DRpmNaHYKeiUQUYVLijAnjAeSA0J+mVhHH8Rf6hP54qr2Z5hNDF1ohzkA==}
     cpu: [arm64]
     os: [win32]
 
-  '@fallow-cli/win32-x64-msvc@3.35.0':
-    resolution: {integrity: sha512-oFK9jkBtg/b2+WiL3FBWHRDdDGcfIkPm9hVMTpDWr4OZ2vRCJUXOkGoOTc5N9j4RY9zleY5408TncJC4/xOe0w==}
+  '@fallow-cli/win32-x64-msvc@3.36.0':
+    resolution: {integrity: sha512-jT1ikT8+rOhmZcrq+yMIo/ngeAhEuKEtZhFs2/xkHQgchh5/M5HDvD3rHXI01pSkqLtZovSfjU0BLmtsYrXcsg==}
     cpu: [x64]
     os: [win32]
 
@@ -2034,8 +2018,8 @@ packages:
   '@maplibre/mlt@1.3.0':
     resolution: {integrity: sha512-7M2O7ABM80Oi8XPkfkrjKB8mOBIxGoVgkA52Mu4RMWoBvvMdagQ522+WxVYujZsMpqIr3BpzrTbXrm4k8lCzCQ==}
 
-  '@maplibre/vt-pbf@4.3.2':
-    resolution: {integrity: sha512-j6p0AdjvAR19Z3XaCysle7A4ZSo08tYOzxD0Y9NQylwPAkwJJeYub5b2eVucdeDh7erhv69DahoLOevDRERRUw==}
+  '@maplibre/vt-pbf@4.3.3':
+    resolution: {integrity: sha512-dEe5XUd64RQbxNxy2OzIkJnwNDWjVmSXjCd0A7zLirm7QJ/WWbmtDFIkfsiM4yt1cplqzG6oSivRYeWx1SM1yg==}
 
   '@mdx-js/mdx@3.1.1':
     resolution: {integrity: sha512-f6ZO2ifpwAQIpzGWaBQT2TXxPv6z3RBzQKpVftEWN78Vl/YweF1uwussDx8ECAXVtr3Rs89fKyG9YlzUs9DyGQ==}
@@ -3252,8 +3236,8 @@ packages:
     peerDependencies:
       astro: ^6.0.0 || ^7.0.0
 
-  '@xsynaptic/astro-image-loader@1.3.0':
-    resolution: {integrity: sha512-tmUNbQHCJfP1XknyEaEU/ACDXiY/KQUoA4glG+gj6FTNI8+yJLVgl8LsM0TUGBxdjh6vScW/Bt2Lclx3KNXLlg==}
+  '@xsynaptic/astro-image-loader@1.4.0':
+    resolution: {integrity: sha512-L9SA1A2/8MYeSZWVwLw+xgoUCIfcxth7WVTGkbhkrWgQ+zI7vpjpA+pL6FbDPVAIlfYwGmlD9a8Qat7zO8FdzQ==}
     peerDependencies:
       astro: ^6.0.0 || ^7.0.0
       exiftool-vendored: ^36.0.0 || ^37.0.0 || ^38.0.0 || ^39.0.0
@@ -3265,8 +3249,15 @@ packages:
       sharp:
         optional: true
 
-  '@xsynaptic/astro-scripts@0.2.0':
-    resolution: {integrity: sha512-CBwmkwBLlKxsKZ1b52WXUI8ePFslM/hM9SN7bfUMBqa04HthbdSrGays0avGfmD9NvUQLpLBr4xldvG9eTnA1g==}
+  '@xsynaptic/astro-image-pipeline@0.1.0':
+    resolution: {integrity: sha512-dwGaPj7B3CL6UAfCngTMLQOiOLoyfBlO198NeqCtF27d3BfeZtFGLEpzkK99sme+b8Mo5Q3KIH71fsEEC06+hg==}
+    engines: {node: '>=24.0.0'}
+    peerDependencies:
+      astro: ^7.4.2
+      sharp: ^0.35
+
+  '@xsynaptic/astro-scripts@0.2.1':
+    resolution: {integrity: sha512-Q4p59OsOcSWzak8e5wFZbRGILyrhszDvIh4KBO/2jLfrL/v9f4YLXj420TxTFoJ1nshM7PLlzPOT3FBdnEHIEw==}
     peerDependencies:
       astro: ^7.0.0
       vite: ^8.0.0
@@ -4198,8 +4189,8 @@ packages:
   extend@3.0.2:
     resolution: {integrity: sha512-fjquC59cD7CyW6urNXK0FBufkZcoiGG80wTuPujX590cB5Ttln20E2UB4S/WARVqhXffZl2LNgS+gQdPIIim/g==}
 
-  fallow@3.35.0:
-    resolution: {integrity: sha512-LrP5DXpnsHyRMAv68eMV4BMmxfKCw60mYUMhsUZh3PafJtT+2JKNWfpQ0vJ0FrxBjIsTMUVXqFA+ytCQjLXN3Q==}
+  fallow@3.36.0:
+    resolution: {integrity: sha512-oqMmHAoZlbgVAdOHFgw771TTG5xs1r+TO+Fy/Qx4Rez11ShzgUbzhtOMm8T1HCMKs2W00kV2+IKi8UzQ028Mvw==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -5174,8 +5165,8 @@ packages:
   magicast@0.5.5:
     resolution: {integrity: sha512-UicdXN8zQ3JHlxVq+28afMXPr1z7WNY6+7EJnzTdQWkTAlMLF5fNCCKxJHBQwGaNGR11581EiQmQzx73+MvszA==}
 
-  maplibre-gl@6.15.0:
-    resolution: {integrity: sha512-kxFetbvUHDOVaAP1CYb226Mdk2QhzIPddqM0xJTFD35wu78Mpd6NM7+H68ALjc6Oa0kAOX5EAdMKyvD2u3qfcg==}
+  maplibre-gl@6.16.0:
+    resolution: {integrity: sha512-gApO66EMtoDZuio680RUBvskR7ahFd/NNhLN4tBAs+Y7FeT4gQV8zVFgYVMRmFxQznOEzecW19w6xOd9XjZjiA==}
     engines: {node: '>=16.14.0', npm: '>=8.1.0'}
 
   markdown-extensions@2.0.0:
@@ -6133,8 +6124,8 @@ packages:
   remark-stringify@11.0.0:
     resolution: {integrity: sha512-1OSmLd3awB/t8qdoEOMazZkNsfVTeY4fTsgzcQFdXNq8ToTN4ZGwrMnlda4K6smTFKD+GRV6O48i6Z4iKgPPpw==}
 
-  remeda@2.53.0:
-    resolution: {integrity: sha512-1jeHr8AUMB3r089AOmaiHBPAcGTep27JCbMt8MeXXXquDkO3h2N4CtuK++4Oas8mulCUiOUDeZqN+ssrcatKlw==}
+  remeda@2.54.1:
+    resolution: {integrity: sha512-l3pxw2Hz5V2FG3RaU9C6z121H8dF5VYjj3z6lnHoN3SCRLoxr+pZS2dq8dDe3NA+9kyKm56A1BB2Ejr+DrLlJw==}
     engines: {node: '>=18.0.0'}
 
   request-light@0.5.8:
@@ -8250,28 +8241,28 @@ snapshots:
       '@eslint/core': 1.2.1
       levn: 0.4.1
 
-  '@fallow-cli/darwin-arm64@3.35.0':
+  '@fallow-cli/darwin-arm64@3.36.0':
     optional: true
 
-  '@fallow-cli/darwin-x64@3.35.0':
+  '@fallow-cli/darwin-x64@3.36.0':
     optional: true
 
-  '@fallow-cli/linux-arm64-gnu@3.35.0':
+  '@fallow-cli/linux-arm64-gnu@3.36.0':
     optional: true
 
-  '@fallow-cli/linux-arm64-musl@3.35.0':
+  '@fallow-cli/linux-arm64-musl@3.36.0':
     optional: true
 
-  '@fallow-cli/linux-x64-gnu@3.35.0':
+  '@fallow-cli/linux-x64-gnu@3.36.0':
     optional: true
 
-  '@fallow-cli/linux-x64-musl@3.35.0':
+  '@fallow-cli/linux-x64-musl@3.36.0':
     optional: true
 
-  '@fallow-cli/win32-arm64-msvc@3.35.0':
+  '@fallow-cli/win32-arm64-msvc@3.36.0':
     optional: true
 
-  '@fallow-cli/win32-x64-msvc@3.35.0':
+  '@fallow-cli/win32-x64-msvc@3.36.0':
     optional: true
 
   '@fontsource/lora@5.3.0': {}
@@ -8622,7 +8613,7 @@ snapshots:
     dependencies:
       '@mapbox/point-geometry': 1.1.0
 
-  '@maplibre/vt-pbf@4.3.2':
+  '@maplibre/vt-pbf@4.3.3':
     dependencies:
       '@mapbox/point-geometry': 1.1.0
       '@types/geojson': 7946.0.16
@@ -9669,13 +9660,13 @@ snapshots:
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
 
-  '@vis.gl/react-maplibre@8.1.3(maplibre-gl@6.15.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
+  '@vis.gl/react-maplibre@8.1.3(maplibre-gl@6.16.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
     dependencies:
       '@maplibre/maplibre-gl-style-spec': 19.3.3
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
     optionalDependencies:
-      maplibre-gl: 6.15.0
+      maplibre-gl: 6.16.0
 
   '@vitejs/plugin-react@6.1.2(vite@8.3.5(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))':
     dependencies:
@@ -9784,7 +9775,7 @@ snapshots:
       astro: 7.4.2(@astrojs/markdown-remark@7.3.1(supports-color@10.2.2))(@types/node@25.9.2)(esbuild@0.28.0)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0)
       zod: 4.6.7
 
-  '@xsynaptic/astro-image-loader@1.3.0(astro@7.4.2(@astrojs/markdown-remark@7.3.1(supports-color@10.2.2))(@types/node@25.9.2)(esbuild@0.28.0)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(exiftool-vendored@39.0.1)(sharp@0.35.5(@types/node@25.9.2))(zod@4.6.7)':
+  '@xsynaptic/astro-image-loader@1.4.0(astro@7.4.2(@astrojs/markdown-remark@7.3.1(supports-color@10.2.2))(@types/node@25.9.2)(esbuild@0.28.0)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(exiftool-vendored@39.0.1)(sharp@0.35.5(@types/node@25.9.2))(zod@4.6.7)':
     dependencies:
       astro: 7.4.2(@astrojs/markdown-remark@7.3.1(supports-color@10.2.2))(@types/node@25.9.2)(esbuild@0.28.0)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0)
       p-limit: 7.3.3
@@ -9795,7 +9786,19 @@ snapshots:
       exiftool-vendored: 39.0.1
       sharp: 0.35.5(@types/node@25.9.2)
 
-  '@xsynaptic/astro-scripts@0.2.0(astro@7.4.2(@astrojs/markdown-remark@7.3.1(supports-color@10.2.2))(@types/node@25.9.2)(esbuild@0.28.0)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vite@8.3.5(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))':
+  '@xsynaptic/astro-image-pipeline@0.1.0(astro@7.4.2(@astrojs/markdown-remark@7.3.1(supports-color@10.2.2))(@types/node@25.9.2)(esbuild@0.28.0)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(sharp@0.35.5(@types/node@25.9.2))':
+    dependencies:
+      astro: 7.4.2(@astrojs/markdown-remark@7.3.1(supports-color@10.2.2))(@types/node@25.9.2)(esbuild@0.28.0)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0)
+      p-limit: 7.3.3
+      sharp: 0.35.5(@types/node@25.9.2)
+
+  '@xsynaptic/astro-image-pipeline@0.1.0(astro@7.4.2(@astrojs/markdown-remark@7.3.1(supports-color@10.2.2))(@types/node@25.9.2)(esbuild@0.28.0)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(sharp@0.35.5(@types/node@25.9.2))':
+    dependencies:
+      astro: 7.4.2(@astrojs/markdown-remark@7.3.1(supports-color@10.2.2))(@types/node@25.9.2)(esbuild@0.28.0)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)
+      p-limit: 7.3.3
+      sharp: 0.35.5(@types/node@25.9.2)
+
+  '@xsynaptic/astro-scripts@0.2.1(astro@7.4.2(@astrojs/markdown-remark@7.3.1(supports-color@10.2.2))(@types/node@25.9.2)(esbuild@0.28.0)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))(vite@8.3.5(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))':
     dependencies:
       chalk: 6.0.1
       ora: 9.4.1
@@ -10106,6 +10109,96 @@ snapshots:
       unstorage: 1.17.5(idb-keyval@6.3.0)
       verkit: 0.5.0
       vite: 8.3.5(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0)
+      vitefu: 1.1.3(vite@8.3.5(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))
+      xxhash-wasm: 1.1.0
+      yargs-parser: 22.0.0
+      zod: 4.6.7
+    optionalDependencies:
+      '@astrojs/markdown-remark': 7.3.1(supports-color@10.2.2)
+      sharp: 0.35.5(@types/node@25.9.2)
+    transitivePeerDependencies:
+      - '@azure/app-configuration'
+      - '@azure/cosmos'
+      - '@azure/data-tables'
+      - '@azure/identity'
+      - '@azure/keyvault-secrets'
+      - '@azure/storage-blob'
+      - '@capacitor/preferences'
+      - '@deno/kv'
+      - '@netlify/blobs'
+      - '@planetscale/database'
+      - '@types/node'
+      - '@upstash/redis'
+      - '@vercel/blob'
+      - '@vercel/functions'
+      - '@vercel/kv'
+      - '@vitejs/devtools'
+      - aws4fetch
+      - db0
+      - esbuild
+      - idb-keyval
+      - ioredis
+      - jiti
+      - less
+      - sass
+      - sass-embedded
+      - stylus
+      - sugarss
+      - terser
+      - tsx
+      - uploadthing
+      - yaml
+
+  astro@7.4.2(@astrojs/markdown-remark@7.3.1(supports-color@10.2.2))(@types/node@25.9.2)(esbuild@0.28.0)(idb-keyval@6.3.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1):
+    dependencies:
+      '@astrojs/compiler-rs': 0.5.1
+      '@astrojs/internal-helpers': 0.13.0
+      '@astrojs/markdown-satteri': 0.4.5
+      '@astrojs/telemetry': 3.4.1
+      '@capsizecss/unpack': 4.0.1
+      '@clack/prompts': 1.8.1
+      '@oslojs/encoding': 1.1.0
+      am-i-vibing: 0.5.0
+      aria-query: 5.3.2
+      axobject-query: 4.1.0
+      ci-info: 4.4.0
+      clsx: 2.1.1
+      common-ancestor-path: 2.0.0
+      cookie: 2.0.1
+      devalue: 6.0.3
+      diff: 9.0.0
+      dset: 3.1.4
+      es-module-lexer: 3.0.3
+      flattie: 1.1.1
+      fontace: 0.4.1
+      get-tsconfig: 5.0.0-beta.6
+      github-slugger: 2.0.0
+      html-escaper: 3.0.3
+      http-cache-semantics: 4.3.0
+      jsonc-parser: 3.3.1
+      magic-string: 1.4.3
+      magicast: 0.5.5
+      mrmime: 2.0.1
+      neotraverse: 1.0.1
+      obug: 3.0.0
+      p-limit: 7.3.3
+      p-queue: 9.3.5
+      package-manager-detector: 1.9.0
+      piccolore: 0.1.3
+      picomatch: 4.0.7
+      rolldown: 1.2.13
+      shiki: 4.5.0
+      smol-toml: 1.9.1
+      svgo: 4.1.0
+      tinyclip: 1.0.3
+      tinyexec: 1.3.1
+      tinyglobby: 0.2.17
+      tinyps: 0.5.0
+      ultrahtml: 1.7.0
+      unifont: 1.0.3
+      unstorage: 1.17.5(idb-keyval@6.3.0)
+      verkit: 0.5.0
+      vite: 8.3.5(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)
       vitefu: 1.1.3(vite@8.3.5(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))
       xxhash-wasm: 1.1.0
       yargs-parser: 22.0.0
@@ -10993,18 +11086,18 @@ snapshots:
 
   extend@3.0.2: {}
 
-  fallow@3.35.0:
+  fallow@3.36.0:
     dependencies:
       detect-libc: 2.1.2
     optionalDependencies:
-      '@fallow-cli/darwin-arm64': 3.35.0
-      '@fallow-cli/darwin-x64': 3.35.0
-      '@fallow-cli/linux-arm64-gnu': 3.35.0
-      '@fallow-cli/linux-arm64-musl': 3.35.0
-      '@fallow-cli/linux-x64-gnu': 3.35.0
-      '@fallow-cli/linux-x64-musl': 3.35.0
-      '@fallow-cli/win32-arm64-msvc': 3.35.0
-      '@fallow-cli/win32-x64-msvc': 3.35.0
+      '@fallow-cli/darwin-arm64': 3.36.0
+      '@fallow-cli/darwin-x64': 3.36.0
+      '@fallow-cli/linux-arm64-gnu': 3.36.0
+      '@fallow-cli/linux-arm64-musl': 3.36.0
+      '@fallow-cli/linux-x64-gnu': 3.36.0
+      '@fallow-cli/linux-x64-musl': 3.36.0
+      '@fallow-cli/win32-arm64-msvc': 3.36.0
+      '@fallow-cli/win32-x64-msvc': 3.36.0
 
   fast-deep-equal@3.1.3: {}
 
@@ -11984,7 +12077,7 @@ snapshots:
       '@babel/types': 7.29.7
       source-map-js: 1.2.2
 
-  maplibre-gl@6.15.0:
+  maplibre-gl@6.16.0:
     dependencies:
       '@mapbox/point-geometry': 1.1.0
       '@mapbox/tiny-sdf': 2.3.0
@@ -11993,7 +12086,7 @@ snapshots:
       '@maplibre/geojson-vt': 6.3.0
       '@maplibre/maplibre-gl-style-spec': 26.4.4
       '@maplibre/mlt': 1.3.0
-      '@maplibre/vt-pbf': 4.3.2
+      '@maplibre/vt-pbf': 4.3.3
       '@types/geojson': 7946.0.16
       bidi-js: 1.1.0
       earcut: 3.2.4
@@ -13051,14 +13144,14 @@ snapshots:
       react: 19.3.1
       scheduler: 0.28.0
 
-  react-map-gl@8.1.3(maplibre-gl@6.15.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1):
+  react-map-gl@8.1.3(maplibre-gl@6.16.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1):
     dependencies:
       '@vis.gl/react-mapbox': 8.1.3(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
-      '@vis.gl/react-maplibre': 8.1.3(maplibre-gl@6.15.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      '@vis.gl/react-maplibre': 8.1.3(maplibre-gl@6.16.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
     optionalDependencies:
-      maplibre-gl: 6.15.0
+      maplibre-gl: 6.16.0
 
   react@19.3.1: {}
 
@@ -13516,7 +13609,7 @@ snapshots:
       mdast-util-to-markdown: 2.1.2
       unified: 11.0.5
 
-  remeda@2.53.0: {}
+  remeda@2.54.1: {}
 
   request-light@0.5.8: {}
 
@@ -14502,6 +14595,21 @@ snapshots:
       jiti: 2.7.0
       tsx: 4.23.15
       yaml: 2.9.0
+
+  vite@8.3.5(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1):
+    dependencies:
+      lightningcss: 1.33.0
+      picomatch: 4.0.7
+      postcss: 8.5.31
+      rolldown: 1.2.15
+      tinyglobby: 0.2.17
+    optionalDependencies:
+      '@types/node': 25.9.2
+      esbuild: 0.28.0
+      fsevents: 2.3.3
+      jiti: 2.7.0
+      tsx: 4.23.15
+      yaml: 2.9.1
 
   vitefu@1.1.3(vite@8.3.5(@types/node@25.9.2)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0)):
     optionalDependencies:

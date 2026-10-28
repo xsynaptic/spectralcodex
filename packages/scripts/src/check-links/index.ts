@@ -26,7 +26,7 @@ import {
 import { extractLinksFromEntry } from '#check-links/extract.ts';
 import { printList, printSessionSummary, printStatus } from '#check-links/report.ts';
 import { UrlStatusEnum } from '#check-links/types.ts';
-import { defineCommand, runCommand } from '#shared/command.ts';
+import { runCommand } from '#shared/command.ts';
 
 const statusLabels: Record<UrlStatus, string> = {
 	[UrlStatusEnum.Blocked]: chalk.cyan('Blocked'),
@@ -176,83 +176,81 @@ async function checkUrls(
 	signal.throwIfAborted();
 }
 
-await runCommand(
-	defineCommand({
-		interrupted: 'finished checks are recorded',
-		name: 'check-links',
-		options: {
-			concurrency: { default: '10', description: 'Requests in flight at once', type: 'string' },
-			'domain-limit': {
-				default: '2',
-				description: 'Requests in flight per domain',
-				type: 'string',
-			},
-			ignore: {
-				description: 'Skip URLs containing this text; repeatable',
-				multiple: true,
-				type: 'string',
-			},
-			list: {
-				description: 'Print stored issues, optionally only these comma-separated statuses',
-				type: 'string',
-			},
-			'max-missing': {
-				default: '3',
-				description: 'Stop rechecking a failing URL after this many checks',
-				type: 'string',
-			},
-			recheck: {
-				description:
-					'Recheck URLs with these comma-separated statuses (empty for pending and issues)',
-				type: 'string',
-			},
-			'recheck-all': { default: false, description: 'Recheck every URL', type: 'boolean' },
-			status: { default: false, description: 'Print stored totals and exit', type: 'boolean' },
+await runCommand({
+	interrupted: 'finished checks are recorded',
+	name: 'check-links',
+	options: {
+		concurrency: { default: '10', description: 'Requests in flight at once', type: 'string' },
+		'domain-limit': {
+			default: '2',
+			description: 'Requests in flight per domain',
+			type: 'string',
 		},
-		async run({ paths, signal, values }) {
-			openDatabase(getCachePaths(paths.cachePath).checkLinksPath);
+		ignore: {
+			description: 'Skip URLs containing this text; repeatable',
+			multiple: true,
+			type: 'string',
+		},
+		list: {
+			description: 'Print stored issues, optionally only these comma-separated statuses',
+			type: 'string',
+		},
+		'max-missing': {
+			default: '3',
+			description: 'Stop rechecking a failing URL after this many checks',
+			type: 'string',
+		},
+		recheck: {
+			description:
+				'Recheck URLs with these comma-separated statuses (empty for pending and issues)',
+			type: 'string',
+		},
+		'recheck-all': { default: false, description: 'Recheck every URL', type: 'boolean' },
+		status: { default: false, description: 'Print stored totals and exit', type: 'boolean' },
+	},
+	async run({ paths, signal, values }) {
+		openDatabase(getCachePaths(paths.cachePath).checkLinksPath);
 
-			try {
-				if (values.status) {
-					printStatus();
-					return;
-				}
-
-				if (values.list !== undefined) {
-					printStatus();
-					printList(values.list === '' ? undefined : values.list);
-					return;
-				}
-
-				await syncLinks([...defaultIgnorePatterns, ...(values.ignore ?? [])]);
-
-				const recheckFilter =
-					values.recheck && values.recheck !== ''
-						? { recheckStatuses: values.recheck.split(',') as Array<UrlStatus> }
-						: {};
-
-				const urlsToCheck = getUrlsToCheck({
-					recheck: values.recheck !== undefined,
-					...recheckFilter,
-					maxMissing: parseNumberOption(values['max-missing'], 'max-missing'),
-					recheckAll: values['recheck-all'],
-				});
-
-				if (urlsToCheck.length === 0) {
-					log.success('No URLs to check');
-					return;
-				}
-
-				await checkUrls(urlsToCheck, {
-					concurrency: parseNumberOption(values.concurrency, 'concurrency'),
-					domainLimit: parseNumberOption(values['domain-limit'], 'domain-limit'),
-					signal,
-				});
-			} finally {
-				closeDatabase();
+		try {
+			if (values.status) {
+				printStatus();
+				return;
 			}
-		},
-		summary: 'Check external links in content and track their status in a local database',
-		title: 'Check links',
-	}),
-);
+
+			if (values.list !== undefined) {
+				printStatus();
+				printList(values.list === '' ? undefined : values.list);
+				return;
+			}
+
+			await syncLinks([...defaultIgnorePatterns, ...(values.ignore ?? [])]);
+
+			const recheckFilter =
+				values.recheck && values.recheck !== ''
+					? { recheckStatuses: values.recheck.split(',') as Array<UrlStatus> }
+					: {};
+
+			const urlsToCheck = getUrlsToCheck({
+				recheck: values.recheck !== undefined,
+				...recheckFilter,
+				maxMissing: parseNumberOption(values['max-missing'], 'max-missing'),
+				recheckAll: values['recheck-all'],
+			});
+
+			if (urlsToCheck.length === 0) {
+				log.success('No URLs to check');
+				return;
+			}
+
+			await checkUrls(urlsToCheck, {
+				concurrency: parseNumberOption(values.concurrency, 'concurrency'),
+				domainLimit: parseNumberOption(values['domain-limit'], 'domain-limit'),
+				signal,
+			});
+		} finally {
+			closeDatabase();
+		}
+	},
+	summary: 'Check external links in content and track their status in a local database',
+	title: 'Check links',
+});

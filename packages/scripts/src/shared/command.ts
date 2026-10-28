@@ -7,17 +7,15 @@ export interface ScriptPaths {
 	contentDataPath: string;
 	distPath: string;
 	mediaPath: string;
-	rootPath: string;
 }
 
 function resolveScriptPaths(rootPath: string): ScriptPaths {
 	return {
 		...resolveContentPaths(rootPath, process.env),
 		distPath: path.join(rootPath, 'dist'),
-		rootPath,
 	};
 }
 
-export const { defineCommand, runCommand } = createCommandRunner({
+export const { runCommand } = createCommandRunner({
 	context: ({ rootPath }) => ({ paths: resolveScriptPaths(rootPath) }),
 });

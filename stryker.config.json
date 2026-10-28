@@ -8,7 +8,6 @@
 	"mutate": [
 		"src/**/*.ts",
 		"src/**/*.tsx",
-		"packages/astro-image-pipeline/src/**/*.ts",
 		"packages/map-codec/src/**/*.ts",
 		"packages/react-map-component/src/**/*.ts",
 		"packages/react-map-component/src/**/*.tsx",
@@ -28,7 +27,6 @@
 		"!tsconfig.json",
 		"!vitest.config.ts",
 		"!src/**",
-		"!packages/astro-image-pipeline/**",
 		"!packages/map-codec/**",
 		"!packages/react-map-component/**",
 		"!packages/scripts/**",

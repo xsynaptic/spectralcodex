@@ -28,7 +28,7 @@ export async function invokeCacheRefresh(options: InvokeCacheRefreshOptions): Pr
 			const result = await sshCaptureUnchecked(config, command);
 
 			if (result.exitCode !== 0) {
-				throw new UserError(`Cache refresh failed to launch\n${result.stderr.trim()}`);
+				throw new UserError('Cache refresh failed to launch', { detail: result.stderr.trim() });
 			}
 		},
 		() => 'Cache refresh launched',

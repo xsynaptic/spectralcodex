@@ -7,7 +7,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import sanitizeHtml from 'sanitize-html';
 
-import { defineCommand, runCommand } from '#shared/command.ts';
+import { runCommand } from '#shared/command.ts';
 import { isExistingFile, safelyCreateDirectory } from '#shared/files.ts';
 
 const apiUrl = 'https://webmention.io/api/mentions.jf2';
@@ -158,73 +158,71 @@ async function fetchNewMentions(context: FetchContext, sinceId: number | undefin
 	return { invalidCount, mentions, privateCount };
 }
 
-await runCommand(
-	defineCommand({
-		name: 'webmentions',
-		async run({ paths, signal }) {
-			const credentials = loadCredentials();
+await runCommand({
+	name: 'webmentions',
+	async run({ paths, signal }) {
+		const credentials = loadCredentials();
 
-			if (!credentials) return;
+		if (!credentials) return;
 
-			const outputPath = getWebmentionsPath(paths.contentDataPath);
-			const outputDirectory = path.dirname(outputPath);
+		const outputPath = getWebmentionsPath(paths.contentDataPath);
+		const outputDirectory = path.dirname(outputPath);
 
-			const existingMentions = await readExistingMentions(outputPath);
-			const sinceId = getMaxMentionId(existingMentions);
+		const existingMentions = await readExistingMentions(outputPath);
+		const sinceId = getMaxMentionId(existingMentions);
 
-			const fetched = await withSpinner(
-				sinceId === undefined
-					? `Fetching all webmentions for ${credentials.domain}`
-					: `Fetching webmentions for ${credentials.domain} since ${String(sinceId)}`,
-				() => fetchNewMentions({ ...credentials, signal }, sinceId),
+		const fetched = await withSpinner(
+			sinceId === undefined
+				? `Fetching all webmentions for ${credentials.domain}`
+				: `Fetching webmentions for ${credentials.domain} since ${String(sinceId)}`,
+			() => fetchNewMentions({ ...credentials, signal }, sinceId),
+		);
+
+		const mergedMentions = new Map(existingMentions);
+
+		for (const mention of fetched.mentions) mergedMentions.set(mention['wm-id'], mention);
+
+		const sortedMentions = [...mergedMentions.values()].toSorted(
+			(mentionA, mentionB) => mentionA['wm-id'] - mentionB['wm-id'],
+		);
+
+		safelyCreateDirectory(outputDirectory);
+
+		await writeFile(
+			outputPath,
+			sortedMentions.map((mention) => JSON.stringify(mention)).join('\n') + '\n',
+		);
+
+		const propertyCounts = new Map<string, number>();
+		const targets = new Set<string>();
+
+		for (const mention of sortedMentions) {
+			propertyCounts.set(
+				mention['wm-property'],
+				(propertyCounts.get(mention['wm-property']) ?? 0) + 1,
 			);
+			targets.add(mention['wm-target']);
+		}
 
-			const mergedMentions = new Map(existingMentions);
+		log.success(`Wrote ${formatCount(sortedMentions.length)} webmentions → ${outputPath}`);
 
-			for (const mention of fetched.mentions) mergedMentions.set(mention['wm-id'], mention);
+		const sortedCounts = [...propertyCounts].toSorted(([propertyA], [propertyB]) =>
+			propertyA.localeCompare(propertyB),
+		);
 
-			const sortedMentions = [...mergedMentions.values()].toSorted(
-				(mentionA, mentionB) => mentionA['wm-id'] - mentionB['wm-id'],
-			);
+		log.summary([
+			['New this run', fetched.mentions.length],
+			['Targets', targets.size],
+			...sortedCounts,
+			...(fetched.privateCount > 0
+				? [['Private, dropped', fetched.privateCount] satisfies [string, number]]
+				: []),
+		]);
 
-			safelyCreateDirectory(outputDirectory);
-
-			await writeFile(
-				outputPath,
-				sortedMentions.map((mention) => JSON.stringify(mention)).join('\n') + '\n',
-			);
-
-			const propertyCounts = new Map<string, number>();
-			const targets = new Set<string>();
-
-			for (const mention of sortedMentions) {
-				propertyCounts.set(
-					mention['wm-property'],
-					(propertyCounts.get(mention['wm-property']) ?? 0) + 1,
-				);
-				targets.add(mention['wm-target']);
-			}
-
-			log.success(`Wrote ${formatCount(sortedMentions.length)} webmentions → ${outputPath}`);
-
-			const sortedCounts = [...propertyCounts].toSorted(([propertyA], [propertyB]) =>
-				propertyA.localeCompare(propertyB),
-			);
-
-			log.summary([
-				['New this run', fetched.mentions.length],
-				['Targets', targets.size],
-				...sortedCounts,
-				...(fetched.privateCount > 0
-					? [['Private, dropped', fetched.privateCount] satisfies [string, number]]
-					: []),
-			]);
-
-			if (fetched.invalidCount > 0) {
-				log.warn(`${formatCount(fetched.invalidCount)} unrecognized webmentions skipped`);
-			}
-		},
-		summary: 'Fetch new webmentions from webmention.io into the content data directory',
-		title: 'Webmentions',
-	}),
-);
+		if (fetched.invalidCount > 0) {
+			log.warn(`${formatCount(fetched.invalidCount)} unrecognized webmentions skipped`);
+		}
+	},
+	summary: 'Fetch new webmentions from webmention.io into the content data directory',
+	title: 'Webmentions',
+});

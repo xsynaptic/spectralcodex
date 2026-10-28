@@ -7,7 +7,7 @@ import {
 	withSpinner,
 } from '@xsynaptic/astro-scripts';
 
-import { defineCommand, runCommand } from '#shared/command.ts';
+import { runCommand } from '#shared/command.ts';
 import { getEntryImageIds, listMediaImages } from '#shared/image-references.ts';
 
 // OG image fallbacks are referenced indirectly; seed them so they aren't flagged
@@ -37,32 +37,30 @@ function loadEntries() {
 	);
 }
 
-await runCommand(
-	defineCommand({
-		name: 'media-orphans',
-		options: {
-			ignore: {
-				description: 'Skip media paths starting with this prefix; repeatable',
-				multiple: true,
-				type: 'string',
-			},
+await runCommand({
+	name: 'media-orphans',
+	options: {
+		ignore: {
+			description: 'Skip media paths starting with this prefix; repeatable',
+			multiple: true,
+			type: 'string',
 		},
-		async run({ paths, values }) {
-			const entries = await withSpinner('Loading content', loadEntries);
-			const mediaFiles = listMediaImages(paths.mediaPath, { ignore: values.ignore ?? [] });
-			const referencedImages = collectReferencedImages(entries);
+	},
+	async run({ paths, values }) {
+		const entries = await withSpinner('Loading content', loadEntries);
+		const mediaFiles = listMediaImages(paths.mediaPath, { ignore: values.ignore ?? [] });
+		const referencedImages = collectReferencedImages(entries);
 
-			const orphanedFiles = [...mediaFiles]
-				.filter((file) => !referencedImages.has(file))
-				.toSorted((fileA, fileB) => fileA.localeCompare(fileB));
+		const orphanedFiles = [...mediaFiles]
+			.filter((file) => !referencedImages.has(file))
+			.toSorted((fileA, fileB) => fileA.localeCompare(fileB));
 
-			for (const file of orphanedFiles) log.data(file);
+		for (const file of orphanedFiles) log.data(file);
 
-			log.info(
-				`${formatCount(orphanedFiles.length)} of ${formatCount(mediaFiles.size)} media files unreferenced`,
-			);
-		},
-		summary: 'List media files no entry references, one path per line on stdout',
-		title: 'Media orphans',
-	}),
-);
+		log.info(
+			`${formatCount(orphanedFiles.length)} of ${formatCount(mediaFiles.size)} media files unreferenced`,
+		);
+	},
+	summary: 'List media files no entry references, one path per line on stdout',
+	title: 'Media orphans',
+});

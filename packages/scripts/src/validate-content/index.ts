@@ -10,7 +10,7 @@ import {
 import type { ScriptPaths } from '#shared/command.ts';
 import type { ValidationResult } from '#validate-content/validation-result.ts';
 
-import { defineCommand, runCommand } from '#shared/command.ts';
+import { runCommand } from '#shared/command.ts';
 import { validateEntryIds } from '#validate-content/entry-ids.ts';
 import { validateFrontmatterLinks } from '#validate-content/frontmatter-links.ts';
 import { validateImageAspectRatios } from '#validate-content/image-aspect-ratios.ts';
@@ -49,7 +49,7 @@ async function loadEntries() {
 
 function getValidations(
 	{ allEntries, imageEntries }: Awaited<ReturnType<typeof loadEntries>>,
-	{ paths, threshold }: { paths: ScriptPaths; threshold: number },
+	{ paths, rootPath, threshold }: { paths: ScriptPaths; rootPath: string; threshold: number },
 ) {
 	function entriesFrom(...collections: Array<string>) {
 		return allEntries.filter((entry) => collections.includes(entry.collection));
@@ -66,8 +66,8 @@ function getValidations(
 			name: 'references',
 			run: () => validateReferences(allEntries, { skipCollections: ['images'] }),
 		},
-		{ name: 'mdx', run: () => validateMdxComponents(allEntries, paths.rootPath) },
-		{ name: 'link-ids', run: () => validateLinkIds(allEntries, metadataEntries, paths.rootPath) },
+		{ name: 'mdx', run: () => validateMdxComponents(allEntries, rootPath) },
+		{ name: 'link-ids', run: () => validateLinkIds(allEntries, metadataEntries, rootPath) },
 		{
 			name: 'series-items',
 			run: () => validateSeriesItems(entriesFrom('series'), metadataEntries),
@@ -117,52 +117,51 @@ function getValidations(
 	] satisfies Array<{ name: string; run: () => Promise<ValidationResult> | ValidationResult }>;
 }
 
-await runCommand(
-	defineCommand({
-		name: 'validate-content',
-		options: {
-			threshold: {
-				default: '10',
-				description: 'Distance in metres under which two Locations count as overlapping',
-				type: 'string',
-			},
+await runCommand({
+	name: 'validate-content',
+	options: {
+		threshold: {
+			default: '10',
+			description: 'Distance in metres under which two Locations count as overlapping',
+			type: 'string',
 		},
-		positional: { description: 'Run one check by name; omit to run all', name: 'check' },
-		async run({ paths, positionals, signal, values }) {
-			const [checkName] = positionals;
-			const entries = await withSpinner('Loading content', loadEntries);
-			const validations = getValidations(entries, {
-				paths,
-				threshold: parseNumberOption(values.threshold, 'threshold'),
-			});
-			const selected = checkName
-				? validations.filter((validation) => validation.name === checkName)
-				: validations;
+	},
+	positional: { description: 'Run one check by name; omit to run all', name: 'check' },
+	async run({ paths, positionals, rootPath, signal, values }) {
+		const [checkName] = positionals;
+		const entries = await withSpinner('Loading content', loadEntries);
+		const validations = getValidations(entries, {
+			paths,
+			rootPath,
+			threshold: parseNumberOption(values.threshold, 'threshold'),
+		});
+		const selected = checkName
+			? validations.filter((validation) => validation.name === checkName)
+			: validations;
 
-			if (checkName && selected.length === 0) {
-				const names = validations.map((validation) => validation.name).join(', ');
+		if (checkName && selected.length === 0) {
+			const names = validations.map((validation) => validation.name).join(', ');
 
-				throw new UserError(`Unknown check "${checkName}"; choose from ${names}`);
-			}
+			throw new UserError(`Unknown check "${checkName}"; choose from ${names}`);
+		}
 
-			let failureCount = 0;
+		let failureCount = 0;
 
-			for (const validation of selected) {
-				signal.throwIfAborted();
+		for (const validation of selected) {
+			signal.throwIfAborted();
 
-				const result = await validation.run();
+			const result = await validation.run();
 
-				reportValidationResult(result);
+			reportValidationResult(result);
 
-				if (result.status === 'fail') failureCount++;
-			}
+			if (result.status === 'fail') failureCount++;
+		}
 
-			// Subcommands are for inspection; only a full run gates deployment
-			if (!checkName && failureCount > 0) {
-				throw new UserError(`${String(failureCount)} of ${String(selected.length)} checks failed`);
-			}
-		},
-		summary: 'Check content references, images, Locations and Regions before a build',
-		title: 'Validate content',
-	}),
-);
+		// Subcommands are for inspection; only a full run gates deployment
+		if (!checkName && failureCount > 0) {
+			throw new UserError(`${String(failureCount)} of ${String(selected.length)} checks failed`);
+		}
+	},
+	summary: 'Check content references, images, Locations and Regions before a build',
+	title: 'Validate content',
+});
