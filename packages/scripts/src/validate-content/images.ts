@@ -1,17 +1,18 @@
 import type { ContentEntry, ValidationResult } from '@xsynaptic/astro-scripts';
 
 import { findStemCollisions } from '@xsynaptic/astro-image-pipeline/names';
+import { listImageSources } from '@xsynaptic/astro-image-pipeline/node';
 import { toValidationResult } from '@xsynaptic/astro-scripts';
 
-import { getEntryImageIds, listMediaImages } from '#shared/image-references.ts';
+import { getEntryImageIds } from '#shared/image-references.ts';
 
 interface MissingImageIssue {
 	imageId: string;
 	location: string;
 }
 
-export function validateImageReferences(entries: Array<ContentEntry>, mediaPath: string) {
-	const mediaFiles = listMediaImages(mediaPath);
+export async function validateImageReferences(entries: Array<ContentEntry>, mediaPath: string) {
+	const mediaFiles = await listImageSources(mediaPath);
 
 	if (mediaFiles.size === 0) {
 		return {

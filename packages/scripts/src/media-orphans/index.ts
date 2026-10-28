@@ -1,4 +1,5 @@
 import { fallbackImageIds } from '@spectralcodex/shared/open-graph-fallback';
+import { listImageSources } from '@xsynaptic/astro-image-pipeline/node';
 import {
 	formatCount,
 	getCollectionEntries,
@@ -8,7 +9,7 @@ import {
 } from '@xsynaptic/astro-scripts';
 
 import { runCommand } from '#shared/command.ts';
-import { getEntryImageIds, listMediaImages } from '#shared/image-references.ts';
+import { getEntryImageIds } from '#shared/image-references.ts';
 
 // OG image fallbacks are referenced indirectly; seed them so they aren't flagged
 function collectReferencedImages(entries: Awaited<ReturnType<typeof loadEntries>>) {
@@ -48,17 +49,20 @@ await runCommand({
 	},
 	async run({ paths, values }) {
 		const entries = await withSpinner('Loading content', loadEntries);
-		const mediaFiles = listMediaImages(paths.mediaPath, { ignore: values.ignore ?? [] });
+		const ignore = values.ignore ?? [];
+		const mediaFiles = [...(await listImageSources(paths.mediaPath))].filter((file) =>
+			ignore.every((prefix) => !file.startsWith(prefix)),
+		);
 		const referencedImages = collectReferencedImages(entries);
 
-		const orphanedFiles = [...mediaFiles]
+		const orphanedFiles = mediaFiles
 			.filter((file) => !referencedImages.has(file))
 			.toSorted((fileA, fileB) => fileA.localeCompare(fileB));
 
 		for (const file of orphanedFiles) log.data(file);
 
 		log.info(
-			`${formatCount(orphanedFiles.length)} of ${formatCount(mediaFiles.size)} media files unreferenced`,
+			`${formatCount(orphanedFiles.length)} of ${formatCount(mediaFiles.length)} media files unreferenced`,
 		);
 	},
 	summary: 'List media files no entry references, one path per line on stdout',

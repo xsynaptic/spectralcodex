@@ -1,5 +1,10 @@
+import { getPublicId } from '@spectralcodex/shared/entries';
 import { getCachePaths } from '@spectralcodex/shared/paths';
 import {
+	checkComponentProps,
+	checkComponentTargets,
+	checkEntryIds,
+	checkReferences,
 	getCollectionEntries,
 	parseNumberOption,
 	runValidations,
@@ -10,21 +15,17 @@ import {
 import type { ScriptPaths } from '#shared/command.ts';
 
 import { runCommand } from '#shared/command.ts';
-import { validateEntryIds } from '#validate-content/entry-ids.ts';
 import { validateFrontmatterLinks } from '#validate-content/frontmatter-links.ts';
 import { validateImageAspectRatios } from '#validate-content/image-aspect-ratios.ts';
 import { validateImageFeaturedInBody } from '#validate-content/image-featured-in-body.ts';
 import { validateImageFeaturedLinks } from '#validate-content/image-featured-links.ts';
 import { validateImageFeaturedMissing } from '#validate-content/image-featured-missing.ts';
 import { validateImageReferences } from '#validate-content/images.ts';
-import { validateLinkIds } from '#validate-content/link-ids.ts';
 import { validateLocationsCoordinates } from '#validate-content/locations-coordinates.ts';
 import { validateLocationsDuplicates } from '#validate-content/locations-duplicates.ts';
 import { validateLocationsOverlap } from '#validate-content/locations-overlap.ts';
 import { validateLocationsPointTitles } from '#validate-content/locations-point-titles.ts';
 import { validateLocationsRegions } from '#validate-content/locations-region.ts';
-import { validateMdxComponents } from '#validate-content/mdx.ts';
-import { validateReferences } from '#validate-content/references.ts';
 import { validateRegionsParents } from '#validate-content/regions-parent.ts';
 import { validateSeriesItems } from '#validate-content/series-items.ts';
 import { validateSourceIds } from '#validate-content/source-ids.ts';
@@ -80,14 +81,21 @@ function getChecks(
 	const locationEntries = entriesFrom('locations');
 
 	return {
-		'entry-ids': () => validateEntryIds(allEntries),
+		'entry-ids': () =>
+			checkEntryIds(allEntries, { getIds: (entry) => [entry.id, getPublicId(entry)] }),
 		'frontmatter-links': () => validateFrontmatterLinks(allEntries, resourceEntries),
 		'image-aspect-ratios': () => validateImageAspectRatios(imageEntries, { showStats: true }),
 		'image-featured-in-body': () => validateImageFeaturedInBody(bodyContentEntries),
 		'image-featured-links': () => validateImageFeaturedLinks(allEntries, metadataEntries),
 		'image-featured-missing': () => validateImageFeaturedMissing(bodyContentEntries),
 		images: () => validateImageReferences(allEntries, paths.mediaPath),
-		'link-ids': () => validateLinkIds(allEntries, metadataEntries, rootPath),
+		'link-ids': () =>
+			checkComponentTargets(allEntries, {
+				component: 'Link',
+				prop: 'id',
+				rootPath,
+				targets: metadataEntries.map((entry) => entry.id),
+			}),
 		'location-coordinates': () =>
 			validateLocationsCoordinates(
 				locationEntries,
@@ -98,8 +106,8 @@ function getChecks(
 		'location-overlap': () => validateLocationsOverlap(locationEntries, threshold),
 		'location-point-titles': () => validateLocationsPointTitles(locationEntries),
 		'location-regions': () => validateLocationsRegions(locationEntries),
-		mdx: () => validateMdxComponents(allEntries, rootPath),
-		references: () => validateReferences(allEntries, { skipCollections: ['images'] }),
+		mdx: () => checkComponentProps(allEntries, { required: { Img: 'src', Link: 'id' }, rootPath }),
+		references: () => checkReferences(allEntries, { skipCollections: ['images'] }),
 		'region-parents': () => validateRegionsParents(entriesFrom('regions')),
 		'series-items': () => validateSeriesItems(entriesFrom('series'), metadataEntries),
 		'source-ids': () => validateSourceIds(allEntries, resourceEntries),

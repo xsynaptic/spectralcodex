@@ -2,7 +2,7 @@ import { openGraphBasePath, openGraphImageFormat } from '@spectralcodex/shared/o
 import { getCachePaths } from '@spectralcodex/shared/paths';
 import { imageFormats } from '@xsynaptic/astro-image-pipeline/names';
 import { getImageCachePaths } from '@xsynaptic/astro-image-pipeline/node';
-import { formatDuration, log, UserError } from '@xsynaptic/astro-scripts';
+import { log, UserError, withStep } from '@xsynaptic/astro-scripts';
 import { readdir } from 'node:fs/promises';
 
 import type { DeployConfig } from '#deploy/deploy-config.ts';
@@ -108,17 +108,16 @@ export async function uploadRenderedSet(
 
 	if (dryRun) log.warn('Dry run');
 
-	const start = Date.now();
-
-	const summary = await rsyncTo(`${set.localPath}/`, `${config.remoteHost}:${set.remotePath}/`, {
-		...renderedUploadOptions,
-		config,
-		dryRun,
-		label: `Uploading ${set.label}`,
-	});
-
-	log.success(
-		`${set.title} uploaded · ${describeRsyncSummary(summary)} · ${formatDuration(Date.now() - start)}`,
+	await withStep(
+		`Uploading ${set.label}`,
+		() =>
+			rsyncTo(`${set.localPath}/`, `${config.remoteHost}:${set.remotePath}/`, {
+				...renderedUploadOptions,
+				config,
+				dryRun,
+				label: 'Transferring',
+			}),
+		(summary) => `${set.title} uploaded · ${describeRsyncSummary(summary)}`,
 	);
 
 	await purgeSet(set, dryRun);

@@ -1,10 +1,12 @@
 import {
 	openGraphBlurTreatment,
 	OpenGraphCardTitlesSchema,
+	openGraphImageHeight,
+	openGraphImageWidth,
 } from '@spectralcodex/shared/open-graph';
 import { getCachePaths } from '@spectralcodex/shared/paths';
 import {
-	getImageCachePaths,
+	hashTemplateVersion,
 	prepareOpenGraphCardRender,
 } from '@xsynaptic/astro-image-pipeline/node';
 import { createProgress, formatCount, log, UserError, withSpinner } from '@xsynaptic/astro-scripts';
@@ -14,8 +16,14 @@ import type { ScriptPaths } from '#shared/command.ts';
 
 import { loadOpenGraphFonts } from '#og-image/fonts.ts';
 import { createRenderer, processImage } from '#og-image/generate.ts';
-import { templateVersion } from '#og-image/template-version.ts';
 import { runCommand } from '#shared/command.ts';
+
+const templateVersion = hashTemplateVersion({
+	files: ['element.tsx', 'fonts.ts', 'generate.ts'].map((file) => new URL(file, import.meta.url)),
+	from: import.meta.url,
+	packages: ['takumi-js'],
+	parts: [openGraphImageWidth, openGraphImageHeight],
+});
 
 async function generateCards({
 	isClearCache,
@@ -27,12 +35,6 @@ async function generateCards({
 	signal: AbortSignal;
 }) {
 	const { imagesPath } = getCachePaths(paths.cachePath);
-	const { openGraphCardsPath: outputPath } = getImageCachePaths(imagesPath);
-
-	if (isClearCache) {
-		rmSync(outputPath, { force: true, recursive: true });
-		log.warn('Cleared OpenGraph cards');
-	}
 
 	const fonts = await withSpinner(
 		'Loading fonts',
@@ -54,6 +56,11 @@ async function generateCards({
 
 	if (render.total === 0) {
 		throw new UserError('The last build recorded no OpenGraph cards; check getOpenGraphCardPath');
+	}
+
+	if (isClearCache) {
+		rmSync(render.directory, { force: true, recursive: true });
+		log.warn('Cleared OpenGraph cards');
 	}
 
 	let latest = { fresh: 0, rendered: 0 };
@@ -88,7 +95,7 @@ async function generateCards({
 		['Written', counts.written],
 		['Errors', counts.failures.length],
 	]);
-	log.detail(`Output: ${outputPath}`);
+	log.detail(`Output: ${render.directory}`);
 
 	if (counts.failures.length > 0) {
 		throw new UserError(`${formatCount(counts.failures.length)} card(s) failed`);

@@ -1,6 +1,6 @@
 import type { ProcessOutput } from 'zx';
 
-import { createStatus, formatBytes, formatCount, log } from '@xsynaptic/astro-scripts';
+import { createStatus, formatBytes, formatCount, log, readChild } from '@xsynaptic/astro-scripts';
 import chalk from 'chalk';
 import { $ } from 'zx';
 
@@ -187,21 +187,18 @@ export async function rsyncTo(
 	return summary;
 }
 
-export async function sshCapture(config: SshTarget, command: string): Promise<string> {
-	const sshArgs = [...(config.sshKeyPath ? ['-i', config.sshKeyPath] : []), config.remoteHost];
-
-	const result = await $`ssh ${sshArgs} ${command}`;
-
-	return result.stdout;
+function getSshArgs(config: SshTarget) {
+	return [...(config.sshKeyPath ? ['-i', config.sshKeyPath] : []), config.remoteHost];
 }
 
-export async function sshCaptureUnchecked(
-	config: SshTarget,
-	command: string,
-): Promise<ProcessOutput> {
-	const sshArgs = [...(config.sshKeyPath ? ['-i', config.sshKeyPath] : []), config.remoteHost];
+export async function sshCapture(config: SshTarget, command: string): Promise<string> {
+	const { stdout } = await readChild(['ssh', ...getSshArgs(config), command]);
 
-	return await $({ nothrow: true, quiet: true })`ssh ${sshArgs} ${command}`;
+	return stdout;
+}
+
+export async function sshCaptureUnchecked(config: SshTarget, command: string) {
+	return readChild(['ssh', ...getSshArgs(config), command], { allowFailure: true });
 }
 
 // For dry-run, print the command instead of running it so a deploy preview shows remote actions
@@ -215,9 +212,7 @@ export async function sshExec(
 		return;
 	}
 
-	const sshArgs = [...(config.sshKeyPath ? ['-i', config.sshKeyPath] : []), config.remoteHost];
-
-	await $({ stdio: 'inherit' })`ssh ${sshArgs} ${command}`;
+	await $({ stdio: 'inherit' })`ssh ${getSshArgs(config)} ${command}`;
 }
 
 // Feed the payload over stdin so secrets never appear on the remote command line (visible in `ps`)
@@ -226,7 +221,5 @@ export async function sshExecWithInput(
 	command: string,
 	input: string,
 ): Promise<void> {
-	const sshArgs = [...(config.sshKeyPath ? ['-i', config.sshKeyPath] : []), config.remoteHost];
-
-	await $({ input, stdio: ['pipe', 'inherit', 'inherit'] })`ssh ${sshArgs} ${command}`;
+	await $({ input, stdio: ['pipe', 'inherit', 'inherit'] })`ssh ${getSshArgs(config)} ${command}`;
 }

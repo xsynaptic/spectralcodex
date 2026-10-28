@@ -1,6 +1,6 @@
 import { getCachePaths } from '@spectralcodex/shared/paths';
 import { prepareImageSweep } from '@xsynaptic/astro-image-pipeline/node';
-import { formatBytes, formatCount, log, UserError, withStatus } from '@xsynaptic/astro-scripts';
+import { formatBytes, formatCount, log, UserError, withSpinner } from '@xsynaptic/astro-scripts';
 import * as R from 'remeda';
 
 import type { SweepFile } from '#images/images-sweep.ts';
@@ -49,11 +49,11 @@ await runCommand({
 
 		const config = loadDeployConfig();
 		const { imagesPath } = getCachePaths(paths.cachePath);
-		const live = await withStatus('Reading the live build', () => readLiveBuild(config));
-		const sweep = await withStatus('Reading the cache', () =>
+		const live = await withSpinner('Reading the live build', () => readLiveBuild(config));
+		const sweep = await withSpinner('Reading the cache', () =>
 			prepareImageSweep({ cachePath: imagesPath, keep: [live.buildId] }),
 		);
-		const remoteFiles = await withStatus('Listing the image host', () => listRemoteFiles(config));
+		const remoteFiles = await withSpinner('Listing the image host', () => listRemoteFiles(config));
 		const remoteDeletions = remoteFiles.filter((file) => !sweep.keep.has(file.name));
 
 		log.summary([
@@ -91,10 +91,10 @@ await runCommand({
 		}
 
 		// Local first: an upload only adds, so a rendition left here would return on the next deploy
-		const result = await withStatus('Sweeping the cache', () => sweep.run());
+		const result = await withSpinner('Sweeping the cache', () => sweep.run());
 		const remoteSwept = remoteFiles.filter((file) => !result.keep.has(file.name));
 
-		await withStatus('Sweeping the image host', () => deleteRemoteFiles(config, remoteSwept));
+		await withSpinner('Sweeping the image host', () => deleteRemoteFiles(config, remoteSwept));
 
 		log.summary([
 			['Local deleted', describeFiles(result.deletions)],

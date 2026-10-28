@@ -1,40 +1,7 @@
 import type { ContentEntry } from '@xsynaptic/astro-scripts';
 
 import { ImageFeaturedSchema } from '@spectralcodex/shared/schemas';
-import { isImageSource } from '@xsynaptic/astro-image-pipeline/names';
-import { readdirSync, statSync } from 'node:fs';
-import path from 'node:path';
-
-import { findComponentTags, getTagProp } from '#shared/component-tags.ts';
-
-export function listMediaImages(
-	mediaPath: string,
-	options?: { ignore?: ReadonlyArray<string> },
-): Set<string> {
-	const files = new Set<string>();
-	const ignore = options?.ignore ?? [];
-
-	function processDirectory(dirPath: string, prefix = '') {
-		const entries = readdirSync(dirPath);
-
-		for (const entry of entries) {
-			const fullPath = path.join(dirPath, entry);
-			const relativePath = prefix ? `${prefix}/${entry}` : entry;
-			const stat = statSync(fullPath);
-
-			if (stat.isDirectory()) {
-				processDirectory(fullPath, relativePath);
-			} else if (isImageSource(entry)) {
-				if (ignore.some((ignored) => relativePath.startsWith(ignored))) continue;
-				files.add(relativePath);
-			}
-		}
-	}
-
-	processDirectory(mediaPath);
-
-	return files;
-}
+import { findComponentTags, getTagProp } from '@xsynaptic/astro-scripts';
 
 function getFeaturedImageIds(frontmatter: Record<string, unknown>): Array<string> {
 	const data = parseImageFeatured(frontmatter);

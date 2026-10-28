@@ -6,7 +6,7 @@ export function makeEntry(
 	return { collection: 'locations', data: {}, ...overrides };
 }
 
-export function makeRefs(collection: string, ids: Array<string>) {
+function makeRefs(collection: string, ids: Array<string>) {
 	return ids.map((id) => ({ collection, id }));
 }
 

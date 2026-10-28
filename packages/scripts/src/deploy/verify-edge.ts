@@ -1,7 +1,7 @@
 import { getCachePaths } from '@spectralcodex/shared/paths';
 import { parseImageName } from '@xsynaptic/astro-image-pipeline/names';
 import { findDistManifest, getImageCachePaths } from '@xsynaptic/astro-image-pipeline/node';
-import { createStatus, formatCount, formatDuration, log } from '@xsynaptic/astro-scripts';
+import { fetchWithRetry, formatCount, log, withStep } from '@xsynaptic/astro-scripts';
 import { stat } from 'node:fs/promises';
 import path from 'node:path';
 import * as R from 'remeda';
@@ -22,17 +22,8 @@ const requestTimeoutMs = 10_000;
 
 const imageSampleSize = 20;
 
-export async function verifyEdge({
-	config,
-	paths,
-}: {
-	config: DeployConfig;
-	paths: ScriptPaths;
-}): Promise<void> {
-	const start = Date.now();
-	const token = start.toString();
-	const status = createStatus('Verifying edge cache tiers');
-
+async function runEdgeProbes(paths: ScriptPaths, config: DeployConfig) {
+	const token = Date.now().toString();
 	const documentProbe = getDocumentProbe({ config, token });
 	const documentResponse = await request(documentProbe);
 	const documentFailure = labelFailure(
@@ -46,8 +37,6 @@ export async function verifyEdge({
 		R.isNonNullish,
 	);
 
-	status.stop();
-
 	if (failures.length > 0) {
 		for (const failure of failures) {
 			log.error(failure);
@@ -57,10 +46,20 @@ export async function verifyEdge({
 		);
 	}
 
-	const probeCount = formatCount(edge.probes.length + 1);
+	return edge.probes.length + 1;
+}
 
-	log.success(
-		`Edge verified · ${probeCount} probes passed · ${formatDuration(Date.now() - start)}`,
+export async function verifyEdge({
+	config,
+	paths,
+}: {
+	config: DeployConfig;
+	paths: ScriptPaths;
+}): Promise<void> {
+	await withStep(
+		'Verifying edge cache tiers',
+		() => runEdgeProbes(paths, config),
+		(probeCount) => `Edge verified · ${formatCount(probeCount)} probes passed`,
 	);
 }
 
@@ -110,27 +109,11 @@ function labelFailure(probe: EdgeProbe, failure: string | undefined) {
 	return `${probe.label} (${describeProbe(probe)}): ${failure}`;
 }
 
-function fetchWithTimeout(probe: EdgeProbe) {
-	return fetch(probe.url, {
+function request(probe: EdgeProbe) {
+	return fetchWithRetry(probe.url, {
+		label: `${probe.label} (${describeProbe(probe)})`,
 		method: probe.method,
 		redirect: 'manual',
-		signal: AbortSignal.timeout(requestTimeoutMs),
+		timeoutMs: requestTimeoutMs,
 	});
-}
-
-async function request(probe: EdgeProbe) {
-	try {
-		return await fetchWithTimeout(probe);
-	} catch (error) {
-		if (!(error instanceof DOMException && error.name === 'TimeoutError')) throw error;
-	}
-
-	try {
-		return await fetchWithTimeout(probe);
-	} catch (error) {
-		throw new Error(
-			`${probe.label} (${describeProbe(probe)}): no response within ${String(requestTimeoutMs)}ms after a retry`,
-			{ cause: error },
-		);
-	}
 }

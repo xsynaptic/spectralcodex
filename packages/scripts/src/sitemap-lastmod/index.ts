@@ -7,18 +7,17 @@ import { getCollectionSegment, joinUrl, siteBasePath } from '@spectralcodex/shar
 import {
 	formatCount,
 	getCollectionEntries,
+	getEntryCommitDates,
 	log,
 	withAstroContent,
 	withSpinner,
 } from '@xsynaptic/astro-scripts';
 import { writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { $ } from 'zx';
 
 import type { ScriptPaths } from '#shared/command.ts';
 
 import { safelyCreateDirectory } from '#shared/files.ts';
-import { getGitFileDates } from '#sitemap-lastmod/git-file-dates.ts';
 
 interface SitemapLastmodOptions {
 	paths: ScriptPaths;
@@ -27,21 +26,8 @@ interface SitemapLastmodOptions {
 }
 
 export async function generateSitemapLastmod({ paths, rootPath, siteUrl }: SitemapLastmodOptions) {
-	const collectionsPath = paths.contentDataPath;
 	const outputPath = getCachePaths(paths.cachePath).sitemapLastmodPath;
 
-	const gitMap = await withSpinner('Reading git log', async () => {
-		const topLevel = await $({ cwd: collectionsPath })`git rev-parse --show-toplevel`;
-		const keyPrefix = path.relative(rootPath, topLevel.stdout.trim());
-
-		return getGitFileDates({
-			cwd: collectionsPath,
-			...(keyPrefix ? { keyPrefix } : {}),
-			pathspec: '.',
-		});
-	});
-
-	// Only file-based content collections carry a `filePath` under the content directory
 	const entries = await withSpinner('Loading content', () =>
 		withAstroContent((content) =>
 			getCollectionEntries(content, [
@@ -57,10 +43,13 @@ export async function generateSitemapLastmod({ paths, rootPath, siteUrl }: Sitem
 		),
 	);
 
-	const { missingDateCount, resolvedCount, urls } = resolveUrls(entries, gitMap, {
-		contentPathPrefix: `${path.relative(rootPath, collectionsPath)}/`,
-		siteUrl,
-	});
+	// Only file-based content collections carry a `filePath` under the content directory
+	const contentPathPrefix = `${path.relative(rootPath, paths.contentDataPath)}/`;
+	const contentEntries = entries.filter((entry) => entry.filePath?.startsWith(contentPathPrefix));
+	const gitMap = await withSpinner('Reading git log', () =>
+		getEntryCommitDates(contentEntries, { rootPath }),
+	);
+	const { missingDateCount, resolvedCount, urls } = resolveUrls(contentEntries, gitMap, siteUrl);
 
 	safelyCreateDirectory(path.dirname(outputPath));
 
@@ -82,24 +71,18 @@ function buildContentUrl(siteUrl: string, collection: string, id: string): strin
 	return joinUrl(siteUrl, siteBasePath, getCollectionSegment(collection), id, '/');
 }
 
-function resolveUrls(
-	entries: Array<ContentEntry>,
-	gitMap: Map<string, string>,
-	{ contentPathPrefix, siteUrl }: { contentPathPrefix: string; siteUrl: string },
-) {
+function resolveUrls(entries: Array<ContentEntry>, gitMap: Map<string, string>, siteUrl: string) {
 	const urls: Record<string, string> = {};
 
 	let resolvedCount = 0;
 	let missingDateCount = 0;
 
 	for (const entry of entries) {
-		if (!entry.filePath?.startsWith(contentPathPrefix)) continue;
-
-		const gitDate = gitMap.get(entry.filePath);
+		const gitDate = entry.filePath ? gitMap.get(entry.filePath) : undefined;
 
 		if (!gitDate) {
 			missingDateCount++;
-			log.detail(`No git history: ${entry.filePath}`);
+			log.detail(`No git history: ${entry.filePath ?? entry.id}`);
 			continue;
 		}
 

@@ -1,4 +1,4 @@
-import { formatDuration, log, UserError, withStatus } from '@xsynaptic/astro-scripts';
+import { log, UserError, withSpinner, withStep } from '@xsynaptic/astro-scripts';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { z } from 'zod';
@@ -29,17 +29,8 @@ interface SyncCaddyConfigOptions {
 
 const caddyLogEntrySchema = z.object({ level: z.string(), msg: z.string() });
 
-export async function deployCaddy(options: DeployCaddyOptions): Promise<void> {
-	const { dryRun = false, rootPath } = options;
-
-	const config = loadDeployConfig();
-	const deployDir = path.join(rootPath, 'deploy');
-
-	if (dryRun) log.warn('Dry run');
-
-	const start = Date.now();
-
-	const image = await withStatus('Reading the running Caddy image', () =>
+async function applyCaddyConfig(config: DeployConfig, deployDir: string, isDryRun: boolean) {
+	const image = await withSpinner('Reading the running Caddy image', () =>
 		sshCaptureOrRefuse(
 			config,
 			"docker inspect -f '{{.Config.Image}}' caddy",
@@ -47,10 +38,10 @@ export async function deployCaddy(options: DeployCaddyOptions): Promise<void> {
 		),
 	);
 
-	const changes = await syncCaddyConfig({ config, deployDir, dryRun, image });
+	const changes = await syncCaddyConfig({ config, deployDir, dryRun: isDryRun, image });
 
-	if (!dryRun) {
-		await withStatus('Reloading Caddy', () =>
+	if (!isDryRun) {
+		await withSpinner('Reloading Caddy', () =>
 			sshCaptureOrRefuse(
 				config,
 				'docker exec caddy caddy reload --config /etc/caddy/Caddyfile',
@@ -59,14 +50,28 @@ export async function deployCaddy(options: DeployCaddyOptions): Promise<void> {
 		);
 	}
 
-	const parts = [
-		dryRun ? 'Caddy config checked (dry run)' : 'Caddy config live',
-		...(changes.length === 0 ? ['no changes'] : []),
-		`validated with ${image}`,
-		formatDuration(Date.now() - start),
-	];
+	return { changes, image };
+}
 
-	log.success(parts.join(' · '));
+export async function deployCaddy(options: DeployCaddyOptions): Promise<void> {
+	const { dryRun = false, rootPath } = options;
+
+	const config = loadDeployConfig();
+	const deployDir = path.join(rootPath, 'deploy');
+
+	if (dryRun) log.warn('Dry run');
+
+	const { changes } = await withStep(
+		'Deploying Caddy config',
+		() => applyCaddyConfig(config, deployDir, dryRun),
+		({ changes, image }) =>
+			[
+				dryRun ? 'Caddy config checked (dry run)' : 'Caddy config live',
+				...(changes.length === 0 ? ['no changes'] : []),
+				`validated with ${image}`,
+			].join(' · '),
+	);
+
 	logCaddyChanges(changes);
 }
 
@@ -97,7 +102,7 @@ export async function syncCaddyConfig(
 		label: 'Staging certificates',
 	});
 
-	await withStatus(`Validating with ${image}`, () =>
+	await withSpinner(`Validating with ${image}`, () =>
 		sshCaptureOrRefuse(
 			config,
 			`docker run --rm --network none -v ${stagingPath}/caddy:/etc/caddy:ro -v ${stagingPath}/certs:/certs:ro ${image} caddy validate --config /etc/caddy/Caddyfile`,
@@ -107,7 +112,7 @@ export async function syncCaddyConfig(
 
 	const swapFlags = dryRun ? '-ai --dry-run --delay-updates' : '-ai --delay-updates';
 
-	const swapOutput = await withStatus('Swapping into live config', () =>
+	const swapOutput = await withSpinner('Swapping into live config', () =>
 		sshCapture(
 			config,
 			`rsync ${swapFlags} --delete ${stagingPath}/caddy/ ${config.remotePath}/caddy/ && rsync ${swapFlags} ${stagingPath}/certs/ ${config.remotePath}/certs/`,

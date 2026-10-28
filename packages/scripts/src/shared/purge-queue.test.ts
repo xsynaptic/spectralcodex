@@ -14,12 +14,11 @@ let statePath: string;
 let queuePath: string;
 
 async function queueNames(count: number) {
-	const queue = await createPurgeQueue(queuePath);
 	const names = R.times(count, (index) => `a/image-${String(index)}-450.jpg`);
 
-	for (const name of names) await queue.add(name);
+	await fs.writeFile(queuePath, names.map((name) => `${name}\n`).join(''));
 
-	return { names, queue };
+	return { names, queue: await createPurgeQueue(queuePath) };
 }
 
 async function readQueuedCount() {
