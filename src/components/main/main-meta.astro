@@ -15,8 +15,8 @@ const {
 	description: contentDescription,
 	image,
 	imageAlt,
-	noFollow,
-	noIndex,
+	noFollow = false,
+	noIndex = false,
 	ogType,
 	preloadUrls,
 	title: contentTitle,
@@ -85,7 +85,7 @@ const socialProps = openGraphImage
 		],
 		meta: [{ content: Astro.generator, name: 'generator' }],
 	}}
-	nofollow={noFollow ?? false}
-	noindex={noIndex ?? false}
+	nofollow={noFollow}
+	noindex={noIndex}
 	robotsExtras="max-snippet:-1, max-image-preview:large, max-video-preview:-1"
 />

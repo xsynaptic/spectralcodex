@@ -70,7 +70,7 @@ const MapCanvasContainer: FC = function MapCanvasContainer() {
 		baseMapTheme,
 		bounds,
 		center,
-		hash,
+		hash = false,
 		isInteractive,
 		languages,
 		mapId,
@@ -111,7 +111,7 @@ const MapCanvasContainer: FC = function MapCanvasContainer() {
 		<ReactMapGlMap
 			attributionControl={false}
 			fadeDuration={100}
-			hash={hash ?? false}
+			hash={hash}
 			initialViewState={initialViewState}
 			interactive={isInteractive}
 			interactiveLayerIds={[...mapInteractiveLayerIds]}

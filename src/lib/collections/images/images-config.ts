@@ -18,8 +18,6 @@ const ImageMetadataSchema = ImageExifDataSchema.extend({
 	width: z.number(),
 });
 
-type ImageMetadataInput = z.input<typeof ImageMetadataSchema>;
-
 // EXIF extraction is slow; a JSONL cache in ./.cache survives store wipes and node_modules reinstalls
 // Explicit filePath because the package default lives under node_modules/.astro
 const imageLoaderCache = createJsonlCache({
@@ -66,7 +64,7 @@ export const images = defineCollection(
 				...defaultMetadata,
 				...dimensions,
 				...exif,
-			} satisfies Omit<ImageMetadataInput, 'src'>;
+			} satisfies Omit<z.input<typeof ImageMetadataSchema>, 'src'>;
 		},
 		extractionVersion,
 		schema: ImageMetadataSchema.strict(),

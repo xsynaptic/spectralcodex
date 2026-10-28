@@ -293,8 +293,6 @@ const translationStrings = {
 	[LanguageCodeEnum.Vietnamese]: {},
 } as const satisfies TranslationsRecord<Record<string, string>>;
 
-type PluralValues = Record<string, number | string> & { langCode?: LanguageCode };
-
 // Get all possible translation keys across ALL languages
 type TranslationKey = {
 	[L in keyof typeof translationStrings]: keyof (typeof translationStrings)[L];
@@ -308,6 +306,8 @@ type TranslationKeyPlural<K extends string = TranslationKey> = K extends `${infe
 const pluralRulesCache = new Map<LanguageCode, Intl.PluralRules>();
 
 export function getTranslations() {
+	type PluralValues = Record<string, number | string> & { langCode?: LanguageCode };
+
 	function t(key: TranslationKey, langCode: LanguageCode = defaultLanguage) {
 		const langTranslations = translationStrings[langCode] as Partial<
 			Record<TranslationKey, string>

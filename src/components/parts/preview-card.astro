@@ -21,9 +21,14 @@ interface Props extends HTMLAttributes<'div'> {
 	titleAs?: 'h2' | 'h3' | undefined;
 }
 
-const { alt, imageId, linkUrl, showMicroformats = false, titleAs, ...props } = Astro.props;
-
-const TitleTag = titleAs ?? 'h3';
+const {
+	alt,
+	imageId,
+	linkUrl,
+	showMicroformats = false,
+	titleAs: TitleTag = 'h3',
+	...props
+} = Astro.props;
 
 const { imageProps, placeholderProps } = await getImageFeaturedProps({
 	alt,

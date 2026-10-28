@@ -13,17 +13,6 @@ interface FieldSchemas {
 	standard: z.ZodType;
 }
 
-type CompressedShape<
-	Fields extends MapCodecTable,
-	Schemas extends Record<keyof Fields, FieldSchemas>,
-> = {
-	[Name in keyof Fields as Fields[Name]['key']]: Schemas[Name]['compressed'];
-};
-
-type StandardShape<Schemas extends Record<string, FieldSchemas>> = {
-	[Name in keyof Schemas]: Schemas[Name]['standard'];
-};
-
 function same<Schema extends z.ZodType>(schema: Schema) {
 	return { compressed: schema, standard: schema };
 }
@@ -42,6 +31,11 @@ function createFieldCodec<
 	Fields extends MapCodecTable,
 	Schemas extends Record<keyof Fields, FieldSchemas>,
 >(fields: Fields, schemas: Schemas) {
+	type CompressedShape = {
+		[Name in keyof Fields as Fields[Name]['key']]: Schemas[Name]['compressed'];
+	};
+	type StandardShape = { [Name in keyof Schemas]: Schemas[Name]['standard'] };
+
 	const namesByKey = new Map<string, string>();
 
 	for (const [name, { key }] of Object.entries(fields)) {
@@ -54,13 +48,13 @@ function createFieldCodec<
 
 	const compressedShape = Object.fromEntries(
 		Object.entries(fields).map(([name, { key }]) => [key, schemas[name]?.compressed]),
-	) as CompressedShape<Fields, Schemas>;
+	) as CompressedShape;
 	const standardShape = Object.fromEntries(
 		Object.entries(schemas).map(([name, { standard }]) => [name, standard]),
-	) as StandardShape<Schemas>;
+	) as StandardShape;
 
-	type Compressed = z.output<z.ZodObject<CompressedShape<Fields, Schemas>>>;
-	type Standard = z.output<z.ZodObject<StandardShape<Schemas>>>;
+	type Compressed = z.output<z.ZodObject<CompressedShape>>;
+	type Standard = z.output<z.ZodObject<StandardShape>>;
 
 	return {
 		compressedShape,

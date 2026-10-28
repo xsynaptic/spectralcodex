@@ -104,12 +104,11 @@ export function getMonthName(date: Date): string {
 
 // Every UTC day covered by a recorded range, start to end inclusive
 // A single date yields one day
-function expandRangeDays(start: Date, end: Date | undefined): Array<Date> {
+function expandRangeDays(start: Date, end = start): Array<Date> {
 	const startDay = Date.UTC(start.getUTCFullYear(), start.getUTCMonth(), start.getUTCDate());
-	const endSource = end ?? start;
 	const endDay = Math.max(
 		startDay,
-		Date.UTC(endSource.getUTCFullYear(), endSource.getUTCMonth(), endSource.getUTCDate()),
+		Date.UTC(end.getUTCFullYear(), end.getUTCMonth(), end.getUTCDate()),
 	);
 
 	const days: Array<Date> = [];

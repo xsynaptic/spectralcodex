@@ -8,7 +8,7 @@ import { markdownToHtml } from 'satteri';
 const wordSegmenter = new Intl.Segmenter(undefined, { granularity: 'word' });
 
 export function formatNumber({
-	locales,
+	locales = 'en',
 	number,
 	options,
 }: {
@@ -16,7 +16,7 @@ export function formatNumber({
 	number: number | string;
 	options?: Intl.NumberFormatOptions | undefined;
 }) {
-	return getNumberFormat(locales ?? 'en', options).format(Number(number));
+	return getNumberFormat(locales, options).format(Number(number));
 }
 
 // Interpolate named placeholders in a string *e.g.* "Chronology: {month} {year}"

@@ -11,9 +11,6 @@ import { decodeFields } from '#codec-fields.ts';
 import { geometryKey, popupFields, sourceFields } from '#codec-tables.ts';
 import { decodeMapRowId, getMapRowUrl } from '#map-ids.ts';
 
-type MapSourceProperties = MapSourceItem['properties'];
-type MapPosition = MapSourceItem['geometry']['coordinates'];
-
 export function decodeMapDirectory(columns: MapDirectoryColumns): Array<MapSourceItem> {
 	const columnsByKey = columns as Partial<Record<string, Array<unknown>>>;
 	const fieldColumns = Object.entries(sourceFields).map(([name, { decode, key }]) => ({
@@ -34,13 +31,16 @@ export function decodeMapDirectory(columns: MapDirectoryColumns): Array<MapSourc
 			if (value !== undefined) properties[name] = value;
 		}
 
-		const sourceProperties = properties as MapSourceProperties;
+		const sourceProperties = properties as MapSourceItem['properties'];
 
 		sourceProperties.id = decodeMapRowId(sourceProperties.id, sourceProperties.title);
 		sourceProperties.url = getMapRowUrl(sourceProperties.id);
 
 		rows.push({
-			geometry: { coordinates: geometryColumn[index] as MapPosition, type: GeometryTypeEnum.Point },
+			geometry: {
+				coordinates: geometryColumn[index] as MapSourceItem['geometry']['coordinates'],
+				type: GeometryTypeEnum.Point,
+			},
 			properties: sourceProperties,
 			type: 'Feature',
 		});

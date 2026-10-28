@@ -106,8 +106,15 @@ function createRowEntries(rows: ReadonlyArray<MapSourceItem>) {
 	const locationKeys = new Set<string>();
 
 	for (const { properties } of rows) {
-		const { id, pointTitle, pointTitleMultilingual, title, titleMultilingual, url } = properties;
-		const locationKey = `location-${url ?? id}`;
+		const {
+			id,
+			pointTitle,
+			pointTitleMultilingual,
+			title,
+			titleMultilingual,
+			url = id,
+		} = properties;
+		const locationKey = `location-${url}`;
 
 		if (!locationKeys.has(locationKey)) {
 			locationKeys.add(locationKey);

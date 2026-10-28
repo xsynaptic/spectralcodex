@@ -19,17 +19,17 @@ import { isEntryMapEnabled } from '#lib/map/map-locations.ts';
 export type MapComponentData =
 	{ hasGeodata: false; props?: never } | { hasGeodata: true; props: MapComponentProps };
 
-type MapDataOptions = MapBoundsOptions &
-	Omit<
-		MapComponentProps,
-		'bounds' | 'center' | 'mapFeaturesRule' | 'maxBounds' | 'payloadBase' | 'protomapsApiKey'
-	> & {
-		dataset?: MapDatasetName | undefined;
-		limitBounds?: MapBbox | undefined;
-		rule: MapFeaturesRule;
-	};
-
 export async function createMapDataFunction() {
+	type MapDataOptions = MapBoundsOptions &
+		Omit<
+			MapComponentProps,
+			'bounds' | 'center' | 'mapFeaturesRule' | 'maxBounds' | 'payloadBase' | 'protomapsApiKey'
+		> & {
+			dataset?: MapDatasetName | undefined;
+			limitBounds?: MapBbox | undefined;
+			rule: MapFeaturesRule;
+		};
+
 	const { datasets } = await getMapDirectoryData();
 	const rowsByRuleByDataset: Record<
 		MapDatasetName,

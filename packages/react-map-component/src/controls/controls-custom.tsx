@@ -18,8 +18,11 @@ class CustomControl implements IControl {
 	#container = document.createElement('div');
 	#position: ControlPosition = 'top-left';
 
-	constructor({ className, position }: CustomControlConfig) {
-		this.#container.className = className ?? 'maplibregl-ctrl maplibregl-ctrl-group';
+	constructor({
+		className = 'maplibregl-ctrl maplibregl-ctrl-group',
+		position,
+	}: CustomControlConfig) {
+		this.#container.className = className;
 		this.#position = position;
 	}
 

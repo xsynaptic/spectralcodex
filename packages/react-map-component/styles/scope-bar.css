@@ -148,6 +148,7 @@
 	}
 }
 
+/* stylelint-disable-next-line a11y/no-outline-none -- a transparent outline still renders in forced colors */
 [data-map-root] .map-search-input:focus-visible {
 	outline-color: transparent;
 }
