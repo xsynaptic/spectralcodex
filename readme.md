@@ -9,7 +9,7 @@ This repository contains the working [Astro](https://astro.build) project used t
 - All content authored in MDX using the Content Layer API, with strict Zod schemas and generated JSON schemas for editor tooling
 - Entry quality scoring on a 1-5 scale, used to prioritize content in listings, chronology highlights, and image fallbacks
 - Comprehensive validation: frontmatter checks, cross-collection reference integrity, global ID uniqueness, geospatial boundary checking against Overture Maps divisions (Turf.js), proximity-based duplicate detection ([KDBush](https://github.com/mourner/kdbush)), image reference and aspect ratio validation
-- Build scripts read `astro:content` outside the Astro runtime via a Vite module runner, so validation, redirects, OG images, and sitemap dates see the same parsed collections the site does
+- Build scripts read `astro:content` outside the Astro runtime via a Vite module runner, so validation, redirects, and OG images see the same parsed collections the site does
 - Backlinks discovered from the internal `<Link>` component, plus entry counts computed across regions, themes, series, and resources
 - Markdown processed by [Sätteri](https://github.com/bruits/satteri) with plugins for component auto-import, image groups, CJK wrapping, and trailing slashes
 - Content linting and formatting via [mdxlint](https://github.com/remcohaszing/mdxlint), plus a check for media files no entry references

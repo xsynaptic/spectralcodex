@@ -1,12 +1,13 @@
 import { defineCollection, reference } from 'astro:content';
 import { z } from 'zod';
 
+import { withSitemapLastmod } from '#lib/collections/collections-lastmod.ts';
 import { createEntryGlobLoader } from '#lib/collections/collections-loader.ts';
 import { entrySchemaFields } from '#lib/collections/collections-schemas.ts';
 import { LinkSchema, SourceSchema } from '#lib/schemas/resources.ts';
 
 export const themes = defineCollection({
-	loader: createEntryGlobLoader('themes'),
+	loader: withSitemapLastmod('themes', createEntryGlobLoader('themes')),
 	schema: z
 		.object({
 			...entrySchemaFields,

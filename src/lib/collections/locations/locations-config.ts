@@ -2,6 +2,7 @@ import { LocationCategoryEnum, LocationStatusEnum } from '@spectralcodex/shared/
 import { defineCollection, reference } from 'astro:content';
 import { z } from 'zod';
 
+import { withSitemapLastmod } from '#lib/collections/collections-lastmod.ts';
 import { createEntryGlobLoader } from '#lib/collections/collections-loader.ts';
 import { entrySchemaFields } from '#lib/collections/collections-schemas.ts';
 import { LocationTwHeritageSchema } from '#lib/collections/locations/locations-schemas.ts';
@@ -11,7 +12,7 @@ import { DateRecordedSchema, NumericScaleSchema, TitleSchema } from '#lib/schema
 import { LinkSchema, SourceSchema } from '#lib/schemas/resources.ts';
 
 export const locations = defineCollection({
-	loader: createEntryGlobLoader('locations', { flatIds: true }),
+	loader: withSitemapLastmod('locations', createEntryGlobLoader('locations', { flatIds: true })),
 	schema: z
 		.object({
 			...entrySchemaFields,

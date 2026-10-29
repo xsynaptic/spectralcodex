@@ -1,4 +1,4 @@
-import { log, runSubprocess, withStep } from '@xsynaptic/astro-scripts';
+import { log, runSubprocess } from '@xsynaptic/astro-scripts';
 
 import { deployApp } from '#deploy/deploy-app.ts';
 import { invokeCacheRefresh } from '#deploy/deploy-cache-refresh.ts';
@@ -8,7 +8,6 @@ import { getOpenGraphSet, getRenditionSet, uploadRenderedSet } from '#deploy/dep
 import { ensureSshKeychain } from '#deploy/rsync-exec.ts';
 import { verifyEdge } from '#deploy/verify-edge.ts';
 import { runCommand } from '#shared/command.ts';
-import { generateSitemapLastmod } from '#sitemap-lastmod/index.ts';
 
 await runCommand({
 	name: 'deploy-site',
@@ -84,7 +83,6 @@ await runCommand({
 			() => runScript('Generating redirects', 'generate-redirects'),
 			() => runScript('Finding similar content', 'similar-content'),
 			webmentions,
-			() => withStep('Sitemap lastmod', () => generateSitemapLastmod({ paths, rootPath })),
 			build,
 			() => runScript('Rendering images', 'render-images'),
 			() => runScript('Rendering OpenGraph cards', 'render-opengraph'),
