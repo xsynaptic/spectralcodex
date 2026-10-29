@@ -1,6 +1,12 @@
 import type { ProcessOutput } from 'zx';
 
-import { createStatus, formatBytes, formatCount, log, readChild } from '@xsynaptic/astro-scripts';
+import {
+	createStatus,
+	formatBytes,
+	formatCount,
+	log,
+	readSubprocess,
+} from '@xsynaptic/astro-scripts';
 import chalk from 'chalk';
 import { $ } from 'zx';
 
@@ -192,13 +198,13 @@ function getSshArgs(config: SshTarget) {
 }
 
 export async function sshCapture(config: SshTarget, command: string): Promise<string> {
-	const { stdout } = await readChild(['ssh', ...getSshArgs(config), command]);
+	const { stdout } = await readSubprocess(['ssh', ...getSshArgs(config), command]);
 
 	return stdout;
 }
 
 export async function sshCaptureUnchecked(config: SshTarget, command: string) {
-	return readChild(['ssh', ...getSshArgs(config), command], { allowFailure: true });
+	return readSubprocess(['ssh', ...getSshArgs(config), command], { allowFailure: true });
 }
 
 // For dry-run, print the command instead of running it so a deploy preview shows remote actions

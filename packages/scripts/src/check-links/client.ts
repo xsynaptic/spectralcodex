@@ -1,4 +1,4 @@
-import { fetchWithRetry } from '@xsynaptic/astro-scripts';
+import { fetchUrl } from '@xsynaptic/astro-scripts';
 
 import type { UrlRow, UrlStatus } from '#check-links/types.ts';
 
@@ -61,12 +61,13 @@ async function fetchStatus(url: string): Promise<Response> {
 }
 
 function fetchMethod(url: string, method: string): Promise<Response> {
-	return fetchWithRetry(url, {
+	return fetchUrl(url, {
 		headers: requestHeaders,
-		label: method,
 		method,
 		redirect: 'manual',
-		timeoutMs,
+		retry: { limit: 1, retryOnTimeout: true },
+		throwHttpErrors: false,
+		timeout: timeoutMs,
 	});
 }
 

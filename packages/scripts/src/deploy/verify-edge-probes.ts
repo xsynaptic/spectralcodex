@@ -1,6 +1,6 @@
 import type { ImageFormat } from '@xsynaptic/astro-image-pipeline/names';
 
-import { imageQualityByFormat } from '@spectralcodex/shared/images';
+import { imageQualityByFormat, isSiteImageFormat } from '@spectralcodex/shared/images';
 import { parseRenditionName } from '@xsynaptic/astro-image-pipeline/names';
 import { createHash } from 'node:crypto';
 
@@ -42,10 +42,12 @@ const renderedCacheControl =
 	'public, max-age=2592000, stale-while-revalidate=604800, s-maxage=31536000, no-transform';
 const renderedNotFoundCacheControl = 'public, max-age=60';
 
-const imageContentTypes = { jpg: 'image/jpeg', webp: 'image/webp' } satisfies Record<
-	ImageFormat,
-	string
->;
+const imageContentTypes = {
+	avif: 'image/avif',
+	jpg: 'image/jpeg',
+	png: 'image/png',
+	webp: 'image/webp',
+} satisfies Record<ImageFormat, string>;
 
 function getSiteBaseUrl(config: Pick<DeployConfig, 'siteUrl'>) {
 	return config.siteUrl.replace(/\/$/, '');
@@ -185,6 +187,13 @@ function getLegacyRedirectProbes(imageBaseUrl: string, imagePath: string, token:
 
 	if (parsed?.height === undefined) {
 		return { failures: [`legacy redirect: hero candidate ${imagePath} is not a crop`], probes: [] };
+	}
+
+	if (!isSiteImageFormat(parsed.format)) {
+		return {
+			failures: [`legacy redirect: hero candidate ${imagePath} is not a jpg or webp`],
+			probes: [],
+		};
 	}
 
 	const { format, height, stem, width } = parsed;

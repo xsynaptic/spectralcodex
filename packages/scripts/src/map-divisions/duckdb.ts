@@ -60,6 +60,7 @@ export async function fetchDivisionData({
 	return divisionsById;
 }
 
+// DuckDB 2.0 deprecates s3_region; a credential-free secret carries the region for the public bucket
 export async function initializeDuckDB(): Promise<DuckDBConnection> {
 	const instance = await DuckDBInstance.create(':memory:');
 	const connection = await instance.connect();
@@ -69,10 +70,9 @@ export async function initializeDuckDB(): Promise<DuckDBConnection> {
 		LOAD spatial;
 		INSTALL httpfs;
 		LOAD httpfs;
-		SET enable_object_cache=true;
 		SET http_timeout=12000;
 		SET http_retries=5;
-		SET s3_region='us-west-2';
+		CREATE SECRET overture (TYPE s3, PROVIDER config, REGION 'us-west-2');
 	`);
 
 	return connection;

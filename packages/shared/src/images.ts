@@ -35,24 +35,30 @@ const imageWidths = [
 export const imageQualityByFormat = {
 	jpg: 85,
 	webp: 70,
-} as const satisfies Record<ImageFormat, number>;
+} as const satisfies Partial<Record<ImageFormat, number>>;
+
+export type SiteImageFormat = keyof typeof imageQualityByFormat;
+
+export function isSiteImageFormat(format: ImageFormat): format is SiteImageFormat {
+	return Object.hasOwn(imageQualityByFormat, format);
+}
 
 interface ImagePresetCover {
 	aspectRatio: number;
 	fit: 'cover';
-	format: ImageFormat;
+	format: SiteImageFormat;
 	widths: ReadonlyArray<number>;
 }
 
 interface ImagePresetNative {
 	fit: 'native';
-	format: ImageFormat;
+	format: SiteImageFormat;
 	widths: ReadonlyArray<number>;
 }
 
 interface ImagePresetWidth {
 	fit: 'width';
-	format: ImageFormat;
+	format: SiteImageFormat;
 	widths: ReadonlyArray<number>;
 }
 

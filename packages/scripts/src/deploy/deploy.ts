@@ -1,4 +1,4 @@
-import { log, runChild, withStep } from '@xsynaptic/astro-scripts';
+import { log, runSubprocess, withStep } from '@xsynaptic/astro-scripts';
 
 import { deployApp } from '#deploy/deploy-app.ts';
 import { invokeCacheRefresh } from '#deploy/deploy-cache-refresh.ts';
@@ -30,11 +30,13 @@ await runCommand({
 		await ensureSshKeychain();
 
 		async function runRoot(text: string, args: Array<string>) {
-			await runChild(text, ['pnpm', ...args], { cwd: rootPath });
+			await runSubprocess(text, ['pnpm', ...args], { cwd: rootPath });
 		}
 
 		async function runScript(text: string, name: string) {
-			await runChild(text, ['pnpm', '--silent', '-C', 'packages/scripts', name], { cwd: rootPath });
+			await runSubprocess(text, ['pnpm', '--silent', '-C', 'packages/scripts', name], {
+				cwd: rootPath,
+			});
 		}
 
 		// Content scripts read the store `astro sync` writes, so it has to run first

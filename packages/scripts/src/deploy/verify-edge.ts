@@ -1,7 +1,7 @@
 import { getCachePaths } from '@spectralcodex/shared/paths';
 import { parseRenditionName } from '@xsynaptic/astro-image-pipeline/names';
 import { findDistManifest, getImageStorePaths } from '@xsynaptic/astro-image-pipeline/node';
-import { fetchWithRetry, formatCount, formatError, log, withStep } from '@xsynaptic/astro-scripts';
+import { fetchUrl, formatCount, formatError, log, withStep } from '@xsynaptic/astro-scripts';
 import { stat } from 'node:fs/promises';
 import path from 'node:path';
 import * as R from 'remeda';
@@ -119,10 +119,11 @@ function labelFailure(probe: EdgeProbe, failure: string | undefined) {
 }
 
 function request(probe: EdgeProbe) {
-	return fetchWithRetry(probe.url, {
-		label: `${probe.label} (${describeProbe(probe)})`,
+	return fetchUrl(probe.url, {
 		method: probe.method,
 		redirect: 'manual',
-		timeoutMs: requestTimeoutMs,
+		retry: { limit: 1, retryOnTimeout: true },
+		throwHttpErrors: false,
+		timeout: requestTimeoutMs,
 	});
 }

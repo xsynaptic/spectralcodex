@@ -1,6 +1,6 @@
 {
 	"name": "@xsynaptic/spectralcodex",
-	"version": "7.33.0",
+	"version": "7.34.0",
 	"scripts": {
 		"build": "astro check && astro build",
 		"check": "lefthook run check",
@@ -51,16 +51,16 @@
 		"#*": "./src/*"
 	},
 	"dependencies": {
-		"astro": "^7.4.2",
+		"astro": "^7.4.4",
 		"react": "^19.3.1",
 		"react-dom": "^19.3.1"
 	},
 	"devDependencies": {
 		"@astrojs/check": "^0.9.12",
-		"@astrojs/markdown-satteri": "^0.4.5",
-		"@astrojs/mdx": "^8.1.1",
+		"@astrojs/markdown-satteri": "^0.4.6",
+		"@astrojs/mdx": "^8.1.2",
 		"@astrojs/node": "^11.1.9",
-		"@astrojs/react": "^7.1.1",
+		"@astrojs/react": "^7.1.2",
 		"@astrojs/rss": "^4.0.19",
 		"@astrojs/sitemap": "^3.7.4",
 		"@pagefind/component-ui": "^1.5.2",
@@ -85,7 +85,7 @@
 		"@xsynaptic/astro-build-logger": "^1.1.0",
 		"@xsynaptic/astro-image-loader": "^1.4.0",
 		"@xsynaptic/astro-image-pipeline": "^0.10.0",
-		"@xsynaptic/astro-scripts": "^0.12.0",
+		"@xsynaptic/astro-scripts": "^0.14.0",
 		"@xsynaptic/eslint-config": "^6.8.0",
 		"@xsynaptic/mdxlint-config": "^2.0.0",
 		"@xsynaptic/path-suggestions": "^0.2.0",
@@ -106,7 +106,7 @@
 		"eslint-plugin-jsx-a11y": "^6.10.2",
 		"eslint-plugin-react-hooks": "^7.1.1",
 		"exiftool-vendored": "^39.0.1",
-		"fallow": "^3.36.0",
+		"fallow": "^3.37.0",
 		"geokdbush": "^2.1.0",
 		"globals": "^17.13.0",
 		"kdbush": "^4.1.0",
@@ -117,7 +117,7 @@
 		"prettier": "^3.9.10",
 		"prettier-plugin-astro": "^1.1.2",
 		"prettier-plugin-tailwindcss": "^0.8.1",
-		"remeda": "^2.54.1",
+		"remeda": "^2.55.0",
 		"satteri": "^0.10.5",
 		"sharp": "0.35.5",
 		"stylelint": "^17.16.0",
