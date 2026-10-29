@@ -2,7 +2,15 @@ import type { MapPopupItem, MapSourceItem } from '@spectralcodex/map-codec';
 import type { LngLat } from 'maplibre-gl';
 
 import { getMapRowLabel } from '@spectralcodex/map-codec';
-import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import {
+	useCallback,
+	useEffect,
+	useEffectEvent,
+	useMemo,
+	useRef,
+	useState,
+	useSyncExternalStore,
+} from 'react';
 import { useMap } from 'react-map-gl/maplibre';
 
 import { useMapChunk, useMapRow } from '#data/data-query.ts';
@@ -77,34 +85,35 @@ export function useMapHoverPreload() {
 
 	const preloadedRef = useRef<Set<string>>(new Set());
 
-	useEffect(() => {
-		if (!map || !debouncedHoveredId || preloadedRef.current.has(debouncedHoveredId)) return;
+	const preload = useEffectEvent((pointId: string, chunkData: Array<MapPopupItem> | undefined) => {
+		if (!map || preloadedRef.current.has(pointId)) return;
 
-		const outcome = resolve(
-			{ isPick: false, kind: 'point', pointId: debouncedHoveredId },
-			map.getMap(),
-		);
+		const outcome = resolve({ isPick: false, kind: 'point', pointId }, map.getMap());
 
 		if (outcome.kind === 'open') {
-			preloadedRef.current.add(debouncedHoveredId);
+			preloadedRef.current.add(pointId);
 			host.prefetch(outcome.url);
 			return;
 		}
 
 		if (outcome.kind !== 'popup') return;
 
-		const popupImageSources = findPopupImageSources(hoverChunkData, debouncedHoveredId);
+		const popupImageSources = findPopupImageSources(chunkData, pointId);
 
 		if (!popupImageSources) return;
 
-		preloadedRef.current.add(debouncedHoveredId);
+		preloadedRef.current.add(pointId);
 
 		// A detached image given srcset and sizes picks the same candidate the popup will, which warms the cache
 		const preloadImage = new Image();
 
 		preloadImage.sizes = getPopupImageSizes(maxWidthPx);
 		preloadImage.srcset = getPopupImageSrcSet(popupImageSources, imageBaseUrl);
-	}, [debouncedHoveredId, host, hoverChunkData, imageBaseUrl, map, maxWidthPx, resolve]);
+	});
+
+	useEffect(() => {
+		if (debouncedHoveredId) preload(debouncedHoveredId, hoverChunkData);
+	}, [debouncedHoveredId, hoverChunkData]);
 }
 
 export function useMapPopupLayout() {
@@ -125,5 +134,5 @@ export function useMapPopupLayout() {
 
 	const containerWidth = useSyncExternalStore(subscribe, getWidth, () => 0);
 
-	return useMemo(() => getPopupLayout(containerWidth), [containerWidth]);
+	return getPopupLayout(containerWidth);
 }

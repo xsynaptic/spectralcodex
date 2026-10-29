@@ -17,7 +17,7 @@ import { useMapConfig } from '#lib/config.tsx';
 import { useTrackMap } from '#lib/track-hook.ts';
 import { MapLayerIdEnum, MapSourceIdEnum } from '#source/source-config.ts';
 import { useMapStore, useMapStoreApi } from '#store/store.tsx';
-import { trackMapErrorOnce } from '#track.ts';
+import { getTrackedErrorMessage, trackMapErrorOnce } from '#track.ts';
 
 const hoverQuery = '(hover: hover)';
 
@@ -89,14 +89,8 @@ interface MapHoverEvent {
 	mapInstance: MapLayerMouseEvent['target'];
 }
 
-const canvasErrorMessageMaxLength = 100;
-
-// Tile URLs carry the Protomaps key in their query string
 function getCanvasErrorData(error: Error) {
-	return {
-		message: error.message.replaceAll(/\?\S*/g, '').slice(0, canvasErrorMessageMaxLength),
-		webgl: hasWebglContext(),
-	};
+	return { message: getTrackedErrorMessage(error), webgl: hasWebglContext() };
 }
 
 function hasWebglContext() {
@@ -132,18 +126,15 @@ export function useMapCanvasEvents(onUnsupported: () => void) {
 	const onClick = useClickHandler();
 	const throttledOnMouseMove = useThrottledMouseMoveHandler();
 
-	const onMoveEnd = useCallback(
-		(event: ViewStateChangeEvent) => {
-			if (!mapId) return;
+	function onMoveEnd(event: ViewStateChangeEvent) {
+		if (!mapId) return;
 
-			writeSavedViewport(mapId, {
-				latitude: event.viewState.latitude,
-				longitude: event.viewState.longitude,
-				zoom: event.viewState.zoom,
-			});
-		},
-		[mapId],
-	);
+		writeSavedViewport(mapId, {
+			latitude: event.viewState.latitude,
+			longitude: event.viewState.longitude,
+			zoom: event.viewState.zoom,
+		});
+	}
 
 	return {
 		// Style, tile, and sprite failures leave onLoad unfired; clear the spinner rather than hang
@@ -182,16 +173,15 @@ export function useMapCanvasEvents(onUnsupported: () => void) {
 function useClickHandler() {
 	const click = useMapClick();
 
-	return useCallback<NonNullable<MapCallbacks['onClick']>>(
-		({ features, target: mapInstance }) => {
-			const outcome = click(getCanvasClickHit(getClickInput(features?.[0])), mapInstance);
+	const onClick: NonNullable<MapCallbacks['onClick']> = ({ features, target: mapInstance }) => {
+		const outcome = click(getCanvasClickHit(getClickInput(features?.[0])), mapInstance);
 
-			if (outcome.kind === 'expand-cluster') {
-				void expandCluster(mapInstance, outcome.clusterId, outcome.center);
-			}
-		},
-		[click],
-	);
+		if (outcome.kind === 'expand-cluster') {
+			void expandCluster(mapInstance, outcome.clusterId, outcome.center);
+		}
+	};
+
+	return onClick;
 }
 
 function useThrottledMouseMoveHandler() {

@@ -1,17 +1,18 @@
 import type { FC } from 'react';
 
 import { LngLatBounds } from 'maplibre-gl';
-import { memo, useEffect, useLayoutEffect, useState } from 'react';
+import { useLayoutEffect, useState } from 'react';
 import { Map as ReactMapGlMap, useMap } from 'react-map-gl/maplibre';
 
 import type { MapComponentProps } from '#types.ts';
 
 import '#canvas/canvas-worker.ts';
+import { MapErrorBoundary } from '#canvas/canvas-error-boundary.tsx';
 import { useMapCanvasEvents } from '#canvas/canvas-events.ts';
+import { MapCanvasFallback } from '#canvas/canvas-fallback.tsx';
 import { MapSelectionFeatureState } from '#canvas/canvas-feature-state.tsx';
 import { MapHoverLabel } from '#canvas/canvas-hover-label.tsx';
 import { MapCanvasMode } from '#canvas/canvas-mode.tsx';
-import { MapCanvasUnsupported } from '#canvas/canvas-unsupported.tsx';
 import { getInitialViewState } from '#canvas/canvas-viewport.ts';
 import { MapScopeBar } from '#controls/controls-scope.tsx';
 import { MapControls } from '#controls/controls.tsx';
@@ -27,8 +28,6 @@ import { mapInteractiveLayerIds, mapSlotLayers } from '#source/source-config.ts'
 import { MapSource } from '#source/source.tsx';
 import { MapStoreProvider } from '#store/store.tsx';
 import { MapTargets } from '#targets/targets.tsx';
-
-const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
 
 // Features past the antimeridian only draw when world copies are on
 function isBeyondAntimeridian(bounds: MapComponentProps['bounds']) {
@@ -53,7 +52,7 @@ const MapRootMarker: FC = function MapRootMarker() {
 	const { current: map } = useMap();
 	const isDarkMode = useIsDarkMode();
 
-	useIsomorphicLayoutEffect(() => {
+	useLayoutEffect(() => {
 		if (!map) return;
 
 		const container = map.getMap().getContainer();
@@ -105,7 +104,7 @@ const MapCanvasContainer: FC = function MapCanvasContainer() {
 
 	useHostViewSync();
 
-	if (isUnsupported) return <MapCanvasUnsupported />;
+	if (isUnsupported) return <MapCanvasFallback messageKey="unsupportedMessage" />;
 
 	return (
 		<ReactMapGlMap
@@ -137,14 +136,16 @@ const MapCanvasContainer: FC = function MapCanvasContainer() {
 	);
 };
 
-export const MapCanvas: FC = memo(function MapCanvas() {
+export const MapCanvas: FC = function MapCanvas() {
 	const { host } = useMapConfig();
 
 	return (
-		<MapStoreProvider page={host.readView()}>
-			<CanvasDataProvider>
-				<MapCanvasContainer />
-			</CanvasDataProvider>
-		</MapStoreProvider>
+		<MapErrorBoundary>
+			<MapStoreProvider page={host.readView()}>
+				<CanvasDataProvider>
+					<MapCanvasContainer />
+				</CanvasDataProvider>
+			</MapStoreProvider>
+		</MapErrorBoundary>
 	);
-});
+};

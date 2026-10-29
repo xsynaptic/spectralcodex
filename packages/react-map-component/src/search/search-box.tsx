@@ -1,7 +1,7 @@
 import type { FC, KeyboardEvent, ReactNode, RefObject } from 'react';
 
 import { getNumberFormat } from '@spectralcodex/shared/i18n';
-import { useEffect, useId, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useId, useRef, useState } from 'react';
 
 import type { MapSearchResult, MapSearchText } from '#search/search-factory.ts';
 import type { MapMessages, MapOverlayClose } from '#types.ts';
@@ -45,11 +45,12 @@ const MapSearchHighlight: FC<{ parenthesis?: boolean; text: MapSearchText }> =
 
 const MapSearchOption: FC<{
 	id: string;
+	index: number;
 	isActive: boolean;
-	onActivate: () => void;
-	onPick: () => void;
+	onActivate: (index: number) => void;
+	onPick: (result: MapSearchResult) => void;
 	result: MapSearchResult;
-}> = function MapSearchOption({ id, isActive, onActivate, onPick, result }) {
+}> = memo(function MapSearchOption({ id, index, isActive, onActivate, onPick, result }) {
 	const { messages } = useMapConfig();
 
 	return (
@@ -57,8 +58,16 @@ const MapSearchOption: FC<{
 			aria-selected={isActive}
 			className="map-search-option"
 			id={id}
-			onClick={onPick}
-			onMouseMove={isActive ? undefined : onActivate}
+			onClick={() => {
+				onPick(result);
+			}}
+			onMouseMove={
+				isActive
+					? undefined
+					: () => {
+							onActivate(index);
+						}
+			}
 			role="option"
 		>
 			<span className="map-search-line">
@@ -87,7 +96,7 @@ const MapSearchOption: FC<{
 			</span>
 		</li>
 	);
-};
+});
 
 function getStatus(messages: MapMessages, count: number) {
 	if (count === 0) return messages.searchEmpty;
@@ -139,9 +148,12 @@ function useSearchKeys({
 	const activeIndex = active.results === results ? active.index : 0;
 	const activeResult = results[activeIndex];
 
-	function setActiveIndex(index: number) {
-		setActive({ index, results });
-	}
+	const setActiveIndex = useCallback(
+		(index: number) => {
+			setActive({ index, results });
+		},
+		[results],
+	);
 
 	function moveActive(step: number) {
 		const next = Math.max(Math.min(activeIndex + step, results.length - 1), 0);
@@ -232,6 +244,13 @@ export const MapSearchBox: FC<{
 	const { pick, pickOnEnter, results } = useMapSearch(query, onClose);
 	const listedResults = results ?? noResults;
 
+	const pickWithPointer = useCallback(
+		(result: MapSearchResult) => {
+			pick(result, 'pointer');
+		},
+		[pick],
+	);
+
 	function getOptionId(result: MapSearchResult) {
 		return `${listboxId}-${result.key}`;
 	}
@@ -296,14 +315,11 @@ export const MapSearchBox: FC<{
 				{listedResults.map((result, resultIndex) => (
 					<MapSearchOption
 						id={getOptionId(result)}
+						index={resultIndex}
 						isActive={resultIndex === activeIndex}
 						key={result.key}
-						onActivate={() => {
-							setActiveIndex(resultIndex);
-						}}
-						onPick={() => {
-							pick(result, 'pointer');
-						}}
+						onActivate={setActiveIndex}
+						onPick={pickWithPointer}
 						result={result}
 					/>
 				))}

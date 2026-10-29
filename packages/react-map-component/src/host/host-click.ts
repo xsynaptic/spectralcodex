@@ -108,12 +108,9 @@ export function useMapLinkClick(url: string) {
 	const { current: map } = useMap();
 	const click = useMapClick();
 
-	return useCallback(
-		(event: MouseEvent<HTMLAnchorElement>) => {
-			if (!map || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+	return (event: MouseEvent<HTMLAnchorElement>) => {
+		if (!map || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
 
-			if (click({ kind: 'link', url }, map.getMap()).kind === 'open') event.preventDefault();
-		},
-		[click, map, url],
-	);
+		if (click({ kind: 'link', url }, map.getMap()).kind === 'open') event.preventDefault();
+	};
 }

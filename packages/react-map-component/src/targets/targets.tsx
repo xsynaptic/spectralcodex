@@ -3,7 +3,7 @@ import type { LngLatBoundsLike, LngLatLike } from 'maplibre-gl';
 import type { FC } from 'react';
 import type { MapRef } from 'react-map-gl/maplibre';
 
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useEffectEvent, useRef } from 'react';
 import { useMap } from 'react-map-gl/maplibre';
 
 import type { MapComponentProps, MapScope } from '#types.ts';
@@ -102,14 +102,12 @@ function useViewFit(view: MapFitView) {
 
 	const key = `${view.targetIds.join(' ')} ${JSON.stringify(view.bounds)} ${String(width)}`;
 
-	const handledKeyRef = useRef<string | undefined>(undefined);
+	const hasFitRef = useRef(false);
 
-	useEffect(() => {
-		if (!map || !sourceData || handledKeyRef.current === key) return;
+	const fitView = useEffectEvent((map: MapRef, sourceData: ReadonlyArray<MapSourceItem>) => {
+		const isFirstFit = !hasFitRef.current;
 
-		const isFirstFit = handledKeyRef.current === undefined;
-
-		handledKeyRef.current = key;
+		hasFitRef.current = true;
 
 		// MapLibre resizes from a throttled observer; until then the fit measures the old width
 		map.resize();
@@ -123,7 +121,13 @@ function useViewFit(view: MapFitView) {
 			duration: isFirstFit ? 0 : fit.duration,
 			zoom: fit.zoom,
 		});
-	}, [key, map, sourceData, view]);
+	});
+
+	useEffect(() => {
+		if (!map || !sourceData) return;
+
+		fitView(map, sourceData);
+	}, [key, map, sourceData]);
 }
 
 export const MapTargets: FC = function MapTargets() {
@@ -131,7 +135,7 @@ export const MapTargets: FC = function MapTargets() {
 	const bounds = useMapStore((state) => state.view.scope?.bounds);
 	const scope = useMapStore(selectScope);
 
-	useViewFit(useMemo(() => ({ bounds, scope, targetIds }), [bounds, scope, targetIds]));
+	useViewFit({ bounds, scope, targetIds });
 
 	return <MapTargetMarkers />;
 };

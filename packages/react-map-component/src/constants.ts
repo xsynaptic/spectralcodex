@@ -29,6 +29,7 @@ export const mapControlClassName = {
 export const defaultMapMessages = {
 	copyCoordinatesLabel: 'Copy coordinates',
 	enterAriaLabel: 'Open map',
+	errorMessage: 'This map stopped working. Reloading the page should bring it back.',
 	exitAriaLabel: 'Close map',
 	expandAriaLabel: 'Expand map',
 	filterMenuActiveAriaLabel: 'Filter Menu, filters active',

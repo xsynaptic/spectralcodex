@@ -3,7 +3,7 @@ import type { SearchTracker } from '@spectralcodex/shared/search-tracker';
 import type { QueryClient } from '@tanstack/react-query';
 
 import { createSearchTracker } from '@spectralcodex/shared/search-tracker';
-import { queryOptions, useQuery } from '@tanstack/react-query';
+import { queryOptions, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react';
 import { useMap } from 'react-map-gl/maplibre';
 
@@ -38,6 +38,23 @@ function searchIndexQueryOptions(payloadBase: MapPayloadBase, mapFeaturesRule: M
 		queryKey: ['search-index', payloadBase, mapFeaturesRule],
 		staleTime: (query) => (query.state.data?.isComplete ? Infinity : 0),
 	});
+}
+
+export function usePrefetchMapSearch() {
+	const client = useQueryClient();
+	const { mapFeaturesRule, payloadBase } = useMapConfig();
+
+	async function prefetch() {
+		try {
+			await client.query(searchIndexQueryOptions(payloadBase, mapFeaturesRule));
+		} catch {
+			return;
+		}
+	}
+
+	return () => {
+		void prefetch();
+	};
 }
 
 function useSearchTracker() {

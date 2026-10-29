@@ -4,6 +4,15 @@ import { mapTrackEventName } from '#constants.ts';
 
 const trackedErrorKinds = new Set<string>();
 
+const trackedErrorMessageMaxLength = 100;
+
+// Tile URLs carry the Protomaps key in their query string
+export function getTrackedErrorMessage(error: unknown) {
+	const message = error instanceof Error ? error.message : String(error);
+
+	return message.replaceAll(/\?\S*/g, '').slice(0, trackedErrorMessageMaxLength);
+}
+
 export function trackMap(detail: MapTrackDetail) {
 	document.dispatchEvent(new CustomEvent<MapTrackDetail>(mapTrackEventName, { detail }));
 }

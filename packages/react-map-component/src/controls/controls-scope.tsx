@@ -13,6 +13,7 @@ import { useMapConfig } from '#lib/config.tsx';
 import { MapControlIcon, MapIconEye, MapIconEyeOff, MapIconSearch } from '#lib/icons.tsx';
 import { useTrackMap } from '#lib/track-hook.ts';
 import { MapSearchBox } from '#search/search-box.tsx';
+import { usePrefetchMapSearch } from '#search/search-hooks.ts';
 import { useMapStore } from '#store/store.tsx';
 
 const telescopeDurationMs = 200;
@@ -55,6 +56,7 @@ const MapScopeRest: FC<{ onOpen: () => void; openerRef: Ref<HTMLButtonElement> }
 	function MapScopeRest({ onOpen, openerRef }) {
 		const scopeHeld = useMapStore((state) => state.scope);
 		const { messages } = useMapConfig();
+		const prefetchSearch = usePrefetchMapSearch();
 		const searchLabel = scopeHeld ? messages.searchLabel : undefined;
 
 		return (
@@ -66,6 +68,8 @@ const MapScopeRest: FC<{ onOpen: () => void; openerRef: Ref<HTMLButtonElement> }
 						scopeHeld ? 'map-scope-button map-scope-search' : 'map-scope-button map-scope-prompt'
 					}
 					onClick={onOpen}
+					onFocus={prefetchSearch}
+					onPointerEnter={prefetchSearch}
 					ref={openerRef}
 					title={searchLabel}
 					type="button"

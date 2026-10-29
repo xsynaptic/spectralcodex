@@ -2,7 +2,6 @@ import type { MapSourceItem } from '@spectralcodex/map-codec';
 import type { FC } from 'react';
 
 import { getMapRowLabel } from '@spectralcodex/map-codec';
-import { memo } from 'react';
 import { Marker } from 'react-map-gl/maplibre';
 
 import type { MapHoverCluster } from '#types.ts';
@@ -55,7 +54,7 @@ const MapHoverClusterLabel: FC<{ cluster: MapHoverCluster }> = function MapHover
 	);
 };
 
-export const MapHoverLabel: FC = memo(function MapHoverLabel() {
+export const MapHoverLabel: FC = function MapHoverLabel() {
 	const hoveredCluster = useMapStore((state) => state.hoveredCluster);
 	const hoveredId = useMapStore((state) => state.hoveredId);
 	const selectedId = useMapStore((state) => state.selectedId);
@@ -70,4 +69,4 @@ export const MapHoverLabel: FC = memo(function MapHoverLabel() {
 	if (hoveredCluster) return <MapHoverClusterLabel cluster={hoveredCluster} />;
 
 	return;
-});
+};
