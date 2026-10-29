@@ -232,6 +232,48 @@ const MapSearchStatus: FC<{ count: number | undefined }> = function MapSearchSta
 	);
 };
 
+const MapSearchList: FC<{
+	activeIndex: number;
+	getOptionId: (result: MapSearchResult) => string;
+	id: string;
+	onActivate: (index: number) => void;
+	onPick: (result: MapSearchResult) => void;
+	results: Array<MapSearchResult>;
+}> = function MapSearchList({ activeIndex, getOptionId, id, onActivate, onPick, results }) {
+	const { messages } = useMapConfig();
+	const listRef = useRef<HTMLUListElement>(null);
+
+	useEffect(() => {
+		if (listRef.current) listRef.current.scrollTop = 0;
+	}, [results]);
+
+	return (
+		<ul
+			aria-label={messages.searchListAriaLabel}
+			className="map-search-list"
+			hidden={results.length === 0}
+			id={id}
+			onMouseDown={(event) => {
+				event.preventDefault();
+			}}
+			ref={listRef}
+			role="listbox"
+		>
+			{results.map((result, resultIndex) => (
+				<MapSearchOption
+					id={getOptionId(result)}
+					index={resultIndex}
+					isActive={resultIndex === activeIndex}
+					key={result.key}
+					onActivate={onActivate}
+					onPick={onPick}
+					result={result}
+				/>
+			))}
+		</ul>
+	);
+};
+
 export const MapSearchBox: FC<{
 	onClose: (how: MapOverlayClose) => void;
 	ref: RefObject<HTMLDivElement | null>;
@@ -239,7 +281,6 @@ export const MapSearchBox: FC<{
 	const { messages } = useMapConfig();
 	const listboxId = useId();
 	const inputRef = useRef<HTMLInputElement>(null);
-	const listRef = useRef<HTMLUListElement>(null);
 	const [query, setQuery] = useState('');
 	const { pick, pickOnEnter, results } = useMapSearch(query, onClose);
 	const listedResults = results ?? noResults;
@@ -266,10 +307,6 @@ export const MapSearchBox: FC<{
 	useEffect(() => {
 		inputRef.current?.focus();
 	}, []);
-
-	useEffect(() => {
-		if (listRef.current) listRef.current.scrollTop = 0;
-	}, [results]);
 
 	return (
 		<div className="map-search" ref={ref}>
@@ -301,29 +338,14 @@ export const MapSearchBox: FC<{
 				/>
 				<MapSearchClose onClose={onClose} />
 			</div>
-			<ul
-				aria-label={messages.searchListAriaLabel}
-				className="map-search-list"
-				hidden={listedResults.length === 0}
+			<MapSearchList
+				activeIndex={activeIndex}
+				getOptionId={getOptionId}
 				id={listboxId}
-				onMouseDown={(event) => {
-					event.preventDefault();
-				}}
-				ref={listRef}
-				role="listbox"
-			>
-				{listedResults.map((result, resultIndex) => (
-					<MapSearchOption
-						id={getOptionId(result)}
-						index={resultIndex}
-						isActive={resultIndex === activeIndex}
-						key={result.key}
-						onActivate={setActiveIndex}
-						onPick={pickWithPointer}
-						result={result}
-					/>
-				))}
-			</ul>
+				onActivate={setActiveIndex}
+				onPick={pickWithPointer}
+				results={listedResults}
+			/>
 			<MapSearchStatus count={results?.length} />
 		</div>
 	);
