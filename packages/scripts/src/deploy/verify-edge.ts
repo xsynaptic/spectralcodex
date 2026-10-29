@@ -1,6 +1,6 @@
 import { getCachePaths } from '@spectralcodex/shared/paths';
 import { parseRenditionName } from '@xsynaptic/astro-image-pipeline/names';
-import { findDistManifest, getImageCachePaths } from '@xsynaptic/astro-image-pipeline/node';
+import { findDistManifest, getImageStorePaths } from '@xsynaptic/astro-image-pipeline/node';
 import { fetchWithRetry, formatCount, formatError, log, withStep } from '@xsynaptic/astro-scripts';
 import { stat } from 'node:fs/promises';
 import path from 'node:path';
@@ -65,8 +65,8 @@ export async function verifyEdge({
 
 async function readImageSamples(paths: ScriptPaths) {
 	const { imagesPath } = getCachePaths(paths.cachePath);
-	const { renditionsPath } = getImageCachePaths(imagesPath);
-	const manifest = await findDistManifest({ cachePath: imagesPath, distPath: paths.distPath });
+	const { renditionsPath } = getImageStorePaths(imagesPath);
+	const manifest = await findDistManifest({ distPath: paths.distPath, storePath: imagesPath });
 
 	if (!manifest) return;
 

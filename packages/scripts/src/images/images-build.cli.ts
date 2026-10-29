@@ -12,8 +12,8 @@ await runCommand({
 		const { imagePurgeQueuePath, imagesPath } = getCachePaths(paths.cachePath);
 		const purgeQueue = await createPurgeQueue(imagePurgeQueuePath);
 		const render = await prepareRenditionRender({
-			cachePath: imagesPath,
 			distPath: paths.distPath,
+			storePath: imagesPath,
 		});
 		const progress = createProgress({ label: 'Rendering', total: render.total });
 

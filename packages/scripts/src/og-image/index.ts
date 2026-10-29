@@ -40,7 +40,6 @@ async function generateCards({
 	);
 	const renderCard = createRenderer({ fonts });
 	const render = await prepareCardRender({
-		cachePath: imagesPath,
 		decode: (source) =>
 			processImage({
 				imageInput: source.filePath,
@@ -48,6 +47,7 @@ async function generateCards({
 			}),
 		distPath: paths.distPath,
 		render: (input, image) => renderCard(OpenGraphCardTitlesSchema.parse(input), image),
+		storePath: imagesPath,
 		templateVersion,
 	});
 

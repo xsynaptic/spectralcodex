@@ -194,13 +194,13 @@ export default defineConfig({
 		atlas(),
 		imagePipeline({
 			baseUrl: IMAGE_BASE_URL,
-			cachePath: getCachePaths(CUSTOM_CACHE_PATH).imagesPath,
 			encoding: {
 				jpg: { quality: imageQualityByFormat.jpg },
 				webp: { quality: imageQualityByFormat.webp },
 			},
 			mediaPath: CONTENT_MEDIA_PATH,
 			placeholders: { pixels: 250, quality: 10, saturation: 1.2 },
+			storePath: getCachePaths(CUSTOM_CACHE_PATH).imagesPath,
 		}),
 		compressor({
 			gzip: false,

@@ -1,7 +1,7 @@
 import { openGraphBasePath, openGraphImageFormat } from '@spectralcodex/shared/open-graph';
 import { getCachePaths } from '@spectralcodex/shared/paths';
 import { imageFormats } from '@xsynaptic/astro-image-pipeline/names';
-import { getImageCachePaths } from '@xsynaptic/astro-image-pipeline/node';
+import { getImageStorePaths } from '@xsynaptic/astro-image-pipeline/node';
 import { log, UserError, withStep } from '@xsynaptic/astro-scripts';
 import { readdir } from 'node:fs/promises';
 
@@ -46,7 +46,7 @@ export function getRenditionSet(paths: ScriptPaths, config: DeployConfig): Rende
 		command: 'pnpm render-images',
 		extensions: imageFormats,
 		label: 'renditions',
-		localPath: getImageCachePaths(getCachePaths(paths.cachePath).imagesPath).renditionsPath,
+		localPath: getImageStorePaths(getCachePaths(paths.cachePath).imagesPath).renditionsPath,
 		purge: {
 			baseUrl: config.imageBaseUrl,
 			queuePath: getCachePaths(paths.cachePath).imagePurgeQueuePath,
@@ -62,7 +62,7 @@ export function getOpenGraphSet(paths: ScriptPaths, config: DeployConfig): Rende
 		command: 'pnpm render-opengraph',
 		extensions: [openGraphImageFormat],
 		label: 'OpenGraph cards',
-		localPath: getImageCachePaths(getCachePaths(paths.cachePath).imagesPath).cardsPath,
+		localPath: getImageStorePaths(getCachePaths(paths.cachePath).imagesPath).cardsPath,
 		remotePath: `${config.sitePath}/${openGraphBasePath}`,
 		title: 'OpenGraph cards',
 	};

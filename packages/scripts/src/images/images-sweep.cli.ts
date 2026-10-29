@@ -6,12 +6,16 @@ import { formatBytes, formatCount, log, UserError, withSpinner } from '@xsynapti
 import * as R from 'remeda';
 
 import { loadDeployConfig } from '#deploy/deploy-config.ts';
+import { getOpenGraphSet, getRenditionSet } from '#deploy/deploy-images.ts';
 import { ensureSshKeychain } from '#deploy/rsync-exec.ts';
 import {
 	deleteRemoteFiles,
+	getRemoteDeletions,
 	getSweepRefusals,
+	listLocalNames,
 	listRemoteFiles,
 	readLiveBuild,
+	sweepRetentionDays,
 	sweepShareLimit,
 } from '#images/images-sweep.ts';
 import { runCommand } from '#shared/command.ts';
@@ -49,32 +53,73 @@ await runCommand({
 
 		const config = loadDeployConfig();
 		const { imagesPath } = getCachePaths(paths.cachePath);
+		const now = new Date();
 		const live = await withSpinner('Reading the live build', () => readLiveBuild(config));
-		const sweep = await withSpinner('Reading the cache', () =>
-			prepareImageSweep({ cachePath: imagesPath, keep: [live.buildId] }),
+		const sweep = await withSpinner('Reading the store', () =>
+			prepareImageSweep({
+				live: live.buildId,
+				retentionDays: sweepRetentionDays,
+				storePath: imagesPath,
+			}),
 		);
-		const remoteFiles = await withSpinner('Listing the image host', () => listRemoteFiles(config));
-		const remoteDeletions = remoteFiles.filter((file) => !sweep.keep.has(file.name));
+		const kinds = await withSpinner('Listing the image hosts', () =>
+			Promise.all(
+				[
+					{ key: 'renditions' as const, label: 'Renditions', set: getRenditionSet(paths, config) },
+					{ key: 'cards' as const, label: 'Cards', set: getOpenGraphSet(paths, config) },
+				].map(async (kind) => {
+					const plan = sweep[kind.key];
+					const remoteFiles = await listRemoteFiles(config, kind.set.remotePath);
+					const localNames = await listLocalNames(plan.directory);
+					const retentionDays = sweepRetentionDays[kind.key];
+
+					return {
+						...kind,
+						localNames,
+						plan,
+						remoteDeletions: getRemoteDeletions({
+							deletions: plan.deletions,
+							localNames,
+							now,
+							remoteFiles,
+							retentionDays,
+						}),
+						remoteFiles,
+						retentionDays,
+					};
+				}),
+			),
+		);
 
 		log.summary([
 			['Live build', live.buildId],
 			['Live since', live.liveAt.toISOString()],
-			['Kept names', sweep.keep.size],
-			['Local files', sweep.total],
-			['Local deletions', describeFiles(sweep.deletions)],
-			['Remote files', remoteFiles.length],
-			['Remote deletions', describeFiles(remoteDeletions)],
+			...kinds.flatMap(
+				({ label, plan, remoteDeletions, remoteFiles }): Array<[string, number | string]> => [
+					[`${label}, local`, plan.total],
+					[`${label}, local deletions`, describeFiles(plan.deletions)],
+					[`${label}, remote`, remoteFiles.length],
+					[`${label}, remote deletions`, describeFiles(remoteDeletions)],
+				],
+			),
 		]);
-		logSample('Local deletions', sweep.deletions);
-		logSample('Remote deletions', remoteDeletions);
+
+		for (const { label, plan, remoteDeletions } of kinds) {
+			logSample(`${label}, local deletions`, plan.deletions);
+			logSample(`${label}, remote deletions`, remoteDeletions);
+		}
 
 		const refusals = getSweepRefusals({
-			counts: [
-				{ deletions: sweep.deletions.length, label: 'The cache', total: sweep.total },
-				{ deletions: remoteDeletions.length, label: 'The image host', total: remoteFiles.length },
-			],
+			counts: kinds.flatMap(({ label, plan, remoteDeletions, remoteFiles }) => [
+				{ deletions: plan.deletions.length, label: `${label} in the store`, total: plan.total },
+				{
+					deletions: remoteDeletions.length,
+					label: `${label} on the server`,
+					total: remoteFiles.length,
+				},
+			]),
 			live,
-			now: new Date(),
+			now,
 		});
 
 		if (values['dry-run']) {
@@ -90,18 +135,31 @@ await runCommand({
 			});
 		}
 
-		// Local first: an upload only adds, so a rendition left here would return on the next deploy
-		const result = await withSpinner('Sweeping the cache', () => sweep.run());
-		const remoteSwept = remoteFiles.filter((file) => !result.keep.has(file.name));
+		// Local first: an upload only adds, so a file left here would return on the next deploy
+		const result = await withSpinner('Sweeping the store', () => sweep.run());
+		const rows: Array<[string, number | string]> = [];
 
-		await withSpinner('Sweeping the image host', () => deleteRemoteFiles(config, remoteSwept));
+		for (const { key, label, localNames, remoteFiles, retentionDays, set } of kinds) {
+			const files = getRemoteDeletions({
+				deletions: result[key].deletions,
+				localNames,
+				now,
+				remoteFiles,
+				retentionDays,
+			});
 
-		log.summary([
-			['Local deleted', describeFiles(result.deletions)],
-			['Remote deleted', describeFiles(remoteSwept)],
-			['Manifests dropped', result.droppedBuilds.length],
-		]);
+			await withSpinner(`Sweeping ${label.toLowerCase()} on the server`, () =>
+				deleteRemoteFiles(config, set.remotePath, files),
+			);
+
+			rows.push(
+				[`${label}, local deleted`, describeFiles(result[key].deletions)],
+				[`${label}, remote deleted`, describeFiles(files)],
+			);
+		}
+
+		log.summary([...rows, ['Manifests dropped', result.droppedBuilds.length]]);
 	},
-	summary: 'Delete renditions neither the live build nor the newest build references',
+	summary: 'Delete renditions and cards past their window that no kept build names',
 	title: 'Sweep images',
 });
