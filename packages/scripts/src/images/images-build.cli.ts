@@ -1,5 +1,5 @@
 import { getCachePaths } from '@spectralcodex/shared/paths';
-import { engineVersions, prepareImageRender } from '@xsynaptic/astro-image-pipeline/node';
+import { engineVersions, prepareRenditionRender } from '@xsynaptic/astro-image-pipeline/node';
 import { createProgress, log } from '@xsynaptic/astro-scripts';
 
 import { runCommand } from '#shared/command.ts';
@@ -11,7 +11,10 @@ await runCommand({
 	async run({ paths, signal }) {
 		const { imagePurgeQueuePath, imagesPath } = getCachePaths(paths.cachePath);
 		const purgeQueue = await createPurgeQueue(imagePurgeQueuePath);
-		const render = await prepareImageRender({ cachePath: imagesPath, distPath: paths.distPath });
+		const render = await prepareRenditionRender({
+			cachePath: imagesPath,
+			distPath: paths.distPath,
+		});
 		const progress = createProgress({ label: 'Rendering', total: render.total });
 
 		const counts = await render.run({

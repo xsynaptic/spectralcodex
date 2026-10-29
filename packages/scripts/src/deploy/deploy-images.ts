@@ -62,7 +62,7 @@ export function getOpenGraphSet(paths: ScriptPaths, config: DeployConfig): Rende
 		command: 'pnpm render-opengraph',
 		extensions: [openGraphImageFormat],
 		label: 'OpenGraph cards',
-		localPath: getImageCachePaths(getCachePaths(paths.cachePath).imagesPath).openGraphCardsPath,
+		localPath: getImageCachePaths(getCachePaths(paths.cachePath).imagesPath).cardsPath,
 		remotePath: `${config.sitePath}/${openGraphBasePath}`,
 		title: 'OpenGraph cards',
 	};

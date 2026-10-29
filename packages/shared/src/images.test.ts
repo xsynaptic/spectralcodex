@@ -1,4 +1,4 @@
-import { getSizedName } from '@xsynaptic/astro-image-pipeline/names';
+import { getRenditionName } from '@xsynaptic/astro-image-pipeline/names';
 import { describe, expect, test } from 'vitest';
 
 import { getImageName, getImagePresetSize, getImagePresetWidths } from '#images.ts';
@@ -74,7 +74,7 @@ describe('getImageName', () => {
 	test('a preset and a sized call for the same size and format share one name', () => {
 		const source = makeSource(3600, 2400);
 
-		expect(getSizedName(source, { format: 'webp', height: 800, width: 1200 })).toBe(
+		expect(getRenditionName(source, { format: 'webp', height: 800, width: 1200 })).toBe(
 			getImageName(source, 'hero', 1200),
 		);
 		expect(getImageName(source, 'feed', 900)).toBe(getImageName(source, 'card-hq', 900));

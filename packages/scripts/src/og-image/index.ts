@@ -5,10 +5,7 @@ import {
 	openGraphImageWidth,
 } from '@spectralcodex/shared/open-graph';
 import { getCachePaths } from '@spectralcodex/shared/paths';
-import {
-	hashTemplateVersion,
-	prepareOpenGraphCardRender,
-} from '@xsynaptic/astro-image-pipeline/node';
+import { hashTemplateVersion, prepareCardRender } from '@xsynaptic/astro-image-pipeline/node';
 import { createProgress, formatCount, log, UserError, withSpinner } from '@xsynaptic/astro-scripts';
 import { rmSync } from 'node:fs';
 
@@ -42,7 +39,7 @@ async function generateCards({
 		(loaded) => `Loaded ${String(loaded.length)} font variants`,
 	);
 	const renderCard = createRenderer({ fonts });
-	const render = await prepareOpenGraphCardRender({
+	const render = await prepareCardRender({
 		cachePath: imagesPath,
 		decode: (source) =>
 			processImage({

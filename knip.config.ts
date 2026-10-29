@@ -3,7 +3,7 @@ import type { KnipConfig } from 'knip';
 export default {
 	workspaces: {
 		'.': {
-			// MDX auto-import components; referenced via remark-auto-import, not static imports
+			// MDX auto-import components; referenced via satteri-auto-import, not static imports
 			// The inventory page is injected as a route under `astro dev`, never imported
 			entry: [
 				'src/components/mdx/*.astro',

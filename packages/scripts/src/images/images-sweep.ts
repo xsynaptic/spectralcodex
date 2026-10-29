@@ -1,3 +1,6 @@
+import type { ImageSweepFile } from '@xsynaptic/astro-image-pipeline/node';
+
+import { imageBuildIdFile } from '@xsynaptic/astro-image-pipeline/node';
 import { formatDuration, UserError } from '@xsynaptic/astro-scripts';
 
 import type { DeployConfig } from '#deploy/deploy-config.ts';
@@ -14,11 +17,6 @@ export const sweepWaitMs = 2 * 24 * 60 * 60 * 1000;
 export interface LiveBuild {
 	buildId: string;
 	liveAt: Date;
-}
-
-export interface SweepFile {
-	name: string;
-	size: number;
 }
 
 interface SweepCount {
@@ -56,7 +54,7 @@ export function getSweepRefusals({
 	return refusals;
 }
 
-export function parseRemoteListing(listing: string): Array<SweepFile> {
+export function parseRemoteListing(listing: string): Array<ImageSweepFile> {
 	return listing
 		.split('\n')
 		.filter(Boolean)
@@ -75,10 +73,10 @@ async function readLiveBuildFile(config: DeployConfig) {
 	try {
 		return await sshCapture(
 			config,
-			`cd ${config.sitePath} && stat -c %Z image-build-id.txt && cat image-build-id.txt`,
+			`cd ${config.sitePath} && stat -c %Z ${imageBuildIdFile} && cat ${imageBuildIdFile}`,
 		);
 	} catch (error) {
-		throw new UserError(`Could not read image-build-id.txt from ${config.sitePath}`, {
+		throw new UserError(`Could not read ${imageBuildIdFile} from ${config.sitePath}`, {
 			cause: error,
 		});
 	}
@@ -89,7 +87,7 @@ export async function readLiveBuild(config: DeployConfig): Promise<LiveBuild> {
 	const [changedAt, buildId] = output.trim().split('\n', 2);
 
 	if (changedAt === undefined || !buildId) {
-		throw new UserError(`${config.sitePath}/image-build-id.txt is empty`);
+		throw new UserError(`${config.sitePath}/${imageBuildIdFile} is empty`);
 	}
 
 	return { buildId: buildId.trim(), liveAt: new Date(Number(changedAt) * 1000) };
@@ -104,7 +102,10 @@ export async function listRemoteFiles(config: DeployConfig) {
 	return parseRemoteListing(listing);
 }
 
-export async function deleteRemoteFiles(config: DeployConfig, files: ReadonlyArray<SweepFile>) {
+export async function deleteRemoteFiles(
+	config: DeployConfig,
+	files: ReadonlyArray<ImageSweepFile>,
+) {
 	if (files.length === 0) return;
 
 	await sshExecWithInput(

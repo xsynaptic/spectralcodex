@@ -1,5 +1,5 @@
 import { getCachePaths } from '@spectralcodex/shared/paths';
-import { parseImageName } from '@xsynaptic/astro-image-pipeline/names';
+import { parseRenditionName } from '@xsynaptic/astro-image-pipeline/names';
 import { findDistManifest, getImageCachePaths } from '@xsynaptic/astro-image-pipeline/node';
 import { fetchWithRetry, formatCount, formatError, log, withStep } from '@xsynaptic/astro-scripts';
 import { stat } from 'node:fs/promises';
@@ -71,7 +71,7 @@ async function readImageSamples(paths: ScriptPaths) {
 	if (!manifest) return;
 
 	const samples = R.sample(Object.keys(manifest.renditions), imageSampleSize).flatMap((name) => {
-		const parsed = parseImageName(name);
+		const parsed = parseRenditionName(name);
 
 		return parsed ? [{ format: parsed.format, name }] : [];
 	});

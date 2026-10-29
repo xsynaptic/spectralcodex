@@ -1,7 +1,7 @@
 import type { ImageFormat } from '@xsynaptic/astro-image-pipeline/names';
 
 import { imageQualityByFormat } from '@spectralcodex/shared/images';
-import { parseImageName } from '@xsynaptic/astro-image-pipeline/names';
+import { parseRenditionName } from '@xsynaptic/astro-image-pipeline/names';
 import { createHash } from 'node:crypto';
 
 import type { DeployConfig } from '#deploy/deploy-config.ts';
@@ -181,7 +181,7 @@ function toSiteProbes(
 
 // Real legacy URLs still hit their cached 200s at the edge, so the probe makes up a signature to reach the redirect
 function getLegacyRedirectProbes(imageBaseUrl: string, imagePath: string, token: string) {
-	const parsed = parseImageName(imagePath);
+	const parsed = parseRenditionName(imagePath);
 
 	if (parsed?.height === undefined) {
 		return { failures: [`legacy redirect: hero candidate ${imagePath} is not a crop`], probes: [] };

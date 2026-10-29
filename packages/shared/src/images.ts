@@ -7,7 +7,7 @@ import type {
 
 import {
 	fitWithinSource,
-	getSizedName,
+	getRenditionName,
 	isWithinSource,
 } from '@xsynaptic/astro-image-pipeline/names';
 
@@ -131,5 +131,5 @@ export function getImageName(
 		);
 	}
 
-	return getSizedName(source, { format: preset.format, ...size });
+	return getRenditionName(source, { format: preset.format, ...size });
 }

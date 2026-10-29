@@ -1,9 +1,9 @@
+import type { ImageSweepFile } from '@xsynaptic/astro-image-pipeline/node';
+
 import { getCachePaths } from '@spectralcodex/shared/paths';
 import { prepareImageSweep } from '@xsynaptic/astro-image-pipeline/node';
 import { formatBytes, formatCount, log, UserError, withSpinner } from '@xsynaptic/astro-scripts';
 import * as R from 'remeda';
-
-import type { SweepFile } from '#images/images-sweep.ts';
 
 import { loadDeployConfig } from '#deploy/deploy-config.ts';
 import { ensureSshKeychain } from '#deploy/rsync-exec.ts';
@@ -18,11 +18,11 @@ import { runCommand } from '#shared/command.ts';
 
 const sampleSize = 10;
 
-function describeFiles(files: ReadonlyArray<SweepFile>) {
+function describeFiles(files: ReadonlyArray<ImageSweepFile>) {
 	return `${formatCount(files.length)} (${formatBytes(R.sumBy(files, (file) => file.size))})`;
 }
 
-function logSample(label: string, files: ReadonlyArray<SweepFile>) {
+function logSample(label: string, files: ReadonlyArray<ImageSweepFile>) {
 	if (files.length === 0) return;
 
 	log.step(`${label}, first ${String(Math.min(sampleSize, files.length))}:`);

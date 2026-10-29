@@ -200,7 +200,7 @@ export default defineConfig({
 				webp: { quality: imageQualityByFormat.webp },
 			},
 			mediaPath: CONTENT_MEDIA_PATH,
-			placeholders: { pixels: 250, recipe: 'mosaic' },
+			placeholders: { pixels: 250, quality: 10, saturation: 1.2 },
 		}),
 		compressor({
 			gzip: false,
