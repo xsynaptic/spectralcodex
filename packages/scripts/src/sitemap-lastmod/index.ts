@@ -1,5 +1,5 @@
-import type { SitemapLastmod } from '@spectralcodex/shared/sitemap';
 import type { ContentEntry } from '@xsynaptic/astro-scripts';
+import type { SitemapLastmodPair } from '@xsynaptic/astro-sitemap-lastmod/write';
 
 import { getPublicId } from '@spectralcodex/shared/entries';
 import { getCachePaths } from '@spectralcodex/shared/paths';
@@ -12,20 +12,17 @@ import {
 	withAstroContent,
 	withSpinner,
 } from '@xsynaptic/astro-scripts';
-import { writeFileSync } from 'node:fs';
+import { createSitemapLastmodWriter } from '@xsynaptic/astro-sitemap-lastmod/write';
 import path from 'node:path';
 
 import type { ScriptPaths } from '#shared/command.ts';
 
-import { safelyCreateDirectory } from '#shared/files.ts';
-
 interface SitemapLastmodOptions {
 	paths: ScriptPaths;
 	rootPath: string;
-	siteUrl: string;
 }
 
-export async function generateSitemapLastmod({ paths, rootPath, siteUrl }: SitemapLastmodOptions) {
+export async function generateSitemapLastmod({ paths, rootPath }: SitemapLastmodOptions) {
 	const outputPath = getCachePaths(paths.cachePath).sitemapLastmodPath;
 
 	const entries = await withSpinner('Loading content', () =>
@@ -49,32 +46,20 @@ export async function generateSitemapLastmod({ paths, rootPath, siteUrl }: Sitem
 	const gitMap = await withSpinner('Reading git log', () =>
 		getEntryCommitDates(contentEntries, { rootPath }),
 	);
-	const { missingDateCount, resolvedCount, urls } = resolveUrls(contentEntries, gitMap, siteUrl);
+	const { missingDateCount, pairs } = resolvePathDates(contentEntries, gitMap);
 
-	safelyCreateDirectory(path.dirname(outputPath));
+	const resolvedCount = createSitemapLastmodWriter({ filePath: outputPath }).record(pairs);
 
-	const payload = {
-		generatedAt: new Date().toISOString(),
-		urls,
-	} satisfies SitemapLastmod;
-
-	writeFileSync(outputPath, JSON.stringify(payload, undefined, 2));
-
-	log.success(`Resolved ${formatCount(resolvedCount)} URLs → ${outputPath}`);
+	log.success(`Resolved ${formatCount(resolvedCount)} paths → ${outputPath}`);
 
 	if (missingDateCount > 0) {
 		log.warn(`${formatCount(missingDateCount)} entries with no matching git history`);
 	}
 }
 
-function buildContentUrl(siteUrl: string, collection: string, id: string): string {
-	return joinUrl(siteUrl, siteBasePath, getCollectionSegment(collection), id, '/');
-}
+function resolvePathDates(entries: Array<ContentEntry>, gitMap: Map<string, string>) {
+	const pairs: Array<SitemapLastmodPair> = [];
 
-function resolveUrls(entries: Array<ContentEntry>, gitMap: Map<string, string>, siteUrl: string) {
-	const urls: Record<string, string> = {};
-
-	let resolvedCount = 0;
 	let missingDateCount = 0;
 
 	for (const entry of entries) {
@@ -86,11 +71,11 @@ function resolveUrls(entries: Array<ContentEntry>, gitMap: Map<string, string>, 
 			continue;
 		}
 
-		const url = buildContentUrl(siteUrl, entry.collection, getPublicId(entry));
-
-		urls[url] = gitDate;
-		resolvedCount++;
+		pairs.push([
+			joinUrl(siteBasePath, getCollectionSegment(entry.collection), getPublicId(entry)),
+			gitDate,
+		]);
 	}
 
-	return { missingDateCount, resolvedCount, urls };
+	return { missingDateCount, pairs };
 }

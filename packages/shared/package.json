@@ -19,7 +19,6 @@
 		"./routing": "./src/routing.ts",
 		"./schemas": "./src/schemas/index.ts",
 		"./search-tracker": "./src/search-tracker.ts",
-		"./sitemap": "./src/sitemap.ts",
 		"./text": "./src/text.ts"
 	},
 	"imports": {
@@ -27,7 +26,7 @@
 	},
 	"private": true,
 	"dependencies": {
-		"@xsynaptic/astro-image-pipeline": "^0.11.0",
+		"@xsynaptic/astro-image-pipeline": "^0.11.1",
 		"zod": "^4.6.7"
 	}
 }

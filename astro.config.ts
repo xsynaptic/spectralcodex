@@ -13,10 +13,10 @@ import {
 	getCachePaths,
 } from '@spectralcodex/shared/paths';
 import { siteBasePath } from '@spectralcodex/shared/routing';
-import { readSitemapLastmod } from '@spectralcodex/shared/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import buildLogger from '@xsynaptic/astro-build-logger';
 import imagePipeline from '@xsynaptic/astro-image-pipeline';
+import { sitemapLastmod } from '@xsynaptic/astro-sitemap-lastmod';
 import { autoImport } from '@xsynaptic/satteri-auto-import';
 import { imgGroupSatteriPlugin } from '@xsynaptic/satteri-img-group';
 import { trailingSlash as trailingSlashPlugin } from '@xsynaptic/satteri-trailing-slash';
@@ -59,15 +59,7 @@ function isPrecompressed(filePath: string) {
 	return distFilePath.startsWith(`${assetsPath}/`) && /\.(?:css|js)$/.test(distFilePath);
 }
 
-// Read on first use, so loading this config never depends on a file a content script writes
-let sitemapLastmodCache: ReturnType<typeof readSitemapLastmod> | undefined;
-
-function getSitemapLastmod() {
-	if (!sitemapLastmodCache)
-		sitemapLastmodCache = readSitemapLastmod(getCachePaths(CUSTOM_CACHE_PATH).sitemapLastmodPath);
-
-	return sitemapLastmodCache;
-}
+const lastmod = sitemapLastmod({ filePath: getCachePaths(CUSTOM_CACHE_PATH).sitemapLastmodPath });
 
 export default defineConfig({
 	base: siteBasePath,
@@ -173,15 +165,9 @@ export default defineConfig({
 		mdx(),
 		sitemap({
 			filter: (page) => getUrlPathIndexing(new URL(page).pathname).index,
-			serialize: (item) => {
-				const sitemapLastmod = getSitemapLastmod();
-
-				return {
-					...item,
-					lastmod: sitemapLastmod.urls[item.url] ?? sitemapLastmod.generatedAt,
-				};
-			},
+			serialize: lastmod.serialize,
 		}),
+		lastmod.integration,
 		pagefind({
 			indexConfig: {
 				excludeSelectors: [

@@ -261,11 +261,14 @@ importers:
         specifier: ^1.4.0
         version: 1.4.0(astro@7.4.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(exiftool-vendored@39.0.1)(sharp@0.35.5(@types/node@26.6.5))(zod@4.6.7)
       '@xsynaptic/astro-image-pipeline':
-        specifier: ^0.11.0
-        version: 0.11.0(astro@7.4.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(sharp@0.35.5(@types/node@26.6.5))
+        specifier: ^0.11.1
+        version: 0.11.1(astro@7.4.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(sharp@0.35.5(@types/node@26.6.5))
       '@xsynaptic/astro-scripts':
         specifier: ^0.14.0
         version: 0.14.0(astro@7.4.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(satteri@0.10.5)
+      '@xsynaptic/astro-sitemap-lastmod':
+        specifier: ^0.1.0
+        version: 0.1.0(astro@7.4.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
       '@xsynaptic/eslint-config':
         specifier: ^6.8.0
         version: 6.8.0(@typescript-eslint/parser@8.72.1(eslint@10.13.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint-plugin-jsx-a11y@6.10.2(eslint@10.13.0(jiti@2.7.0)(supports-color@10.2.2)))(eslint@10.13.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)
@@ -541,11 +544,14 @@ importers:
         specifier: ^2.16.2
         version: 2.16.2
       '@xsynaptic/astro-image-pipeline':
-        specifier: ^0.11.0
-        version: 0.11.0(astro@7.4.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(sharp@0.35.5(@types/node@26.6.5))
+        specifier: ^0.11.1
+        version: 0.11.1(astro@7.4.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(sharp@0.35.5(@types/node@26.6.5))
       '@xsynaptic/astro-scripts':
         specifier: ^0.14.0
         version: 0.14.0(astro@7.4.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(satteri@0.10.5)
+      '@xsynaptic/astro-sitemap-lastmod':
+        specifier: ^0.1.0
+        version: 0.1.0(astro@7.4.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
       '@xsynaptic/unified-tools':
         specifier: ^5.1.3
         version: 5.1.3(supports-color@10.2.2)
@@ -607,8 +613,8 @@ importers:
   packages/shared:
     dependencies:
       '@xsynaptic/astro-image-pipeline':
-        specifier: ^0.11.0
-        version: 0.11.0(astro@7.4.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(sharp@0.35.5(@types/node@26.6.5))
+        specifier: ^0.11.1
+        version: 0.11.1(astro@7.4.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(sharp@0.35.5(@types/node@26.6.5))
       zod:
         specifier: ^4.6.7
         version: 4.6.7
@@ -2951,8 +2957,8 @@ packages:
       sharp:
         optional: true
 
-  '@xsynaptic/astro-image-pipeline@0.11.0':
-    resolution: {integrity: sha512-l3CA5HxdEBChcvDP0Dd3h8H8rcmX8j3EoCAnlsOc525NhHw+MtHjV3QxeVniqR2CBgO+KMvlY2keqWD4zqiiFw==}
+  '@xsynaptic/astro-image-pipeline@0.11.1':
+    resolution: {integrity: sha512-dDAWD10lImx6wh7ZRRJ8c8qkecKlW3AqOmkZ+1dgX32B+r9zRUy/0hmksnj8lJFrpC+ApkdvI6llbNBoEOqhEA==}
     engines: {node: '>=24.0.0'}
     peerDependencies:
       astro: ^7.4.2
@@ -2969,6 +2975,12 @@ packages:
         optional: true
       satteri:
         optional: true
+
+  '@xsynaptic/astro-sitemap-lastmod@0.1.0':
+    resolution: {integrity: sha512-wMlaUdZu6DkGCM5Xh9cpdPW78AnhxVymK/TysZ9aTkpdzYYGb/4c32QsHUpiomy7Ap5fPWzZBqhqQ80yviJ1pA==}
+    engines: {node: '>=24.0.0'}
+    peerDependencies:
+      astro: ^7.4.2
 
   '@xsynaptic/eslint-config@6.8.0':
     resolution: {integrity: sha512-DWKEfz8FMqr75FG2hwphE6PLCYfyq6jhBjERJfqntaTaIRpviDlTrZsHJOJiquKntod7J1m5FD6k0m58BJQ0ag==}
@@ -9076,7 +9088,7 @@ snapshots:
       exiftool-vendored: 39.0.1
       sharp: 0.35.5(@types/node@26.6.5)
 
-  '@xsynaptic/astro-image-pipeline@0.11.0(astro@7.4.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(sharp@0.35.5(@types/node@26.6.5))':
+  '@xsynaptic/astro-image-pipeline@0.11.1(astro@7.4.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(sharp@0.35.5(@types/node@26.6.5))':
     dependencies:
       astro: 7.4.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)
       p-limit: 7.3.3
@@ -9090,6 +9102,10 @@ snapshots:
     optionalDependencies:
       astro: 7.4.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)
       satteri: 0.10.5
+
+  '@xsynaptic/astro-sitemap-lastmod@0.1.0(astro@7.4.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))':
+    dependencies:
+      astro: 7.4.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)
 
   '@xsynaptic/eslint-config@6.8.0(@typescript-eslint/parser@8.72.1(eslint@10.13.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint-plugin-jsx-a11y@6.10.2(eslint@10.13.0(jiti@2.7.0)(supports-color@10.2.2)))(eslint@10.13.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)':
     dependencies:

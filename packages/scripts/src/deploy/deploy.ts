@@ -84,10 +84,7 @@ await runCommand({
 			() => runScript('Generating redirects', 'generate-redirects'),
 			() => runScript('Finding similar content', 'similar-content'),
 			webmentions,
-			() =>
-				withStep('Sitemap lastmod', () =>
-					generateSitemapLastmod({ paths, rootPath, siteUrl: config.siteUrl }),
-				),
+			() => withStep('Sitemap lastmod', () => generateSitemapLastmod({ paths, rootPath })),
 			build,
 			() => runScript('Rendering images', 'render-images'),
 			() => runScript('Rendering OpenGraph cards', 'render-opengraph'),
