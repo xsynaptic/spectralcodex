@@ -176,12 +176,3 @@ Allow: /"
 		hide .*
 	}
 }
-
-api.spectralcodex.com {
-	import spectralcodex-tls
-	handle /robots.txt {
-		respond "User-agent: *
-Disallow: /"
-	}
-	respond "API coming soon!" 503
-}
