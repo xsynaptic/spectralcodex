@@ -16,6 +16,13 @@
 	.maplibregl-ctrl:has(> .map-ctrl-expand) {
 		display: none;
 	}
+
+	/* A raised Sheet covers this control and the system answers edge drags on the handle, trapping the reader in fullscreen */
+	@media (width < 64rem) {
+		.maplibregl-ctrl:has(> .maplibregl-ctrl-fullscreen, > .maplibregl-ctrl-shrink) {
+			display: none;
+		}
+	}
 }
 
 .main-pane {

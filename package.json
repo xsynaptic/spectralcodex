@@ -9,7 +9,6 @@
 		"check-links": "pnpm -F @spectralcodex/scripts check-links",
 		"check-types": "tsc --noEmit --extendedDiagnostics",
 		"content-schemas": "pnpm -F @spectralcodex/scripts content-schemas",
-		"deploy-app": "pnpm -F @spectralcodex/scripts deploy-app",
 		"deploy-caddy": "pnpm -F @spectralcodex/scripts deploy-caddy",
 		"deploy-images": "pnpm -F @spectralcodex/scripts deploy-images",
 		"deploy-infra": "pnpm -F @spectralcodex/scripts deploy-infra",
