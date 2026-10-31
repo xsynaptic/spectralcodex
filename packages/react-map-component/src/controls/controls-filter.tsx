@@ -1,19 +1,20 @@
-import type { LocationStatus, LocationStatusMetadata } from '@spectralcodex/shared/map';
 import type { CSSProperties, FC, PropsWithChildren, RefObject } from 'react';
 import type { ControlPosition } from 'react-map-gl/maplibre';
 
-import { locationStatusOrder, LocationStatusRecords } from '@spectralcodex/shared/map';
 import { memo, useId, useLayoutEffect } from 'react';
+
+import type { MapFilterStatusOption } from '#data/data-filter.ts';
 
 import { mapControlClassName } from '#constants.ts';
 import { CustomControlPortal } from '#controls/controls-custom.tsx';
 import { useOverlay } from '#controls/controls-overlay.ts';
+import { hasActiveFilter, mapFilterStatusOptions } from '#data/data-filter.ts';
 import { useIsMapLoading } from '#data/data-query.ts';
 import { getActiveAttribute } from '#lib/active-attribute.ts';
+import { getCanvasPalette } from '#lib/canvas-palette.ts';
 import { useMapConfig } from '#lib/config.tsx';
 import { MapControlIcon, MapIconFilters, MapIconRating } from '#lib/icons.tsx';
 import { useTrackMap } from '#lib/track-hook.ts';
-import { hasActiveFilter } from '#store/store-factory.ts';
 import { useMapStore, useMapStoreApi } from '#store/store.tsx';
 
 // Bilingual secondary labels; kept local pending the deferred map-portability work
@@ -31,12 +32,15 @@ interface StatusSwatchStyle extends CSSProperties {
 	'--map-status-fill-dark': string;
 }
 
-function getStatusSwatchStyle(data: LocationStatusMetadata): StatusSwatchStyle {
+const lightPalette = getCanvasPalette(false);
+const darkPalette = getCanvasPalette(true);
+
+function getStatusSwatchStyle({ status }: MapFilterStatusOption): StatusSwatchStyle {
 	return {
-		'--map-status-edge': data.stroke,
-		'--map-status-edge-dark': data.strokeDark,
-		'--map-status-fill': data.color,
-		'--map-status-fill-dark': data.colorDark,
+		'--map-status-edge': lightPalette.statusStroke[status],
+		'--map-status-edge-dark': darkPalette.statusStroke[status],
+		'--map-status-fill': lightPalette.statusFill[status],
+		'--map-status-fill-dark': darkPalette.statusFill[status],
 	};
 }
 
@@ -64,10 +68,9 @@ const MapFilterMenuItem: FC<PropsWithChildren<{ isActive?: boolean }>> =
 	};
 
 const MapFilterStatusMenuItem: FC<{
-	data: LocationStatusMetadata;
 	isFiltered: boolean;
-	status: LocationStatus;
-}> = memo(function MapFilterStatusMenuItem({ data, isFiltered, status }) {
+	option: MapFilterStatusOption;
+}> = memo(function MapFilterStatusMenuItem({ isFiltered, option }) {
 	const store = useMapStoreApi();
 	const { setFilter } = useMapStore((state) => state.actions);
 
@@ -81,14 +84,14 @@ const MapFilterStatusMenuItem: FC<{
 
 					setFilter({
 						status: isFiltered
-							? hidden.filter((hiddenStatus) => hiddenStatus !== status)
-							: [...hidden, status],
+							? hidden.filter((hiddenStatus) => hiddenStatus !== option.status)
+							: [...hidden, option.status],
 					});
 				}}
 				type="button"
 			>
-				<span className="map-filter-swatch" style={getStatusSwatchStyle(data)}></span>
-				<MapFilterLabel title={data.title} titleZh={data.title_zh} />
+				<span className="map-filter-swatch" style={getStatusSwatchStyle(option)}></span>
+				<MapFilterLabel title={option.title} titleZh={option.titleZh} />
 			</button>
 		</MapFilterMenuItem>
 	);
@@ -116,7 +119,7 @@ const MapFilterStatusShowHideMenu: FC = function MapFilterStatusShowHideMenu() {
 				<button
 					className="map-filter-button"
 					onClick={() => {
-						setFilter({ status: locationStatusOrder });
+						setFilter({ status: mapFilterStatusOptions.map((option) => option.status) });
 					}}
 					type="button"
 				>
@@ -231,12 +234,11 @@ const MapControlsFilterMenu: FC<{
 			<div className="maplibregl-popup-tip"></div>
 			<div className="maplibregl-popup-content">
 				<ul className="map-filter-menu-list">
-					{locationStatusOrder.map((status) => (
+					{mapFilterStatusOptions.map((option) => (
 						<MapFilterStatusMenuItem
-							data={LocationStatusRecords[status]}
-							isFiltered={hiddenStatuses.includes(status)}
-							key={status}
-							status={status}
+							isFiltered={hiddenStatuses.includes(option.status)}
+							key={option.status}
+							option={option}
 						/>
 					))}
 					<MapFilterStatusShowHideMenu />
@@ -251,7 +253,7 @@ const MapControlsFilterMenu: FC<{
 export const FilterControl: FC<{ position: ControlPosition }> = function FilterControl({
 	position,
 }) {
-	const isFilterActive = useMapStore(hasActiveFilter);
+	const isFilterActive = useMapStore((state) => hasActiveFilter(state.filter));
 	const isLoading = useIsMapLoading();
 	const { messages } = useMapConfig();
 	const trackMap = useTrackMap();

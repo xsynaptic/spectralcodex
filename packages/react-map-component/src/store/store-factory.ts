@@ -1,10 +1,11 @@
 import type { MapSourceItem } from '@spectralcodex/map-codec';
-import type { LocationStatus } from '@spectralcodex/shared/map';
 
 import { createStore } from 'zustand';
 
+import type { MapFilter } from '#data/data-filter.ts';
 import type { MapClickOutcome, MapHoverCluster, MapScope, MapStoreView } from '#types.ts';
 
+import { defaultMapFilter } from '#data/data-filter.ts';
 import { reduceMapScope } from '#store/store-scope.ts';
 
 export interface MapDataStore extends MapDataState {
@@ -21,12 +22,6 @@ export interface MapDataStore extends MapDataState {
 	};
 }
 
-export interface MapFilter {
-	objective: number;
-	rating: number;
-	status: ReadonlyArray<LocationStatus>;
-}
-
 export type MapOverlay = 'filter' | 'search';
 
 interface MapDataState extends MapStoreView {
@@ -40,8 +35,6 @@ interface MapDataState extends MapStoreView {
 	scope: MapScope | undefined;
 	selectedId: string | undefined;
 }
-
-const defaultMapFilter: MapFilter = { objective: 1, rating: 1, status: [] };
 
 const emptyTargetIds: Array<string> = [];
 
@@ -68,10 +61,6 @@ export function selectScope({
 	scope,
 }: Pick<MapDataState, 'isScopeEnabled' | 'scope'>) {
 	return isScopeEnabled ? scope : undefined;
-}
-
-export function hasActiveFilter({ filter }: Pick<MapDataState, 'filter'>) {
-	return filter.status.length > 0 || filter.rating > 1 || filter.objective > 1;
 }
 
 const noOverlay = { isPopupVisible: true, overlay: undefined, selectedId: undefined } as const;

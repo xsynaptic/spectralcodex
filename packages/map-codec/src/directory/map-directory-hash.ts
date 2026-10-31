@@ -1,6 +1,7 @@
 import { hash } from 'ohash';
 
-import { hashShortLength } from '#constants.ts';
+// Mirrors `hashShortLength` in src/constants.ts
+const hashShortLength = 12;
 
 export function hashMapPayloads(payloads: ReadonlyMap<string, string>): string {
 	return hash(

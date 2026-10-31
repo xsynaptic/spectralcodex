@@ -10,6 +10,10 @@ export interface MapPayloadBase {
 	version: string;
 }
 
+export function getMapPayloadId(prefix: string, name: string) {
+	return `${prefix}${name}`;
+}
+
 export function getMapPayloadUrl({ path, prefix, version }: MapPayloadBase, name: string) {
-	return `${path}/${prefix}${name}.json?v=${version}`;
+	return `${path}/${getMapPayloadId(prefix, name)}.json?v=${version}`;
 }

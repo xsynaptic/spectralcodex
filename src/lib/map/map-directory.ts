@@ -6,17 +6,14 @@ import type {
 } from '@spectralcodex/map-codec';
 
 import {
+	getMapPayloadId,
 	getMapPayloadUrl,
 	getMapRowUrl,
 	mapPayloadName,
-	mapPopupKeys,
 	selectMapRows,
 } from '@spectralcodex/map-codec';
-import {
-	encodeMapDirectory,
-	encodeMapPopupData,
-	MapDivisionMaskSchema,
-} from '@spectralcodex/map-codec/schemas';
+import { buildMapDirectory, hashMapPayloads } from '@spectralcodex/map-codec/directory';
+import { MapDivisionMaskSchema } from '@spectralcodex/map-codec/schemas';
 import { getCachePaths } from '@spectralcodex/shared/paths';
 import { CUSTOM_CACHE_PATH } from 'astro:env/server';
 import { readFile } from 'node:fs/promises';
@@ -35,8 +32,6 @@ import { getObjectiveLocations } from '#lib/collections/locations/locations-subs
 import { getRegionsCollection, getRegionsTree } from '#lib/collections/regions/regions-data.ts';
 import { getMapBacklinksByRowId } from '#lib/map/map-backlinks.ts';
 import { getBoundsWithoutOutliers, getNaturalBounds } from '#lib/map/map-bounds.ts';
-import { assignChunks } from '#lib/map/map-chunks.ts';
-import { hashMapPayloads } from '#lib/map/map-directory-hash.ts';
 import { getMapThemeIndexById } from '#lib/map/map-entry-rules.ts';
 import {
 	getGlobalMapRule,
@@ -140,22 +135,8 @@ function buildMapDataset(
 	});
 
 	const locationByFeatureId = buildLocationByFeatureId(locations);
-	const popupById = new Map(
-		encodeMapPopupData(popupData).map((popupItem) => [popupItem[mapPopupKeys.id], popupItem]),
-	);
 
-	const chunkInputs = sourceData.map((sourceItem) => {
-		const id = sourceItem.properties.id;
-		const [lng, lat] = sourceItem.geometry.coordinates;
-		const popupItem = popupById.get(id);
-		const popupBytes = popupItem ? Buffer.byteLength(JSON.stringify(popupItem)) : 0;
-
-		return { id, lat, lng, popupBytes };
-	});
-
-	const { chunkIds, chunkKeyById } = assignChunks(chunkInputs);
-
-	const directory = sourceData.map((sourceItem) => {
+	const enrichedSourceData = sourceData.map((sourceItem) => {
 		const id = sourceItem.properties.id;
 		const location = locationByFeatureId.get(id);
 
@@ -173,24 +154,11 @@ function buildMapDataset(
 				...(regionOrdinals.length > 0 ? { regionOrdinals } : {}),
 				...(themeIndices.length > 0 ? { themeIndices } : {}),
 				backlinks: backlinksByRowId.get(id),
-				chunkKey: chunkKeyById.get(id) ?? '0',
 			},
 		} satisfies MapSourceItem;
 	});
 
-	const payloads = new Map([
-		[getDirectoryPayloadId(prefix), JSON.stringify(encodeMapDirectory(directory))],
-	]);
-
-	for (const [chunkKey, ids] of chunkIds) {
-		const popupItems = ids
-			.map((id) => popupById.get(id))
-			.filter((popupItem) => popupItem !== undefined);
-
-		payloads.set(`${prefix}${chunkKey}`, JSON.stringify(popupItems));
-	}
-
-	return { directory, payloads, prefix };
+	return { ...buildMapDirectory({ popupData, prefix, sourceData: enrichedSourceData }), prefix };
 }
 
 async function readDivisionMask(regionId: string, divisionsPath: string) {
@@ -221,10 +189,6 @@ async function readDivisionMasks(regions: Array<ComputedEntry<'regions'>>) {
 	);
 
 	return new Map(bodies);
-}
-
-function getDirectoryPayloadId(prefix: string) {
-	return `${prefix}${mapPayloadName.directory}`;
 }
 
 function getDivisionPayloadId(regionId: string) {
@@ -284,7 +248,7 @@ export const getMapDirectoryData = pMemoize(async (): Promise<MapDirectoryData> 
 	const divisionMaskById = await readDivisionMasks(regions);
 
 	shared.payloads.set(
-		mapPayloadName.scopes,
+		getMapPayloadId(shared.prefix, mapPayloadName.scopes),
 		JSON.stringify(mapScopes.flatMap(({ row }) => (row ? [row] : []))),
 	);
 

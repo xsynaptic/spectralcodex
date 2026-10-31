@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { assignChunks } from '#lib/map/map-chunks.ts';
+import { assignChunks } from '#directory/map-chunks.ts';
 
 type ChunkInputItem = Parameters<typeof assignChunks>[0][number];
 

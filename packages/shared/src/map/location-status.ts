@@ -124,29 +124,3 @@ export const locationStatusOrder: ReadonlyArray<LocationStatus> = [
 	LocationStatusEnum.Vanished,
 	LocationStatusEnum.Unknown,
 ];
-
-function getColorMap(
-	prop: keyof (typeof LocationStatusRecords)[keyof typeof LocationStatusRecords],
-) {
-	const colorMap = Object.entries(LocationStatusRecords).flatMap(([status, values]) => [
-		status,
-		values[prop],
-	]);
-
-	if (isDoubleStringArray(colorMap)) {
-		return colorMap;
-	}
-	throw new Error(`Invalid color map: ${colorMap.join(', ')}`);
-}
-
-// MapLibre expects some style properties to have at least two items
-function isDoubleStringArray(array: Array<string>): array is [string, string, ...Array<string>] {
-	return array.every((item) => typeof item === 'string') && array.length >= 2;
-}
-
-// This creates an array of status and color values for use with clusters in MapLibre
-export const statusColorArray = getColorMap('color');
-export const statusColorDarkArray = getColorMap('colorDark');
-export const statusTintColorArray = getColorMap('tint');
-export const statusStrokeColorArray = getColorMap('stroke');
-export const statusStrokeColorDarkArray = getColorMap('strokeDark');

@@ -1,10 +1,10 @@
 {
 	"ignorePatterns": ["packages/scripts/src/validate-content/fixtures/**", "deploy/**"],
 	"rulePacks": ["fallow-rules.jsonc"],
-	// Rule packs only check reachable files; MDX components are reached by auto-import
+	// MDX components load by auto-import, which fallow can't follow, and rule packs skip what they can't reach
 	"dynamicallyLoaded": ["src/components/mdx/*.astro"],
 	"rules": {
-		// Dead code and dependency hygiene belong to knip
+		// knip already covers dead code and dependencies, so fallow stays out of it
 		"unused-files": "off",
 		"unused-exports": "off",
 		"unused-types": "off",
@@ -25,42 +25,56 @@
 		"package-cycle": "error",
 	},
 	"health": {
-		// Zero disables CRAP; without Istanbul data fallow estimates coverage from the module graph
+		// CRAP is off; without Istanbul data fallow would only be guessing at coverage from the module graph
 		"maxCrap": 0,
 		"maxCognitive": 12,
 		"ignore": ["src/dev/**"],
-		// Cognitive ceilings sit at the measured score plus 2; re-measure on a deliberate change, never raise one to clear a failure
+		// Each ceiling is the measured score plus two; re-measure after a deliberate change, but never raise one just to pass
 		"thresholdOverrides": [
 			{
 				"files": ["src/components/content/content-section.astro"],
 				"functions": ["<template>"],
 				"maxCognitive": 32,
-				"reason": "Flat optional slots and class switches",
+				"reason": "Many optional slots and class switches, none of them nested",
 			},
 			{
 				"files": ["src/components/content/content-header.astro"],
 				"functions": ["<template>"],
 				"maxCognitive": 22,
-				"reason": "Flat optional slots and class switches",
+				"reason": "Many optional slots and class switches, none of them nested",
 			},
 			{
 				"files": ["src/components/image/image-carousel-caption.astro"],
 				"functions": ["<template>"],
 				"maxCognitive": 22,
-				"reason": "Flat optional slots and class switches",
+				"reason": "Many optional slots and class switches, none of them nested",
 			},
 		],
 	},
 	"duplicates": {
 		"minTokens": 40,
-		// A threshold of zero means no limit; this fails on any clone group
+		// Zero would mean no limit, so a threshold just above it fails on any clone group
 		"threshold": 0.01,
 	},
-	// On-demand semantic pass; the 0.80 default is mostly shared idiom, not shared logic
+	// Runs only on demand; at the 0.80 default it mostly finds shared idiom rather than shared logic
 	"similarCode": { "threshold": 0.9 },
 	"boundaries": {
-		// First match wins, so the map package's zones sit before `packages`
+		// A file takes the first zone it matches, so the map zones and `shared-map` come before the catch-all `packages`
 		"zones": [
+			{
+				"name": "map-tests",
+				"patterns": [
+					"packages/react-map-component/src/**/*.test.ts",
+					"packages/react-map-component/src/lib/map-test-utils.ts",
+				],
+			},
+			{
+				"name": "map-domain",
+				"patterns": [
+					"packages/react-map-component/src/data/data-filter.ts",
+					"packages/react-map-component/src/lib/canvas-palette.ts",
+				],
+			},
 			{
 				"name": "map-ui",
 				"patterns": [
@@ -83,9 +97,17 @@
 				],
 			},
 			{ "name": "map-base", "patterns": ["packages/react-map-component/src/**"] },
+			{
+				"name": "shared-map",
+				"patterns": [
+					"packages/shared/src/map/location-status.ts",
+					"packages/shared/src/map/map-locations.ts",
+					"packages/shared/src/map/tailwind-colors.ts",
+				],
+			},
 			{ "name": "packages", "patterns": ["packages/**"] },
 			{ "name": "dev", "patterns": ["src/dev/**"] },
-			// The read path sits below the Catalog and Map Directory, which import it
+			// The Catalog and Map Directory are built on the read path, so it sits a layer below them
 			{
 				"name": "assembly",
 				"patterns": [
@@ -108,23 +130,34 @@
 				],
 			},
 		],
-		// Unzoned files are unrestricted both ways, so every analyzed file needs a zone
+		// A file outside every zone can import and be imported freely, so every analyzed file needs one
 		"coverage": {
 			"requireAllFiles": true,
 			"allowUnmatched": ["*.config.{ts,mjs}", "tests/**"],
 		},
 		"rules": [
-			{ "from": "map-ui", "allow": ["map-state", "map-base", "packages"] },
-			{ "from": "map-state", "allow": ["map-base", "packages"] },
+			{
+				"from": "map-tests",
+				"allow": ["map-domain", "map-ui", "map-state", "map-base", "shared-map", "packages"],
+			},
+			{ "from": "map-domain", "allow": ["shared-map", "map-base", "packages"] },
+			{ "from": "map-ui", "allow": ["map-domain", "map-state", "map-base", "packages"] },
+			{ "from": "map-state", "allow": ["map-domain", "map-base", "packages"] },
 			{ "from": "map-base", "allow": ["packages"] },
-			// Vite/Rolldown build breaks when packages import the app
-			{ "from": "packages", "allow": [] },
-			{ "from": "read-path", "allow": ["lib", "packages"] },
-			{ "from": "assembly", "allow": ["read-path", "lib", "packages", "map-ui", "map-base"] },
-			{ "from": "lib", "allow": ["assembly", "read-path", "packages", "map-ui", "map-base"] },
+			// The Vite/Rolldown build breaks if a package imports from the app
+			{ "from": "packages", "allow": ["shared-map"] },
+			{ "from": "read-path", "allow": ["lib", "shared-map", "packages"] },
+			{
+				"from": "assembly",
+				"allow": ["read-path", "lib", "shared-map", "packages", "map-ui", "map-base"],
+			},
+			{
+				"from": "lib",
+				"allow": ["assembly", "read-path", "shared-map", "packages", "map-ui", "map-base"],
+			},
 			{
 				"from": "components",
-				"allow": ["lib", "assembly", "read-path", "packages", "map-ui", "map-base"],
+				"allow": ["lib", "assembly", "read-path", "shared-map", "packages", "map-ui", "map-base"],
 			},
 		],
 	},

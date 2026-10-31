@@ -1,10 +1,11 @@
-import type { MapSourceItem } from '@spectralcodex/map-codec';
-
-import { mapPayloadName, mapSourceKeys } from '@spectralcodex/map-codec';
-import { encodeMapDirectory, MapDirectorySchema } from '@spectralcodex/map-codec/schemas';
 import { describe, expect, test } from 'vitest';
 
-import { hashMapPayloads } from '#lib/map/map-directory-hash.ts';
+import type { MapSourceItem } from '#schemas/codec.ts';
+
+import { mapSourceKeys } from '#codec-tables.ts';
+import { hashMapPayloads } from '#directory/map-directory-hash.ts';
+import { mapPayloadName } from '#map-payloads.ts';
+import { encodeMapDirectory, MapDirectorySchema } from '#schemas/codec.ts';
 
 const sourceItem = {
 	geometry: { coordinates: [100, 10], type: 'Point' },

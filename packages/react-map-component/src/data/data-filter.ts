@@ -1,9 +1,36 @@
 import type { MapSourceItem } from '@spectralcodex/map-codec';
+import type { LocationStatus } from '@spectralcodex/shared/map';
 
 import { selectMapRows } from '@spectralcodex/map-codec';
+import { locationStatusOrder, LocationStatusRecords } from '@spectralcodex/shared/map';
 
-import type { MapFilter } from '#store/store-factory.ts';
 import type { MapFeaturesRule } from '#types.ts';
+
+export interface MapFilter {
+	objective: number;
+	rating: number;
+	status: ReadonlyArray<LocationStatus>;
+}
+
+export interface MapFilterStatusOption {
+	status: LocationStatus;
+	title: string;
+	titleZh: string;
+}
+
+export const mapFilterStatusOptions: ReadonlyArray<MapFilterStatusOption> = locationStatusOrder.map(
+	(status) => {
+		const { title, title_zh: titleZh } = LocationStatusRecords[status];
+
+		return { status, title, titleZh };
+	},
+);
+
+export const defaultMapFilter: MapFilter = { objective: 1, rating: 1, status: [] };
+
+export function hasActiveFilter(filter: MapFilter) {
+	return filter.status.length > 0 || filter.rating > 1 || filter.objective > 1;
+}
 
 export interface MapCanvasData {
 	filteredCount: number;

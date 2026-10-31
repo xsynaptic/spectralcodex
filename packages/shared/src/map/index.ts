@@ -1,12 +1,4 @@
-export {
-	locationStatusOrder,
-	LocationStatusRecords,
-	statusColorArray,
-	statusColorDarkArray,
-	statusStrokeColorArray,
-	statusStrokeColorDarkArray,
-	statusTintColorArray,
-} from '#map/location-status.ts';
+export { locationStatusOrder, LocationStatusRecords } from '#map/location-status.ts';
 export type { LocationStatusMetadata } from '#map/location-status.ts';
 export { GeometryTypeEnum } from '#map/map-geometry.ts';
 export { LocationCategoryEnum, LocationStatusEnum } from '#map/map-locations.ts';

@@ -6,6 +6,8 @@ The map island and the contract it keeps with its host, the Atlas in `src/lib/at
 
 Imports flow one way, UI to state to base, along the zones in `.fallowrc.jsonc` that `pnpm check` enforces. When an import breaks a zone, move the code down to where it belongs rather than widening the zone.
 
+Location knowledge (Status and its records) enters the package only through the filter module, `data/data-filter.ts`, which owns the Map Filter, and the canvas palette, `lib/canvas-palette.ts`. The `map-domain` zone catches direct and re-exported imports, though tests may import Status freely; a Status value wrapped inside another package slips past it, so watch for that in review.
+
 ## State
 
 - Props are read once at mount. The Atlas persists the island's wrapper rather than the island, so Astro never hands it new props; anything that changes afterwards lives in the store or arrives from the host.
@@ -32,7 +34,7 @@ Map search extends its own matcher in `search/`. MiniSearch was measured: it ran
 - The colour scale in `tokens.css` holds only the steps a role reads, and the host remaps those same steps in `src/styles/main/components/map.css`, so add or drop a step in both.
 - Rules read colour through a role token, never a scale step; a non-colour dark swap uses `[data-map-mode='dark']`.
 - MapLibre's CSS sits in `layer(maplibre)`, under the unlayered package rules, so an override needs no extra specificity. That win also cancels MapLibre's forced-colours rules, so restate an overridden property in the forced-colours block that closes its area's stylesheet, where every floating surface takes the `ButtonText` outline.
-- Status colours on the canvas and filter swatches come from `LocationStatusRecords`, not the tokens.
+- Canvas colour goes through the role-named `lib/canvas-palette.ts`, since CSS can't reach the canvas. The filter swatches read it too, because they are the legend for the canvas dots. Neither reads the tokens.
 
 ## Tests
 

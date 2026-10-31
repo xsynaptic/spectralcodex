@@ -2,20 +2,13 @@ import type { ExpressionSpecification } from 'maplibre-gl';
 import type { FC } from 'react';
 import type { CircleLayerSpecification, SymbolLayerSpecification } from 'react-map-gl/maplibre';
 
-import {
-	LocationStatusEnum,
-	statusColorArray,
-	statusColorDarkArray,
-	statusStrokeColorArray,
-	statusStrokeColorDarkArray,
-	statusTintColorArray,
-	tailwindColors,
-} from '@spectralcodex/shared/map';
 import { memo, useMemo } from 'react';
 import { Layer, Source } from 'react-map-gl/maplibre';
 
 import type { MapRowCollection } from '#data/data-filter.ts';
+import type { ClusterRamp, StatusColors } from '#lib/canvas-palette.ts';
 
+import { canvasStatuses, getCanvasPalette } from '#lib/canvas-palette.ts';
 import { pointClusterOptions } from '#lib/clusters-factory.ts';
 import { useIsDarkMode } from '#lib/dark-mode.ts';
 import { MapLayerIdEnum, MapSlotIdEnum, MapSourceIdEnum } from '#source/source-config.ts';
@@ -33,41 +26,47 @@ const selectStateExpression = [
 	false,
 ] satisfies ExpressionSpecification;
 
-const clusterRampBright = [
-	'interpolate',
-	['linear'],
-	['get', 'point_count'],
-	0,
-	tailwindColors.sky600,
-	10,
-	tailwindColors.sky500,
-	80,
-	tailwindColors.sky400,
-	150,
-	tailwindColors.sky300,
-] satisfies ExpressionSpecification;
+function getClusterRamp([few, some, many, most]: ClusterRamp) {
+	return [
+		'interpolate',
+		['linear'],
+		['get', 'point_count'],
+		0,
+		few,
+		10,
+		some,
+		80,
+		many,
+		150,
+		most,
+	] satisfies ExpressionSpecification;
+}
 
-const clusterRampDeep = [
-	'interpolate',
-	['linear'],
-	['get', 'point_count'],
-	0,
-	tailwindColors.sky700,
-	10,
-	tailwindColors.sky600,
-	80,
-	tailwindColors.sky500,
-	150,
-	tailwindColors.sky400,
-] satisfies ExpressionSpecification;
+function getStatusMatch(colors: StatusColors, fallback: string) {
+	const [first, ...rest] = Object.entries(colors);
 
-export const clustersLabelPaint = {
-	'text-color': tailwindColors.sky50,
-	'text-halo-color': 'rgba(0, 0, 0, 0.2)',
-	'text-halo-width': 1,
-} satisfies SymbolLayerSpecification['paint'];
+	if (!first) throw new Error('A status match needs at least one status');
 
-function getClustersLabelLayerStyle() {
+	return [
+		'match',
+		['string', ['get', 'status']],
+		...first,
+		...rest.flat(),
+		fallback,
+	] satisfies ExpressionSpecification;
+}
+
+export function getClustersLabelPaint(isDarkMode: boolean) {
+	const palette = getCanvasPalette(isDarkMode);
+
+	return {
+		'text-color': palette.clusterLabel,
+		'text-halo-color': palette.clusterLabelHalo,
+		'text-halo-width': 1,
+	} satisfies SymbolLayerSpecification['paint'];
+}
+
+function getClustersLabelLayerStyle(isDarkMode: boolean) {
 	return {
 		filter: ['has', 'point_count'],
 		id: MapLayerIdEnum.ClustersLabel,
@@ -78,13 +77,18 @@ function getClustersLabelLayerStyle() {
 			'text-ignore-placement': true,
 			'text-size': 10,
 		},
-		paint: { ...clustersLabelPaint, 'text-opacity': ['case', hoverStateExpression, 0, 1] },
+		paint: {
+			...getClustersLabelPaint(isDarkMode),
+			'text-opacity': ['case', hoverStateExpression, 0, 1],
+		},
 		source: MapSourceIdEnum.PointCollection,
 		type: 'symbol',
 	} satisfies SymbolLayerSpecification;
 }
 
 function getClustersLayerStyle(isDarkMode: boolean) {
+	const palette = getCanvasPalette(isDarkMode);
+
 	return {
 		filter: ['has', 'point_count'],
 		id: MapLayerIdEnum.Clusters,
@@ -92,7 +96,7 @@ function getClustersLayerStyle(isDarkMode: boolean) {
 			'circle-sort-key': ['-', ['get', 'point_count']],
 		},
 		paint: {
-			'circle-color': isDarkMode ? clusterRampDeep : clusterRampBright,
+			'circle-color': getClusterRamp(palette.clusterFill),
 			'circle-radius': [
 				'interpolate',
 				['linear'],
@@ -104,7 +108,7 @@ function getClustersLayerStyle(isDarkMode: boolean) {
 				60,
 				['case', hoverStateExpression, 14, 12],
 			],
-			'circle-stroke-color': isDarkMode ? clusterRampBright : clusterRampDeep,
+			'circle-stroke-color': getClusterRamp(palette.clusterStroke),
 			'circle-stroke-width': 1,
 		},
 		source: MapSourceIdEnum.PointCollection,
@@ -113,7 +117,7 @@ function getClustersLayerStyle(isDarkMode: boolean) {
 }
 
 // Inner dot marking points with a featured image; every radius is 3/8 of its Points layer counterpart
-function getPointsImageLayerStyle() {
+function getPointsImageLayerStyle(isDarkMode: boolean) {
 	return {
 		filter: [
 			'all',
@@ -122,7 +126,7 @@ function getPointsImageLayerStyle() {
 		],
 		id: MapLayerIdEnum.PointsImage,
 		paint: {
-			'circle-color': ['match', ['string', ['get', 'status']], ...statusTintColorArray, 'white'],
+			'circle-color': getStatusMatch(getCanvasPalette(isDarkMode).statusTint, 'white'),
 			'circle-radius': [
 				'interpolate',
 				['linear'],
@@ -145,16 +149,13 @@ function getPointsImageLayerStyle() {
 }
 
 function getPointsLayerStyle(isDarkMode: boolean) {
+	const palette = getCanvasPalette(isDarkMode);
+
 	return {
 		filter: ['!', ['has', 'point_count']],
 		id: MapLayerIdEnum.Points,
 		paint: {
-			'circle-color': [
-				'match',
-				['string', ['get', 'status']],
-				...(isDarkMode ? statusColorDarkArray : statusColorArray),
-				'gray',
-			],
+			'circle-color': getStatusMatch(palette.statusFill, 'gray'),
 			'circle-radius': [
 				'interpolate',
 				['linear'],
@@ -170,12 +171,7 @@ function getPointsLayerStyle(isDarkMode: boolean) {
 				18,
 				['case', selectStateExpression, 12, hoverStateExpression, 9, 8],
 			],
-			'circle-stroke-color': [
-				'match',
-				['string', ['get', 'status']],
-				...(isDarkMode ? statusStrokeColorDarkArray : statusStrokeColorArray),
-				'gray',
-			],
+			'circle-stroke-color': getStatusMatch(palette.statusStroke, 'gray'),
 			'circle-stroke-width': 1,
 		},
 		source: MapSourceIdEnum.PointCollection,
@@ -190,12 +186,7 @@ function getPointsTargetLayerStyle(isDarkMode: boolean) {
 		filter: ['!', ['has', 'point_count']],
 		id: MapLayerIdEnum.PointsTarget,
 		paint: {
-			'circle-color': [
-				'match',
-				['string', ['get', 'status']],
-				...(isDarkMode ? statusColorDarkArray : statusColorArray),
-				'gray',
-			],
+			'circle-color': getStatusMatch(getCanvasPalette(isDarkMode).statusFill, 'gray'),
 			'circle-opacity': 0.2,
 			'circle-radius': [
 				'interpolate',
@@ -224,9 +215,9 @@ function useMapSourcePointsStyle() {
 	return useMemo(
 		() => ({
 			clusters: getClustersLayerStyle(isDarkMode),
-			clustersLabel: getClustersLabelLayerStyle(),
+			clustersLabel: getClustersLabelLayerStyle(isDarkMode),
 			points: getPointsLayerStyle(isDarkMode),
-			pointsImage: getPointsImageLayerStyle(),
+			pointsImage: getPointsImageLayerStyle(isDarkMode),
 			pointsTarget: getPointsTargetLayerStyle(isDarkMode),
 		}),
 		[isDarkMode],
@@ -242,7 +233,7 @@ export const MapSourcePoints: FC<{
 
 	const clusterConfig = useMemo(() => {
 		const clusterProperties: Record<string, unknown> = Object.fromEntries(
-			Object.values(LocationStatusEnum).map((status) => [
+			canvasStatuses.map((status) => [
 				status,
 				['+', ['case', ['==', ['get', 'status'], status], 1, 0]],
 			]),

@@ -3,13 +3,13 @@ import type { ExpressionSpecification } from 'maplibre-gl';
 import type { FC } from 'react';
 import type { LineLayerSpecification } from 'react-map-gl/maplibre';
 
-import { tailwindColors } from '@spectralcodex/shared/map';
 import { memo, useMemo } from 'react';
 import { Layer, Source } from 'react-map-gl/maplibre';
 
 import type { ConnectionCollection } from '#source/source-connections-factory.ts';
 
 import { useClusterPositions } from '#canvas/canvas-positions.ts';
+import { getCanvasPalette } from '#lib/canvas-palette.ts';
 import { useIsDarkMode } from '#lib/dark-mode.ts';
 import { MapLayerIdEnum, MapSlotIdEnum, MapSourceIdEnum } from '#source/source-config.ts';
 import {
@@ -22,32 +22,22 @@ import { useMapStore } from '#store/store.tsx';
 
 const emptyCollection: ConnectionCollection = { features: [], type: 'FeatureCollection' };
 
-const connectionKindStyles = {
-	link: {
-		color: { dark: tailwindColors.stone400, light: tailwindColors.stone500 },
-		lineOpacity: 0.45,
-	},
-	points: {
-		color: { dark: tailwindColors.sky400, light: tailwindColors.sky500 },
-		lineOpacity: 0.8,
-	},
-} as const;
+const connectionLineOpacity = { link: 0.45, points: 0.8 } as const;
 
-type ConnectionKindStyle = (typeof connectionKindStyles)[keyof typeof connectionKindStyles];
-
-function matchKind(getValue: (style: ConnectionKindStyle) => number | string) {
+function matchKind(byKind: { link: number | string; points: number | string }) {
 	return [
 		'match',
 		['get', 'kind'],
 		'points',
-		getValue(connectionKindStyles.points),
-		getValue(connectionKindStyles.link),
+		byKind.points,
+		byKind.link,
 	] satisfies ExpressionSpecification;
 }
 
 function getConnectionsLayerStyles(isDarkMode: boolean) {
+	const palette = getCanvasPalette(isDarkMode);
 	const layout = { 'line-cap': 'round', 'line-join': 'round' } as const;
-	const color = matchKind((style) => (isDarkMode ? style.color.dark : style.color.light));
+	const color = matchKind({ link: palette.connectionLink, points: palette.connectionPoints });
 
 	const band = {
 		id: MapLayerIdEnum.ConnectionsBand,
@@ -66,7 +56,7 @@ function getConnectionsLayerStyles(isDarkMode: boolean) {
 		layout,
 		paint: {
 			'line-color': color,
-			'line-opacity': matchKind((style) => style.lineOpacity),
+			'line-opacity': matchKind(connectionLineOpacity),
 			'line-width': 1,
 		},
 		source: MapSourceIdEnum.ConnectionCollection,

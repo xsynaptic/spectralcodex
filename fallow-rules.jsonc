@@ -2,7 +2,7 @@
 	"$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/rule-pack-schema.json",
 	"version": 1,
 	"name": "spectralcodex",
-	"description": "Collection read paths and the Zod-free map island",
+	"description": "Keeps collection reads on their sanctioned paths and Zod out of the map island",
 	"rules": [
 		{
 			"id": "collection-access",
@@ -13,7 +13,7 @@
 				"astro:content.getEntries",
 			],
 			"exclude": ["src/lib/utils/collections.ts"],
-			"message": "Read collections through the collection wrappers from createCollectionData, or getRawCollection on the read path; both live in src/lib/utils/collections.ts and own the load order.",
+			"message": "Read collections through a wrapper made by createCollectionData, or through getRawCollection on the read path. Both live in src/lib/utils/collections.ts, which decides the order collections load in.",
 		},
 		{
 			"id": "raw-read-path",
@@ -24,15 +24,17 @@
 				"src/lib/utils/collections.ts",
 				"**/*.test.ts",
 			],
-			"message": "Raw reads return pristine frontmatter without computed `_` fields; they exist for cross-collection assembly in *-data.ts that must dodge circular init. Use the wrapper's collection data instead.",
+			"message": "getRawCollection returns frontmatter as written, without the computed `_` fields. It exists for the *-data.ts files that assemble across collections and would otherwise import each other in a circle at startup. Everywhere else, use the wrapper's collection data.",
 		},
 		{
 			"id": "client-zod",
 			"kind": "banned-import",
 			"specifiers": [
 				"zod",
+				"@spectralcodex/map-codec/directory",
 				"@spectralcodex/map-codec/schemas",
 				"@spectralcodex/shared/schemas",
+				"#directory",
 				"#schemas",
 			],
 			"ignoreTypeOnly": true,
@@ -45,8 +47,12 @@
 				"packages/shared/src/search-tracker.ts",
 				"packages/shared/src/text.ts",
 			],
-			"exclude": ["packages/map-codec/src/schemas/**", "**/*.test.ts"],
-			"message": "The map island ships without Zod; classic schemas never tree-shake. Put schemas in packages/map-codec/src/schemas or @spectralcodex/shared/schemas, and keep both out of client code.",
+			"exclude": [
+				"packages/map-codec/src/directory/**",
+				"packages/map-codec/src/schemas/**",
+				"**/*.test.ts",
+			],
+			"message": "The map island ships without Zod, because Zod's classic schemas don't tree-shake. Schemas belong in packages/map-codec/src/schemas or @spectralcodex/shared/schemas, and client code imports neither, nor the build-only @spectralcodex/map-codec/directory.",
 			"severity": "error",
 		},
 	],

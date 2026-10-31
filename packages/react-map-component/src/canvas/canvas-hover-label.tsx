@@ -9,7 +9,7 @@ import type { MapHoverCluster } from '#types.ts';
 import { useMapRow } from '#data/data-query.ts';
 import { useIsDarkMode } from '#lib/dark-mode.ts';
 import { getPointsLabelPaint } from '#source/source-labels.tsx';
-import { clustersLabelPaint } from '#source/source-points.tsx';
+import { getClustersLabelPaint } from '#source/source-points.tsx';
 import { isLabelledTarget, selectTargetIds } from '#store/store-factory.ts';
 import { useMapStore } from '#store/store.tsx';
 
@@ -34,6 +34,7 @@ const MapHoverPointLabel: FC<{ row: MapSourceItem }> = function MapHoverPointLab
 const MapHoverClusterLabel: FC<{ cluster: MapHoverCluster }> = function MapHoverClusterLabel({
 	cluster,
 }) {
+	const paint = getClustersLabelPaint(useIsDarkMode());
 	const [longitude, latitude] = cluster.geometry.coordinates;
 
 	if (longitude === undefined || latitude === undefined) return;
@@ -45,8 +46,8 @@ const MapHoverClusterLabel: FC<{ cluster: MapHoverCluster }> = function MapHover
 			latitude={latitude}
 			longitude={longitude}
 			style={{
-				color: clustersLabelPaint['text-color'],
-				WebkitTextStrokeColor: clustersLabelPaint['text-halo-color'],
+				color: paint['text-color'],
+				WebkitTextStrokeColor: paint['text-halo-color'],
 			}}
 		>
 			{String(cluster.properties?.point_count_abbreviated)}

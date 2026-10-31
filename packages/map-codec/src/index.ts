@@ -7,7 +7,7 @@ export {
 } from '#codec-tables.ts';
 export { MapPopupOwnField } from '#map-codes.ts';
 export { getMapRowUrl, mapPointIdSeparator } from '#map-ids.ts';
-export { getMapPayloadUrl, mapPayloadName } from '#map-payloads.ts';
+export { getMapPayloadId, getMapPayloadUrl, mapPayloadName } from '#map-payloads.ts';
 export type { MapPayloadBase } from '#map-payloads.ts';
 export { createRuleTest, getMapRowById, selectMapRows } from '#map-rules.ts';
 export type { MapFeaturesRule, MapInterval } from '#map-rules.ts';

@@ -1,9 +1,7 @@
 import type { MapSourceItem } from '@spectralcodex/map-codec';
-import type { LocationStatus } from '@spectralcodex/shared/map';
 import type { FC } from 'react';
 
 import { getMapRowById } from '@spectralcodex/map-codec';
-import { LocationStatusRecords, tailwindColors } from '@spectralcodex/shared/map';
 import { useMemo, useState } from 'react';
 import { Marker } from 'react-map-gl/maplibre';
 
@@ -11,6 +9,7 @@ import type { ClusterPosition, PositionedPoint } from '#lib/clusters-factory.ts'
 
 import { useClusterPositions } from '#canvas/canvas-positions.ts';
 import { useMapCanvasData } from '#data/data-canvas.tsx';
+import { getCanvasPalette } from '#lib/canvas-palette.ts';
 import { getClusterKey } from '#lib/clusters-factory.ts';
 import { useIsDarkMode } from '#lib/dark-mode.ts';
 import { selectTargetIds } from '#store/store-factory.ts';
@@ -24,14 +23,6 @@ interface TargetMarker {
 	longitude: number;
 }
 
-function getPointColor(status: LocationStatus | undefined, isDark: boolean) {
-	if (!status) return isDark ? tailwindColors.sky400 : tailwindColors.sky500;
-
-	const record = LocationStatusRecords[status];
-
-	return isDark ? record.colorDark : record.color;
-}
-
 function getTargetMarkers({
 	clusters,
 	isDark,
@@ -43,13 +34,15 @@ function getTargetMarkers({
 	rows: ReadonlyArray<MapSourceItem>;
 	targets: ReadonlyArray<PositionedPoint>;
 }) {
+	const palette = getCanvasPalette(isDark);
 	const markers = new Map<string, TargetMarker>();
 
 	for (const { coordinates, id } of targets) {
 		const cluster = clusters.get(id);
 
 		if (!cluster) {
-			const color = getPointColor(getMapRowById(rows, id)?.properties.status, isDark);
+			const status = getMapRowById(rows, id)?.properties.status;
+			const color = status ? palette.statusFill[status] : palette.target;
 			const [longitude, latitude] = coordinates;
 
 			markers.set(id, { color, id, latitude, longitude });
@@ -57,7 +50,7 @@ function getTargetMarkers({
 		}
 
 		const clusterKey = getClusterKey(cluster.clusterId);
-		const color = isDark ? tailwindColors.sky400 : tailwindColors.sky500;
+		const color = palette.target;
 		const [longitude, latitude] = cluster.coordinates;
 
 		markers.set(clusterKey, { color, id: clusterKey, latitude, longitude });
