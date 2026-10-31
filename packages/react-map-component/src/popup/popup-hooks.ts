@@ -76,7 +76,6 @@ export function useMapHoverPreload() {
 	const { current: map } = useMap();
 	const hoveredId = useMapStore((state) => state.hoveredId);
 	const resolve = useClickResolver();
-	const { maxWidthPx } = useMapPopupLayout();
 
 	const debouncedHoveredId = useDebouncedValue(hoveredId, mapHoverPreloadDelayMs);
 
@@ -106,6 +105,7 @@ export function useMapHoverPreload() {
 
 		// A detached image given srcset and sizes picks the same candidate the popup will, which warms the cache
 		const preloadImage = new Image();
+		const { maxWidthPx } = getPopupLayout(map.getContainer().clientWidth);
 
 		preloadImage.sizes = getPopupImageSizes(maxWidthPx);
 		preloadImage.srcset = getPopupImageSrcSet(popupImageSources, imageBaseUrl);

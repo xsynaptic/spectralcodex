@@ -154,11 +154,16 @@ const MapPopupTitleText: FC<{ title: string; url: string | undefined }> =
 		return url ? <MapPopupTitleLink title={title} url={url} /> : <span>{title}</span>;
 	};
 
-const MapPopupContent: FC<{ popupItem: MapPopupItemExtended }> = function MapPopupContent({
+interface MapPopupContentProps {
+	maxWidthPx: number;
+	popupItem: MapPopupItemExtended;
+}
+
+const MapPopupContent: FC<MapPopupContentProps> = function MapPopupContent({
+	maxWidthPx,
 	popupItem,
 }) {
 	const { imageBaseUrl, messages } = useMapConfig();
-	const { maxWidthPx } = useMapPopupLayout();
 
 	const {
 		description,
@@ -286,6 +291,7 @@ const MapPopupFrame: FC<{
 					{isLoading ? undefined : (
 						<MapPopupContent
 							key={popupItem.id}
+							maxWidthPx={maxWidthPx}
 							popupItem={isTarget ? getTargetPopupItem(popupItem) : popupItem}
 						/>
 					)}

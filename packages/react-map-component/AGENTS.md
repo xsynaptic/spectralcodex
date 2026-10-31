@@ -12,6 +12,7 @@ Location knowledge (Status and its records) enters the package only through the 
 
 - Props are read once at mount. The Atlas persists the island's wrapper rather than the island, so Astro never hands it new props; anything that changes afterwards lives in the store or arrives from the host.
 - No effect derives store state from other store state. Host changes arrive through `map:sync`, and user actions through their handlers.
+- A `useSyncExternalStore` snapshot runs on every render, so a layout read there (`clientWidth`, `getComputedStyle`) forces style and layout on each hover render; read layout in the handler or effect that needs it.
 - Every map fetches its dataset's one whole directory file from `/api/map/`, so the HTTP cache shares one copy across pages. Partitions scatter a Theme across many Regions, and inlined rows help only one-page visits.
 - Every payload but a Division mask shares one version hash, since Locations change on most edit days.
 - Lines and pulse rings place Points through `lib/clusters-factory.ts`, a main-thread copy of MapLibre's cluster index. It copies three facts from MapLibre's `geojson_source.ts` (radius ×16 into tile units, extent 8192, clustering at `floor(zoom)`); recheck them on a MapLibre major upgrade.
