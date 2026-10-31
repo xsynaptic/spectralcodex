@@ -64,6 +64,25 @@ spectralcodex.com {
 
 	# Scoped to 404: basic_auth fails as a Caddy error, and an unscoped block serves /404.html as a publicly cacheable 401
 	handle_errors 404 {
+		# WordPress-era URLs, redirected only on a miss; first match wins
+		@legacy_paged path_regexp legacy_paged ^(/.+)/page/[0-9]+/$
+		redir @legacy_paged {re.legacy_paged.1}/ 301
+
+		@legacy_places path_regexp legacy_places ^/places/(?:[^/]+/)*([^/]+)/$
+		redir @legacy_places /regions/{re.legacy_places.1}/ 301
+
+		@legacy_nested_region path_regexp legacy_nested_region ^/regions/(?:[^/]+/)+([^/]+)/$
+		redir @legacy_nested_region /regions/{re.legacy_nested_region.1}/ 301
+
+		@legacy_theme {
+			path_regexp legacy_theme ^/themes/([^/]+)/$
+			not path /themes/taiwan-*
+		}
+		redir @legacy_theme /themes/taiwan-{re.legacy_theme.1}/ 301
+
+		@legacy_attachment path_regexp legacy_attachment ^/([^/]+)/[^/]+/$
+		redir @legacy_attachment /{re.legacy_attachment.1}/ 301
+
 		@open_graph_missing path /og/*
 		handle @open_graph_missing {
 			import derivative-not-found
