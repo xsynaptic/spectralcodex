@@ -10,13 +10,18 @@ const { umamiDomain, umamiId, ...props } = Astro.props;
 
 const beforeSendName = 'scxUmamiBeforeSend';
 
-// Crawler cohorts seen in Umami that hide navigator.webdriver but keep a fixed screen
+// Crawler cohorts seen in Umami that hide navigator.webdriver but keep a fixed screen; one that randomizes it lacks WebGL
 const excludedScreens = ['800x600', '1280x1200', '1280x1280', '1600x1600'];
 ---
 
 <script define:vars={{ beforeSendName, excludedScreens }} is:inline>
+	const webglProbe = document.createElement('canvas').getContext('webgl');
+
+	webglProbe?.getExtension('WEBGL_lose_context')?.loseContext();
+
 	window[beforeSendName] = (_type, payload) => {
 		if (navigator.webdriver) return false;
+		if (!webglProbe) return false;
 		if (excludedScreens.includes(`${screen.width}x${screen.height}`)) return false;
 
 		return payload;

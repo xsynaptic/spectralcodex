@@ -81,6 +81,22 @@ export default getConfig(
 				'react-hooks/use-memo': 'warn',
 			},
 		},
+		// Map visitors still run browsers older than Chrome 110 and Safari 16
+		{
+			files: ['packages/react-map-component/src/**/*.{ts,tsx}'],
+			ignores: ['**/*.test.{ts,tsx}'],
+			rules: {
+				'no-restricted-properties': [
+					'error',
+					...['toReversed', 'toSorted', 'toSpliced'].map((property) => ({
+						message: 'Copy then mutate instead (`[...array].sort()`)',
+						property,
+					})),
+				],
+				'unicorn/no-array-reverse': 'off',
+				'unicorn/no-array-sort': 'off',
+			},
+		},
 		{
 			files: ['packages/scripts/src/**/*.{ts,tsx}'],
 			rules: {
