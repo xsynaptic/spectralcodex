@@ -28,7 +28,7 @@ function getCachedCanvasData(
 	const key = JSON.stringify([
 		filter.objective,
 		filter.rating,
-		filter.status.toSorted((first, second) => first.localeCompare(second)),
+		[...filter.status].sort((first, second) => first.localeCompare(second)),
 		filter.pinnedIds,
 		scopeRule,
 	]);

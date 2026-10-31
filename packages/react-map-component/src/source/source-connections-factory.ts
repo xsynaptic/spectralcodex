@@ -17,7 +17,7 @@ export interface Connection {
 export type ConnectionCollection = FeatureCollection<LineString, Pick<Connection, 'kind'>>;
 
 function getPairKey(firstId: string, secondId: string) {
-	return [firstId, secondId].toSorted((first, second) => first.localeCompare(second)).join(' ');
+	return [firstId, secondId].sort((first, second) => first.localeCompare(second)).join(' ');
 }
 
 function getDistance(from: PositionedPoint, to: PositionedPoint) {
@@ -101,7 +101,7 @@ export function getConnections(
 	const points = rows
 		.filter(({ properties }) => getMapRowUrl(properties.id) === url)
 		.map((row) => getPositionedPoint(row))
-		.toSorted((first, second) => first.id.localeCompare(second.id, undefined, { numeric: true }));
+		.sort((first, second) => first.id.localeCompare(second.id, undefined, { numeric: true }));
 	const [main] = points;
 
 	if (!main) return [];

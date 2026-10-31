@@ -50,5 +50,5 @@ export function getArcCoordinates(from: [number, number], to: [number, number]) 
 
 	if (isWestOf(fromPoint, toPoint)) return sampleArc(fromPoint, toPoint);
 
-	return sampleArc(toPoint, fromPoint).toReversed();
+	return sampleArc(toPoint, fromPoint).reverse();
 }

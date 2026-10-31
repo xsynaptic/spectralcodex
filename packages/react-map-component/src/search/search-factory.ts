@@ -203,7 +203,7 @@ function isRegionNamedBy({ fields }: SearchRegion, term: string) {
 }
 
 function getOutermostIntervals(intervals: Array<MapInterval>) {
-	const sorted = intervals.toSorted(([firstLeft], [secondLeft]) => firstLeft - secondLeft);
+	const sorted = [...intervals].sort(([firstLeft], [secondLeft]) => firstLeft - secondLeft);
 	const outermost: Array<MapInterval> = [];
 	let right = 0;
 
@@ -284,7 +284,7 @@ function rankCandidates(candidates: Iterable<Candidate>, limit: number) {
 	for (const bucket of buckets) {
 		if (ranked.length >= limit) break;
 
-		ranked.push(...bucket.toSorted(compareCandidates).slice(0, limit - ranked.length));
+		ranked.push(...[...bucket].sort(compareCandidates).slice(0, limit - ranked.length));
 	}
 
 	return ranked;
