@@ -67,7 +67,11 @@ function getSheetMainTop() {
 	return document.querySelector(atlasPaneMainSelector)?.getBoundingClientRect().top ?? 0;
 }
 
+let isClosing = false;
+
 export function setFlag(isEnabled: boolean) {
+	isClosing = false;
+
 	// The header pads by the handle only while the flag is on, so the page is held by main's top
 	const mainTop = getSheetMainTop();
 
@@ -80,6 +84,12 @@ export function setFlag(isEnabled: boolean) {
 	writeStorage('sessionStorage', atlasFlagStorageKey, isEnabled ? '1' : undefined);
 	updateHeroSizes(readAtlasLayout() === 'split');
 	dispatchSync();
+}
+
+// Cleared from the tab up front so a reload during the X slide stays closed
+export function startClosing() {
+	isClosing = true;
+	writeStorage('sessionStorage', atlasFlagStorageKey, undefined);
 }
 
 function getFromPage(screen: AtlasScreen) {
@@ -135,13 +145,13 @@ export function startAtlasMode() {
 	document.addEventListener('astro:before-swap', (event) => {
 		const incomingRoot = event.newDocument.documentElement;
 		const isMap = readAtlasFlags(incomingRoot).page === atlasPage.map;
+		const hasFlag = readAtlasFlags(document.documentElement).hasFlag && !isClosing;
+
+		isClosing = false;
 
 		if (isMap) writeStorage('sessionStorage', atlasFlagStorageKey, '1');
 
-		incomingRoot.toggleAttribute(
-			atlasFlagAttribute,
-			isMap || readAtlasFlags(document.documentElement).hasFlag,
-		);
+		incomingRoot.toggleAttribute(atlasFlagAttribute, isMap || hasFlag);
 		stampPaneSize(incomingRoot);
 
 		const from = getFromPage(readAtlasScreen());

@@ -9,8 +9,8 @@
 \* Models src/lib/atlas/atlas-sheet-factory.ts
 \* Models src/lib/atlas/atlas-sheet.ts
 
-VARIABLES page, screen, flag, remembered, rest, pref, slide, closing, island, exitLost
-vars == <<page, screen, flag, remembered, rest, pref, slide, closing, island, exitLost>>
+VARIABLES page, screen, flag, remembered, rest, pref, slide, closing, island
+vars == <<page, screen, flag, remembered, rest, pref, slide, closing, island>>
 
 Pages == {"article", "place", "atlas"}
 MapPages == {"place", "atlas"}
@@ -32,7 +32,6 @@ TypeOK ==
     /\ slide \in Slides
     /\ closing \in BOOLEAN
     /\ island \in Islands
-    /\ exitLost \in BOOLEAN
 
 \* isAtlasMapShown and getAtlasLayout
 Shown(f, p) == f /\ p \in MapPages
@@ -80,7 +79,6 @@ Init ==
     /\ slide = "none"
     /\ closing = FALSE
     /\ island = ColdIsland(flag, page)
-    /\ exitLost = FALSE
 
 SetFlag(isEnabled) ==
     /\ flag' = isEnabled
@@ -89,16 +87,18 @@ SetFlag(isEnabled) ==
 \* prepareSheetArrival
 ArrivalRest(f, p) == IF LayoutOf(f, p, screen) = "sheet" THEN Preferred(screen) ELSE "raised"
 
-\* A link, the back button, a place tapped on the map or expand, then astro:before-swap in startAtlasMode
-\* A waiting closeAtlas finds its pane disconnected and returns without closing
+\* astro:before-swap in startAtlasMode, which closes for a waiting closeAtlas
+ArrivalFlag(p) == p = "atlas" \/ (flag /\ ~closing)
+
+\* A link, the back button, a place tapped on the map or expand, then astro:before-swap
+\* A waiting closeAtlas finds its pane disconnected and returns
 YouFollowALink(p) ==
-    LET f == p = "atlas" \/ flag
+    LET f == ArrivalFlag(p)
     IN /\ page' = p
        /\ flag' = f
        /\ remembered' = (p = "atlas" \/ remembered)
        /\ rest' = ArrivalRest(f, p)
        /\ slide' = "none"
-       /\ exitLost' = closing
        /\ closing' = FALSE
        /\ island' = IslandAfter(p, Shown(f, p))
        /\ UNCHANGED <<screen, pref>>
@@ -111,7 +111,6 @@ YouTapThisPlaceOnTheMap ==
     /\ rest = "lowered"
     /\ slide = "none"
     /\ slide' = Preferred(screen)
-    /\ exitLost' = FALSE
     /\ UNCHANGED <<page, screen, flag, remembered, rest, pref, closing, island>>
 
 \* openAtlas, then openSheet
@@ -122,7 +121,6 @@ YouPressEnter ==
     /\ island' = IF island = "live" THEN "live" ELSE "waking"
     /\ rest' = IF screen = "tall" THEN "half" ELSE rest
     /\ slide' = IF screen = "short" THEN "lowered" ELSE slide
-    /\ exitLost' = FALSE
     /\ UNCHANGED <<page, screen, pref, closing>>
 
 \* atlas-sheet-handle.ts; holdSheet's data-grabbing blocks a tap, drag or key mid-slide
@@ -133,8 +131,9 @@ YouMoveTheSheet ==
     /\ \E r \in RestsOn(screen) \ {rest}:
          /\ slide' = r
          /\ pref' = IF r = "lowered" THEN pref ELSE r
-    /\ exitLost' = FALSE
     /\ UNCHANGED <<page, screen, flag, remembered, rest, closing, island>>
+
+LandedRest(r) == IF r \in RestsOn(screen) THEN r ELSE "raised"
 
 \* moveSheet after its await; a waiting closeAtlas then calls setFlag(false)
 TheSheetSettles ==
@@ -142,11 +141,10 @@ TheSheetSettles ==
     /\ IF closing
        THEN /\ rest' = "raised"
             /\ SetFlag(FALSE)
-       ELSE /\ rest' = slide
+       ELSE /\ rest' = LandedRest(slide)
             /\ UNCHANGED <<flag, remembered>>
     /\ slide' = "none"
     /\ closing' = FALSE
-    /\ exitLost' = FALSE
     /\ UNCHANGED <<page, screen, pref, island>>
 
 \* setFlag(false)
@@ -155,17 +153,16 @@ CloseNow ==
     /\ rest' = "raised"
     /\ slide' = "none"
     /\ closing' = FALSE
-    /\ exitLost' = FALSE
 
-\* closeAtlas off /atlas
+\* closeAtlas off /atlas; startClosing clears the tab before the slide
 YouPressClose ==
     /\ MapTappable
     /\ Layout \in {"split", "sheet"}
     /\ IF rest = "lowered" /\ slide = "none"
        THEN /\ slide' = "raised"
             /\ closing' = TRUE
-            /\ exitLost' = FALSE
-            /\ UNCHANGED <<flag, remembered, rest>>
+            /\ remembered' = FALSE
+            /\ UNCHANGED <<flag, rest>>
        ELSE CloseNow
     /\ UNCHANGED <<page, screen, pref, island>>
 
@@ -193,7 +190,6 @@ YouResizeTheWindow ==
                     /\ closing' = FALSE
                     /\ IF closing THEN SetFlag(FALSE) ELSE UNCHANGED <<flag, remembered>>
                ELSE UNCHANGED <<rest, slide, flag, remembered, closing>>
-    /\ exitLost' = FALSE
     /\ UNCHANGED <<page, pref, island>>
 
 \* A full load of the same url, which drops a waiting closeAtlas
@@ -203,7 +199,6 @@ YouReload ==
        /\ remembered' = f
        /\ rest' = ColdRest(f, page, screen)
        /\ slide' = "none"
-       /\ exitLost' = closing
        /\ closing' = FALSE
        /\ island' = ColdIsland(f, page)
        /\ UNCHANGED <<page, screen, pref>>
@@ -212,7 +207,6 @@ YouReload ==
 TheMapFinishesLoading ==
     /\ island = "waking"
     /\ island' = "live"
-    /\ exitLost' = FALSE
     /\ UNCHANGED <<page, screen, flag, remembered, rest, pref, slide, closing>>
 
 Next ==
@@ -233,10 +227,10 @@ SheetOnlyOnPhonePlaces == (rest # "raised" \/ slide # "none") => Layout = "sheet
 
 HalfOnlyOnTallScreens == rest = "half" => screen = "tall"
 
-ModeRemembered == flag = remembered
+ModeRemembered == remembered = (flag /\ ~closing)
 
 MapWakesWhenShown == Layout # "regular" => island \in {"waking", "live"}
 
-CloseIsNotLost == ~exitLost
+CloseIsNotLost == [][closing => closing' \/ ~flag' \/ page' = "atlas"]_vars
 
 ====

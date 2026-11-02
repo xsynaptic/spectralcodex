@@ -24,10 +24,9 @@ interface TlcRun {
 const modelsDirectory = import.meta.dirname;
 const composeArguments = ['compose', '-f', path.join(modelsDirectory, 'compose.yaml')];
 
-const tlcExitCode = { holds: 0, violated: 12 } as const;
+const tlcExitCode = { holds: 0, invariantBroken: 12, propertyBroken: 13 } as const;
 
 const coverageRowPattern = /^<(\w+) line [^>]*>: \d+:(\d+)$/gm;
-const tracePattern = /^State \d+: <(\w+)/gm;
 
 function runTlc(runDirectory: string, { cfg, flags = [], label, model, module }: TlcRun) {
 	const cfgFile = `${model}-${label}.cfg`;
@@ -63,7 +62,12 @@ function runTlc(runDirectory: string, { cfg, flags = [], label, model, module }:
 	const output = `${result.stdout}${result.stderr}`;
 
 	if (result.status === tlcExitCode.holds) return { output, verdict: 'holds' } as const;
-	if (result.status === tlcExitCode.violated) return { output, verdict: 'breaks' } as const;
+	if (
+		result.status === tlcExitCode.invariantBroken ||
+		result.status === tlcExitCode.propertyBroken
+	) {
+		return { output, verdict: 'breaks' } as const;
+	}
 
 	return { output, verdict: 'error' } as const;
 }
@@ -72,13 +76,19 @@ function getToolError(model: string, label: string, output: string): CheckResult
 	return { isPassed: false, line: `${model}: TLC could not run ${label}`, output };
 }
 
-function readTrace(output: string) {
-	return [...output.matchAll(tracePattern)].map(([, action]) => action).slice(1);
+function getRuleKeyword({ properties }: ModelClaims, rule: string) {
+	return properties.includes(rule) ? 'PROPERTY' : 'INVARIANT';
 }
 
-function checkHolds(runDirectory: string, model: string, { holds }: ModelClaims): CheckResult {
+function checkHolds(runDirectory: string, model: string, modelClaims: ModelClaims): CheckResult {
+	const { holds, properties } = modelClaims;
+	const rules = [...holds, ...properties];
 	const { output, verdict } = runTlc(runDirectory, {
-		cfg: ['SPECIFICATION Spec', `INVARIANT ${holds.join(' ')}`],
+		cfg: [
+			'SPECIFICATION Spec',
+			`INVARIANT ${holds.join(' ')}`,
+			...(properties.length > 0 ? [`PROPERTY ${properties.join(' ')}`] : []),
+		],
 		flags: ['-coverage', '1'],
 		label: 'holds',
 		model,
@@ -102,36 +112,17 @@ function checkHolds(runDirectory: string, model: string, { holds }: ModelClaims)
 
 	return {
 		isPassed: true,
-		line: `${model}: ${holds.join(', ')} hold over ${states} states, every action enabled`,
-	};
-}
-
-function checkFinding(runDirectory: string, model: string, rule: string): CheckResult {
-	const { output, verdict } = runTlc(runDirectory, {
-		cfg: ['SPECIFICATION Spec', `INVARIANT ${rule}`],
-		label: `finding-${rule}`,
-		model,
-		module: 'spec',
-	});
-
-	if (verdict === 'error') return getToolError(model, `finding ${rule}`, output);
-	if (verdict === 'holds') {
-		return { isPassed: false, line: `${model}: ${rule} no longer breaks; move it to holds` };
-	}
-
-	return {
-		isPassed: true,
-		line: `${model}: ${rule} still breaks: ${readTrace(output).join(', ')}`,
+		line: `${model}: ${rules.join(', ')} hold over ${states} states, every action enabled`,
 	};
 }
 
 function checkMutant(
 	runDirectory: string,
 	model: string,
-	{ mutant, replace, rule }: ModelClaims['mutants'][number],
+	{ keyword, mutant, replace, rule }: ModelClaims['mutants'][number] & { keyword: string },
 ): CheckResult {
 	const { output, verdict } = runTlc(runDirectory, {
-		cfg: ['SPECIFICATION Spec', `INVARIANT ${rule}`, `CONSTANT ${replace} <- ${mutant}`],
+		cfg: ['SPECIFICATION Spec', `${keyword} ${rule}`, `CONSTANT ${replace} <- ${mutant}`],
 		label: `mutant-${mutant}`,
 		model,
 		module: 'mutants',
@@ -169,10 +160,8 @@ function* checkModel(runDirectory: string, model: string, modelClaims: ModelClai
 
 	yield checkHolds(runDirectory, model, modelClaims);
 
-	for (const rule of modelClaims.findings) yield checkFinding(runDirectory, model, rule);
-
 	for (const mutant of modelClaims.mutants) {
-		if (!modelClaims.holds.includes(mutant.rule)) {
+		if (![...modelClaims.holds, ...modelClaims.properties].includes(mutant.rule)) {
 			yield {
 				isPassed: false,
 				line: `${model}: mutant ${mutant.mutant} targets ${mutant.rule}, not a holding rule`,
@@ -180,7 +169,10 @@ function* checkModel(runDirectory: string, model: string, modelClaims: ModelClai
 			continue;
 		}
 
-		yield checkMutant(runDirectory, model, mutant);
+		yield checkMutant(runDirectory, model, {
+			...mutant,
+			keyword: getRuleKeyword(modelClaims, mutant.rule),
+		});
 	}
 
 	if (existsSync(path.join(modelsDirectory, model, 'witness.tla'))) {

@@ -6,9 +6,11 @@ import {
 	atlasPath,
 	getAtlas,
 	getSlugQuery,
+	holdSlide,
 	lowerSheet,
 	phoneViewport,
 	searchFor,
+	waitForSlide,
 } from '#e2e/atlas.ts';
 import { paths } from '#e2e/constants.ts';
 import { mapLoadTimeout } from '#e2e/map.ts';
@@ -23,19 +25,48 @@ import {
 	atlasSheetRest,
 } from '#lib/atlas/atlas-constants.ts';
 
-async function holdSlide(page: Page) {
-	await page.locator(atlasPaneSelector).evaluate((pane) => {
-		async function markSlideOver() {
-			await Promise.allSettled(pane.getAnimations().map((slide) => slide.finished));
-			Object.assign(globalThis, { isSlideOver: true });
-		}
+async function recordSwapMidSlide(page: Page) {
+	await page.locator(atlasPaneSelector).evaluate(
+		(pane, { lowered, sheetAttribute }) => {
+			document.addEventListener(
+				'astro:before-swap',
+				() => {
+					const isLowered = document.documentElement.getAttribute(sheetAttribute) === lowered;
 
-		void markSlideOver();
-	});
+					if (isLowered && pane.getAnimations().length > 0) {
+						Object.assign(globalThis, { isSwappedMidSlide: true });
+					}
+				},
+				{ once: true },
+			);
+		},
+		{ lowered: atlasSheetRest.lowered, sheetAttribute: atlasSheetAttribute },
+	);
 }
 
-async function waitForSlide(page: Page) {
-	await page.waitForFunction(() => 'isSlideOver' in globalThis);
+// Fetched before the hold, since a dev render outlasts the slide
+async function holdResponse(page: Page, path: string) {
+	const fetched = Promise.withResolvers<undefined>();
+	const delivery = Promise.withResolvers<undefined>();
+
+	await page.route(`**${path}`, async (route) => {
+		const response = await route.fetch();
+
+		fetched.resolve(undefined);
+		await delivery.promise;
+		await route.fulfill({ response });
+	});
+
+	return {
+		fetched: fetched.promise,
+		release: () => {
+			delivery.resolve(undefined);
+		},
+	};
+}
+
+function isSwappedMidSlide(page: Page) {
+	return page.evaluate(() => 'isSwappedMidSlide' in globalThis);
 }
 
 function readFlagStore(page: Page) {
@@ -82,16 +113,36 @@ test.describe('closing the atlas on a phone viewport', () => {
 		expect(new URL(page.url()).pathname).toBe(atlasPath);
 	});
 
+	test('a navigation to a page without a map that lands during the X slide leaves the atlas off', async ({
+		page,
+	}) => {
+		const { close, root } = getAtlas(page);
+		const postsResponse = await holdResponse(page, paths.postsIndex);
+
+		await visit(page, `${paths.locationSinglePoint}?atlas`);
+		await expect(root).toHaveAttribute(atlasSheetAttribute, atlasSheetRest.half);
+
+		await page.locator(`header a[href="${paths.postsIndex}"]`).first().click();
+		await lowerSheet(page);
+		await postsResponse.fetched;
+		await close.click();
+		await recordSwapMidSlide(page);
+		await holdSlide(page);
+		postsResponse.release();
+
+		await expect(root).not.toHaveAttribute(atlasPageAttribute);
+		await waitForSlide(page);
+
+		expect(await isSwappedMidSlide(page)).toBe(true);
+		await expect(root).not.toHaveAttribute(atlasFlagAttribute);
+		expect(await readFlagStore(page)).toBeNull();
+	});
+
 	test('a navigation to the atlas page that lands during the X slide keeps the reader there', async ({
 		page,
 	}) => {
 		const { close, root } = getAtlas(page);
-		const atlasResponse = Promise.withResolvers<undefined>();
-
-		await page.route(`**${atlasPath}`, async (route) => {
-			await atlasResponse.promise;
-			await route.fallback();
-		});
+		const atlasResponse = await holdResponse(page, atlasPath);
 
 		await visit(page, `${paths.locationSinglePoint}?atlas`);
 		await expect(root).toHaveAttribute(atlasSheetAttribute, atlasSheetRest.half);
@@ -100,14 +151,18 @@ test.describe('closing the atlas on a phone viewport', () => {
 
 		await page.locator(`header a[href="${atlasPath}"]`).first().click();
 		await lowerSheet(page);
+		await atlasResponse.fetched;
 		await close.click();
+		await recordSwapMidSlide(page);
 		await holdSlide(page);
-		atlasResponse.resolve(undefined);
+		atlasResponse.release();
 
 		await expect(root).toHaveAttribute(atlasPageAttribute, atlasPage.map);
 		await waitForSlide(page);
 
+		expect(await isSwappedMidSlide(page)).toBe(true);
 		await expect(root).toHaveAttribute(atlasFlagAttribute);
+		expect(await readFlagStore(page)).toBe('1');
 		expect(await page.evaluate(() => history.length)).toBe(historyLength + 1);
 		expect(new URL(page.url()).pathname).toBe(atlasPath);
 	});

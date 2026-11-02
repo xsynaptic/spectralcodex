@@ -112,6 +112,21 @@ export async function lowerSheet(page: Page) {
 	await expect(root).toHaveAttribute(atlasSheetAttribute, atlasSheetRest.lowered);
 }
 
+export async function holdSlide(page: Page) {
+	await page.locator(atlasPaneSelector).evaluate((pane) => {
+		async function markSlideOver() {
+			await Promise.allSettled(pane.getAnimations().map((slide) => slide.finished));
+			Object.assign(globalThis, { isSlideOver: true });
+		}
+
+		void markSlideOver();
+	});
+}
+
+export async function waitForSlide(page: Page) {
+	await page.waitForFunction(() => 'isSlideOver' in globalThis);
+}
+
 export async function expectScopeHeld(page: Page, title: string) {
 	const { metrics, scopeBar, scopeName } = getAtlas(page);
 

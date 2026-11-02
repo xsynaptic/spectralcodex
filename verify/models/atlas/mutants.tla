@@ -18,4 +18,10 @@ DirectiveLooksOnce(p, shown) ==
     ELSE IF shown THEN "waking"
     ELSE "asleep"
 
+\* moveSheet without its readSheetRests check
+SettleIgnoresTheGate(r) == r
+
+\* astro:before-swap without its isClosing check
+SwapKeepsTheFlag(p) == p = "atlas" \/ flag
+
 ====

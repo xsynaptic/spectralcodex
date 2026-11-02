@@ -245,7 +245,7 @@ function slidePane(pane: HTMLElement, keyframe: PropertyIndexedKeyframes, rest: 
 	});
 }
 
-// Takes the rest as asked; callers pick one the height gate allows from `atlas-sheet-factory.ts`
+// The height gate can take away the asked rest mid-slide
 export async function moveSheet(rest: AtlasSheetRest) {
 	const from = readSheetRest();
 
@@ -270,8 +270,10 @@ export async function moveSheet(rest: AtlasSheetRest) {
 	// Only the current slide writes the rest; `resetSheet` may have cancelled it or another replaced it
 	if (move !== currentMove || !pane.isConnected) return;
 
+	const landedRest = readSheetRests().includes(rest) ? rest : atlasSheetRest.raised;
+
 	// The rest lands while the fill still holds the pane, then the slide lets go in the same task
-	setSheet(rest);
+	setSheet(landedRest);
 	pane.style.translate = '';
 	move.cancel();
 }

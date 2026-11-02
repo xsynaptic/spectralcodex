@@ -12,11 +12,13 @@ import {
 	getAtlas,
 	getHeading,
 	getPreviewLink,
+	holdSlide,
 	keepCanvas,
 	lowerSheet,
 	openInPane,
 	phoneViewport,
 	toggleScope,
+	waitForSlide,
 } from '#e2e/atlas.ts';
 import { paths } from '#e2e/constants.ts';
 import { expectMapSettled, mapLoadTimeout } from '#e2e/map.ts';
@@ -50,6 +52,23 @@ async function expectUnderHandle(page: Page, locator: Locator) {
 
 		expect(Math.abs((box?.y ?? 0) - handleBottom)).toBeLessThanOrEqual(1);
 	}).toPass();
+}
+
+// Capture runs ahead of the mode's resize listener, whose reset starts transitions of its own
+async function recordResizeMidSlide(page: Page) {
+	await page.locator(atlasPaneSelector).evaluate((pane, sheetAttribute) => {
+		addEventListener(
+			'resize',
+			() => {
+				const isLanded = document.documentElement.hasAttribute(sheetAttribute);
+
+				if (!isLanded && pane.getAnimations().length > 0) {
+					Object.assign(globalThis, { isResizedMidSlide: true });
+				}
+			},
+			{ capture: true, once: true },
+		);
+	}, atlasSheetAttribute);
 }
 
 test.describe('a sheet on a phone viewport', { tag: '@engines' }, () => {
@@ -197,6 +216,31 @@ test.describe('the rest a sheet takes on a phone viewport', { tag: '@engines' },
 		await expect(root).toHaveAttribute(atlasSheetAttribute, atlasSheetRest.lowered);
 
 		await handle.press('ArrowUp');
+		await expect(root).not.toHaveAttribute(atlasSheetAttribute);
+	});
+});
+
+// Other engines take longer than the slide to apply a viewport size
+test.describe('a slide interrupted on a phone viewport', () => {
+	test.use({ viewport: phoneViewport });
+
+	test('a turn to a short screen during a slide to half lands the sheet raised', async ({
+		page,
+	}) => {
+		const { handle, root } = getAtlas(page);
+
+		await visit(page, `${paths.locationSinglePoint}?atlas`);
+		await expect(root).toHaveAttribute(atlasSheetAttribute, atlasSheetRest.half);
+		await handle.press('ArrowUp');
+		await expect(root).not.toHaveAttribute(atlasSheetAttribute);
+
+		await handle.press('ArrowDown');
+		await recordResizeMidSlide(page);
+		await holdSlide(page);
+		await page.setViewportSize(phoneSidewaysViewport);
+		await waitForSlide(page);
+
+		expect(await page.evaluate(() => 'isResizedMidSlide' in globalThis)).toBe(true);
 		await expect(root).not.toHaveAttribute(atlasSheetAttribute);
 	});
 });
