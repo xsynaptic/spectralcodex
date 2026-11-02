@@ -49,7 +49,6 @@
 	& :where(h4) {
 		margin-top: calc(var(--spacing) * 6);
 		margin-bottom: calc(var(--spacing) * 2);
-		font-size: 1em;
 		font-weight: var(--font-weight-semibold);
 		line-height: 1.5;
 		color: light-dark(var(--color-primary-900), var(--color-white));
