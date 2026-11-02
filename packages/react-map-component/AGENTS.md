@@ -39,4 +39,4 @@ Map search extends its own matcher in `search/`. MiniSearch was measured: it ran
 
 ## Tests
 
-`tests/e2e/atlas.spec.ts` covers what a reader can see: real links, controls and history. Sleeps, pixel measurements and synthetic events pass while the real path breaks, so avoid them. Pure rules get unit tests beside their `*-factory.ts`.
+The `tests/e2e/atlas*.spec.ts` specs cover what a reader can see: real links, controls and history. Sleeps, pixel measurements and synthetic events pass while the real path breaks, so avoid them. Pure rules get unit tests beside their `*-factory.ts`.

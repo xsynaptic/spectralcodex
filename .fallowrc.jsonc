@@ -30,6 +30,7 @@
 		// CRAP is off; without Istanbul data fallow would only be guessing at coverage from the module graph
 		"maxCrap": 0,
 		"maxCognitive": 12,
+		"maxFileLines": 500,
 		"ignore": ["src/dev/**"],
 		// Each ceiling is the measured score plus two; re-measure after a deliberate change, but never raise one just to pass
 		"thresholdOverrides": [
