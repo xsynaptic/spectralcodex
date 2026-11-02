@@ -2,7 +2,7 @@
 	"$schema": "./node_modules/fallow/rule-pack-schema.json",
 	"version": 1,
 	"name": "spectralcodex",
-	"description": "Keeps collection reads on their sanctioned paths and Zod out of the map island",
+	"description": "Keeps collection reads on their sanctioned paths, Zod out of the map island, and image reads on the pipeline",
 	"rules": [
 		{
 			"id": "collection-access",
@@ -53,7 +53,13 @@
 				"**/*.test.ts",
 			],
 			"message": "The map island ships without Zod, because Zod's classic schemas don't tree-shake. Schemas belong in packages/map-codec/src/schemas or @spectralcodex/shared/schemas, and client code imports neither, nor the build-only @spectralcodex/map-codec/directory.",
-			"severity": "error",
+		},
+		{
+			"id": "image-source",
+			"kind": "banned-import",
+			"specifiers": ["sharp"],
+			"files": ["src/**", "packages/scripts/**"],
+			"message": "Open images with `openImageSource` from `@xsynaptic/astro-image-pipeline/node` so photos taken sideways come out upright",
 		},
 	],
 }

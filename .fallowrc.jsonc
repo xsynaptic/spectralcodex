@@ -25,6 +25,7 @@
 		"re-export-cycle": "error",
 		"package-cycle": "error",
 		"unused-component-props": "error",
+		"policy-violation": "error",
 	},
 	"health": {
 		// CRAP is off; without Istanbul data fallow would only be guessing at coverage from the module graph

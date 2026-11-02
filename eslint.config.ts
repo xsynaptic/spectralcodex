@@ -111,23 +111,6 @@ export default getConfig(
 				],
 			},
 		},
-		{
-			files: ['src/**/*', 'packages/scripts/**/*'],
-			rules: {
-				'no-restricted-imports': [
-					'error',
-					{
-						paths: [
-							{
-								message:
-									'Open images with `openImageSource` from `@xsynaptic/astro-image-pipeline/node` so photos taken sideways come out upright',
-								name: 'sharp',
-							},
-						],
-					},
-				],
-			},
-		},
 		getBrowserConfig(['src/components/**/*']),
 		{
 			files: ['verify/e2e/**/*', 'playwright.config.ts'],
