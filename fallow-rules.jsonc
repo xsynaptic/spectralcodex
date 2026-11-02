@@ -1,5 +1,5 @@
 {
-	"$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/rule-pack-schema.json",
+	"$schema": "./node_modules/fallow/rule-pack-schema.json",
 	"version": 1,
 	"name": "spectralcodex",
 	"description": "Keeps collection reads on their sanctioned paths and Zod out of the map island",

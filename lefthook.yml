@@ -22,7 +22,9 @@ check:
           # Uncached on purpose; a stale knip cache once reported a live devDependency as unused
           - name: unused
             run: knip
-          # Dead code stays with knip; fallow's unused-code rules are off in .fallowrc.jsonc
+          # Dead code stays with knip except component props, which knip can't see
+          - name: props
+            run: fallow dead-code --unused-component-props --quiet
           - name: dupes
             run: fallow dupes --quiet
           # Health prints its report even at zero findings, so output shows only on failure
@@ -55,6 +57,8 @@ fix:
         jobs:
           - name: unused
             run: knip
+          - name: props
+            run: fallow dead-code --unused-component-props --quiet
           - name: dupes
             run: fallow dupes --quiet
           - name: complexity

@@ -1,5 +1,6 @@
 {
-	"ignorePatterns": ["packages/scripts/src/validate-content/fixtures/**", "deploy/**"],
+	"ignorePatterns": ["deploy/**"],
+	"failOnParseError": true,
 	"rulePacks": ["fallow-rules.jsonc"],
 	// MDX components load by auto-import, which fallow can't follow, and rule packs skip what they can't reach
 	"dynamicallyLoaded": ["src/components/mdx/*.astro"],
@@ -23,6 +24,7 @@
 		"misconfigured-dependency-overrides": "off",
 		"re-export-cycle": "error",
 		"package-cycle": "error",
+		"unused-component-props": "error",
 	},
 	"health": {
 		// CRAP is off; without Istanbul data fallow would only be guessing at coverage from the module graph
