@@ -1,7 +1,8 @@
 import { GeometryTypeEnum, LocationStatusEnum } from '@spectralcodex/shared/map';
+import fc from 'fast-check';
 import { describe, expect, test } from 'vitest';
 
-import type { MapFeaturesRule, MapInterval } from '#map-rules.ts';
+import type { MapFeaturesRule } from '#map-rules.ts';
 import type { MapSourceItem } from '#schemas/codec.ts';
 
 import { createRuleTest, selectMapRows } from '#map-rules.ts';
@@ -27,74 +28,32 @@ function getIds(rows: Array<MapSourceItem>) {
 	return rows.map(({ properties }) => properties.id);
 }
 
-function createRandom(seed: number) {
-	let state = seed;
+const ordinalArbitrary = fc.integer({ max: 30, min: 0 });
 
-	return function random() {
-		state = (Math.imul(state, 1_664_525) + 1_013_904_223) >>> 0;
+// Ends past every ordinal, fractional and inverted, as well as the ordinals themselves
+const boundArbitrary = fc.oneof(
+	fc.integer({ max: 35, min: -5 }),
+	fc.double({ noNaN: true }),
+	fc.constantFrom(-Infinity, Infinity),
+);
 
-		return state / 4_294_967_296;
-	};
-}
-
-function pick<T>(random: () => number, items: ReadonlyArray<T>): T {
-	const item = items[Math.floor(random() * items.length)];
-
-	if (item === undefined) throw new Error('Cannot pick from an empty list');
-
-	return item;
-}
-
-function createRegionIntervals(random: () => number, regionCount: number) {
-	const children = new Map<number, Array<number>>();
-
-	for (let region = 1; region < regionCount; region++) {
-		const parent = Math.floor(random() * region);
-
-		children.set(parent, [...(children.get(parent) ?? []), region]);
-	}
-
-	const intervals: Array<MapInterval> = [];
-	let counter = 1;
-
-	function visit(region: number) {
-		const left = counter;
-		const regionChildren = children.get(region) ?? [];
-
-		counter += 1;
-		for (const child of regionChildren) visit(child);
-		intervals.push([left, counter]);
-		counter += 1;
-	}
-
-	visit(0);
-
-	return intervals;
-}
-
-function createDirectory(seed: number) {
-	const random = createRandom(seed);
-	const intervals = createRegionIntervals(random, 300);
-	const ordinals = intervals.map(([left]) => left);
-	const themeCount = 40;
-
-	const rows = Array.from({ length: 2000 }, (_, position) => {
-		const regionOrdinals = Array.from({ length: Math.floor(random() * 4) }, () =>
-			pick(random, ordinals),
-		);
-		const themeIndices = Array.from({ length: Math.floor(random() * 3) }, () =>
-			Math.floor(random() * themeCount),
-		);
-
-		return makeRow({
-			id: `location-${String(position)}`,
-			...(regionOrdinals.length > 0 ? { regionOrdinals } : {}),
-			...(themeIndices.length > 0 ? { themeIndices } : {}),
-		});
-	});
-
-	return { intervals, rows, themeCount };
-}
+const rowsArbitrary = fc
+	.array(
+		fc.record({
+			regionOrdinals: fc.option(fc.array(ordinalArbitrary, { maxLength: 4 })),
+			themeIndices: fc.option(fc.array(fc.integer({ max: 5, min: 0 }), { maxLength: 3 })),
+		}),
+		{ maxLength: 40 },
+	)
+	.map((columns) =>
+		columns.map(({ regionOrdinals, themeIndices }, position) =>
+			makeRow({
+				id: `location-${String(position)}`,
+				...(regionOrdinals === null ? {} : { regionOrdinals }),
+				...(themeIndices === null ? {} : { themeIndices }),
+			}),
+		),
+	);
 
 function selectByFilter(rows: ReadonlyArray<MapSourceItem>, rule: MapFeaturesRule) {
 	const isInRule = createRuleTest(rule);
@@ -142,39 +101,24 @@ describe('selectMapRows', () => {
 });
 
 describe('selectMapRows index matches the linear filter', () => {
-	const { intervals, rows, themeCount } = createDirectory(20_261_017);
+	test('for any interval', () => {
+		fc.assert(
+			fc.property(rowsArbitrary, fc.tuple(boundArbitrary, boundArbitrary), (rows, interval) => {
+				const rule = { interval, type: 'region' } as const;
 
-	test('for every region in the tree', () => {
-		for (const interval of intervals) {
-			const rule = { interval, type: 'region' } as const;
-
-			expect(getIds(selectMapRows(rows, rule))).toEqual(getIds(selectByFilter(rows, rule)));
-		}
+				expect(getIds(selectMapRows(rows, rule))).toEqual(getIds(selectByFilter(rows, rule)));
+			}),
+		);
 	});
 
-	test('for every theme', () => {
-		for (let index = 0; index < themeCount; index++) {
-			const rule = { index, type: 'theme' } as const;
+	test('for any theme', () => {
+		fc.assert(
+			fc.property(rowsArbitrary, fc.integer({ max: 6, min: -1 }), (rows, index) => {
+				const rule = { index, type: 'theme' } as const;
 
-			expect(getIds(selectMapRows(rows, rule))).toEqual(getIds(selectByFilter(rows, rule)));
-		}
-	});
-
-	test('for intervals that do not line up with a region', () => {
-		const cases: Array<MapInterval> = [
-			[0, 0],
-			[-5, 3],
-			[7, 7],
-			[10, 4],
-			[2.5, 40.5],
-			[-Infinity, Infinity],
-		];
-
-		for (const interval of cases) {
-			const rule = { interval, type: 'region' } as const;
-
-			expect(getIds(selectMapRows(rows, rule))).toEqual(getIds(selectByFilter(rows, rule)));
-		}
+				expect(getIds(selectMapRows(rows, rule))).toEqual(getIds(selectByFilter(rows, rule)));
+			}),
+		);
 	});
 });
 

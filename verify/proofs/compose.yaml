@@ -3,12 +3,13 @@ services:
     image: lean-elan:4.2.4
     build:
       dockerfile_inline: |
-        FROM debian:bookworm-slim AS elan
+        FROM debian:bookworm-slim@sha256:99c0b25c46d0214d5a2091092e7908907dcaecd6a962cde0ac700acee222b6f3 AS elan
         RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl \
-          && curl -sSfL https://raw.githubusercontent.com/leanprover/elan/v4.2.4/elan-init.sh \
-          | sh -s -- -y --default-toolchain none
+          && curl -sSfL -o /elan-init.sh https://raw.githubusercontent.com/leanprover/elan/v4.2.4/elan-init.sh \
+          && echo 'a620ff1641616222c8d37c54845492004bb84d6877cdbc944dd65c1aa685bf53  /elan-init.sh' | sha256sum -c - \
+          && sh /elan-init.sh -y --default-toolchain none
 
-        FROM gcr.io/distroless/cc-debian12
+        FROM gcr.io/distroless/cc-debian12@sha256:e5d81ddde149641e2a9ba55be4545bc125c67de07508b03ba4c22e6eb0ded5aa
         COPY --from=elan /root/.elan /root/.elan
         ENV PATH=/root/.elan/bin:/usr/local/bin:/usr/bin:/bin
     working_dir: /proofs

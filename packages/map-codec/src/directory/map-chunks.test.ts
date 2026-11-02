@@ -1,3 +1,4 @@
+import fc from 'fast-check';
 import { describe, expect, test } from 'vitest';
 
 import { assignChunks } from '#directory/map-chunks.ts';
@@ -15,12 +16,21 @@ function makeItem(id: string, [lng, lat]: [number, number], popupBytes = 10): Ch
 	return { id, lat, lng, popupBytes };
 }
 
-// Spread-out point set whose ids are permuted by seed, so different seeds feed the same items in a different input order
-function makeSeededItems(seed: number): Array<ChunkInputItem> {
-	return Array.from({ length: 30 }, (_, index) => {
-		const id = `q${String((index * 7 + seed) % 30)}`;
-		return makeItem(id, [-150 + index * 10, -60 + ((index * 13) % 120)], 80);
-	});
+// Ids are entry slugs; canonically equivalent Unicode ids would tie under localeCompare
+const itemsArbitrary = fc.uniqueArray(
+	fc.record({
+		id: fc.stringMatching(/^[a-z][a-z0-9-]{0,11}$/),
+		lat: fc.double({ max: 120, min: -120, noNaN: true }),
+		lng: fc.double({ max: 400, min: -400, noNaN: true }),
+		popupBytes: fc.integer({ max: 40, min: 1 }),
+	}),
+	{ maxLength: 60, selector: (item) => item.id },
+);
+
+const capArbitrary = fc.integer({ max: 200, min: 2 });
+
+function compareIds(first: string, second: string) {
+	return first.localeCompare(second);
 }
 
 // Mirror of the packer's byte accounting: brackets + items + comma separators
@@ -64,23 +74,25 @@ describe('assignChunks', () => {
 		expect(chunkIds.get('0')).toEqual(['a', 'b']);
 	});
 
-	test('every bin stays within the cap and every item is assigned', () => {
-		const byId = new Map<string, ChunkInputItem>();
-		const items = Array.from({ length: 40 }, (_, index) => {
-			const item = makeItem(`p${String(index)}`, [-160 + index * 8, -70 + index * 3], 90);
-			byId.set(item.id, item);
-			return item;
-		});
+	test('every item lands in one bin, and only a lone item exceeds the cap', () => {
+		fc.assert(
+			fc.property(itemsArbitrary, capArbitrary, (items, capBytes) => {
+				const byId = new Map(items.map((item) => [item.id, item] as const));
+				const { chunkIds, chunkKeyById } = assignChunks(items, { capBytes });
 
-		const { chunkIds, chunkKeyById } = assignChunks(items, { capBytes: 250 });
+				expect([...chunkIds.values()].flat().toSorted(compareIds)).toEqual(
+					[...byId.keys()].toSorted(compareIds),
+				);
 
-		expect(chunkKeyById.size).toBe(40);
-		let seen = 0;
-		for (const [, ids] of chunkIds) {
-			seen += ids.length;
-			expect(payloadBytes(itemsForChunk(ids, byId))).toBeLessThanOrEqual(250);
-		}
-		expect(seen).toBe(40);
+				for (const [key, ids] of chunkIds) {
+					expect(ids.every((id) => chunkKeyById.get(id) === key)).toBe(true);
+
+					if (ids.length > 1) {
+						expect(payloadBytes(itemsForChunk(ids, byId))).toBeLessThanOrEqual(capBytes);
+					}
+				}
+			}),
+		);
 	});
 
 	test('isolates a lone item larger than the cap in its own bin', () => {
@@ -99,13 +111,20 @@ describe('assignChunks', () => {
 	});
 
 	test('is deterministic regardless of input order', () => {
-		const byId = (result: ReturnType<typeof assignChunks>) =>
-			[...result.chunkKeyById].toSorted((a, b) => a[0].localeCompare(b[0]));
+		const itemsAndShuffled = itemsArbitrary.chain((items) =>
+			fc.tuple(
+				fc.constant(items),
+				fc.shuffledSubarray(items, { maxLength: items.length, minLength: items.length }),
+			),
+		);
 
-		const forward = assignChunks(makeSeededItems(0), { capBytes: 300 });
-		const shuffled = assignChunks(makeSeededItems(0).toReversed(), { capBytes: 300 });
-
-		expect(byId(shuffled)).toEqual(byId(forward));
+		fc.assert(
+			fc.property(itemsAndShuffled, capArbitrary, ([items, shuffled], capBytes) => {
+				expect([...assignChunks(shuffled, { capBytes }).chunkIds]).toEqual([
+					...assignChunks(items, { capBytes }).chunkIds,
+				]);
+			}),
+		);
 	});
 
 	test('bins walk the world one grid cell at a time', () => {

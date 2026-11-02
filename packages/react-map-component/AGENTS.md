@@ -36,7 +36,3 @@ Map search extends its own matcher in `search/`. MiniSearch was measured: it ran
 - Rules read colour through a role token, never a scale step; a non-colour dark swap uses `[data-map-mode='dark']`.
 - MapLibre's CSS sits in `layer(maplibre)`, under the unlayered package rules, so an override needs no extra specificity. That win also cancels MapLibre's forced-colours rules, so restate an overridden property in the forced-colours block that closes its area's stylesheet, where every floating surface takes the `ButtonText` outline.
 - Canvas colour goes through the role-named `lib/canvas-palette.ts`, since CSS can't reach the canvas. The filter swatches read it too, because they are the legend for the canvas dots. Neither reads the tokens.
-
-## Tests
-
-The `tests/e2e/atlas*.spec.ts` specs cover what a reader can see: real links, controls and history. Sleeps, pixel measurements and synthetic events pass while the real path breaks, so avoid them. Pure rules get unit tests beside their `*-factory.ts`.
