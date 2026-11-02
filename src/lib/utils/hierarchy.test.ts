@@ -36,6 +36,20 @@ describe('createHierarchy nested-set numbering', () => {
 		expect(isWithin(ordinalById.get('taiwan')!, canada)).toBe(false); // separate root
 	});
 
+	test('numbering matches the Lean model fixture', () => {
+		expect(Object.fromEntries(intervalById)).toStrictEqual({
+			canada: [1, 2],
+			north: [4, 7],
+			south: [8, 9],
+			taipei: [5, 6],
+			taiwan: [3, 10],
+		});
+
+		for (const [id, [left]] of intervalById) {
+			expect(ordinalById.get(id)).toBe(left);
+		}
+	});
+
 	test('numbering is deterministic regardless of input order', () => {
 		const again = createHierarchy(nodes.toReversed());
 

@@ -208,6 +208,19 @@ describe('searchMap', () => {
 		expect(result?.title.ranges).toEqual([[0, 3]]);
 	});
 
+	test.each(['𠮷 haleiwa', 'haleiwa 𠮷'])(
+		'highlights take in a dropped apostrophe and a surrogate pair, whatever the word order: %s',
+		(query) => {
+			const [result] =
+				searchMap(createSearchIndex([makeRow('haleiwa', "Hale'iwa 𠮷")], []), query) ?? [];
+
+			expect(result?.title.ranges).toEqual([
+				[0, 8],
+				[9, 11],
+			]);
+		},
+	);
+
 	test('a match on a Scope slug alone ranks as a mid-word match', () => {
 		const rows = [makeRow('a', 'Ancient Cityscape')];
 		const scopes = [makeScope('city-god', 'Chenghuang Temples')];

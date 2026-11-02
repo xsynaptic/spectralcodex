@@ -1,0 +1,22 @@
+services:
+  lean:
+    image: lean-elan:4.2.4
+    build:
+      dockerfile_inline: |
+        FROM debian:bookworm-slim AS elan
+        RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl \
+          && curl -sSfL https://raw.githubusercontent.com/leanprover/elan/v4.2.4/elan-init.sh \
+          | sh -s -- -y --default-toolchain none
+
+        FROM gcr.io/distroless/cc-debian12
+        COPY --from=elan /root/.elan /root/.elan
+        ENV PATH=/root/.elan/bin:/usr/local/bin:/usr/bin:/bin
+    working_dir: /proofs
+    volumes:
+      - .:/proofs
+      - lean-toolchains:/root/.elan/toolchains
+    command: ['lake', 'build', '--wfail']
+
+volumes:
+  lean-toolchains:
+    name: lean-toolchains
