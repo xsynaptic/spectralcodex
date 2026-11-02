@@ -9,6 +9,7 @@ export const mapPrefetchEventName = 'map:prefetch';
 export const mapSyncEventName = 'map:sync';
 export const mapViewAttribute = 'data-map-view';
 export const mapActiveAttribute = 'data-active';
+export const mapSettledAttribute = 'data-map-settled';
 export const mapInsetProperty = '--map-inset-bottom';
 export const mapPageHiddenProperty = '--map-page-hidden';
 

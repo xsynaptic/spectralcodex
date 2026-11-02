@@ -7,11 +7,11 @@ import {
 	getAtlas,
 	getSlugQuery,
 	lowerSheet,
-	mapLoadTimeout,
 	phoneViewport,
 	searchFor,
 } from '#e2e/atlas.ts';
 import { paths } from '#e2e/constants.ts';
+import { mapLoadTimeout } from '#e2e/map.ts';
 import { expect, test, visit } from '#e2e/test.ts';
 import {
 	atlasFlagAttribute,

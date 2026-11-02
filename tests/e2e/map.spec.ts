@@ -3,6 +3,7 @@ import type { Page } from '@playwright/test';
 import { mapControlClassName } from '@spectralcodex/react-map-component/constants';
 
 import { paths } from '#e2e/constants.ts';
+import { expectMapSettled, mapLoadTimeout } from '#e2e/map.ts';
 import { expect, test, visit } from '#e2e/test.ts';
 
 async function hoverOwnPoint(page: Page, path: string) {
@@ -15,15 +16,10 @@ async function hoverOwnPoint(page: Page, path: string) {
 	const ownPoint = island.locator('.maplibregl-marker').first();
 
 	await island.scrollIntoViewIfNeeded();
-	await expect(ownPoint).toBeVisible({ timeout: 10_000 });
+	await expectMapSettled(island);
+	await ownPoint.hover();
 
-	// The cursor turns to a pointer only once the Point is drawn and takes a click
-	await expect(async () => {
-		await page.locator('h1').hover();
-		await ownPoint.hover();
-
-		await expect(canvas).toHaveCSS('cursor', 'pointer', { timeout: 500 });
-	}).toPass({ timeout: 10_000 });
+	await expect(canvas).toHaveCSS('cursor', 'pointer');
 
 	return { canvas, island, ownPoint };
 }
@@ -35,7 +31,7 @@ test('one of the Points of a Location opens its own popup', async ({ page }) => 
 
 	const popupTitle = island.locator(`.maplibregl-popup .${mapControlClassName.popupTitle}`);
 
-	await expect(popupTitle).toBeVisible({ timeout: 10_000 });
+	await expect(popupTitle).toBeVisible();
 	await expect(popupTitle.locator('a')).toHaveCount(0);
 });
 
@@ -54,7 +50,9 @@ test('a Location map downloads the directory once', { tag: '@smoke' }, async ({ 
 	);
 
 	await island.scrollIntoViewIfNeeded();
-	await expect(island.locator('.maplibregl-marker').first()).toBeVisible({ timeout: 10_000 });
+	await expect(island.locator('.maplibregl-marker').first()).toBeVisible({
+		timeout: mapLoadTimeout,
+	});
 	expect(directoryRequests, 'one directory download').toHaveLength(1);
 });
 

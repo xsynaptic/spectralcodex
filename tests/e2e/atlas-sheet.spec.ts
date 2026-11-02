@@ -15,12 +15,12 @@ import {
 	getPreviewLink,
 	keepCanvas,
 	lowerSheet,
-	mapLoadTimeout,
 	openInPane,
 	phoneViewport,
 	toggleScope,
 } from '#e2e/atlas.ts';
 import { paths } from '#e2e/constants.ts';
+import { expectMapSettled, mapLoadTimeout } from '#e2e/map.ts';
 import { expect, test, visit } from '#e2e/test.ts';
 import {
 	atlasFlagAttribute,
@@ -150,11 +150,11 @@ test.describe('a sheet on a phone viewport', { tag: '@engines' }, () => {
 	test("a tap on the open Location's own Point brings a lowered sheet back to half with no popup", async ({
 		page,
 	}) => {
-		const { marker, popup, root } = getAtlas(page);
+		const { marker, popup, root, shell } = getAtlas(page);
 
 		await visit(page, `${paths.locationSinglePoint}?atlas`);
 		await lowerSheet(page);
-		await expect(marker).toBeVisible({ timeout: mapLoadTimeout });
+		await expectMapSettled(shell);
 
 		await marker.click();
 

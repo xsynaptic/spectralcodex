@@ -7,7 +7,7 @@ import {
 	mapControlClassName,
 } from '@spectralcodex/react-map-component/constants';
 
-import { isDev } from '#e2e/constants.ts';
+import { mapLoadTimeout } from '#e2e/map.ts';
 import { expect } from '#e2e/test.ts';
 import {
 	atlasInlineMapSelector,
@@ -26,8 +26,6 @@ const t = getTranslations();
 export const atlasPath = '/atlas/';
 export const phoneViewport = { height: 844, width: 390 };
 export const wideViewport = { height: 900, width: 1440 };
-
-export const mapLoadTimeout = isDev ? 20_000 : 10_000;
 
 export function getAtlas(page: Page) {
 	const shell = page.locator(atlasShellSelector);
@@ -78,7 +76,7 @@ export function getPreviewLink(page: Page) {
 	return page.locator(`${atlasPaneSelector} main .card-preview a[href]`).first();
 }
 
-// A rebuilt map would get a new canvas without this flag
+// A rebuilt map brings a fresh canvas that lacks this flag
 export async function keepCanvas(canvas: Locator) {
 	await canvas.evaluate((element) => {
 		Object.assign(element, { isKept: true });

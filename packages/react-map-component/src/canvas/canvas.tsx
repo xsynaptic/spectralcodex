@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 
 import { LngLatBounds } from 'maplibre-gl';
-import { useLayoutEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import { Map as ReactMapGlMap, useMap } from 'react-map-gl/maplibre';
 
 import type { MapComponentProps } from '#types.ts';
@@ -14,17 +14,18 @@ import { MapSelectionFeatureState } from '#canvas/canvas-feature-state.tsx';
 import { MapHoverLabel } from '#canvas/canvas-hover-label.tsx';
 import { MapCanvasMode } from '#canvas/canvas-mode.tsx';
 import { getInitialViewState } from '#canvas/canvas-viewport.ts';
+import { mapSettledAttribute } from '#constants.ts';
 import { MapScopeBar } from '#controls/controls-scope.tsx';
 import { MapControls } from '#controls/controls.tsx';
 import { CanvasDataProvider } from '#data/data-canvas.tsx';
-import { useIsMapLoading } from '#data/data-query.ts';
+import { useIsMapLoading, useMapRows } from '#data/data-query.ts';
 import { useHostViewSync } from '#host/host-view.ts';
 import { getActiveAttribute } from '#lib/active-attribute.ts';
 import { useMapConfig } from '#lib/config.tsx';
 import { isDocumentDark, useIsDarkMode } from '#lib/dark-mode.ts';
 import { getBasemapStyle } from '#lib/protomaps.ts';
 import { MapHoverPreload, MapPopup } from '#popup/popup.tsx';
-import { mapInteractiveLayerIds, mapSlotLayers } from '#source/source-config.ts';
+import { mapInteractiveLayerIds, mapSlotLayers, MapSourceIdEnum } from '#source/source-config.ts';
 import { MapSource } from '#source/source.tsx';
 import { MapStoreProvider } from '#store/store.tsx';
 import { MapTargets } from '#targets/targets.tsx';
@@ -60,6 +61,42 @@ const MapRootMarker: FC = function MapRootMarker() {
 		container.dataset.mapRoot = '';
 		container.dataset.mapMode = isDarkMode ? 'dark' : 'light';
 	}, [map, isDarkMode]);
+
+	return;
+};
+
+const MapSettledMarker: FC = function MapSettledMarker() {
+	const { current: map } = useMap();
+	const { data: rows } = useMapRows();
+	const hasRows = rows !== undefined;
+
+	useEffect(() => {
+		if (!map || !hasRows) return;
+
+		const instance = map.getMap();
+		const container = instance.getContainer();
+
+		function markSettled() {
+			if (!instance.getSource(MapSourceIdEnum.PointCollection)) return;
+
+			container.setAttribute(mapSettledAttribute, '');
+		}
+
+		function clearSettled() {
+			container.removeAttribute(mapSettledAttribute);
+		}
+
+		instance.on('idle', markSettled);
+		instance.on('movestart', clearSettled);
+		instance.on('dataloading', clearSettled);
+
+		return () => {
+			instance.off('idle', markSettled);
+			instance.off('movestart', clearSettled);
+			instance.off('dataloading', clearSettled);
+			clearSettled();
+		};
+	}, [hasRows, map]);
 
 	return;
 };
@@ -132,6 +169,7 @@ const MapCanvasContainer: FC = function MapCanvasContainer() {
 			<MapTargets />
 			<MapSelectionFeatureState />
 			<MapRootMarker />
+			<MapSettledMarker />
 		</ReactMapGlMap>
 	);
 };

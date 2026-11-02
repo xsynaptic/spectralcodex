@@ -15,12 +15,12 @@ import {
 	getHeading,
 	getPreviewLink,
 	keepCanvas,
-	mapLoadTimeout,
 	openInPane,
 	toggleScope,
 	wideViewport,
 } from '#e2e/atlas.ts';
 import { paths } from '#e2e/constants.ts';
+import { expectMapSettled, mapLoadTimeout } from '#e2e/map.ts';
 import { expect, test, visit } from '#e2e/test.ts';
 import { atlasFlagAttribute } from '#lib/atlas/atlas-constants.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
@@ -96,7 +96,7 @@ test.describe('on a wide viewport', () => {
 
 		await visit(page, paths.locationMultiPoint);
 		await enterAtlas(page);
-		await expect(markers.nth(1)).toBeVisible();
+		await expectMapSettled(shell);
 
 		await markers.nth(1).click();
 
@@ -116,6 +116,7 @@ test.describe('on a wide viewport', () => {
 
 		await visit(page, paths.locationMultiPoint);
 		await enterAtlas(page);
+		await expectMapSettled(shell);
 		await markers.nth(1).click();
 		await expect(popup).toBeVisible();
 

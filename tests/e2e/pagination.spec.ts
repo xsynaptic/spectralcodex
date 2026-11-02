@@ -29,11 +29,7 @@ test('a pointer-driven change navigates immediately', async ({ page }) => {
 
 	const select = page.getByRole('combobox', { name: t('site.pagination.select.label') });
 
-	// `dispatchEvent` only waits for the element to attach, and a visible form means its listener is bound
-	await expect(select).toBeVisible();
-
-	// Playwright cannot open a native select's picker, so this stands in for it
-	await select.dispatchEvent('pointerdown');
+	await select.click();
 	await select.selectOption({ label: getPageOptionLabel(2) });
 
 	await expect(page).toHaveURL(paths.locationsIndexPage2);
@@ -46,8 +42,7 @@ test('a pointer-driven year pick on the Chronology index navigates to that year'
 
 	const select = page.getByRole('combobox', { name: t('chronology.yearly.select.label') });
 
-	await expect(select).toBeVisible();
-	await select.dispatchEvent('pointerdown');
+	await select.click();
 	await select.selectOption({ value: paths.chronologyYear });
 
 	await expect(page).toHaveURL(paths.chronologyYear);
@@ -63,8 +58,7 @@ test.describe('on a coarse pointer', () => {
 		const select = page.getByRole('combobox', { name: t('site.pagination.select.label') });
 		const goButton = page.getByRole('button', { name: t('site.pagination.select.submit') });
 
-		await expect(select).toBeVisible();
-		await select.dispatchEvent('pointerdown');
+		await select.tap();
 		await select.selectOption({ label: getPageOptionLabel(2) });
 
 		await expect(page).toHaveURL(paths.locationsIndex);
