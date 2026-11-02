@@ -7,6 +7,8 @@ import {
 	mapControlClassName,
 } from '@spectralcodex/react-map-component/constants';
 
+import type { ConsoleGuard } from '#e2e/test.ts';
+
 import { mapLoadTimeout } from '#e2e/map.ts';
 import { expect } from '#e2e/test.ts';
 import {
@@ -26,6 +28,11 @@ const t = getTranslations();
 export const atlasPath = '/atlas/';
 export const phoneViewport = { height: 844, width: 390 };
 export const wideViewport = { height: 900, width: 1440 };
+
+// Gecko and WebKit log a reload's cancelled loads, so only Chromium guards the console here
+export function allowReloadNoise(consoleGuard: ConsoleGuard, browserName: string) {
+	if (browserName !== 'chromium') consoleGuard.allow(/./);
+}
 
 export function getAtlas(page: Page) {
 	const shell = page.locator(atlasShellSelector);

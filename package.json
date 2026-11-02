@@ -7,6 +7,7 @@
 		"check-content": "mdxlint-content packages/content --root-path=$PWD",
 		"check-content-demo": "mdxlint-content packages/content-demo --root-path=$PWD",
 		"check-links": "pnpm -F @spectralcodex/scripts check-links",
+		"check-models": "node verify/models/check-models.ts",
 		"check-proofs": "docker compose -f verify/proofs/compose.yaml run --rm lean",
 		"check-types": "tsc --noEmit --extendedDiagnostics",
 		"content-schemas": "pnpm -F @spectralcodex/scripts content-schemas",

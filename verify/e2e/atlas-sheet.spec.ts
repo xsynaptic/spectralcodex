@@ -2,9 +2,8 @@ import type { Locator, Page } from '@playwright/test';
 
 import { mapInsetProperty } from '@spectralcodex/react-map-component/constants';
 
-import type { ConsoleGuard } from '#e2e/test.ts';
-
 import {
+	allowReloadNoise,
 	enterAtlas,
 	expectHistoryArrival,
 	expectSameCanvas,
@@ -51,11 +50,6 @@ async function expectUnderHandle(page: Page, locator: Locator) {
 
 		expect(Math.abs((box?.y ?? 0) - handleBottom)).toBeLessThanOrEqual(1);
 	}).toPass();
-}
-
-// Gecko and WebKit log a reload's cancelled loads, so only Chromium guards the console here
-function allowReloadNoise(consoleGuard: ConsoleGuard, browserName: string) {
-	if (browserName !== 'chromium') consoleGuard.allow(/./);
 }
 
 test.describe('a sheet on a phone viewport', { tag: '@engines' }, () => {
@@ -166,36 +160,6 @@ test.describe('a sheet on a phone viewport', { tag: '@engines' }, () => {
 
 test.describe('the rest a sheet takes on a phone viewport', { tag: '@engines' }, () => {
 	test.use({ viewport: phoneViewport });
-
-	test('the open rest a reader chose decides every later arrival', async ({
-		browserName,
-		consoleGuard,
-		page,
-	}) => {
-		const { handle, root } = getAtlas(page);
-
-		allowReloadNoise(consoleGuard, browserName);
-
-		await visit(page, `${paths.locationSinglePoint}?atlas`);
-		await expect(root).toHaveAttribute(atlasSheetAttribute, atlasSheetRest.half);
-
-		await handle.press('ArrowUp');
-		await expect(root).not.toHaveAttribute(atlasSheetAttribute);
-
-		await visit(page, `${paths.locationMultiPoint}?atlas`);
-		await expect(root).toHaveAttribute(atlasPageAttribute, atlasPage.pane);
-		await expect(root).not.toHaveAttribute(atlasSheetAttribute);
-
-		await page.reload({ waitUntil: 'domcontentloaded' });
-		await expect(root).toHaveAttribute(atlasPageAttribute, atlasPage.pane);
-		await expect(root).not.toHaveAttribute(atlasSheetAttribute);
-
-		await handle.press('ArrowDown');
-		await expect(root).toHaveAttribute(atlasSheetAttribute, atlasSheetRest.half);
-
-		await visit(page, `${paths.locationSinglePoint}?atlas`);
-		await expect(root).toHaveAttribute(atlasSheetAttribute, atlasSheetRest.half);
-	});
 
 	test('half falls to raised when the screen turns, and sideways a chosen half gives way to the height gate', async ({
 		browserName,
