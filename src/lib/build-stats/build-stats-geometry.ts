@@ -5,6 +5,7 @@ import * as R from 'remeda';
 
 import type { BuildRecord } from '#lib/build-stats/build-stats-loader.ts';
 import type { BuildStatsAnnotation, BuildStatsPoint } from '#lib/build-stats/build-stats-utils.ts';
+import type { DateDisplayOptions } from '#lib/utils/date.ts';
 
 import { millisecondsPerDay } from '#constants.ts';
 import {
@@ -58,9 +59,8 @@ const pagesTickCount = 4;
 const tooltipDateOptions = {
 	day: 'numeric',
 	month: 'long',
-	timeZone: 'UTC',
 	year: 'numeric',
-} as const satisfies Intl.DateTimeFormatOptions;
+} as const satisfies DateDisplayOptions;
 
 export interface ChartFrame {
 	bottom: number;

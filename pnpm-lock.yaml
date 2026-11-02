@@ -335,9 +335,6 @@ importers:
       fallow:
         specifier: ^3.38.1
         version: 3.38.1
-      fast-check:
-        specifier: ^4.10.2
-        version: 4.10.2
       geokdbush:
         specifier: ^2.1.0
         version: 2.1.0

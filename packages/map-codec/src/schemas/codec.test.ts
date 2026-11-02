@@ -1,15 +1,17 @@
+import { fc, test } from '@fast-check/vitest';
 import { GeometryTypeEnum, LocationStatusEnum } from '@spectralcodex/shared/map';
-import { describe, expect, test } from 'vitest';
+import { describe, expect } from 'vitest';
 import { z } from 'zod';
 
 import type { MapDirectoryColumns, MapPopupItem, MapSourceItem } from '#schemas/codec.ts';
 
-import { decodeMapDirectory } from '#codec-decode.ts';
+import { decodeMapDirectory, decodeMapPopupData } from '#codec-decode.ts';
 import { mapPopupKeys, mapSourceKeys } from '#codec-tables.ts';
 import { LocationStatusNumericMapping } from '#map-codes.ts';
 import { getMapRowUrl } from '#map-ids.ts';
 import {
 	encodeMapDirectory,
+	encodeMapPopupData,
 	MapDirectorySchema,
 	MapPopupItemSchema,
 	MapSourceItemSchema,
@@ -18,45 +20,6 @@ import {
 function byCodePoint(first: string, second: string): number {
 	return first.localeCompare(second);
 }
-
-const fullSourceItem: MapSourceItem = {
-	geometry: { coordinates: [100, 13], type: GeometryTypeEnum.Point },
-	properties: {
-		chunkKey: '7',
-		entryQuality: 4,
-		hasImage: true,
-		id: 'a',
-		objective: 2,
-		outlier: true,
-		pointTitle: 'Point (點)',
-		precision: 3,
-		rating: 5,
-		regionOrdinals: [1, 2],
-		status: LocationStatusEnum.Abandoned,
-		themeIndices: [3],
-		title: 'A',
-		url: '/a/',
-	},
-	type: 'Feature',
-};
-
-const fullPopupItem: MapPopupItem = {
-	description: 'desc',
-	googleMapsUrl: 'https://maps.app.goo.gl/abc',
-	id: 'a',
-	own: 5,
-	ownTitle: 'Point',
-	ownTitleMultilingualLang: 'zh',
-	ownTitleMultilingualValue: '殿',
-	popupImageSources: [
-		{ path: 'a-350x233.webp', width: 350 },
-		{ path: 'a-700x467.webp', width: 700 },
-	],
-	title: 'A',
-	titleMultilingualLang: 'zh',
-	titleMultilingualValue: '寺',
-	wikipediaUrl: 'https://en.wikipedia.org/wiki/A',
-};
 
 const residualCases = [
 	{ form: 'exact', id: 'dagangshan-airfield', stored: '', title: 'Dagangshan Airfield' },
@@ -80,6 +43,115 @@ const residualCases = [
 	{ form: 'multi-Point colon', id: 'fort-north:0', stored: ':0', title: 'Fort: North' },
 	{ form: 'empty slug', id: 'dagangshan', stored: 'dagangshan', title: '大崗山' },
 ];
+
+const textArbitrary = fc.string({ maxLength: 12, unit: 'grapheme' });
+
+const slugWordsArbitrary = fc.array(fc.stringMatching(/^[a-z0-9]{1,6}$/), {
+	maxLength: 3,
+	minLength: 1,
+});
+
+function capitalize(word: string) {
+	return `${word.charAt(0).toUpperCase()}${word.slice(1)}`;
+}
+
+const rowNameArbitrary = fc
+	.record({
+		core: slugWordsArbitrary,
+		pointIndex: fc.option(fc.nat({ max: 12 })),
+		prefix: fc.array(fc.stringMatching(/^[a-z0-9]{1,6}$/), { maxLength: 2 }),
+		separator: fc.constantFrom(' ', ': ', ' – ', ', ', ' (', '’'),
+		unrelatedTitle: fc.option(textArbitrary),
+	})
+	.map(({ core, pointIndex, prefix, separator, unrelatedTitle }) => ({
+		id: `${[...prefix, ...core].join('-')}${pointIndex === null ? '' : `:${String(pointIndex)}`}`,
+		title: unrelatedTitle ?? core.map((word) => capitalize(word)).join(separator),
+	}));
+
+const finiteCoordinateArbitrary = fc
+	.double({ max: 180, min: -180, noNaN: true })
+	.filter((value) => !Object.is(value, -0));
+
+const sourceRowArbitrary = fc
+	.tuple(
+		rowNameArbitrary,
+		fc.tuple(finiteCoordinateArbitrary, finiteCoordinateArbitrary),
+		fc.record(
+			{
+				chunkKey: fc.stringMatching(/^\d{1,3}$/),
+				entryQuality: fc.integer({ max: 5, min: 1 }),
+				hasImage: fc.boolean(),
+				objective: fc.integer({ max: 5, min: 0 }),
+				outlier: fc.boolean(),
+				pointTitle: textArbitrary,
+				pointTitleMultilingual: textArbitrary,
+				precision: fc.integer({ max: 5, min: 1 }),
+				rating: fc.integer({ max: 5, min: 1 }),
+				regionOrdinals: fc.array(fc.nat({ max: 40 }), { maxLength: 3 }),
+				status: fc.constantFrom(...Object.values(LocationStatusEnum)),
+				themeIndices: fc.array(fc.nat({ max: 8 }), { maxLength: 3 }),
+				titleMultilingual: textArbitrary,
+			},
+			{ requiredKeys: ['entryQuality', 'hasImage', 'precision', 'rating', 'status'] },
+		),
+	)
+	.map(([{ id, title }, coordinates, properties]): MapSourceItem => ({
+		geometry: { coordinates, type: GeometryTypeEnum.Point },
+		properties: { ...properties, id, title, url: getMapRowUrl(id) },
+		type: 'Feature',
+	}));
+
+const directoryRowsArbitrary = fc
+	.uniqueArray(sourceRowArbitrary, { maxLength: 10, selector: (row) => row.properties.id })
+	.chain((rows) => {
+		const ids = rows.map((row) => row.properties.id);
+
+		return fc.tuple(
+			fc.constant(rows),
+			fc.tuple(...rows.map(() => fc.option(fc.subarray(ids), { nil: undefined }))),
+		);
+	})
+	.map(([rows, backlinksByRow]) =>
+		rows.map((row, index): MapSourceItem => {
+			const backlinks = backlinksByRow[index];
+
+			if (backlinks === undefined) return row;
+
+			return { ...row, properties: { ...row.properties, backlinks } };
+		}),
+	);
+
+const googleMapsUrlArbitrary = fc.oneof(
+	fc.stringMatching(/^[A-Za-z0-9/]{1,17}$/).map((token) => `https://maps.app.goo.gl/${token}`),
+	fc.webUrl(),
+);
+
+const popupItemArbitrary: fc.Arbitrary<MapPopupItem> = fc.record(
+	{
+		description: textArbitrary,
+		googleMapsUrl: googleMapsUrlArbitrary,
+		id: fc.stringMatching(/^[a-z0-9]+(?:-[a-z0-9]+){0,2}(?::\d{1,2})?$/),
+		own: fc.nat({ max: 5 }),
+		ownTitle: textArbitrary,
+		ownTitleMultilingualLang: fc.constantFrom('zh', 'ja', 'th', 'vi'),
+		ownTitleMultilingualValue: textArbitrary,
+		popupImageSources: fc.array(
+			fc.record(
+				{
+					path: fc.stringMatching(/^[a-z0-9-]{1,8}(?:\/[a-z0-9-]{1,8})?-\d{2,4}x\d{2,4}\.webp$/),
+					width: fc.integer({ max: 4000, min: 1 }),
+				},
+				{ noNullPrototype: true },
+			),
+			{ maxLength: 3, minLength: 1 },
+		),
+		title: textArbitrary,
+		titleMultilingualLang: fc.constantFrom('zh', 'ja', 'th', 'vi'),
+		titleMultilingualValue: textArbitrary,
+		wikipediaUrl: fc.webUrl(),
+	},
+	{ noNullPrototype: true, requiredKeys: ['id', 'title'] },
+);
 
 describe('MapSourceItemSchema decode', () => {
 	test('decompresses keys, inverts numeric enum codes, applies hasImage and entryQuality defaults', () => {
@@ -147,17 +219,27 @@ describe('MapSourceItemSchema encode (byte-faithful compressed form)', () => {
 });
 
 describe('round trips', () => {
-	test('decode(encode(standard)) deep-equals standard for a fully populated source item', () => {
-		expect(MapSourceItemSchema.parse(z.encode(MapSourceItemSchema, fullSourceItem))).toEqual(
-			fullSourceItem,
-		);
-	});
+	test.prop([directoryRowsArbitrary])(
+		'a directory decodes back to its rows through JSON, by the schema and the fast path alike',
+		(rows) => {
+			const columns = directoryOf(rows);
 
-	test('decode(encode(standard)) deep-equals standard for a popup item with image', () => {
-		expect(MapPopupItemSchema.parse(z.encode(MapPopupItemSchema, fullPopupItem))).toEqual(
-			fullPopupItem,
-		);
-	});
+			expect(MapDirectorySchema.parse(columns)).toStrictEqual(rows);
+			expect(decodeMapDirectory(columns)).toStrictEqual(rows);
+		},
+	);
+
+	test.prop([fc.array(popupItemArbitrary, { maxLength: 4 })])(
+		'popup items decode back through JSON, by the schema and the fast path alike',
+		(items) => {
+			const compressed = viaJson(encodeMapPopupData(items)) as ReturnType<
+				typeof encodeMapPopupData
+			>;
+
+			expect(compressed.map((item) => MapPopupItemSchema.parse(item))).toStrictEqual(items);
+			expect(decodeMapPopupData(compressed)).toStrictEqual(items);
+		},
+	);
 
 	test('an image path the popup would prefix twice fails to encode', () => {
 		for (const path of ['/a-350x233.webp', 'https://img.example.com/a-350x233.webp']) {
@@ -189,6 +271,22 @@ describe('round trips', () => {
 			})[mapPopupKeys.googleMapsUrl],
 		).toBe('www.google.com/maps/place/x');
 	});
+
+	test.each([
+		{ field: 'googleMapsUrl', url: 'https://maps.app.goo.gl/a/b' },
+		{ field: 'googleMapsUrl', url: 'https://www.google.com' },
+		{ field: 'googleMapsUrl', url: 'https://a.aa/://' },
+		{ field: 'wikipediaUrl', url: 'https://a.aa/://' },
+	] as const)(
+		'$field rides whole when its short form would expand elsewhere: $url',
+		({ field, url }) => {
+			const item = { [field]: url, id: 'a', title: 'A' };
+			const encoded = z.encode(MapPopupItemSchema, item);
+
+			expect(encoded[mapPopupKeys[field]]).toBe(url);
+			expect(MapPopupItemSchema.parse(encoded)).toStrictEqual(item);
+		},
+	);
 });
 
 function sourceItemOf(id: string, title: string): MapSourceItem {
@@ -313,33 +411,3 @@ function viaJson(value: unknown): unknown {
 function directoryOf(rows: Array<MapSourceItem>) {
 	return viaJson(encodeMapDirectory(rows)) as MapDirectoryColumns;
 }
-
-describe('decodeMapDirectory matches MapDirectorySchema', () => {
-	const chunked = sourceItemOf('beta-gamma', 'Gamma');
-	const linking = sourceItemOf('delta', 'Delta');
-
-	chunked.properties.chunkKey = '3';
-	linking.properties.backlinks = ['beta-gamma'];
-
-	test.each([
-		{ name: 'a fully populated row', rows: [fullSourceItem] },
-		{
-			name: 'a minimal row, with its all-null columns dropped',
-			rows: [sourceItemOf('alpha', 'Alpha')],
-		},
-		{
-			name: 'residual and Point ids',
-			rows: residualCases.map(({ id, title }) => sourceItemOf(id, title)),
-		},
-		{
-			name: 'mixed rows with nulls',
-			rows: [fullSourceItem, sourceItemOf('alpha', 'Alpha'), chunked],
-		},
-		{ name: 'Backlinks between rows', rows: [chunked, linking] },
-		{ name: 'no rows', rows: [] },
-	])('$name', ({ rows }) => {
-		const columns = directoryOf(rows);
-
-		expect(decodeMapDirectory(columns)).toStrictEqual(MapDirectorySchema.parse(columns));
-	});
-});

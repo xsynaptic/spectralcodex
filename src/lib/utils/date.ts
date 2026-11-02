@@ -54,12 +54,17 @@ interface CollectionEntryWithStandardDates {
 	};
 }
 
+export type DateDisplayOptions = Omit<Intl.DateTimeFormatOptions, 'timeZone'>;
+
 // "May 13th to May 15th, 2018": month repeated, year shown once when both ends share it
 export function getDateDisplay(
 	date: Date,
 	dateEnd: Date | undefined,
-	options: Intl.DateTimeFormatOptions,
+	displayOptions: DateDisplayOptions,
 ): string {
+	// Content dates are stored in UTC and `getDayKey` buckets them by the UTC day, so display them in UTC too
+	const options: Intl.DateTimeFormatOptions = { ...displayOptions, timeZone: 'UTC' };
+
 	if (!dateEnd) return formatDateOrdinal(date, options);
 
 	if (!isMonthNameFormat(options)) {

@@ -13,16 +13,39 @@ import {
 } from '#lib/utils/content-policy.ts';
 import { createHierarchy } from '#lib/utils/hierarchy.ts';
 
+// `createHierarchy` would quietly turn a missing parent into a root and leave a loop off every map, so the build stops on both here
+function validateRegionParents(entries: Array<CollectionEntry<'regions'>>) {
+	const parentById = new Map(entries.map((entry) => [entry.id, entry.data.parent]));
+
+	for (const [id, parentId] of parentById) {
+		if (parentId !== undefined && !parentById.has(parentId)) {
+			throw new Error(`Error: region "${id}" has a parent "${parentId}" that does not exist!`);
+		}
+
+		const chain = [id];
+
+		for (
+			let ancestorId = parentId;
+			ancestorId !== undefined;
+			ancestorId = parentById.get(ancestorId)
+		) {
+			if (chain.includes(ancestorId)) {
+				throw new Error(
+					`Error: regions form a parent loop: ${[...chain, ancestorId].join(' > ')}!`,
+				);
+			}
+
+			chain.push(ancestorId);
+		}
+	}
+}
+
 /**
  * Validate parent references and build the regions hierarchy
  * One tree drives both the materialized closure fields and the map nested-set
  */
 export function createRegionsTree(entries: Array<CollectionEntry<'regions'>>): Hierarchy {
-	for (const entry of entries) {
-		if (entry.data.parent === entry.id) {
-			throw new Error(`Error: region "${entry.id}" cannot be its own parent!`);
-		}
-	}
+	validateRegionParents(entries);
 
 	return createHierarchy(
 		entries.map((entry) =>

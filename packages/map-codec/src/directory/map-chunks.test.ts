@@ -1,5 +1,5 @@
-import fc from 'fast-check';
-import { describe, expect, test } from 'vitest';
+import { fc, test } from '@fast-check/vitest';
+import { describe, expect } from 'vitest';
 
 import { assignChunks } from '#directory/map-chunks.ts';
 
@@ -25,6 +25,13 @@ const itemsArbitrary = fc.uniqueArray(
 		popupBytes: fc.integer({ max: 40, min: 1 }),
 	}),
 	{ maxLength: 60, selector: (item) => item.id },
+);
+
+const itemsAndShuffledArbitrary = itemsArbitrary.chain((items) =>
+	fc.tuple(
+		fc.constant(items),
+		fc.shuffledSubarray(items, { maxLength: items.length, minLength: items.length }),
+	),
 );
 
 const capArbitrary = fc.integer({ max: 200, min: 2 });
@@ -74,26 +81,25 @@ describe('assignChunks', () => {
 		expect(chunkIds.get('0')).toEqual(['a', 'b']);
 	});
 
-	test('every item lands in one bin, and only a lone item exceeds the cap', () => {
-		fc.assert(
-			fc.property(itemsArbitrary, capArbitrary, (items, capBytes) => {
-				const byId = new Map(items.map((item) => [item.id, item] as const));
-				const { chunkIds, chunkKeyById } = assignChunks(items, { capBytes });
+	test.prop([itemsArbitrary, capArbitrary])(
+		'every item lands in one bin, and only a lone item exceeds the cap',
+		(items, capBytes) => {
+			const byId = new Map(items.map((item) => [item.id, item] as const));
+			const { chunkIds, chunkKeyById } = assignChunks(items, { capBytes });
 
-				expect([...chunkIds.values()].flat().toSorted(compareIds)).toEqual(
-					[...byId.keys()].toSorted(compareIds),
-				);
+			expect([...chunkIds.values()].flat().toSorted(compareIds)).toEqual(
+				[...byId.keys()].toSorted(compareIds),
+			);
 
-				for (const [key, ids] of chunkIds) {
-					expect(ids.every((id) => chunkKeyById.get(id) === key)).toBe(true);
+			for (const [key, ids] of chunkIds) {
+				expect(ids.every((id) => chunkKeyById.get(id) === key)).toBe(true);
 
-					if (ids.length > 1) {
-						expect(payloadBytes(itemsForChunk(ids, byId))).toBeLessThanOrEqual(capBytes);
-					}
+				if (ids.length > 1) {
+					expect(payloadBytes(itemsForChunk(ids, byId))).toBeLessThanOrEqual(capBytes);
 				}
-			}),
-		);
-	});
+			}
+		},
+	);
 
 	test('isolates a lone item larger than the cap in its own bin', () => {
 		const items = [
@@ -110,22 +116,14 @@ describe('assignChunks', () => {
 		expect(chunkKeyById.get('small-2')).not.toBe(hugeKey);
 	});
 
-	test('is deterministic regardless of input order', () => {
-		const itemsAndShuffled = itemsArbitrary.chain((items) =>
-			fc.tuple(
-				fc.constant(items),
-				fc.shuffledSubarray(items, { maxLength: items.length, minLength: items.length }),
-			),
-		);
-
-		fc.assert(
-			fc.property(itemsAndShuffled, capArbitrary, ([items, shuffled], capBytes) => {
-				expect([...assignChunks(shuffled, { capBytes }).chunkIds]).toEqual([
-					...assignChunks(items, { capBytes }).chunkIds,
-				]);
-			}),
-		);
-	});
+	test.prop([itemsAndShuffledArbitrary, capArbitrary])(
+		'is deterministic regardless of input order',
+		([items, shuffled], capBytes) => {
+			expect([...assignChunks(shuffled, { capBytes }).chunkIds]).toEqual([
+				...assignChunks(items, { capBytes }).chunkIds,
+			]);
+		},
+	);
 
 	test('bins walk the world one grid cell at a time', () => {
 		const items = gridCellItems();

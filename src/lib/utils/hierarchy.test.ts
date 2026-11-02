@@ -1,4 +1,8 @@
-import { describe, expect, test } from 'vitest';
+import type { MapSourceItem } from '@spectralcodex/map-codec';
+
+import { fc, test } from '@fast-check/vitest';
+import { createRuleTest } from '@spectralcodex/map-codec';
+import { describe, expect } from 'vitest';
 
 import type { HierarchyNode } from '#lib/utils/hierarchy.ts';
 
@@ -15,6 +19,42 @@ const nodes: Array<HierarchyNode> = [
 
 const isWithin = (ordinal: number, interval: readonly [number, number]): boolean =>
 	ordinal >= interval[0] && ordinal <= interval[1];
+
+const forestArbitrary = fc
+	.array(fc.oneof(fc.nat(), fc.constantFrom('missing', 'self'), fc.constant(undefined)), {
+		maxLength: 14,
+		minLength: 1,
+	})
+	.map((parents) =>
+		parents.map((parent, index): HierarchyNode => {
+			const id = `region-${String(index)}`;
+
+			if (parent === undefined) return { id };
+			if (parent === 'missing') return { id, parentId: 'missing' };
+			if (parent === 'self' || index === 0) return { id, parentId: id };
+
+			return { id, parentId: `region-${String(parent % index)}` };
+		}),
+	)
+	.chain((nodes) => {
+		const ids = nodes.map(({ id }) => id);
+
+		return fc.record({
+			filed: fc.array(fc.constantFrom(...ids), { maxLength: 4 }),
+			nodes: fc.shuffledSubarray(nodes, { maxLength: nodes.length, minLength: nodes.length }),
+			region: fc.constantFrom(...ids),
+		});
+	});
+
+const locationProperties: MapSourceItem['properties'] = {
+	entryQuality: 1,
+	hasImage: false,
+	id: 'location',
+	precision: 3,
+	rating: 3,
+	status: 'unknown',
+	title: 'Location',
+};
 
 describe('createHierarchy nested-set numbering', () => {
 	const { intervalById, ordinalById } = createHierarchy(nodes);
@@ -49,6 +89,22 @@ describe('createHierarchy nested-set numbering', () => {
 			expect(ordinalById.get(id)).toBe(left);
 		}
 	});
+
+	test.prop([forestArbitrary])(
+		'a Region map shows a Location exactly when it is filed in that Region or one inside it',
+		({ filed, nodes, region }) => {
+			const hierarchy = createHierarchy(nodes);
+			const isInRegion = createRuleTest({
+				interval: hierarchy.intervalById.get(region)!,
+				type: 'region',
+			});
+			const regionOrdinals = filed.map((id) => hierarchy.ordinalById.get(id)!);
+
+			expect(isInRegion({ ...locationProperties, regionOrdinals })).toBe(
+				filed.some((id) => id === region || hierarchy.ancestorsOf(id).includes(region)),
+			);
+		},
+	);
 
 	test('numbering is deterministic regardless of input order', () => {
 		const again = createHierarchy(nodes.toReversed());

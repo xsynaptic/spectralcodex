@@ -1,6 +1,6 @@
+import { fc, test } from '@fast-check/vitest';
 import { GeometryTypeEnum, LocationStatusEnum } from '@spectralcodex/shared/map';
-import fc from 'fast-check';
-import { describe, expect, test } from 'vitest';
+import { describe, expect } from 'vitest';
 
 import type { MapFeaturesRule } from '#map-rules.ts';
 import type { MapSourceItem } from '#schemas/codec.ts';
@@ -101,24 +101,19 @@ describe('selectMapRows', () => {
 });
 
 describe('selectMapRows index matches the linear filter', () => {
-	test('for any interval', () => {
-		fc.assert(
-			fc.property(rowsArbitrary, fc.tuple(boundArbitrary, boundArbitrary), (rows, interval) => {
-				const rule = { interval, type: 'region' } as const;
+	test.prop([rowsArbitrary, fc.tuple(boundArbitrary, boundArbitrary)])(
+		'for any interval',
+		(rows, interval) => {
+			const rule = { interval, type: 'region' } as const;
 
-				expect(getIds(selectMapRows(rows, rule))).toEqual(getIds(selectByFilter(rows, rule)));
-			}),
-		);
-	});
+			expect(getIds(selectMapRows(rows, rule))).toEqual(getIds(selectByFilter(rows, rule)));
+		},
+	);
 
-	test('for any theme', () => {
-		fc.assert(
-			fc.property(rowsArbitrary, fc.integer({ max: 6, min: -1 }), (rows, index) => {
-				const rule = { index, type: 'theme' } as const;
+	test.prop([rowsArbitrary, fc.integer({ max: 6, min: -1 })])('for any theme', (rows, index) => {
+		const rule = { index, type: 'theme' } as const;
 
-				expect(getIds(selectMapRows(rows, rule))).toEqual(getIds(selectByFilter(rows, rule)));
-			}),
-		);
+		expect(getIds(selectMapRows(rows, rule))).toEqual(getIds(selectByFilter(rows, rule)));
 	});
 });
 

@@ -40,10 +40,25 @@ function makeRegionsFixture() {
 }
 
 describe('createRegionsTree', () => {
-	test('throws when a region is its own parent', () => {
-		expect(() => createRegionsTree([makeRegion('loop', 'loop')])).toThrow(
-			'region "loop" cannot be its own parent',
+	test.each([
+		{ name: 'its own parent', regions: [makeRegion('loop', 'loop')], trail: 'loop > loop' },
+		{
+			name: 'a longer loop',
+			regions: [makeRegion('taiwan'), makeRegion('north', 'south'), makeRegion('south', 'north')],
+			trail: 'north > south > north',
+		},
+	])('throws when a region is $name', ({ regions, trail }) => {
+		expect(() => createRegionsTree(regions)).toThrow(`regions form a parent loop: ${trail}!`);
+	});
+
+	test('throws when a parent does not exist', () => {
+		expect(() => createRegionsTree([makeRegion('taipei', 'north-taiwan')])).toThrow(
+			'region "taipei" has a parent "north-taiwan" that does not exist',
 		);
+	});
+
+	test('accepts a well-formed tree', () => {
+		expect(createRegionsTree(makeRegionsFixture()).roots).toStrictEqual(['taiwan']);
 	});
 });
 

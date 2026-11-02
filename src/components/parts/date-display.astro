@@ -1,14 +1,14 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
-import type { DatePreset } from '#lib/utils/date.ts';
+import type { DateDisplayOptions, DatePreset } from '#lib/utils/date.ts';
 
 import { DatePresetEnum, getDateDisplay } from '#lib/utils/date.ts';
 
 interface Props extends HTMLAttributes<'time'> {
 	date: Date;
 	dateEnd?: Date | undefined;
-	dateOptions?: Intl.DateTimeFormatOptions | undefined;
+	dateOptions?: DateDisplayOptions | undefined;
 	datePreset?: DatePreset;
 }
 
@@ -19,7 +19,6 @@ const datePresets = {
 		hour12: false,
 		minute: 'numeric',
 		month: 'long',
-		timeZone: 'UTC',
 		timeZoneName: 'short',
 		year: 'numeric',
 	},
@@ -27,17 +26,15 @@ const datePresets = {
 		day: 'numeric',
 		hour12: false,
 		month: 'long',
-		timeZone: 'UTC',
 		year: 'numeric',
 	},
 	[DatePresetEnum.Short]: {
 		day: 'numeric',
 		hour12: false,
 		month: 'numeric',
-		timeZone: 'UTC',
 		year: 'numeric',
 	},
-} satisfies Record<DatePreset, Intl.DateTimeFormatOptions>;
+} satisfies Record<DatePreset, DateDisplayOptions>;
 
 const { date, dateEnd, dateOptions, datePreset = DatePresetEnum.Medium, ...props } = Astro.props;
 

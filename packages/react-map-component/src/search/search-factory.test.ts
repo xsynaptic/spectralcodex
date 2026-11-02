@@ -1,9 +1,13 @@
 import type { MapScopeRow, MapSourceItem } from '@spectralcodex/map-codec';
 
-import { describe, expect, test } from 'vitest';
+import { fc, test } from '@fast-check/vitest';
+import { describe, expect } from 'vitest';
+
+import type { MapSearchText } from '#search/search-factory.ts';
 
 import { makeMapSourceItem } from '#lib/map-test-utils.ts';
 import { createSearchIndex, searchMap } from '#search/search-factory.ts';
+import { normalizeText } from '#search/search-normalize.ts';
 
 function makeRow(
 	id: string,
@@ -20,6 +24,131 @@ function makeScope(id: string, title: string, row: Partial<MapScopeRow> = {}): M
 function getTitles(rows: Array<MapSourceItem>, scopes: Array<MapScopeRow>, query: string) {
 	return searchMap(createSearchIndex(rows, scopes), query)?.map(({ title }) => title.text);
 }
+
+const titleCharacterArbitrary = fc.oneof(
+	{ arbitrary: fc.constantFrom('a', 'B', 'z', '1', ' ', ' '), weight: 4 },
+	{ arbitrary: fc.constantFrom("'", '’', 'ʻ', '\u{301}', '\u{E35}'), weight: 2 },
+	{ arbitrary: fc.constantFrom('Đ', 'đ', 'ộ', 'É', 'İ', 'ẞ', '臺', '台', 'ดี'), weight: 2 },
+	{ arbitrary: fc.constantFrom('𠮷', '👍', '\u{958}', '\u{FB2C}'), weight: 2 },
+	{ arbitrary: fc.string({ maxLength: 1, minLength: 1, unit: 'binary' }), weight: 1 },
+);
+
+const titleAndQueryArbitrary = fc
+	.array(titleCharacterArbitrary, { maxLength: 16, minLength: 1 })
+	.chain((characters) => {
+		const sliceArbitrary = fc
+			.tuple(fc.nat(characters.length), fc.nat(characters.length))
+			.map(([first, second]) =>
+				characters.slice(Math.min(first, second), Math.max(first, second)).join(''),
+			);
+
+		return fc.record({
+			query: fc
+				.array(sliceArbitrary, { maxLength: 3, minLength: 1 })
+				.map((slices) => slices.join(' ')),
+			title: fc.constant(characters.join('')),
+		});
+	});
+
+function getHighlightParts({ ranges = [], text }: MapSearchText) {
+	const parts: Array<{ isMark: boolean; start: number; text: string }> = [];
+	let cursor = 0;
+
+	for (const [start, end] of ranges) {
+		parts.push(
+			{ isMark: false, start: cursor, text: text.slice(cursor, start) },
+			{ isMark: true, start, text: text.slice(start, end) },
+		);
+		cursor = end;
+	}
+
+	parts.push({ isMark: false, start: cursor, text: text.slice(cursor) });
+
+	return parts;
+}
+
+function getFoldedCharacters(text: string) {
+	const characters: Array<{ end: number; foldedEnd: number; foldedStart: number; start: number }> =
+		[];
+	let start = 0;
+	let foldedStart = 0;
+
+	for (const character of text) {
+		const foldedEnd = foldedStart + normalizeText(character).length;
+
+		characters.push({ end: start + character.length, foldedEnd, foldedStart, start });
+		start += character.length;
+		foldedStart = foldedEnd;
+	}
+
+	return characters;
+}
+
+function getTermSpans(normalized: string, terms: Array<string>) {
+	const spans: Array<readonly [number, number]> = [];
+
+	for (const term of terms) {
+		for (
+			let position = normalized.indexOf(term);
+			position !== -1;
+			position = normalized.indexOf(term, position + 1)
+		) {
+			spans.push([position, position + term.length]);
+		}
+	}
+
+	return spans;
+}
+
+describe('searchMap highlights', () => {
+	test.prop([titleAndQueryArbitrary])(
+		'mark whole characters of a match, and the parts reassemble the title',
+		({ query, title }) => {
+			const terms = normalizeText(query).split(/\s+/u).filter(Boolean);
+			const results = searchMap(createSearchIndex([makeRow('row', title)], []), query);
+
+			if (terms.length === 0) {
+				expect(results).toBeUndefined();
+				return;
+			}
+
+			expect(results).toHaveLength(1);
+
+			const parts = getHighlightParts(results![0]!.title);
+			const marks = parts.filter(({ isMark }) => isMark);
+			const characters = getFoldedCharacters(title);
+			const termSpans = getTermSpans(normalizeText(title), terms);
+
+			expect(parts.map((part) => part.text).join('')).toBe(title);
+			expect(parts.slice(1, -1).every((part) => part.text !== '')).toBe(true);
+
+			for (const term of terms) {
+				expect(
+					marks.some((mark) => normalizeText(mark.text).includes(term)),
+					term,
+				).toBe(true);
+			}
+
+			for (const mark of marks) {
+				const markCharacters = characters.filter(
+					({ end, start }) => start >= mark.start && end <= mark.start + mark.text.length,
+				);
+				const isInTerm = ({ foldedEnd, foldedStart }: (typeof characters)[number]) =>
+					termSpans.some(([spanStart, spanEnd]) => spanStart < foldedEnd && foldedStart < spanEnd);
+
+				expect(markCharacters.map(({ end, start }) => title.slice(start, end)).join('')).toBe(
+					mark.text,
+				);
+				expect(isInTerm(markCharacters[0]!) && isInTerm(markCharacters.at(-1)!)).toBe(true);
+				expect(
+					markCharacters.every(
+						(character) => character.foldedStart === character.foldedEnd || isInTerm(character),
+					),
+				).toBe(true);
+			}
+		},
+	);
+});
 
 describe('searchMap', () => {
 	test('a query matches across case, marks, đ and apostrophes', () => {

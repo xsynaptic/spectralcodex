@@ -39,10 +39,17 @@ function expandUrl(value: string | undefined, host?: string) {
 	return `https://${value}`;
 }
 
+// Some URLs come back wrong after shortening (a path containing `://`, say), so those are stored in full
+function encodeUrl(url: string | undefined, host?: string) {
+	const shortened = shortenUrl(url, host);
+
+	return expandUrl(shortened, host) === url ? shortened : url;
+}
+
 function url<Key extends string>(key: Key, host?: string) {
 	return field(key, {
 		decode: (value: string | undefined) => expandUrl(value, host),
-		encode: (value: string | undefined) => shortenUrl(value, host),
+		encode: (value: string | undefined) => encodeUrl(value, host),
 	});
 }
 

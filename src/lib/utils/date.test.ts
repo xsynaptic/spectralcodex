@@ -1,6 +1,7 @@
-import { describe, expect, test } from 'vitest';
+import { fc, test } from '@fast-check/vitest';
+import { describe, expect } from 'vitest';
 
-import type { DateRecordedEntry } from '#lib/utils/date.ts';
+import type { DateDisplayOptions, DateRecordedEntry } from '#lib/utils/date.ts';
 
 import {
 	getDateDisplay,
@@ -9,18 +10,32 @@ import {
 	sortByDateReverseChronological,
 } from '#lib/utils/date.ts';
 
-const longMonth: Intl.DateTimeFormatOptions = {
-	day: 'numeric',
-	month: 'long',
-	timeZone: 'UTC',
-	year: 'numeric',
-};
+const longMonth: DateDisplayOptions = { day: 'numeric', month: 'long', year: 'numeric' };
 
-const shortMonth: Intl.DateTimeFormatOptions = { ...longMonth, month: 'short' };
+const shortMonth: DateDisplayOptions = { ...longMonth, month: 'short' };
 
-const numericMonth: Intl.DateTimeFormatOptions = { ...longMonth, month: 'numeric' };
+const numericMonth: DateDisplayOptions = { ...longMonth, month: 'numeric' };
 
 const utc = (iso: string) => new Date(`${iso}T00:00:00Z`);
+
+const dayMilliseconds = 86_400_000;
+const firstDay = utc('0000-01-01').getTime() / dayMilliseconds;
+const lastDay = utc('9999-12-31').getTime() / dayMilliseconds;
+
+const instantArbitrary = fc.oneof(
+	fc.date({
+		max: new Date('9999-12-31T23:59:59.999Z'),
+		min: utc('0000-01-01'),
+		noInvalidDate: true,
+	}),
+	fc
+		.tuple(
+			fc.integer({ max: lastDay, min: firstDay }),
+			fc.integer({ max: 2 * 3_600_000, min: -2 * 3_600_000 }),
+		)
+		.map(([day, offset]) => new Date(day * dayMilliseconds + offset))
+		.filter((date) => date.getUTCFullYear() >= 0 && date.getUTCFullYear() <= 9999),
+);
 
 describe('getDateDisplay single date', () => {
 	test.each([
@@ -67,7 +82,7 @@ describe('getDateDisplay range', () => {
 	});
 
 	test('renders a range under a format that carries no year', () => {
-		const yearless: Intl.DateTimeFormatOptions = { ...longMonth, year: undefined };
+		const yearless: DateDisplayOptions = { ...longMonth, year: undefined };
 
 		expect(getDateDisplay(utc('2018-05-13'), utc('2018-05-15'), yearless)).toBe(
 			'May 13th to May 15th',
@@ -115,6 +130,19 @@ describe('getDayKey', () => {
 		expect(getDayKey(new Date('2018-05-13T23:30:00Z'))).toBe('2018-05-13');
 		expect(getDayKey(new Date('2018-05-13T00:30:00Z'))).toBe('2018-05-13');
 	});
+
+	test.prop([instantArbitrary])('names the UTC calendar day of any instant', (date) => {
+		expect(getDayKey(date)).toBe(date.toISOString().slice(0, 10));
+	});
+
+	test.prop([instantArbitrary])(
+		'names the day a date display shows for the same instant',
+		(date) => {
+			expect(getDateDisplay(date, undefined, longMonth)).toBe(
+				getDateDisplay(new Date(`${getDayKey(date)}T00:00:00Z`), undefined, longMonth),
+			);
+		},
+	);
 });
 
 const entry = (dateCreated: string, dateUpdated?: string) => ({

@@ -1,4 +1,6 @@
 ---
+import type { DateDisplayOptions } from '#lib/utils/date.ts';
+
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { buildActivityGraph } from '#lib/utils/activity-graph.ts';
 import { getDateDisplay } from '#lib/utils/date.ts';
@@ -22,9 +24,8 @@ const { days, monthLabels, padCount, weekCount } = buildActivityGraph({
 const tooltipDateOptions = {
 	day: 'numeric',
 	month: 'long',
-	timeZone: 'UTC',
 	year: 'numeric',
-} as const satisfies Intl.DateTimeFormatOptions;
+} as const satisfies DateDisplayOptions;
 
 function getDayTitle(value: number, date: Date): string {
 	const dateDisplay = getDateDisplay(date, undefined, tooltipDateOptions);

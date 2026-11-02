@@ -110,7 +110,6 @@
 		"eslint-plugin-react-hooks": "^7.1.1",
 		"exiftool-vendored": "^39.1.0",
 		"fallow": "^3.38.1",
-		"fast-check": "^4.10.2",
 		"geokdbush": "^2.1.0",
 		"globals": "^17.13.0",
 		"kdbush": "^4.1.0",
