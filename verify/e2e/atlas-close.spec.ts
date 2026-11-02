@@ -7,9 +7,11 @@ import {
 	getAtlas,
 	getSlugQuery,
 	holdSlide,
+	isRestored,
 	lowerSheet,
 	phoneViewport,
 	searchFor,
+	trackRestore,
 	waitForSlide,
 } from '#e2e/atlas.ts';
 import { paths } from '#e2e/constants.ts';
@@ -73,16 +75,20 @@ function readFlagStore(page: Page) {
 	return page.evaluate((key) => sessionStorage.getItem(key), atlasFlagStorageKey);
 }
 
-async function trackRestore(page: Page) {
-	await page.addInitScript(() => {
-		addEventListener('pageshow', (event) => {
-			if (event.persisted) Object.assign(globalThis, { isRestored: true });
-		});
+async function recordHideMidSlide(page: Page) {
+	await page.locator(atlasPaneSelector).evaluate((pane) => {
+		addEventListener(
+			'pagehide',
+			() => {
+				if (pane.getAnimations().length > 0) Object.assign(globalThis, { isHiddenMidSlide: true });
+			},
+			{ once: true },
+		);
 	});
 }
 
-function isRestored(page: Page) {
-	return page.evaluate(() => 'isRestored' in globalThis);
+function isHiddenMidSlide(page: Page) {
+	return page.evaluate(() => 'isHiddenMidSlide' in globalThis);
 }
 
 test.describe('closing the atlas on a phone viewport', () => {
@@ -218,6 +224,38 @@ baseTest.describe('the back/forward cache on a phone viewport', { tag: '@bfcache
 			await expect.poll(() => isRestored(page)).toBe(true);
 			await expect(root).toHaveAttribute(atlasFlagAttribute);
 			await expect(canvas).toBeVisible({ timeout: mapLoadTimeout });
+			expect(await readFlagStore(page)).toBe('1');
+		},
+	);
+
+	baseTest(
+		'the X slide held over in the cache gives way to a tab that turned the atlas on meanwhile',
+		async ({ page }) => {
+			const { canvas, close, root } = getAtlas(page);
+
+			await trackRestore(page);
+			await page.goto(paths.postsIndex, { waitUntil: 'networkidle' });
+			await page.goto(`${paths.locationSinglePoint}?atlas`, { waitUntil: 'networkidle' });
+			await expect(canvas).toBeVisible({ timeout: mapLoadTimeout });
+
+			await lowerSheet(page);
+			await recordHideMidSlide(page);
+			await close.click();
+			await holdSlide(page);
+			await page.goBack({ waitUntil: 'commit' });
+			await page.waitForURL(`**${paths.postsIndex}`, { waitUntil: 'commit' });
+
+			await page.evaluate((key) => {
+				sessionStorage.setItem(key, '1');
+			}, atlasFlagStorageKey);
+
+			await page.goForward({ waitUntil: 'commit' });
+			await page.waitForURL(`**${paths.locationSinglePoint}*`, { waitUntil: 'commit' });
+			await expect.poll(() => isRestored(page)).toBe(true);
+			await waitForSlide(page);
+
+			expect(await isHiddenMidSlide(page)).toBe(true);
+			await expect(root).toHaveAttribute(atlasFlagAttribute);
 			expect(await readFlagStore(page)).toBe('1');
 		},
 	);

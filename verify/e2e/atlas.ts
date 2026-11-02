@@ -127,6 +127,18 @@ export async function waitForSlide(page: Page) {
 	await page.waitForFunction(() => 'isSlideOver' in globalThis);
 }
 
+export async function trackRestore(page: Page) {
+	await page.addInitScript(() => {
+		addEventListener('pageshow', (event) => {
+			if (event.persisted) Object.assign(globalThis, { isRestored: true });
+		});
+	});
+}
+
+export function isRestored(page: Page) {
+	return page.evaluate(() => 'isRestored' in globalThis);
+}
+
 export async function expectScopeHeld(page: Page, title: string) {
 	const { metrics, scopeBar, scopeName } = getAtlas(page);
 

@@ -91,7 +91,6 @@ ArrivalRest(f, p) == IF LayoutOf(f, p, screen) = "sheet" THEN Preferred(screen) 
 ArrivalFlag(p) == p = "atlas" \/ (flag /\ ~closing)
 
 \* A link, the back button, a place tapped on the map or expand, then astro:before-swap
-\* A waiting closeAtlas finds its pane disconnected and returns
 YouFollowALink(p) ==
     LET f == ArrivalFlag(p)
     IN /\ page' = p
@@ -203,6 +202,22 @@ YouReload ==
        /\ island' = ColdIsland(f, page)
        /\ UNCHANGED <<page, screen, pref>>
 
+RestoredClosing == FALSE
+
+YouComeBackFromTheCache ==
+    \E r \in BOOLEAN, q \in {"half", "raised"}:
+        LET f == page = "atlas" \/ r
+        IN /\ SetFlag(f)
+           /\ pref' = q
+           /\ closing' = RestoredClosing
+           /\ IF f
+              THEN /\ island' = IF Shown(f, page) /\ island = "asleep" THEN "waking" ELSE island
+                   /\ UNCHANGED <<rest, slide>>
+              ELSE /\ rest' = "raised"
+                   /\ slide' = "none"
+                   /\ UNCHANGED island
+           /\ UNCHANGED <<page, screen>>
+
 \* client:atlas hydrating
 TheMapFinishesLoading ==
     /\ island = "waking"
@@ -220,6 +235,7 @@ Next ==
     \/ YouResizeTheWindow
     \/ YouReload
     \/ TheMapFinishesLoading
+    \/ YouComeBackFromTheCache
 
 Spec == Init /\ [][Next]_vars
 
@@ -230,7 +246,5 @@ HalfOnlyOnTallScreens == rest = "half" => screen = "tall"
 ModeRemembered == remembered = (flag /\ ~closing)
 
 MapWakesWhenShown == Layout # "regular" => island \in {"waking", "live"}
-
-CloseIsNotLost == [][closing => closing' \/ ~flag' \/ page' = "atlas"]_vars
 
 ====

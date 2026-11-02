@@ -14,7 +14,13 @@ import {
 	atlasShellSelector,
 } from '#lib/atlas/atlas-constants.ts';
 import { getAtlasOpenAction } from '#lib/atlas/atlas-layout-factory.ts';
-import { readAtlasLayout, readAtlasScreen, setFlag, startClosing } from '#lib/atlas/atlas-mode.ts';
+import {
+	isClosePending,
+	readAtlasLayout,
+	readAtlasScreen,
+	setFlag,
+	startClosing,
+} from '#lib/atlas/atlas-mode.ts';
 import {
 	moveSheet,
 	readPreferredSheetRest,
@@ -97,12 +103,10 @@ function leaveMap() {
 
 async function closeAtlas() {
 	if (readSheetRest() === atlasSheetRest.lowered) {
-		const pane = document.querySelector(atlasPaneSelector);
-
 		startClosing();
 		await moveSheet(atlasSheetRest.raised);
 
-		if (pane?.isConnected === false) return;
+		if (!isClosePending()) return;
 	}
 
 	const hasShellFocus = document

@@ -18,8 +18,9 @@ export const claims = {
 			{ mutant: 'SetFlagForgetsTheTab', replace: 'SetFlag', rule: 'ModeRemembered' },
 			{ mutant: 'SettleIgnoresTheGate', replace: 'LandedRest', rule: 'HalfOnlyOnTallScreens' },
 			{ mutant: 'DirectiveLooksOnce', replace: 'IslandAfter', rule: 'MapWakesWhenShown' },
-			{ mutant: 'SwapKeepsTheFlag', replace: 'ArrivalFlag', rule: 'CloseIsNotLost' },
+			{ mutant: 'SwapKeepsTheFlag', replace: 'ArrivalFlag', rule: 'ModeRemembered' },
+			{ mutant: 'CloseOutlivesTheRestore', replace: 'RestoredClosing', rule: 'ModeRemembered' },
 		],
-		properties: ['CloseIsNotLost'],
+		properties: [],
 	},
 } satisfies Record<string, ModelClaims>;

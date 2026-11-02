@@ -1,5 +1,6 @@
 import type { Locator, Page } from '@playwright/test';
 
+import { test as baseTest } from '@playwright/test';
 import { mapInsetProperty } from '@spectralcodex/react-map-component/constants';
 
 import {
@@ -13,11 +14,13 @@ import {
 	getHeading,
 	getPreviewLink,
 	holdSlide,
+	isRestored,
 	keepCanvas,
 	lowerSheet,
 	openInPane,
 	phoneViewport,
 	toggleScope,
+	trackRestore,
 	waitForSlide,
 } from '#e2e/atlas.ts';
 import { paths } from '#e2e/constants.ts';
@@ -243,6 +246,29 @@ test.describe('a slide interrupted on a phone viewport', () => {
 		expect(await page.evaluate(() => 'isResizedMidSlide' in globalThis)).toBe(true);
 		await expect(root).not.toHaveAttribute(atlasSheetAttribute);
 	});
+});
+
+baseTest.describe('the back/forward cache on a phone viewport', { tag: '@bfcache' }, () => {
+	baseTest.use({ viewport: phoneViewport });
+
+	baseTest(
+		'a half sheet restored from the cache onto a short screen lands raised',
+		async ({ page }) => {
+			const { root } = getAtlas(page);
+
+			await trackRestore(page);
+			await page.goto(`${paths.locationSinglePoint}?atlas`, { waitUntil: 'networkidle' });
+			await expect(root).toHaveAttribute(atlasSheetAttribute, atlasSheetRest.half);
+
+			await page.goto(paths.postsIndex, { waitUntil: 'networkidle' });
+			await page.setViewportSize(phoneSidewaysViewport);
+			await page.goBack({ waitUntil: 'commit' });
+			await page.waitForURL(`**${paths.locationSinglePoint}*`, { waitUntil: 'commit' });
+
+			await expect.poll(() => isRestored(page)).toBe(true);
+			await expect(root).not.toHaveAttribute(atlasSheetAttribute);
+		},
+	);
 });
 
 test.describe('reading in a sheet on a phone viewport', { tag: '@engines' }, () => {

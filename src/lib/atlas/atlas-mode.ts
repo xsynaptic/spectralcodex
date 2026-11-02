@@ -92,6 +92,10 @@ export function startClosing() {
 	writeStorage('sessionStorage', atlasFlagStorageKey, undefined);
 }
 
+export function isClosePending() {
+	return isClosing;
+}
+
 function getFromPage(screen: AtlasScreen) {
 	const isLowered = screen.layout === 'sheet' && screen.rest === atlasSheetRest.lowered;
 

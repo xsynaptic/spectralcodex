@@ -24,4 +24,6 @@ SettleIgnoresTheGate(r) == r
 \* astro:before-swap without its isClosing check
 SwapKeepsTheFlag(p) == p = "atlas" \/ flag
 
+CloseOutlivesTheRestore == closing
+
 ====
