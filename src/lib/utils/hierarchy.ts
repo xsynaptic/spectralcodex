@@ -32,18 +32,21 @@ const byId = (idA: string, idB: string): number => idA.localeCompare(idB);
 
 export function createHierarchy(nodes: Array<HierarchyNode>): Hierarchy {
 	const idSet = new Set(nodes.map((node) => node.id));
-	const { childrenByParent, parentById, roots } = indexAdjacency(nodes, idSet);
+
+	validateParents(nodes);
+
+	const { childrenByParent, parentById, roots } = indexAdjacency(nodes);
 	const { descendantsById, intervalById, ordinalById } = numberNestedSets(roots, childrenByParent);
 
 	function ancestorsOf(id: string): Array<string> {
 		const ancestors: Array<string> = [];
-		const seen = new Set<string>([id]);
-		let current = parentById.get(id);
 
-		while (current !== undefined && !seen.has(current)) {
+		for (
+			let current = parentById.get(id);
+			current !== undefined;
+			current = parentById.get(current)
+		) {
 			ancestors.push(current);
-			seen.add(current);
-			current = parentById.get(current);
 		}
 		return ancestors;
 	}
@@ -86,28 +89,48 @@ export function createHierarchy(nodes: Array<HierarchyNode>): Hierarchy {
 	};
 }
 
-// Only edges whose parent exists in the set; a missing, dangling, or self parent makes a root
-function indexAdjacency(nodes: Array<HierarchyNode>, idSet: ReadonlySet<string>) {
+function validateParents(nodes: Array<HierarchyNode>) {
+	const parentById = new Map(nodes.map((node) => [node.id, node.parentId]));
+
+	for (const [id, parentId] of parentById) {
+		if (parentId !== undefined && !parentById.has(parentId)) {
+			throw new Error(`Error: "${id}" has a parent "${parentId}" that does not exist!`);
+		}
+
+		const chain = [id];
+
+		for (
+			let ancestorId = parentId;
+			ancestorId !== undefined;
+			ancestorId = parentById.get(ancestorId)
+		) {
+			if (chain.includes(ancestorId)) {
+				throw new Error(`Error: parents form a loop: ${[...chain, ancestorId].join(' > ')}!`);
+			}
+
+			chain.push(ancestorId);
+		}
+	}
+}
+
+function indexAdjacency(nodes: Array<HierarchyNode>) {
 	const parentById = new Map<string, string>();
 	const childrenByParent = new Map<string, Array<string>>();
 	const roots: Array<string> = [];
 
-	for (const node of nodes) {
-		const hasParent =
-			node.parentId !== undefined && node.parentId !== node.id && idSet.has(node.parentId);
-
-		if (!hasParent) {
-			roots.push(node.id);
+	for (const { id, parentId } of nodes) {
+		if (parentId === undefined) {
+			roots.push(id);
 			continue;
 		}
 
-		parentById.set(node.id, node.parentId!);
+		parentById.set(id, parentId);
 
-		const siblings = childrenByParent.get(node.parentId!);
+		const siblings = childrenByParent.get(parentId);
 		if (siblings) {
-			siblings.push(node.id);
+			siblings.push(id);
 		} else {
-			childrenByParent.set(node.parentId!, [node.id]);
+			childrenByParent.set(parentId, [id]);
 		}
 	}
 
@@ -127,15 +150,10 @@ function numberNestedSets(
 	const ordinalById = new Map<string, number>();
 	const intervalById = new Map<string, [number, number]>();
 	const descendantsById = new Map<string, Array<string>>();
-	const visited = new Set<string>();
 
 	let counter = 1;
 
 	function visit(id: string): Array<string> {
-		if (visited.has(id)) return []; // Defensive against malformed cycles
-
-		visited.add(id);
-
 		const left = counter;
 
 		counter += 1;

@@ -30,7 +30,6 @@ function getIds(rows: Array<MapSourceItem>) {
 
 const ordinalArbitrary = fc.integer({ max: 30, min: 0 });
 
-// Ends past every ordinal, fractional and inverted, as well as the ordinals themselves
 const boundArbitrary = fc.oneof(
 	fc.integer({ max: 35, min: -5 }),
 	fc.double({ noNaN: true }),

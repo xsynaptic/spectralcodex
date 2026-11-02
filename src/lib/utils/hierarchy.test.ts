@@ -21,17 +21,12 @@ const isWithin = (ordinal: number, interval: readonly [number, number]): boolean
 	ordinal >= interval[0] && ordinal <= interval[1];
 
 const forestArbitrary = fc
-	.array(fc.oneof(fc.nat(), fc.constantFrom('missing', 'self'), fc.constant(undefined)), {
-		maxLength: 14,
-		minLength: 1,
-	})
+	.array(fc.option(fc.nat(), { nil: undefined }), { maxLength: 14, minLength: 1 })
 	.map((parents) =>
 		parents.map((parent, index): HierarchyNode => {
 			const id = `region-${String(index)}`;
 
-			if (parent === undefined) return { id };
-			if (parent === 'missing') return { id, parentId: 'missing' };
-			if (parent === 'self' || index === 0) return { id, parentId: id };
+			if (parent === undefined || index === 0) return { id };
 
 			return { id, parentId: `region-${String(parent % index)}` };
 		}),
@@ -146,17 +141,25 @@ describe('createHierarchy adjacency', () => {
 		expect(tree.descendantsOf('taipei')).toStrictEqual([]);
 	});
 
-	test('malformed parents are tolerated: dangling and self references become roots', () => {
-		const malformed = createHierarchy([
-			{ id: 'orphan', parentId: 'missing' },
-			{ id: 'child', parentId: 'orphan' },
-			{ id: 'loop', parentId: 'loop' },
-		]);
+	test('a parent that does not exist throws, naming both ids', () => {
+		expect(() => createHierarchy([{ id: 'orphan', parentId: 'missing' }])).toThrow(
+			'"orphan" has a parent "missing" that does not exist!',
+		);
+	});
 
-		expect(malformed.roots).toStrictEqual(['loop', 'orphan']);
-		expect(malformed.parentOf('orphan')).toBeUndefined();
-		expect(malformed.ancestorsOf('child')).toStrictEqual(['orphan']);
-		expect(malformed.ancestorsOf('loop')).toStrictEqual([]);
+	test.each([
+		{ name: 'its own parent', nodes: [{ id: 'loop', parentId: 'loop' }], trail: 'loop > loop' },
+		{
+			name: 'a longer loop',
+			nodes: [
+				{ id: 'root' },
+				{ id: 'north', parentId: 'south' },
+				{ id: 'south', parentId: 'north' },
+			],
+			trail: 'north > south > north',
+		},
+	])('a node that is $name throws, naming the loop', ({ nodes, trail }) => {
+		expect(() => createHierarchy(nodes)).toThrow(`parents form a loop: ${trail}!`);
 	});
 });
 

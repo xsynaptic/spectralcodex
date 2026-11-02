@@ -16,7 +16,6 @@ function makeItem(id: string, [lng, lat]: [number, number], popupBytes = 10): Ch
 	return { id, lat, lng, popupBytes };
 }
 
-// Ids are entry slugs; canonically equivalent Unicode ids would tie under localeCompare
 const itemsArbitrary = fc.uniqueArray(
 	fc.record({
 		id: fc.stringMatching(/^[a-z][a-z0-9-]{0,11}$/),
@@ -40,7 +39,6 @@ function compareIds(first: string, second: string) {
 	return first.localeCompare(second);
 }
 
-// Mirror of the packer's byte accounting: brackets + items + comma separators
 function payloadBytes(items: Array<ChunkInputItem>): number {
 	const sum = items.reduce((total, item) => total + item.popupBytes, 0);
 	return 2 + sum + Math.max(0, items.length - 1);
