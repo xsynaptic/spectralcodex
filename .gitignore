@@ -22,6 +22,8 @@ astro-error.log*
 
 # generated types and files
 .astro/
+verify/proofs/.lake/
+verify/proofs/lake-manifest.json
 .cache/
 temp/
 

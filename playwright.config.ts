@@ -46,7 +46,7 @@ export default defineConfig({
 	],
 	reporter: [['list'], ['html', { open: 'never', outputFolder: './temp/playwright-report' }]],
 	retries: 0,
-	testDir: './tests/e2e',
+	testDir: './verify/e2e',
 	timeout: isDev ? 60_000 : 15_000,
 	use: {
 		baseURL: getBaseUrl(),

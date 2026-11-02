@@ -130,7 +130,7 @@ export default getConfig(
 		},
 		getBrowserConfig(['src/components/**/*']),
 		{
-			files: ['tests/e2e/**/*', 'playwright.config.ts'],
+			files: ['verify/e2e/**/*', 'playwright.config.ts'],
 			languageOptions: {
 				globals: { ...globals.node, ...globals.browser },
 			},
