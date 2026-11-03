@@ -266,18 +266,24 @@ describe('the Scope over any walk through the Atlas', () => {
 		{ arbitrary: fc.record({ kind: fc.constant('land') }), weight: 1 },
 	);
 
-	const reached = { cleared: 0, clearedLate: 0, held: 0, kept: 0, restored: 0 };
-
-	function countArrival(name: PageName, before: Shown, after: Shown) {
-		if (!scopesByLocation.has(name) || !before.scope) return;
-
-		if (!before.isScopeEnabled) reached.held += 1;
-		else if (after.scope) reached.kept += 1;
-		else reached.cleared += 1;
+	interface Reached {
+		cleared: number;
+		clearedLate: number;
+		held: number;
+		kept: number;
+		restored: number;
 	}
 
-	function createWalk(start: PageName) {
+	function createWalk(start: PageName, reached: Reached) {
 		type WalkStep = typeof step extends fc.Arbitrary<infer Step> ? Step : never;
+
+		function countArrival(name: PageName, before: Shown, after: Shown) {
+			if (!scopesByLocation.has(name) || !before.scope) return;
+
+			if (!before.isScopeEnabled) reached.held += 1;
+			else if (after.scope) reached.kept += 1;
+			else reached.cleared += 1;
+		}
 
 		const store = createMapStore({
 			view: viewByPage[start],
@@ -409,21 +415,25 @@ describe('the Scope over any walk through the Atlas', () => {
 		return { check, take };
 	}
 
-	test.prop([fc.constantFrom(...pageNames), fc.array(step, { maxLength: 20, size: 'max' })], {
-		numRuns: 500,
-	})(
-		'a Location keeps or clears it, a Scope switched off is held, and reopening its page turns it on',
-		(start, steps) => {
-			const walk = createWalk(start);
+	test('a Location keeps or clears it, a Scope switched off is held, and reopening its page turns it on', () => {
+		const reached: Reached = { cleared: 0, clearedLate: 0, held: 0, kept: 0, restored: 0 };
 
-			for (const next of steps) {
-				walk.take(next);
-				walk.check();
-			}
-		},
-	);
+		fc.assert(
+			fc.property(
+				fc.constantFrom(...pageNames),
+				fc.array(step, { maxLength: 20, size: 'max' }),
+				(start, steps) => {
+					const walk = createWalk(start, reached);
 
-	test('the walks reached every case the claims cover', () => {
+					for (const next of steps) {
+						walk.take(next);
+						walk.check();
+					}
+				},
+			),
+			{ numRuns: 500 },
+		);
+
 		for (const [name, count] of Object.entries(reached)) {
 			expect(count, name).toBeGreaterThan(0);
 		}
