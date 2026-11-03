@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import type { MapView } from '#types.ts';
 
 import { mapSyncEventName } from '#constants.ts';
-import { useEnsureMapRows } from '#data/data-query.ts';
+import { useMapRows, useReadMapRows } from '#data/data-query.ts';
 import { useMapConfig } from '#lib/config.tsx';
 import { useMapStore } from '#store/store.tsx';
 
@@ -26,31 +26,27 @@ export function parseMapView(value: string | undefined, isDev = false): MapView 
 
 export function useHostViewSync() {
 	const { host } = useMapConfig();
-	const { syncView } = useMapStore((state) => state.actions);
-	const ensureRows = useEnsureMapRows();
+	const { resolveScope, syncView } = useMapStore((state) => state.actions);
+	const { data: rows } = useMapRows();
+	const readRows = useReadMapRows();
+
+	// A refetch after a failed fetch brings rows with no map:sync
+	useEffect(() => {
+		if (rows) resolveScope(rows);
+	}, [resolveScope, rows]);
 
 	useEffect(() => {
-		async function sync() {
-			const page = host.readView();
-
-			try {
-				syncView(page, await ensureRows());
-			} catch {
-				syncView(page, undefined);
-			}
+		function sync() {
+			syncView(host.readView(), readRows());
 		}
 
-		function handleSync() {
-			void sync();
-		}
-
-		document.addEventListener(mapSyncEventName, handleSync);
+		document.addEventListener(mapSyncEventName, sync);
 
 		// A sync can land after render reads the view but before this listener attaches
-		void sync();
+		sync();
 
 		return () => {
-			document.removeEventListener(mapSyncEventName, handleSync);
+			document.removeEventListener(mapSyncEventName, sync);
 		};
-	}, [ensureRows, host, syncView]);
+	}, [host, readRows, syncView]);
 }

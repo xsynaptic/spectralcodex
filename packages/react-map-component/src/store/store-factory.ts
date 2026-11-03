@@ -3,15 +3,17 @@ import type { MapSourceItem } from '@spectralcodex/map-codec';
 import { createStore } from 'zustand';
 
 import type { MapFilter } from '#data/data-filter.ts';
-import type { MapClickOutcome, MapHoverCluster, MapScope, MapStoreView } from '#types.ts';
+import type { MapScopeState } from '#store/store-scope.ts';
+import type { MapClickOutcome, MapHoverCluster, MapStoreView } from '#types.ts';
 
 import { defaultMapFilter } from '#data/data-filter.ts';
-import { reduceMapScope } from '#store/store-scope.ts';
+import { reduceMapScope, resolveMapScope } from '#store/store-scope.ts';
 
 export interface MapDataStore extends MapDataState {
 	actions: {
 		applyClick: (outcome: MapClickOutcome) => void;
 		clearSelection: () => void;
+		resolveScope: (items: ReadonlyArray<MapSourceItem>) => void;
 		setCanvasLoading: (isCanvasLoading: boolean) => void;
 		setFilter: (filter: Partial<MapFilter>) => void;
 		setHoveredId: (hoveredId: string | undefined, hoveredCluster?: MapHoverCluster) => void;
@@ -24,15 +26,13 @@ export interface MapDataStore extends MapDataState {
 
 export type MapOverlay = 'filter' | 'search';
 
-interface MapDataState extends MapStoreView {
+interface MapDataState extends MapScopeState, MapStoreView {
 	filter: MapFilter;
 	hoveredCluster: MapHoverCluster | undefined;
 	hoveredId: string | undefined;
 	isCanvasLoading: boolean;
 	isPopupVisible: boolean;
-	isScopeEnabled: boolean;
 	overlay: MapOverlay | undefined;
-	scope: MapScope | undefined;
 	selectedId: string | undefined;
 }
 
@@ -63,6 +63,10 @@ export function selectScope({
 	return isScopeEnabled ? scope : undefined;
 }
 
+export function isScopePending({ pendingTargetIds }: Pick<MapDataState, 'pendingTargetIds'>) {
+	return pendingTargetIds.length > 0;
+}
+
 const noOverlay = { isPopupVisible: true, overlay: undefined, selectedId: undefined } as const;
 
 const noPage: MapStoreView = { view: {}, viewKey: undefined };
@@ -75,7 +79,11 @@ export function createMapStore(page = noPage) {
 		isCanvasLoading: true,
 		...noOverlay,
 		...page,
-		...reduceMapScope({ isScopeEnabled: true, scope: undefined }, page, undefined),
+		...reduceMapScope(
+			{ isScopeEnabled: true, pendingTargetIds: [], scope: undefined },
+			page,
+			undefined,
+		),
 	};
 
 	return createStore<MapDataStore>()((set, get) => ({
@@ -93,6 +101,13 @@ export function createMapStore(page = noPage) {
 			},
 			clearSelection: () => {
 				set(noOverlay);
+			},
+			resolveScope: (items) => {
+				const current = get();
+
+				if (current.pendingTargetIds.length === 0) return;
+
+				set(resolveMapScope(current, items));
 			},
 			setCanvasLoading: (isCanvasLoading) => {
 				set({ isCanvasLoading });

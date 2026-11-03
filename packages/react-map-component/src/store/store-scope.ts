@@ -21,22 +21,48 @@ function isEveryTargetInRule(
 
 export interface MapScopeState {
 	isScopeEnabled: boolean;
+	pendingTargetIds: ReadonlyArray<ReadonlyArray<string>>;
 	scope: MapScope | undefined;
 }
 
-export function reduceMapScope(
-	{ isScopeEnabled, scope }: MapScopeState,
-	page: MapStoreView,
-	items: ReadonlyArray<MapSourceItem> | undefined,
-): MapScopeState {
-	if (page.view.scope) return { isScopeEnabled: true, scope: page.view.scope };
+const noPendingTargetIds: MapScopeState['pendingTargetIds'] = [];
 
-	if (!items || !scope || !isScopeEnabled || !page.view.targetIds) {
-		return { isScopeEnabled, scope };
+export function resolveMapScope(
+	{ isScopeEnabled, pendingTargetIds, scope }: MapScopeState,
+	items: ReadonlyArray<MapSourceItem>,
+): MapScopeState {
+	if (!scope || pendingTargetIds.length === 0) {
+		return { isScopeEnabled, pendingTargetIds, scope };
 	}
+
+	const isKept = pendingTargetIds.every((targetIds) =>
+		isEveryTargetInRule(items, targetIds, scope.rule),
+	);
 
 	return {
 		isScopeEnabled,
-		scope: isEveryTargetInRule(items, page.view.targetIds, scope.rule) ? scope : undefined,
+		pendingTargetIds: noPendingTargetIds,
+		scope: isKept ? scope : undefined,
 	};
+}
+
+export function reduceMapScope(
+	{ isScopeEnabled, pendingTargetIds, scope }: MapScopeState,
+	page: MapStoreView,
+	items: ReadonlyArray<MapSourceItem> | undefined,
+): MapScopeState {
+	const { targetIds } = page.view;
+
+	if (page.view.scope) {
+		return { isScopeEnabled: true, pendingTargetIds: noPendingTargetIds, scope: page.view.scope };
+	}
+
+	const next = {
+		isScopeEnabled,
+		pendingTargetIds:
+			scope && isScopeEnabled && targetIds ? [...pendingTargetIds, targetIds] : pendingTargetIds,
+		scope,
+	};
+
+	return items ? resolveMapScope(next, items) : next;
 }

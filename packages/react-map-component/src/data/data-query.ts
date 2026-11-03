@@ -89,12 +89,12 @@ export function useIsMapLoading() {
 	return isRowsLoading || isCanvasLoading;
 }
 
-export function useEnsureMapRows() {
+export function useReadMapRows() {
 	const client = useQueryClient();
 	const { mapFeaturesRule, payloadBase } = useMapConfig();
 
 	return useCallback(
-		() => client.query(mapRowsQueryOptions(payloadBase, mapFeaturesRule)),
+		() => client.getQueryData(mapRowsQueryOptions(payloadBase, mapFeaturesRule).queryKey),
 		[client, mapFeaturesRule, payloadBase],
 	);
 }

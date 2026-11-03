@@ -1,7 +1,5 @@
 import type { Page } from '@playwright/test';
 
-import { readFileSync } from 'node:fs';
-
 import {
 	allowReloadNoise,
 	getAtlas,
@@ -11,6 +9,7 @@ import {
 } from '#e2e/atlas.ts';
 import { paths } from '#e2e/constants.ts';
 import { expect, test, visit } from '#e2e/test.ts';
+import { readWitnessPath } from '#e2e/witness.ts';
 import {
 	atlasFlagAttribute,
 	atlasFlagStorageKey,
@@ -21,32 +20,6 @@ import {
 } from '#lib/atlas/atlas-constants.ts';
 
 const witnessFile = 'verify/models/atlas/witness.tla';
-const witnessRowPattern = /\[step \|-> "(\w+)",\s*seen \|-> \[([^\]]*)\]\]/g;
-const witnessFieldPattern = /(\w+) \|-> ("[^"]*"|TRUE|FALSE)/g;
-
-function readTlaValue(value: string) {
-	if (value === 'TRUE') return true;
-	if (value === 'FALSE') return false;
-
-	return value.slice(1, -1);
-}
-
-function readWitnessPath() {
-	const text = readFileSync(witnessFile, 'utf8');
-	const witnessPath: Array<{ seen: Record<string, boolean | string>; step: string }> = [];
-
-	for (const [, step = '', fields = ''] of text.matchAll(witnessRowPattern)) {
-		const seen: Record<string, boolean | string> = {};
-
-		for (const [, key = '', value = ''] of fields.matchAll(witnessFieldPattern)) {
-			seen[key] = readTlaValue(value);
-		}
-
-		witnessPath.push({ seen, step });
-	}
-
-	return witnessPath;
-}
 
 function readObserved(page: Page) {
 	return page.evaluate(
@@ -98,7 +71,7 @@ test.describe('the Atlas model on a phone viewport', { tag: '@engines' }, () => 
 		consoleGuard,
 		page,
 	}) => {
-		const witnessPath = readWitnessPath();
+		const witnessPath = readWitnessPath(witnessFile);
 
 		allowReloadNoise(consoleGuard, browserName);
 		expect(witnessPath.map(({ step }) => step)).toEqual(acts.map(({ step }) => step));

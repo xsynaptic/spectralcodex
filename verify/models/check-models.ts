@@ -136,6 +136,22 @@ function checkMutant(
 	return { isPassed: true, line: `${model}: mutant ${mutant} breaks ${rule}` };
 }
 
+function checkFinding(runDirectory: string, model: string, rule: string): CheckResult {
+	const { output, verdict } = runTlc(runDirectory, {
+		cfg: ['SPECIFICATION Spec', `INVARIANT ${rule}`],
+		label: `finding-${rule}`,
+		model,
+		module: 'spec',
+	});
+
+	if (verdict === 'error') return getToolError(model, `finding ${rule}`, output);
+	if (verdict === 'holds') {
+		return { isPassed: false, line: `${model}: finding ${rule} now holds; move it to holds` };
+	}
+
+	return { isPassed: true, line: `${model}: finding ${rule} still breaks` };
+}
+
 function checkWitness(runDirectory: string, model: string): CheckResult {
 	const { output, verdict } = runTlc(runDirectory, {
 		cfg: ['SPECIFICATION WitnessSpec', 'INVARIANT PathNotReplayed', 'CHECK_DEADLOCK FALSE'],
@@ -173,6 +189,10 @@ function* checkModel(runDirectory: string, model: string, modelClaims: ModelClai
 			...mutant,
 			keyword: getRuleKeyword(modelClaims, mutant.rule),
 		});
+	}
+
+	for (const rule of modelClaims.findings) {
+		yield checkFinding(runDirectory, model, rule);
 	}
 
 	if (existsSync(path.join(modelsDirectory, model, 'witness.tla'))) {

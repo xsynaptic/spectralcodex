@@ -14,12 +14,14 @@ import { MapControlIcon, MapIconEye, MapIconEyeOff, MapIconSearch } from '#lib/i
 import { useTrackMap } from '#lib/track-hook.ts';
 import { MapSearchBox } from '#search/search-box.tsx';
 import { usePrefetchMapSearch } from '#search/search-hooks.ts';
+import { isScopePending } from '#store/store-factory.ts';
 import { useMapStore } from '#store/store.tsx';
 
 const telescopeDurationMs = 200;
 
 const MapScopeHeld: FC<{ scope: MapScope }> = function MapScopeHeld({ scope: { title, url } }) {
 	const isEnabled = useMapStore((state) => state.isScopeEnabled);
+	const isPending = useMapStore(isScopePending);
 	const { setScopeEnabled } = useMapStore((state) => state.actions);
 	const handleNameClick = useMapLinkClick(url);
 	const { messages } = useMapConfig();
@@ -39,6 +41,7 @@ const MapScopeHeld: FC<{ scope: MapScope }> = function MapScopeHeld({ scope: { t
 			<button
 				aria-label={toggleLabel}
 				className={`map-scope-button ${mapControlClassName.scopeToggle}`}
+				disabled={isPending}
 				onClick={() => {
 					setScopeEnabled(!isEnabled);
 					trackMap({ data: { enabled: !isEnabled }, name: 'map-scope-toggle' });

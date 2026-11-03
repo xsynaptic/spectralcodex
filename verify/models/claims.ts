@@ -1,4 +1,6 @@
 export interface ModelClaims {
+	// Rules that break today, kept running until each bug is fixed or settled, then moved to holds
+	findings: Array<string>;
 	holds: Array<string>;
 	mutants: Array<{ mutant: string; replace: string; rule: string }>;
 	properties: Array<string>;
@@ -6,6 +8,7 @@ export interface ModelClaims {
 
 export const claims = {
 	atlas: {
+		findings: [],
 		holds: [
 			'TypeOK',
 			'SheetOnlyOnPhonePlaces',
@@ -20,6 +23,39 @@ export const claims = {
 			{ mutant: 'DirectiveLooksOnce', replace: 'IslandAfter', rule: 'MapWakesWhenShown' },
 			{ mutant: 'SwapKeepsTheFlag', replace: 'ArrivalFlag', rule: 'ModeRemembered' },
 			{ mutant: 'CloseOutlivesTheRestore', replace: 'RestoredClosing', rule: 'ModeRemembered' },
+		],
+		properties: [],
+	},
+	'map-scope': {
+		findings: [],
+		holds: [
+			'TypeOK',
+			'NoOlderViewLands',
+			'LocationKeepsOrClearsTheScope',
+			'ScopeHeldWhileOff',
+			'ScopeOnWhenAsked',
+		],
+		mutants: [
+			{ mutant: 'LocationsWaitForRows', replace: 'AppliesWithoutRows', rule: 'NoOlderViewLands' },
+			{
+				mutant: 'FailureForgetsThePending',
+				replace: 'FailedFetch',
+				rule: 'LocationKeepsOrClearsTheScope',
+			},
+			{
+				mutant: 'ResolveForgetsTheEarlier',
+				replace: 'ResolveScope',
+				rule: 'LocationKeepsOrClearsTheScope',
+			},
+			{
+				mutant: 'EveryLocationKeepsTheScope',
+				replace: 'KeepsTheScope',
+				rule: 'LocationKeepsOrClearsTheScope',
+			},
+			{ mutant: 'TheToggleIgnoresThePending', replace: 'CanSwitch', rule: 'ScopeHeldWhileOff' },
+			{ mutant: 'OffScopeStillDecides', replace: 'DecidesTheScope', rule: 'ScopeHeldWhileOff' },
+			{ mutant: 'ResyncReappliesTheView', replace: 'IsSameView', rule: 'ScopeHeldWhileOff' },
+			{ mutant: 'MapForgetsTheRestore', replace: 'ScopeRestored', rule: 'ScopeOnWhenAsked' },
 		],
 		properties: [],
 	},

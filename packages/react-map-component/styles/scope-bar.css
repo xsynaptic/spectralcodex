@@ -42,10 +42,15 @@
 	&:focus-visible {
 		background-color: var(--map-surface-hover);
 	}
+
+	&:disabled {
+		color: var(--map-text-faint);
+		cursor: progress;
+	}
 }
 
 @media (hover: hover) {
-	.map-scope-button:hover {
+	.map-scope-button:hover:not(:disabled) {
 		background-color: var(--map-surface-hover);
 	}
 }
