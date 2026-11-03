@@ -74,7 +74,7 @@
 		"@stryker-mutator/core": "^10.1.1",
 		"@stryker-mutator/vitest-runner": "^10.1.1",
 		"@tailwindcss/vite": "^4.3.3",
-		"@tanstack/eslint-plugin-query": "^5.105.1",
+		"@tanstack/eslint-plugin-query": "^5.105.2",
 		"@turf/centroid": "^7.4.0",
 		"@turf/distance": "^7.4.0",
 		"@turf/helpers": "^7.4.0",
