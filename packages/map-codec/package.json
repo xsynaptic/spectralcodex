@@ -15,7 +15,7 @@
 	"dependencies": {
 		"@spectralcodex/shared": "workspace:*",
 		"ohash": "^2.0.12",
-		"remeda": "^2.57.0",
+		"remeda": "^2.58.0",
 		"zod": "^4.6.7"
 	}
 }

@@ -26,6 +26,10 @@ minimumReleaseAgeExclude:
 ignoredOptionalDependencies:
   - fallow-type-aware
 
+overrides:
+  # Indexer output must match the @pagefind/component-ui release
+  'astro-pagefind>pagefind': ^1.6.0
+
 peerDependencyRules:
   allowedVersions:
     'astro-pagefind>astro': '7'

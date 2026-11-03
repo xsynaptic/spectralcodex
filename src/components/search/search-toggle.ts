@@ -1,9 +1,4 @@
-import type {
-	getInstanceManager,
-	Instance,
-	PagefindModal,
-	PagefindModalTrigger,
-} from '@pagefind/component-ui';
+import type { Instance, PagefindModal, PagefindModalTrigger } from '@pagefind/component-ui';
 import type { SearchTracker } from '@spectralcodex/shared/search-tracker';
 
 import { createSearchTracker } from '@spectralcodex/shared/search-tracker';
@@ -21,8 +16,6 @@ interface PagefindMatch {
 const imageMetaFields = new Set(['image', 'image_2x']);
 
 const searchTrackers = new WeakMap<Instance, SearchTracker>();
-
-let instanceManager: ReturnType<typeof getInstanceManager> | undefined;
 
 class SearchToggle extends HTMLElement implements ModalTriggerContract {
 	// eslint-disable-next-line unicorn/no-null -- matches Pagefind's PagefindComponent interface
@@ -55,7 +48,10 @@ class SearchToggle extends HTMLElement implements ModalTriggerContract {
 	}
 
 	disconnectedCallback() {
+		// Instance persists across navigation; close any open search as abandoned
+		this.#searchTracker?.end(false);
 		this.instance?.deregisterAllShortcuts(this);
+		this.instance?.unregisterComponent(this);
 		// eslint-disable-next-line unicorn/no-null -- matches Pagefind's PagefindComponent interface
 		this.instance = null;
 		this.#searchTracker = undefined;
@@ -116,11 +112,11 @@ class SearchToggle extends HTMLElement implements ModalTriggerContract {
 	#ensurePagefindRegistered = async (): Promise<void> => {
 		const pagefind = await import('@pagefind/component-ui');
 
-		instanceManager = pagefind.getInstanceManager();
-
 		if (this.instance || !this.#abortController) return;
 
-		this.instance = instanceManager.getInstance(this.getAttribute('instance') ?? 'default');
+		this.instance = pagefind
+			.getInstanceManager()
+			.getInstance(this.getAttribute('instance') ?? 'default');
 
 		this.#searchTracker = getSearchTracker(this.instance);
 
@@ -201,15 +197,6 @@ function getSearchTracker(instance: Instance) {
 
 	return tracker;
 }
-
-// Pagefind components never deregister (Pagefind/pagefind#1230); a fresh instance per page keeps the registry bounded
-document.addEventListener('astro:before-swap', () => {
-	if (!instanceManager) return;
-
-	for (const name of instanceManager.getInstanceNames()) {
-		instanceManager.removeInstance(name);
-	}
-});
 
 if (!customElements.get('search-toggle')) {
 	customElements.define('search-toggle', SearchToggle);

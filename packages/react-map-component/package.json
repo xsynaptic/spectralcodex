@@ -18,12 +18,12 @@
 		"@protomaps/basemaps": "^5.7.2",
 		"@spectralcodex/map-codec": "workspace:*",
 		"@spectralcodex/shared": "workspace:*",
-		"@tanstack/react-query": "^5.105.0",
+		"@tanstack/react-query": "^5.105.1",
 		"maplibre-gl": "^6.16.0",
 		"react": "^19.3.1",
 		"react-dom": "^19.3.1",
 		"react-map-gl": "^8.1.3",
-		"remeda": "^2.57.0",
+		"remeda": "^2.58.0",
 		"zustand": "^5.0.16"
 	},
 	"devDependencies": {

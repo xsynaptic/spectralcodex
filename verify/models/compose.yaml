@@ -3,12 +3,12 @@ services:
     image: tla2tools:1.7.4
     build:
       dockerfile_inline: |
-        FROM debian:bookworm-slim@sha256:99c0b25c46d0214d5a2091092e7908907dcaecd6a962cde0ac700acee222b6f3 AS fetch
+        FROM debian:trixie-slim@sha256:f6b08b09a05725f9431502d3b5714f5c4576e82c1a84fa1debe0c24a7e0c3ec4 AS fetch
         RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl \
           && curl -sSfL -o /tla2tools.jar https://github.com/tlaplus/tlaplus/releases/download/v1.7.4/tla2tools.jar \
           && echo '936a262061c914694dfd669a543be24573c45d5aa0ff20a8b96b23d01e050e88  /tla2tools.jar' | sha256sum -c -
 
-        FROM gcr.io/distroless/java21-debian12@sha256:f34fd3e4e2d7a246d764d0614f5e6ffb3a735930723fac4cfc25a72798950262
+        FROM gcr.io/distroless/java21-debian13@sha256:1bc4eca3c3b351743be673d7109951b509d6f47a57648e5e2efe784a1b051c4a
         COPY --from=fetch /tla2tools.jar /opt/tla2tools.jar
         ENTRYPOINT ["java", "-XX:+UseParallelGC", "-cp", "/opt/tla2tools.jar", "tlc2.TLC"]
     working_dir: /models
