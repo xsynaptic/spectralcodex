@@ -1,5 +1,5 @@
 /-! Models `getWrittenRange` in `packages/react-map-component/src/search/search-normalize.ts`,
-the merge in `getRanges` in `packages/react-map-component/src/search/search-factory.ts`, and
+`mergeIntervals` as `getRanges` calls it in `packages/react-map-component/src/search/search-factory.ts`, and
 `MapSearchHighlight` in `packages/react-map-component/src/search/search-box.tsx`. -/
 
 namespace SearchHighlights
@@ -21,15 +21,14 @@ def getWrittenRange (text : List Character) (position length : Nat) : Nat × Nat
   let rangeStart := (bounds[position]?.map (·.1)).getD 0
   (rangeStart, (bounds[position + length - 1]?.map (·.2)).getD rangeStart)
 
-/-- The merge loop body in `getRanges`, with `merged` kept newest first -/
+/-- The loop body in `mergeIntervals`, with `merged` kept newest first -/
 def mergeStep : List (Nat × Nat) → Nat × Nat → List (Nat × Nat)
   | last :: earlier, range =>
     if range.1 ≤ last.2 then (last.1, max last.2 range.2) :: earlier
     else range :: last :: earlier
   | [], range => [range]
 
-/-- The sort and merge in `getRanges` -/
-def mergeRanges (ranges : List (Nat × Nat)) : List (Nat × Nat) :=
+def mergeIntervals (ranges : List (Nat × Nat)) : List (Nat × Nat) :=
   ((ranges.mergeSort fun first second => first.1 ≤ second.1).foldl mergeStep []).reverse
 
 inductive Part (α : Type) where
@@ -73,7 +72,7 @@ def Covers (ranges : List (Nat × Nat)) (unit : Nat) : Prop :=
 def HighlightsKeepTitle : Prop :=
   ∀ {α : Type} (text : List Character) (units : List α) (termMatches : List (Nat × Nat)),
     (∀ termMatch ∈ termMatches, 0 < termMatch.2 ∧ termMatch.1 + termMatch.2 ≤ foldedLength text) →
-      let ranges := mergeRanges (termMatches.map fun termMatch => getWrittenRange text termMatch.1 termMatch.2)
+      let ranges := mergeIntervals (termMatches.map fun termMatch => getWrittenRange text termMatch.1 termMatch.2)
       (render units ranges).flatMap Part.units = units ∧
         (∀ unit, Covers ranges unit ↔ ∃ termMatch ∈ termMatches, ∃ first last,
           FoldsTo text first termMatch.1 ∧ FoldsTo text last (termMatch.1 + termMatch.2 - 1) ∧
@@ -87,6 +86,6 @@ def HighlightsKeepTitle : Prop :=
 def haleiwaTitle : List Character :=
   [⟨1, 1⟩, ⟨1, 1⟩, ⟨1, 1⟩, ⟨1, 1⟩, ⟨1, 0⟩, ⟨1, 1⟩, ⟨1, 1⟩, ⟨1, 1⟩, ⟨1, 1⟩, ⟨2, 2⟩]
 
-#guard mergeRanges [getWrittenRange haleiwaTitle 8 2, getWrittenRange haleiwaTitle 0 7] == [(0, 8), (9, 11)]
+#guard mergeIntervals [getWrittenRange haleiwaTitle 8 2, getWrittenRange haleiwaTitle 0 7] == [(0, 8), (9, 11)]
 
 end SearchHighlights

@@ -11,10 +11,10 @@ def WrittenRangeCovers : Prop :=
 
 def MergeSeparates : Prop :=
   ∀ ranges : List (Nat × Nat), (∀ range ∈ ranges, range.1 ≤ range.2) →
-    (mergeRanges ranges).Pairwise (fun earlier later => earlier.2 < later.1) ∧
-      (∀ merged ∈ mergeRanges ranges, merged.1 ≤ merged.2) ∧
-      (∀ unit, Covers (mergeRanges ranges) unit ↔ Covers ranges unit) ∧
-      ∀ merged ∈ mergeRanges ranges,
+    (mergeIntervals ranges).Pairwise (fun earlier later => earlier.2 < later.1) ∧
+      (∀ merged ∈ mergeIntervals ranges, merged.1 ≤ merged.2) ∧
+      (∀ unit, Covers (mergeIntervals ranges) unit ↔ Covers ranges unit) ∧
+      ∀ merged ∈ mergeIntervals ranges,
         (∃ range ∈ ranges, range.1 = merged.1) ∧ ∃ range ∈ ranges, range.2 = merged.2
 
 def RenderKeepsText : Prop :=
@@ -210,13 +210,13 @@ theorem merge_separates : MergeSeparates := by
       hEmpty (by simp)
   simp only [List.nil_append] at hCovers hEnds
   refine ⟨?_, ?_, fun unit => ?_, fun range hRange => ?_⟩
-  · simpa [mergeRanges, List.pairwise_reverse] using hPairwise
-  · simpa [mergeRanges] using hEach
+  · simpa [mergeIntervals, List.pairwise_reverse] using hPairwise
+  · simpa [mergeIntervals] using hEach
   · have := hCovers unit
-    simp only [Covers, mergeRanges, List.mem_reverse] at this ⊢
+    simp only [Covers, mergeIntervals, List.mem_reverse] at this ⊢
     simpa [sorted, List.mem_mergeSort] using this
   · obtain ⟨⟨source, hSource, hStart⟩, ⟨other, hOther, hEnd⟩⟩ :=
-      hEnds range (by simpa [mergeRanges] using hRange)
+      hEnds range (by simpa [mergeIntervals] using hRange)
     exact ⟨⟨source, List.mem_mergeSort.1 hSource, hStart⟩, ⟨other, List.mem_mergeSort.1 hOther, hEnd⟩⟩
 
 theorem slice_append_drop {α : Type} (text : List α) {start finish : Nat} (hOrder : start ≤ finish) :
