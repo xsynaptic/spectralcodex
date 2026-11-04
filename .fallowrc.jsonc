@@ -137,7 +137,7 @@
 		// A file outside every zone can import and be imported freely, so every analyzed file needs one
 		"coverage": {
 			"requireAllFiles": true,
-			"allowUnmatched": ["*.config.{ts,mjs}", "verify/**"],
+			"allowUnmatched": ["**/*.config.{ts,mjs}", "verify/**"],
 		},
 		"rules": [
 			{
