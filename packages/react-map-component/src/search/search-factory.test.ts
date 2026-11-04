@@ -1,4 +1,4 @@
-import type { MapScopeRow, MapSourceItem } from '@spectralcodex/map-codec';
+import type { MapInterval, MapScopeRow, MapSourceItem } from '@spectralcodex/map-codec';
 
 import { fc, test } from '@fast-check/vitest';
 import { describe, expect } from 'vitest';
@@ -150,6 +150,34 @@ describe('searchMap highlights', () => {
 	);
 });
 
+// Any closed interval, empty ones included, since `MapInterval` admits them
+const intervalArbitrary = fc.tuple(fc.nat(12), fc.nat(12));
+
+// The first two named intervals partly overlap, and `reach` lies only in the second
+const namedRegionsArbitrary = fc
+	.record({
+		extraNamed: fc.array(intervalArbitrary, { maxLength: 5 }),
+		length: fc.nat(4),
+		overhang: fc.integer({ max: 4, min: 1 }),
+		shift: fc.nat(4),
+		start: fc.nat(8),
+		unnamed: fc.array(intervalArbitrary, { maxLength: 3 }),
+	})
+	.chain(({ extraNamed, length, overhang, shift, start, unnamed }) => {
+		const first: MapInterval = [start, start + length];
+		const second: MapInterval = [start + Math.min(shift, length), start + length + overhang];
+		const scopes = [
+			...[first, second, ...extraNamed].map((interval) => ({ interval, isNamed: true })),
+			...unnamed.map((interval) => ({ interval, isNamed: false })),
+		];
+
+		return fc.record({
+			locationOrdinals: fc.array(fc.uniqueArray(fc.nat(20), { maxLength: 3 }), { maxLength: 8 }),
+			reach: fc.constant(second[1]),
+			scopes: fc.shuffledSubarray(scopes, { maxLength: scopes.length, minLength: scopes.length }),
+		});
+	});
+
 describe('searchMap', () => {
 	test('a query matches across case, marks, đ and apostrophes', () => {
 		const rows = [makeRow('da-nang', 'Đà Nẵng'), makeRow('ohare', "O'Hare")];
@@ -239,6 +267,42 @@ describe('searchMap', () => {
 			'Qigu Salt Mountain',
 		]);
 	});
+
+	test.prop([namedRegionsArbitrary])(
+		'merging the named Regions never changes which Locations a term takes in',
+		({ locationOrdinals, reach, scopes }) => {
+			const scopeRows = scopes.map(({ interval, isNamed }, index) =>
+				makeScope(`region-${String(index)}`, `${isNamed ? 'Tainan' : 'Region'} ${String(index)}`, {
+					interval,
+				}),
+			);
+			const ordinalsById = new Map([
+				['reach', [reach]],
+				...locationOrdinals.map((ordinals, index) => [`place-${String(index)}`, ordinals] as const),
+			]);
+			const rows = [...ordinalsById].map(([id, regionOrdinals]) =>
+				makeRow(id, 'Place', regionOrdinals.length > 0 ? { regionOrdinals } : {}),
+			);
+			const takenIn = new Set(
+				searchMap(createSearchIndex(rows, scopeRows), 'tainan')?.flatMap((result) =>
+					result.kind === 'location' ? [result.pointId] : [],
+				),
+			);
+			const namedIntervals = scopes
+				.filter(({ isNamed }) => isNamed)
+				.map(({ interval }) => interval);
+
+			expect(takenIn.has('reach')).toBe(true);
+
+			for (const [id, regionOrdinals] of ordinalsById) {
+				expect(takenIn.has(id), id).toBe(
+					regionOrdinals.some((ordinal) =>
+						namedIntervals.some(([left, right]) => ordinal >= left && ordinal <= right),
+					),
+				);
+			}
+		},
+	);
 
 	test('臺 and 台 find each other, as do the other variant forms in the titles', () => {
 		const rows = [

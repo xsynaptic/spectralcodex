@@ -202,19 +202,23 @@ function isRegionNamedBy({ fields }: SearchRegion, term: string) {
 	return tier !== undefined && tier <= matchTier.word;
 }
 
-function getOutermostIntervals(intervals: Array<MapInterval>) {
-	const sorted = [...intervals].sort(([firstLeft], [secondLeft]) => firstLeft - secondLeft);
-	const outermost: Array<MapInterval> = [];
-	let right = 0;
+// Touching intervals join too, which keeps the union for closed Region intervals and half-open highlight ranges alike
+function mergeIntervals(intervals: ReadonlyArray<readonly [number, number]>) {
+	const sorted = [...intervals].sort(([firstStart], [secondStart]) => firstStart - secondStart);
+	const merged: Array<[number, number]> = [];
 
-	for (const interval of sorted) {
-		if (interval[0] <= right) continue;
+	for (const [start, end] of sorted) {
+		const last = merged.at(-1);
 
-		outermost.push(interval);
-		right = interval[1];
+		if (last && start <= last[1]) {
+			last[1] = Math.max(last[1], end);
+			continue;
+		}
+
+		merged.push([start, end]);
 	}
 
-	return outermost;
+	return merged;
 }
 
 function getRegionTests(regions: Array<SearchRegion>, term: string): Array<IsInRegion> {
@@ -222,9 +226,7 @@ function getRegionTests(regions: Array<SearchRegion>, term: string): Array<IsInR
 		.filter((region) => isRegionNamedBy(region, term))
 		.map(({ interval }) => interval);
 
-	return getOutermostIntervals(intervals).map((interval) =>
-		createRuleTest({ interval, type: 'region' }),
-	);
+	return mergeIntervals(intervals).map((interval) => createRuleTest({ interval, type: 'region' }));
 }
 
 function matchEntry(
@@ -313,22 +315,7 @@ function getRanges(text: string, terms: Array<string>) {
 		if (match) ranges.push(getWrittenRange(text, match.position, term.length));
 	}
 
-	ranges.sort(([firstStart], [secondStart]) => firstStart - secondStart);
-
-	const merged: Array<MapSearchRange> = [];
-
-	for (const range of ranges) {
-		const last = merged.at(-1);
-
-		if (last && range[0] <= last[1]) {
-			merged[merged.length - 1] = [last[0], Math.max(last[1], range[1])];
-			continue;
-		}
-
-		merged.push(range);
-	}
-
-	return merged;
+	return mergeIntervals(ranges);
 }
 
 function toText(text: string, terms: Array<string>): MapSearchText {
