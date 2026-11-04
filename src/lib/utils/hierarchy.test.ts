@@ -71,7 +71,7 @@ describe('createHierarchy nested-set numbering', () => {
 		expect(isWithin(ordinalById.get('taiwan')!, canada)).toBe(false); // separate root
 	});
 
-	test('numbering matches the Lean model fixture', () => {
+	test('numbering matches the worked example', () => {
 		expect(Object.fromEntries(intervalById)).toStrictEqual({
 			canada: [1, 2],
 			north: [4, 7],

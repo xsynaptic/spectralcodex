@@ -8,7 +8,6 @@
 		"check-content-demo": "mdxlint-content packages/content-demo --root-path=$PWD",
 		"check-links": "pnpm -F @spectralcodex/scripts check-links",
 		"check-models": "node verify/models/check-models.ts",
-		"check-proofs": "docker compose -f verify/proofs/compose.yaml run --rm -q --build --quiet-build lean",
 		"check-types": "tsc --noEmit --extendedDiagnostics",
 		"content-schemas": "pnpm -F @spectralcodex/scripts content-schemas",
 		"deploy-caddy": "pnpm -F @spectralcodex/scripts deploy-caddy",

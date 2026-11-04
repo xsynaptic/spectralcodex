@@ -30,6 +30,7 @@ const titleCharacterArbitrary = fc.oneof(
 	{ arbitrary: fc.constantFrom("'", '’', 'ʻ', '\u{301}', '\u{E35}'), weight: 2 },
 	{ arbitrary: fc.constantFrom('Đ', 'đ', 'ộ', 'É', 'İ', 'ẞ', '臺', '台', 'ดี'), weight: 2 },
 	{ arbitrary: fc.constantFrom('𠮷', '👍', '\u{958}', '\u{FB2C}'), weight: 2 },
+	{ arbitrary: fc.constantFrom('क', '\u{93C}', 'ש', '\u{5BC}', '\u{D842}', '\u{DFB7}'), weight: 2 },
 	{ arbitrary: fc.string({ maxLength: 1, minLength: 1, unit: 'binary' }), weight: 1 },
 );
 

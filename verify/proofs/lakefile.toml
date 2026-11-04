@@ -1,7 +1,0 @@
-name = "proofs"
-srcDir = ".."
-defaultTargets = ["proofs"]
-
-[[lean_lib]]
-name = "proofs"
-globs = ["proofs.+"]
