@@ -22,7 +22,6 @@ import { imgGroupSatteriPlugin } from '@xsynaptic/satteri-img-group';
 import { trailingSlash as trailingSlashPlugin } from '@xsynaptic/satteri-trailing-slash';
 import { wrapCjk } from '@xsynaptic/satteri-wrap-cjk';
 import compressor from 'astro-compressor';
-import pagefind from 'astro-pagefind';
 import { defineConfig, envField, fontProviders } from 'astro/config';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -31,6 +30,7 @@ import { loadEnv } from 'vite';
 import { mdxComponentFiles } from '#constants.ts';
 import devInventory from '#dev/inventory/inventory-integration.ts';
 import atlas from '#lib/atlas/atlas-integration.ts';
+import pagefind from '#lib/search/pagefind-integration.ts';
 
 const imageBaseUrlDefault = '/_img';
 
@@ -168,15 +168,7 @@ export default defineConfig({
 			serialize: lastmod.serialize,
 		}),
 		lastmod.integration,
-		pagefind({
-			indexConfig: {
-				excludeSelectors: [
-					"[id='footnote-label']",
-					"[id^='user-content-fnref']",
-					'[data-footnote-backref]',
-				],
-			},
-		}),
+		pagefind(),
 		atlas(),
 		imagePipeline({
 			baseUrl: IMAGE_BASE_URL,

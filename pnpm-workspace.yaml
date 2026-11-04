@@ -26,13 +26,8 @@ minimumReleaseAgeExclude:
 ignoredOptionalDependencies:
   - fallow-type-aware
 
-overrides:
-  # Indexer output must match the @pagefind/component-ui release
-  'astro-pagefind>pagefind': ^1.6.0
-
 peerDependencyRules:
   allowedVersions:
-    'astro-pagefind>astro': '7'
     # eslint-plugin-jsx-a11y@6.10.2 caps its eslint peer at ^9 but uses no APIs
     # removed in ESLint 10. Safe to run on 10 until upstream widens the range.
     'eslint-plugin-jsx-a11y>eslint': '10'
