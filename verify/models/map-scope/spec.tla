@@ -8,6 +8,7 @@
 \* Models packages/react-map-component/src/data/data-query.ts
 \* Models packages/react-map-component/src/controls/controls-scope.tsx
 \* Models src/lib/atlas/atlas-layout-factory.ts
+\* Sync commit 8ff2712a
 EXTENDS Naturals
 
 VARIABLES page, store, rows, opening, want

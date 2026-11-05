@@ -8,6 +8,7 @@
 \* Models src/lib/atlas/atlas-mode.ts
 \* Models src/lib/atlas/atlas-sheet-factory.ts
 \* Models src/lib/atlas/atlas-sheet.ts
+\* Sync commit d712be05
 
 VARIABLES page, screen, flag, remembered, rest, pref, slide, closing, island
 vars == <<page, screen, flag, remembered, rest, pref, slide, closing, island>>
