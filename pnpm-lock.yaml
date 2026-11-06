@@ -258,14 +258,17 @@ importers:
         specifier: ^19.3.0
         version: 19.3.0(@types/react@19.3.0)
       '@xsynaptic/astro-build-logger':
-        specifier: ^1.1.0
-        version: 1.1.0(astro@7.4.7(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
+        specifier: ^1.2.0
+        version: 1.2.0(astro@7.4.7(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
       '@xsynaptic/astro-image-loader':
         specifier: ^1.4.1
         version: 1.4.1(astro@7.4.7(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(exiftool-vendored@39.1.0)(sharp@0.35.5(@types/node@26.6.5))(zod@4.6.7)
       '@xsynaptic/astro-image-pipeline':
-        specifier: ^0.11.3
-        version: 0.11.3(astro@7.4.7(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(sharp@0.35.5(@types/node@26.6.5))
+        specifier: ^0.12.0
+        version: 0.12.0(astro@7.4.7(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(sharp@0.35.5(@types/node@26.6.5))
+      '@xsynaptic/astro-pagefind':
+        specifier: ^0.1.0
+        version: 0.1.0(@pagefind/component-ui@1.6.0)(astro@7.4.7(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(pagefind@1.6.0)
       '@xsynaptic/astro-scripts':
         specifier: ^0.15.1
         version: 0.15.1(astro@7.4.7(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(satteri@0.11.6)
@@ -374,9 +377,6 @@ importers:
       sharp:
         specifier: 0.35.5
         version: 0.35.5(@types/node@26.6.5)
-      sirv:
-        specifier: ^3.0.2
-        version: 3.0.2
       stylelint:
         specifier: ^17.16.0
         version: 17.16.0(supports-color@10.2.2)(typescript@6.0.3)
@@ -559,8 +559,8 @@ importers:
         specifier: ^2.16.2
         version: 2.16.2
       '@xsynaptic/astro-image-pipeline':
-        specifier: ^0.11.3
-        version: 0.11.3(astro@7.4.7(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(sharp@0.35.5(@types/node@26.6.5))
+        specifier: ^0.12.0
+        version: 0.12.0(astro@7.4.7(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(sharp@0.35.5(@types/node@26.6.5))
       '@xsynaptic/astro-scripts':
         specifier: ^0.15.1
         version: 0.15.1(astro@7.4.7(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(satteri@0.11.6)
@@ -625,8 +625,8 @@ importers:
   packages/shared:
     dependencies:
       '@xsynaptic/astro-image-pipeline':
-        specifier: ^0.11.3
-        version: 0.11.3(astro@7.4.7(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(sharp@0.35.5(@types/node@26.6.5))
+        specifier: ^0.12.0
+        version: 0.12.0(astro@7.4.7(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(sharp@0.35.5(@types/node@26.6.5))
       zod:
         specifier: ^4.6.7
         version: 4.6.7
@@ -2968,8 +2968,8 @@ packages:
   '@vscode/l10n@0.0.18':
     resolution: {integrity: sha512-KYSIHVmslkaCDyw013pphY+d7x1qV8IZupYfeIfzNA+nsaWHbn5uPuQRvdRFsa9zFzGeudPuoGoZ1Op4jrJXIQ==}
 
-  '@xsynaptic/astro-build-logger@1.1.0':
-    resolution: {integrity: sha512-KvnNy/U7uT+wJkVSKMr0KC6m7uKIbiEmnznboqFjt8H3J9YF9vAV+v9BBSCP8I9jXF9ACf4BWSqzuZrT/Ow/Kw==}
+  '@xsynaptic/astro-build-logger@1.2.0':
+    resolution: {integrity: sha512-43hHdzMIrUwmQEqc4EZeWVmJ8mtO8+2XZI9DEhQvsMmlBXB/xR/Ne6ZEwOh5FzOqWtXMo7PEynoB92btC7BgiQ==}
     peerDependencies:
       astro: ^6.0.0 || ^7.0.0
 
@@ -2986,12 +2986,23 @@ packages:
       sharp:
         optional: true
 
-  '@xsynaptic/astro-image-pipeline@0.11.3':
-    resolution: {integrity: sha512-tytT3eK6xgh2snzP+IryZa36ucrZorrRQnHDiz4X797b+ZdU+rYUL7MKGBR1oVxlG5IWDtKLmNrNKLaAEfCBKA==}
+  '@xsynaptic/astro-image-pipeline@0.12.0':
+    resolution: {integrity: sha512-omMgZocy5zcmN25JJL1UioBm6xmCTFylqaL3vJzzUL9V1nCJWG5U6sfK69PMgPbegp67cBB2NWZUvcV02GbGaA==}
     engines: {node: '>=24.0.0'}
     peerDependencies:
       astro: ^7.4.2
       sharp: ^0.35
+
+  '@xsynaptic/astro-pagefind@0.1.0':
+    resolution: {integrity: sha512-Riji7n89aF8aUVn5Mhkolr5kvT2EiYauVdS7kIWplWZmrabyHlbLgSMCOLRrxp0JLBif/eUoPEE43tNw2ISzvw==}
+    engines: {node: '>=24.0.0'}
+    peerDependencies:
+      '@pagefind/component-ui': ^1.6.0
+      astro: ^7.4.2
+      pagefind: ^1.6.0
+    peerDependenciesMeta:
+      '@pagefind/component-ui':
+        optional: true
 
   '@xsynaptic/astro-scripts@0.15.1':
     resolution: {integrity: sha512-4T57h6nKoBJbJosqUlKFIheMxpIys0+cTmlp4gjazcI8CgUX2nVuLW5PfZUuHgJ1gpv4BbFu0NEmpfygbeegXw==}
@@ -9036,7 +9047,7 @@ snapshots:
 
   '@vscode/l10n@0.0.18': {}
 
-  '@xsynaptic/astro-build-logger@1.1.0(astro@7.4.7(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))':
+  '@xsynaptic/astro-build-logger@1.2.0(astro@7.4.7(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))':
     dependencies:
       astro: 7.4.7(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)
       zod: 4.6.7
@@ -9052,11 +9063,21 @@ snapshots:
       exiftool-vendored: 39.1.0
       sharp: 0.35.5(@types/node@26.6.5)
 
-  '@xsynaptic/astro-image-pipeline@0.11.3(astro@7.4.7(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(sharp@0.35.5(@types/node@26.6.5))':
+  '@xsynaptic/astro-image-pipeline@0.12.0(astro@7.4.7(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(sharp@0.35.5(@types/node@26.6.5))':
     dependencies:
       astro: 7.4.7(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)
       p-limit: 7.3.3
       sharp: 0.35.5(@types/node@26.6.5)
+      zod: 4.6.7
+
+  '@xsynaptic/astro-pagefind@0.1.0(@pagefind/component-ui@1.6.0)(astro@7.4.7(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(pagefind@1.6.0)':
+    dependencies:
+      astro: 7.4.7(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)
+      pagefind: 1.6.0
+      sirv: 3.0.2
+      zod: 4.6.7
+    optionalDependencies:
+      '@pagefind/component-ui': 1.6.0
 
   '@xsynaptic/astro-scripts@0.15.1(astro@7.4.7(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(satteri@0.11.6)':
     dependencies:

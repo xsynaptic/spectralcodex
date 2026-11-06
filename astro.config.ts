@@ -16,6 +16,7 @@ import { siteBasePath } from '@spectralcodex/shared/routing';
 import tailwindcss from '@tailwindcss/vite';
 import buildLogger from '@xsynaptic/astro-build-logger';
 import imagePipeline from '@xsynaptic/astro-image-pipeline';
+import pagefind from '@xsynaptic/astro-pagefind';
 import { sitemapLastmod } from '@xsynaptic/astro-sitemap-lastmod';
 import { autoImport } from '@xsynaptic/satteri-auto-import';
 import { imgGroupSatteriPlugin } from '@xsynaptic/satteri-img-group';
@@ -30,7 +31,6 @@ import { loadEnv } from 'vite';
 import { mdxComponentFiles } from '#constants.ts';
 import devInventory from '#dev/inventory/inventory-integration.ts';
 import atlas from '#lib/atlas/atlas-integration.ts';
-import pagefind from '#lib/search/pagefind-integration.ts';
 
 const imageBaseUrlDefault = '/_img';
 
@@ -168,7 +168,15 @@ export default defineConfig({
 			serialize: lastmod.serialize,
 		}),
 		lastmod.integration,
-		pagefind(),
+		pagefind({
+			indexConfig: {
+				excludeSelectors: [
+					"[id='footnote-label']",
+					"[id^='user-content-fnref']",
+					'[data-footnote-backref]',
+				],
+			},
+		}),
 		atlas(),
 		imagePipeline({
 			baseUrl: IMAGE_BASE_URL,

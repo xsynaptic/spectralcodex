@@ -27,7 +27,7 @@ async function pruneStaleAssets(config: DeployConfig, distPath: string) {
 	);
 }
 
-// Directory naming from `src/lib/search/pagefind-bundle.ts`
+// Directory naming from `@xsynaptic/astro-pagefind`
 const pagefindVersionPattern = /^\d+\.\d+\.\d+/;
 
 // The marker starts the 7-day clock when a version is replaced; rsync drops it if that version returns
