@@ -9,35 +9,40 @@ function makeConfig(sshKeyPath?: string) {
 	};
 }
 
+const sshCommand: unknown = expect.stringMatching(/^ssh -o ControlMaster=auto /);
+
+function getSshCommand(args: Array<string>) {
+	return args[args.indexOf('-e') + 1];
+}
+
 describe('buildRsyncArgs', () => {
-	test('defaults to compressed, itemized archive with stats and no ssh flag', () => {
+	test('defaults to compressed, itemized archive with stats over the shared ssh connection', () => {
 		expect(buildRsyncArgs('dist/', 'host:/path', { config: makeConfig() })).toEqual([
 			'-azi',
 			'--stats',
+			'-e',
+			sshCommand,
 			'dist/',
 			'host:/path',
 		]);
 	});
 
-	test('places the ssh key flag directly after stats', () => {
-		expect(buildRsyncArgs('dist/', 'host:/path', { config: makeConfig('/k') })).toEqual([
-			'-azi',
-			'--stats',
-			'-e',
-			'ssh -i /k',
-			'dist/',
-			'host:/path',
-		]);
+	test('passes the ssh key through the ssh command', () => {
+		const args = buildRsyncArgs('dist/', 'host:/path', { config: makeConfig('/k') });
+
+		expect(getSshCommand(args)).toMatch(/ -i \/k$/);
 	});
 
 	test('treats an empty ssh key path as absent', () => {
-		expect(buildRsyncArgs('dist/', 'host:/path', { config: makeConfig('') })).not.toContain('-e');
+		const args = buildRsyncArgs('dist/', 'host:/path', { config: makeConfig('') });
+
+		expect(getSshCommand(args)).not.toContain('-i');
 	});
 
 	test('skips compression for payloads that are already compressed', () => {
 		expect(
 			buildRsyncArgs('media/', 'host:/path/', { compress: false, config: makeConfig() }),
-		).toEqual(['-ai', '--stats', 'media/', 'host:/path/']);
+		).toEqual(['-ai', '--stats', '-e', sshCommand, 'media/', 'host:/path/']);
 	});
 
 	test('emits excludes in order, ahead of extra flags', () => {
@@ -50,6 +55,8 @@ describe('buildRsyncArgs', () => {
 		expect(args).toEqual([
 			'-azi',
 			'--stats',
+			'-e',
+			sshCommand,
 			'--exclude=manifest.json',
 			'--exclude=*.tmp',
 			'--checksum',
@@ -65,7 +72,16 @@ describe('buildRsyncArgs', () => {
 			extraFlags: ['--delete-after'],
 		});
 
-		expect(args).toEqual(['-azi', '--stats', '--delete-after', '--dry-run', 'dist/', 'host:/path']);
+		expect(args).toEqual([
+			'-azi',
+			'--stats',
+			'-e',
+			sshCommand,
+			'--delete-after',
+			'--dry-run',
+			'dist/',
+			'host:/path',
+		]);
 	});
 });
 

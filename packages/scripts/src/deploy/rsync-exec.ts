@@ -64,7 +64,8 @@ export function buildRsyncArgs(
 	return [
 		getArchiveFlag(options),
 		'--stats',
-		...(config.sshKeyPath ? ['-e', `ssh -i ${config.sshKeyPath}`] : []),
+		'-e',
+		['ssh', ...getSshOptions(config)].join(' '),
 		...excludes.map((pattern) => `--exclude=${pattern}`),
 		...extraFlags,
 		...(dryRun ? ['--dry-run'] : []),
@@ -193,8 +194,22 @@ export async function rsyncTo(
 	return summary;
 }
 
+// One handshake per deploy instead of one per call; each costs ~2.5s at the server's ~257ms round trip
+const sshMultiplexOptions = [
+	'-o',
+	'ControlMaster=auto',
+	'-o',
+	'ControlPath=~/.ssh/spectralcodex-%C',
+	'-o',
+	'ControlPersist=60',
+];
+
+function getSshOptions(config: SshTarget) {
+	return [...sshMultiplexOptions, ...(config.sshKeyPath ? ['-i', config.sshKeyPath] : [])];
+}
+
 function getSshArgs(config: SshTarget) {
-	return [...(config.sshKeyPath ? ['-i', config.sshKeyPath] : []), config.remoteHost];
+	return [...getSshOptions(config), config.remoteHost];
 }
 
 export async function sshCapture(config: SshTarget, command: string): Promise<string> {
