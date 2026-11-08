@@ -6,6 +6,7 @@
 \* Models packages/react-map-component/src/host/host-adapter.ts
 \* Models packages/react-map-component/src/host/host-click-factory.ts
 \* Models packages/react-map-component/src/data/data-query.ts
+\* Models packages/react-map-component/src/data/data-filter.ts
 \* Models packages/react-map-component/src/controls/controls-scope.tsx
 \* Models src/lib/atlas/atlas-layout-factory.ts
 \* Sync commit d1958624

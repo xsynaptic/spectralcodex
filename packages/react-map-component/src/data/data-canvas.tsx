@@ -53,10 +53,10 @@ export const CanvasDataProvider: FC<PropsWithChildren> = function CanvasDataProv
 	const filter = useDeferredValue(useMapStore((state) => state.filter));
 	const scopeRule = useDeferredValue(useMapStore(selectScope)?.rule);
 
-	// Joined into a string so that a new Target the filter doesn't hide keeps the same clusters
+	// Joined into a string so that a new Target neither the filter nor the Scope hides keeps the same clusters
 	const pinnedKey = useMemo(
-		() => getHiddenTargetIds(sourceData ?? emptyItems, targetIds, filter).join(' '),
-		[sourceData, targetIds, filter],
+		() => getHiddenTargetIds(sourceData ?? emptyItems, filter, { scopeRule, targetIds }).join(' '),
+		[sourceData, targetIds, filter, scopeRule],
 	);
 
 	const canvasData = useMemo(

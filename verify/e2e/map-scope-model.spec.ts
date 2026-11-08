@@ -66,7 +66,7 @@ async function readObserved(page: Page) {
 	};
 }
 
-// The Theme has no link from the pages before it, so one is added to the pane
+// The Theme, the Region and the outside Location have no link from the page before them, so one is added to the pane
 async function followLinkTo(page: Page, path: string) {
 	await page.locator(atlasPaneMainSelector).evaluate(
 		(main, { href, id }) => {
@@ -75,12 +75,22 @@ async function followLinkTo(page: Page, path: string) {
 			link.href = href;
 			link.id = id;
 			link.textContent = href;
+			link.style.cssText = 'position: fixed; inset: 50% auto auto 50%; z-index: 2147483647';
 			main.prepend(link);
 		},
 		{ href: path, id: insertedLinkId },
 	);
 
 	return openInPane(page, page.locator(`#${insertedLinkId}`));
+}
+
+// The Scope bar shows a switch before the canvas's deferred render applies it
+async function switchTheScope(page: Page) {
+	const { metrics, scopeToggle } = getAtlas(page);
+	const scopedMetrics = (await metrics.textContent()) ?? '';
+
+	await scopeToggle.click();
+	await expect(metrics).not.toHaveText(scopedMetrics);
 }
 
 test.describe('the map Scope model on a wide viewport', () => {
@@ -112,7 +122,7 @@ test.describe('the map Scope model on a wide viewport', () => {
 				},
 				step: 'YouFollowALink',
 			},
-			{ act: () => getAtlas(page).scopeToggle.click(), step: 'YouSwitchTheScope' },
+			{ act: () => switchTheScope(page), step: 'YouSwitchTheScope' },
 			{
 				act: async () => {
 					await page.goBack();
@@ -127,7 +137,7 @@ test.describe('the map Scope model on a wide viewport', () => {
 				},
 				step: 'YouFollowALink',
 			},
-			{ act: () => getAtlas(page).scopeToggle.click(), step: 'YouSwitchTheScope' },
+			{ act: () => switchTheScope(page), step: 'YouSwitchTheScope' },
 			{ act: () => getAtlas(page).scopeName.click(), step: 'YouOpenFromTheMap' },
 			{
 				act: async () => {
@@ -136,6 +146,20 @@ test.describe('the map Scope model on a wide viewport', () => {
 				},
 				step: 'YouFollowALink',
 			},
+			{
+				act: async () => {
+					headings.set('tainan', await followLinkTo(page, paths.regionDetail));
+				},
+				step: 'YouFollowALink',
+			},
+			{ act: () => switchTheScope(page), step: 'YouSwitchTheScope' },
+			{
+				act: async () => {
+					headings.set('theater', await followLinkTo(page, paths.locationOutsideScopes));
+				},
+				step: 'YouFollowALink',
+			},
+			{ act: () => switchTheScope(page), step: 'YouSwitchTheScope' },
 		];
 
 		expect(witnessPath.map(({ step }) => step)).toEqual(acts.map(({ step }) => step));

@@ -17,6 +17,7 @@ export const paths = {
 	chronologyIndex: '/chronology/',
 	chronologyYear: '/chronology/2019/',
 	locationMultiPoint: '/budai-saltworks/',
+	locationOutsideScopes: '/budai-haishan-theater/',
 	locationsIndex: '/locations/',
 	locationsIndexPage2: '/locations/2/',
 	locationSinglePoint: '/tainan-confucian-temple/',

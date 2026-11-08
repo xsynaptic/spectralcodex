@@ -1,7 +1,7 @@
 import type { MapSourceItem } from '@spectralcodex/map-codec';
 import type { LocationStatus } from '@spectralcodex/shared/map';
 
-import { selectMapRows } from '@spectralcodex/map-codec';
+import { createRuleTest, selectMapRows } from '@spectralcodex/map-codec';
 import { locationStatusOrder, LocationStatusRecords } from '@spectralcodex/shared/map';
 
 import type { MapFeaturesRule } from '#types.ts';
@@ -40,6 +40,11 @@ export interface MapCanvasData {
 
 export type MapRowCollection = ReturnType<typeof toFeatureCollection>;
 
+interface HiddenTargetQuery {
+	scopeRule?: MapFeaturesRule | undefined;
+	targetIds: ReadonlyArray<string>;
+}
+
 export interface MapFilterState extends MapFilter {
 	pinnedIds?: ReadonlyArray<string>;
 }
@@ -54,9 +59,26 @@ export function getMapCanvasData(
 
 	return {
 		filteredCount: points.length,
-		pointCollection: toFeatureCollection(points),
+		pointCollection: toFeatureCollection([
+			...points,
+			...selectPinnedOutsideScope(items, filter.pinnedIds, scopeRule),
+		]),
 		totalCount: scopeItems.length,
 	};
+}
+
+function selectPinnedOutsideScope(
+	items: ReadonlyArray<MapSourceItem>,
+	pinnedIds: ReadonlyArray<string> | undefined,
+	scopeRule: MapFeaturesRule | undefined,
+) {
+	if (!scopeRule || !pinnedIds?.length) return [];
+
+	const isInScope = createRuleTest(scopeRule);
+
+	return selectMapRows(items, { ids: [...pinnedIds], type: 'ids' }).filter(
+		({ properties }) => !isInScope(properties),
+	);
 }
 
 function isLocationVisible(
@@ -69,16 +91,18 @@ function isLocationVisible(
 	return properties.objective === undefined || properties.objective >= filter.objective;
 }
 
-// A Target is the subject of its page, so a filter never hides it; these are the ones to pin
+// A Target is the subject of its page, so neither a Map Filter nor the Scope hides it; these are the ones to pin
 export function getHiddenTargetIds(
 	items: ReadonlyArray<MapSourceItem>,
-	targetIds: ReadonlyArray<string>,
 	filter: MapFilterState,
+	{ scopeRule, targetIds }: HiddenTargetQuery,
 ): Array<string> {
 	if (targetIds.length === 0) return [];
 
+	const isInScope = scopeRule ? createRuleTest(scopeRule) : () => true;
+
 	return selectMapRows(items, { ids: [...targetIds], type: 'ids' })
-		.filter(({ properties }) => !isLocationVisible(properties, filter))
+		.filter(({ properties }) => !isInScope(properties) || !isLocationVisible(properties, filter))
 		.map(({ properties }) => properties.id);
 }
 
