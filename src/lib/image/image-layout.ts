@@ -48,6 +48,12 @@ export function getImageInferredWidth({
 	}
 }
 
+export function getImageFeedWidth({ height, width }: { height: number; width: number }) {
+	return getImageOrientation({ height, width }) === ImageOrientationEnum.Portrait
+		? ImageSizeEnum.Medium
+		: ImageSizeEnum.Large;
+}
+
 export function getImageLayoutSizesProp(
 	layout?: ImageLayout,
 	isPriority?: boolean,

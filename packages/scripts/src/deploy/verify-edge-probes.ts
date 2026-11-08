@@ -1,6 +1,10 @@
 import type { ImageFormat } from '@xsynaptic/astro-image-pipeline/names';
 
-import { imageQualityByFormat, isSiteImageFormat } from '@spectralcodex/shared/images';
+import {
+	imageContentTypes,
+	imageQualityByFormat,
+	isSiteImageFormat,
+} from '@spectralcodex/shared/images';
 import { parseRenditionName } from '@xsynaptic/astro-image-pipeline/names';
 import { createHash } from 'node:crypto';
 
@@ -41,13 +45,6 @@ const documentCacheControl = 'public, max-age=3600, s-maxage=86400, stale-while-
 const renderedCacheControl =
 	'public, max-age=2592000, stale-while-revalidate=604800, s-maxage=31536000, no-transform';
 const renderedNotFoundCacheControl = 'public, max-age=60';
-
-const imageContentTypes = {
-	avif: 'image/avif',
-	jpg: 'image/jpeg',
-	png: 'image/png',
-	webp: 'image/webp',
-} satisfies Record<ImageFormat, string>;
 
 function getSiteBaseUrl(config: Pick<DeployConfig, 'siteUrl'>) {
 	return config.siteUrl.replace(/\/$/, '');

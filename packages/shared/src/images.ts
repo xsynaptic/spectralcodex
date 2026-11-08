@@ -37,6 +37,13 @@ export const imageQualityByFormat = {
 	webp: 70,
 } as const satisfies Partial<Record<ImageFormat, number>>;
 
+export const imageContentTypes = {
+	avif: 'image/avif',
+	jpg: 'image/jpeg',
+	png: 'image/png',
+	webp: 'image/webp',
+} as const satisfies Record<ImageFormat, string>;
+
 export type SiteImageFormat = keyof typeof imageQualityByFormat;
 
 export function isSiteImageFormat(format: ImageFormat): format is SiteImageFormat {

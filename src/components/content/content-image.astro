@@ -1,8 +1,6 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
-import { ImageSizeEnum } from '@spectralcodex/shared/images';
-
 import type { ImageContext, ImageLayout } from '#lib/image/image-types.ts';
 import type { ImageComponentProps, ImagePlaceholderProps } from '#lib/image/image-types.ts';
 
@@ -10,7 +8,11 @@ import ImageMetadata from '#components/image-metadata/image-metadata.astro';
 import ImagePlaceholder from '#components/image/image-placeholder.astro';
 import Image from '#components/parts/image.astro';
 import { getImageByIdFunction, getImageSource } from '#lib/collections/images/images-data.ts';
-import { getImageInferredWidth, getImageLayoutSizesProp } from '#lib/image/image-layout.ts';
+import {
+	getImageFeedWidth,
+	getImageInferredWidth,
+	getImageLayoutSizesProp,
+} from '#lib/image/image-layout.ts';
 import { ImageContextEnum, ImageLayoutEnum } from '#lib/image/image-types.ts';
 import { renderSlot } from '#lib/utils/astro.ts';
 import { sanitizeImageAltAttribute, sanitizeImageCaption } from '#lib/utils/text.ts';
@@ -75,9 +77,6 @@ async function getImageProps() {
 		layout,
 		width: imageEntry.data.width,
 	});
-	const feedWidth =
-		imageEntry.data.height > imageEntry.data.width ? ImageSizeEnum.Medium : ImageSizeEnum.Large;
-
 	return {
 		aspectRatioString: getAspectRatio(imageEntry.data.width, imageEntry.data.height),
 		imageEntry,
@@ -87,7 +86,7 @@ async function getImageProps() {
 			preset: isFeed ? 'feed' : 'content',
 			priority,
 			sizes: getImageLayoutSizesProp(layout, priority, context),
-			width: isFeed ? feedWidth : width,
+			width: isFeed ? getImageFeedWidth(imageEntry.data) : width,
 		} satisfies ImageComponentProps,
 		placeholderProps: { imageId } satisfies ImagePlaceholderProps,
 	};

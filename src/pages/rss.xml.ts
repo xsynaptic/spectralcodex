@@ -5,8 +5,9 @@ import { performance } from 'node:perf_hooks';
 
 import { siteYearFounded } from '#constants.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { getRssItem, mediaNamespace } from '#lib/rss/rss-item.ts';
+import { getSyndicationItems } from '#lib/syndication/syndication-data.ts';
 import { getAbsoluteUrl, getBasePath } from '#lib/utils/routing.ts';
-import { generateFeedItems } from '#lib/utils/rss.ts';
 import { formatStringTemplate } from '#lib/utils/text.ts';
 
 // Provide some helpful info while debugging feed generation
@@ -23,11 +24,12 @@ export async function GET(context: APIContext): Promise<Response> {
 
 	if (isFeedDebug) console.log(`[RSS] Initializing feed...`);
 
-	const items = await generateFeedItems({
-		debug: isFeedDebug,
+	const syndicationItems = await getSyndicationItems({
 		itemCount: feedItemCount,
 		shouldExcludeFootnotes: isFeedExcludeFootnotes,
 	});
+
+	const items = syndicationItems.map((item) => getRssItem(item));
 
 	const t = getTranslations();
 
@@ -50,7 +52,7 @@ export async function GET(context: APIContext): Promise<Response> {
 		items,
 		site: context.site ?? '',
 		title: t('site.title'),
-		xmlns: { atom: 'http://www.w3.org/2005/Atom' },
+		xmlns: { atom: 'http://www.w3.org/2005/Atom', media: mediaNamespace },
 	});
 
 	if (isFeedDebug) {
