@@ -30,6 +30,8 @@ This file is a glossary of terms commonly used in this project.
 
 **Backlink**: An inbound reference to an Entry from another Entry's body. Only a deliberate internal reference creates one; an ordinary Markdown link does not. _Avoid_: reverse link, mention, connection.
 
+**Syndication**: Publishing Entries to readers outside the site, through a service or format they already follow (RSS now, others later). Each target receives the same selection of Entries in the same shape; only the format differs. _Avoid_: feed (that is one format), cross-posting, distribution, export.
+
 ### Attribution and reference
 
 Nearly everything an Entry cites is written as either a Link or a Source, and the choice between them turns on the thing referred to, not on the relationship. A webpage that its address fully identifies becomes a Link; anything needing description (a book, a report, a journal article, a database, a work behind a paywall or since gone offline) becomes a Source. The two are listed separately because a column of addresses and a bibliography read differently.
