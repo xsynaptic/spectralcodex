@@ -38,7 +38,13 @@ export function createDescriptionRenderers({ cache }: { cache: Cache<Description
 
 		// Key by entry ID so edits overwrite the old row; the hash validates cached content
 		// MDX component names participate so render-affecting code changes self-invalidate
-		const sourceHash = hash({ mdxComponents, source, version: 3 }).slice(0, hashShortLength);
+		const sourceHash = hash({
+			descriptionSchema,
+			mdxComponents,
+			source,
+			version: 3,
+			wordCountFinal,
+		}).slice(0, hashShortLength);
 
 		const cached = cache.get(entry.id, sourceHash);
 

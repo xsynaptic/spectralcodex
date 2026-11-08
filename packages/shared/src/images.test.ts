@@ -1,11 +1,41 @@
-import { getRenditionName } from '@xsynaptic/astro-image-pipeline/names';
+import { fc, test as property } from '@fast-check/vitest';
+import { getRenditionName, parseRenditionName } from '@xsynaptic/astro-image-pipeline/names';
+import * as R from 'remeda';
 import { describe, expect, test } from 'vitest';
 
-import { getImageName, getImagePresetSize, getImagePresetWidths } from '#images.ts';
+import { getImageName, getImagePresetSize, getImagePresetWidths, imagePresets } from '#images.ts';
+
+// A wider panorama rounds a native rendition to zero pixels tall, which no photograph in the library approaches
+const maxAspectRatio = 20;
 
 function makeSource(width: number, height: number, id = 'taiwan/taipei/some-image-1.jpg') {
 	return { height, id, width };
 }
+
+function getSourceArbitrary(width: number) {
+	// Sources narrower than the asked width are drawn often, since that is where widths cap and can collide
+	return fc
+		.oneof(fc.integer({ max: width, min: 1 }), fc.integer({ max: 6000, min: 1 }))
+		.chain((sourceWidth) =>
+			fc.record({
+				sourceHeight: fc.integer({
+					max: sourceWidth * maxAspectRatio,
+					min: Math.ceil(sourceWidth / maxAspectRatio),
+				}),
+				sourceWidth: fc.constant(sourceWidth),
+			}),
+		);
+}
+
+const renditionRequestArbitrary = fc
+	.constantFrom(...R.keys(imagePresets))
+	.chain((presetName) =>
+		fc
+			.constantFrom(...imagePresets[presetName].widths)
+			.chain((width) =>
+				getSourceArbitrary(width).map((source) => ({ ...source, presetName, width })),
+			),
+	);
 
 describe('getImagePresetWidths', () => {
 	test('drops a crop whose height the source cannot fill, even when the width fits', () => {
@@ -30,6 +60,20 @@ describe('getImagePresetSize', () => {
 			width: 771,
 		});
 	});
+
+	property.prop([renditionRequestArbitrary], { numRuns: 2000 })(
+		'is the size of the file the image loads',
+		({ presetName, sourceHeight, sourceWidth, width }) => {
+			const source = makeSource(sourceWidth, sourceHeight);
+			const size = getImagePresetSize(presetName, width, source);
+			const rendition = parseRenditionName(getImageName(source, presetName, size.width));
+
+			expect({ height: rendition?.height, width: rendition?.width }).toStrictEqual({
+				height: size.height,
+				width: size.width,
+			});
+		},
+	);
 
 	test('the feed keeps the source ratio, so a 4:3 image is not cropped to 3:2', () => {
 		expect(getImagePresetSize('feed', 1200, makeSource(4000, 3000))).toStrictEqual({

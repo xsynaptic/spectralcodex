@@ -8,7 +8,7 @@
 \* Models packages/react-map-component/src/data/data-query.ts
 \* Models packages/react-map-component/src/controls/controls-scope.tsx
 \* Models src/lib/atlas/atlas-layout-factory.ts
-\* Sync commit 8ff2712a
+\* Sync commit d1958624
 EXTENDS Naturals
 
 VARIABLES page, store, rows, opening, want
@@ -34,7 +34,6 @@ TypeOK ==
     /\ rows \in RowStates
     /\ opening \in Pages \cup {"none"}
     /\ want \in [scope: Scopes \cup {"none"}, enabled: BOOLEAN]
-    /\ rows = "cached" => store.pending = {}
 
 \* isEveryTargetInRule
 KeepsTheScope(p, s) == Inside(p, s)
@@ -57,13 +56,9 @@ ReduceScope(st, p, hasRows) ==
 \* syncView's viewKey check
 IsSameView(st, p) == KeyOf(p) = st.key
 
-\* syncView, which applies the view without rows
-AppliesWithoutRows(st, p) == TRUE
-
 \* syncView
 SyncView(st, p, hasRows) ==
     IF IsSameView(st, p) THEN st
-    ELSE IF ~hasRows /\ ~AppliesWithoutRows(st, p) THEN st
     ELSE [ReduceScope(st, p, hasRows) EXCEPT !.key = KeyOf(p)]
 
 \* A query error reaches no store action
@@ -79,7 +74,7 @@ Arrive(w, p) ==
 \* sync(), in one task
 Sync(p) == store' = SyncView(store, p, rows = "cached")
 
-\* Astro swaps the page, then astro:after-swap dispatches map:sync
+\* Astro swaps the page, then astro:after-swap dispatches map:sync one microtask later
 Open(p) ==
     /\ page' = p
     /\ opening' = "none"
@@ -129,12 +124,18 @@ TheOpenedPageArrives ==
     /\ Open(opening)
     /\ want' = Arrive(want, opening)
 
-\* useHostViewSync's effect on useMapRows' data calls resolveScope; a sync before it reads the cache
+\* The query cache takes the rows; a sync from here on reads them, and the map draws them
 TheDirectoryLands ==
     /\ rows = "flying"
     /\ rows' = "cached"
+    /\ UNCHANGED <<page, store, opening, want>>
+
+\* useHostViewSync's effect on useMapRows' data, a render after the rows land
+TheMapReadsTheRows ==
+    /\ rows = "cached"
+    /\ store.pending # {}
     /\ store' = ResolveScope(store)
-    /\ UNCHANGED <<page, opening, want>>
+    /\ UNCHANGED <<page, rows, opening, want>>
 
 TheDirectoryFails ==
     /\ rows = "flying"
@@ -163,14 +164,13 @@ Next ==
     \/ \E p \in Pages: YouOpenFromTheMap(p)
     \/ TheOpenedPageArrives
     \/ TheDirectoryLands
+    \/ TheMapReadsTheRows
     \/ TheDirectoryFails
     \/ TheMapRefetches
 
 Spec == Init /\ [][Next]_vars
 
-Settled == opening = "none"
-
-NoOlderViewLands == Settled => store.key = KeyOf(page)
+Settled == opening = "none" /\ ~(rows = "cached" /\ store.pending # {})
 
 LocationKeepsOrClearsTheScope == (Settled /\ rows = "cached" /\ page \in Locations) => store.scope = want.scope
 

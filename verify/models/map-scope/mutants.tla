@@ -9,9 +9,6 @@ FailureForgetsThePending(st) == [st EXCEPT !.pending = {}]
 \* The Scope toggle live while a Location is pending
 TheToggleIgnoresThePending == TRUE
 
-\* A Location's view waits for rows before it applies
-LocationsWaitForRows(st, p) == p \notin Locations
-
 \* resolveMapScope resolving only the Location open when the rows land
 ResolveForgetsTheEarlier(st) ==
     IF st.pending = {} THEN st

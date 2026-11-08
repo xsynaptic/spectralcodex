@@ -1,3 +1,4 @@
+import { spawnSync } from 'node:child_process';
 import { promises as fs } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -46,6 +47,23 @@ beforeEach(async () => {
 afterEach(async () => {
 	vi.restoreAllMocks();
 	await fs.rm(statePath, { force: true, recursive: true });
+});
+
+describe('the queue lock', () => {
+	test('a run whose process is still alive refuses a second', async () => {
+		await fs.writeFile(`${queuePath}.lock`, String(process.ppid));
+
+		await expect(createPurgeQueue(queuePath)).rejects.toThrow('Another run');
+	});
+
+	test('a lock left by a process that is gone is taken over', async () => {
+		const { pid } = spawnSync(process.execPath, ['--eval', '']);
+
+		await fs.writeFile(`${queuePath}.lock`, String(pid));
+
+		await expect(createPurgeQueue(queuePath)).resolves.toBeDefined();
+		expect(await fs.readFile(`${queuePath}.lock`, 'utf8')).toBe(String(process.pid));
+	});
 });
 
 describe('drain', () => {

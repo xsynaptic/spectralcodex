@@ -38,11 +38,12 @@ async function holdDirectory(page: Page) {
 
 async function readObserved(page: Page) {
 	const observed = await page.evaluate(
-		({ activeAttribute, metrics, scopeBar, scopeName, shell }) => ({
+		({ activeAttribute, metrics, scopeBar, scopeName, scopeToggle, shell }) => ({
 			active: document.querySelector(`${shell} .${scopeBar}`)?.hasAttribute(activeAttribute),
 			heading: document.querySelector('h1')?.textContent,
 			marker: document.querySelector(`${shell} .maplibregl-marker`) !== null,
 			metrics: document.querySelector(`${shell} .${metrics}`)?.textContent,
+			pending: document.querySelector(`${shell} .${scopeToggle}`)?.hasAttribute('disabled'),
 			scope: document.querySelector(`${shell} .${scopeName}`)?.textContent,
 		}),
 		{
@@ -50,6 +51,7 @@ async function readObserved(page: Page) {
 			metrics: mapControlClassName.metrics,
 			scopeBar: mapControlClassName.scopeBar,
 			scopeName: mapControlClassName.scopeName,
+			scopeToggle: mapControlClassName.scopeToggle,
 			shell: atlasShellSelector,
 		},
 	);
@@ -59,6 +61,7 @@ async function readObserved(page: Page) {
 		loaded: (observed.metrics ?? '').trim() !== '',
 		marker: observed.marker,
 		page: (observed.heading ?? '').trim(),
+		pending: observed.pending === true,
 		scope: (observed.scope ?? '').trim(),
 	};
 }
@@ -102,6 +105,7 @@ test.describe('the map Scope model on a wide viewport', () => {
 				},
 				step: 'YouFollowALink',
 			},
+			{ act: releaseDirectory, step: 'TheDirectoryLands' },
 			{
 				act: async () => {
 					headings.set('theme', await followLinkTo(page, paths.themeDetail));
@@ -109,7 +113,6 @@ test.describe('the map Scope model on a wide viewport', () => {
 				step: 'YouFollowALink',
 			},
 			{ act: () => getAtlas(page).scopeToggle.click(), step: 'YouSwitchTheScope' },
-			{ act: releaseDirectory, step: 'TheDirectoryLands' },
 			{
 				act: async () => {
 					await page.goBack();
@@ -119,11 +122,13 @@ test.describe('the map Scope model on a wide viewport', () => {
 			},
 			{
 				act: async () => {
-					await getAtlas(page).scopeName.click();
+					await page.goForward();
 					await expectHistoryArrival(page, headings.get('theme') ?? '');
 				},
-				step: 'YouOpenFromTheMap',
+				step: 'YouFollowALink',
 			},
+			{ act: () => getAtlas(page).scopeToggle.click(), step: 'YouSwitchTheScope' },
+			{ act: () => getAtlas(page).scopeName.click(), step: 'YouOpenFromTheMap' },
 			{
 				act: async () => {
 					await page.goBack();

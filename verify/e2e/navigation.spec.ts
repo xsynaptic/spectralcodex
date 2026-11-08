@@ -51,6 +51,29 @@ test('the keyboard opens a group and Escape hands focus back to its trigger', as
 	await expect(group).toBeHidden();
 });
 
+test('a passing cursor leaves the group holding keyboard focus open', async ({ page }) => {
+	await visit(page, '/');
+
+	const nav = page.getByRole('navigation', { name: t('site.navigation.header.label') });
+	const regions = nav.getByRole('link', { name: t('collection.regions.labelPlural') });
+	const themes = nav.getByRole('link', { name: t('collection.themes.labelPlural') });
+
+	await expect(regions).toHaveAttribute('aria-expanded', 'false');
+
+	await regions.focus();
+	await page.keyboard.press('ArrowDown');
+
+	const focusedItem = nav.locator(':focus');
+
+	await expect(regions).toHaveAttribute('aria-expanded', 'true');
+
+	await themes.hover();
+
+	await expect(regions).toHaveAttribute('aria-expanded', 'true');
+	await expect(themes).toHaveAttribute('aria-expanded', 'false');
+	await expect(focusedItem).toBeVisible();
+});
+
 test('the current page is the only one marked', async ({ page }) => {
 	await visit(page, paths.regionDetailAncestor);
 

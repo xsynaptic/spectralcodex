@@ -23,8 +23,9 @@ check:
           - name: unused
             run: knip
           # Dead code stays with knip except component props, which knip can't see
-          - name: props
-            run: fallow dead-code --unused-component-props --quiet
+          # Unfiltered, since a filter flag such as --unused-component-props skips the rule packs
+          - name: policy
+            run: fallow dead-code --quiet
           - name: dupes
             run: fallow dupes --quiet
           # Health prints its report even at zero findings, so output shows only on failure
@@ -57,8 +58,8 @@ fix:
         jobs:
           - name: unused
             run: knip
-          - name: props
-            run: fallow dead-code --unused-component-props --quiet
+          - name: policy
+            run: fallow dead-code --quiet
           - name: dupes
             run: fallow dupes --quiet
           - name: complexity

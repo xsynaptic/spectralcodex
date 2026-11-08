@@ -222,6 +222,7 @@ export default defineConfig({
 		}),
 	},
 	prefetch: { prefetchAll: true },
+	prerenderConflictBehavior: 'error',
 	vite: {
 		build: {
 			// Inlines only the smallest client scripts; anything larger stays a separate file for cache granularity

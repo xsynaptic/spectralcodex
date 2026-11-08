@@ -1,5 +1,5 @@
-import { formatCount, log, withSpinner } from '@xsynaptic/astro-scripts';
-import { existsSync, promises as fs } from 'node:fs';
+import { formatCount, log, UserError, withSpinner } from '@xsynaptic/astro-scripts';
+import { existsSync, promises as fs, rmSync } from 'node:fs';
 import path from 'node:path';
 import * as R from 'remeda';
 
@@ -17,8 +17,61 @@ function getPurgePrefix(baseUrl: string) {
 	return `${url.host}${url.pathname.replace(/\/+$/, '')}`;
 }
 
+const heldLocks = new Set<string>();
+
+function hasErrorCode(error: unknown, code: string) {
+	return error instanceof Error && 'code' in error && error.code === code;
+}
+
+function isProcessAlive(pid: number) {
+	try {
+		process.kill(pid, 0);
+		return true;
+	} catch (error) {
+		// EPERM is a live process owned by another user
+		return hasErrorCode(error, 'EPERM');
+	}
+}
+
+function releaseLocks() {
+	for (const lockPath of heldLocks) rmSync(lockPath, { force: true });
+
+	heldLocks.clear();
+}
+
+// Draining rewrites the queue from memory, so a second live run would erase the names the first appends
+async function lockQueue(filePath: string) {
+	const lockPath = `${filePath}.lock`;
+
+	if (heldLocks.has(lockPath)) return;
+
+	await fs.mkdir(path.dirname(filePath), { recursive: true });
+
+	try {
+		await fs.writeFile(lockPath, String(process.pid), { flag: 'wx' });
+	} catch (error) {
+		if (!hasErrorCode(error, 'EEXIST')) throw error;
+
+		const holder = Number(await fs.readFile(lockPath, 'utf8'));
+
+		if (holder !== process.pid && isProcessAlive(holder)) {
+			throw new UserError(
+				`Another run (pid ${String(holder)}) holds ${filePath}; let it finish first`,
+			);
+		}
+
+		await fs.writeFile(lockPath, String(process.pid));
+	}
+
+	if (heldLocks.size === 0) process.once('exit', releaseLocks);
+
+	heldLocks.add(lockPath);
+}
+
 // Appended before each overwrite lands, so a run killed after the rename still leaves the purge queued
 export async function createPurgeQueue(filePath: string) {
+	await lockQueue(filePath);
+
 	const data = existsSync(filePath) ? await fs.readFile(filePath, 'utf8') : '';
 	const queued = new Set(data.split('\n').filter(Boolean));
 
@@ -36,7 +89,6 @@ export async function createPurgeQueue(filePath: string) {
 			if (queued.has(name)) return;
 
 			queued.add(name);
-			await fs.mkdir(path.dirname(filePath), { recursive: true });
 			await fs.appendFile(filePath, `${name}\n`);
 		},
 		async drain({

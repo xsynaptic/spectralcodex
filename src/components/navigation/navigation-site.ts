@@ -257,8 +257,6 @@ class SiteNavigation extends HTMLElement {
 
 		event.preventDefault();
 
-		this.#closeSiblings(li);
-
 		// The first click after hover opened it must not shut it under the cursor; later clicks toggle
 		if (li.dataset.open === undefined || li === this.#hoverOpened) {
 			this.#open(li);
@@ -365,7 +363,13 @@ class SiteNavigation extends HTMLElement {
 		// Depth 2+ flies out sideways, which only fits at sm and above
 		if (!this.#isRootLevel(li) && !matchMedia('(width >= 40rem)').matches) return;
 
-		this.#closeSiblings(li);
+		// Keyboard focus wins over a passing cursor
+		const isFocusElsewhere = this.#getSiblingItems(li).some(
+			(sibling) => sibling !== li && sibling.querySelector(':focus-visible'),
+		);
+
+		if (isFocusElsewhere) return;
+
 		this.#open(li);
 		this.#hoverOpened = li;
 	};
@@ -386,7 +390,6 @@ class SiteNavigation extends HTMLElement {
 		if (!isInTrigger || li.dataset.open !== undefined) return;
 
 		event.preventDefault();
-		this.#closeSiblings(li);
 		this.#open(li);
 	}
 
@@ -420,6 +423,8 @@ class SiteNavigation extends HTMLElement {
 	}
 
 	#open(li: HTMLElement) {
+		this.#closeSiblings(li);
+
 		li.dataset.open = '';
 
 		const trigger = this.#getTrigger(li);

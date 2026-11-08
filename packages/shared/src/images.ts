@@ -118,7 +118,11 @@ export function getImagePresetSize(
 	width: number,
 	source: ImageDimensions,
 ) {
-	return fitWithinSource(getPresetSize(imagePresets[presetName], width, source), source);
+	const preset: ImagePreset = imagePresets[presetName];
+	const size = fitWithinSource(getPresetSize(preset, width, source), source);
+
+	// Two preset widths can cap to one width at heights a pixel apart, and the file is named for the first
+	return resolvePresetSize(preset, size.width, source) ?? size;
 }
 
 export function getImageName(

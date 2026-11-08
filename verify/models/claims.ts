@@ -1,6 +1,6 @@
 export interface ModelClaims {
 	// Rules that break today, kept running until each bug is fixed or settled, then moved to holds
-	findings: Array<string>;
+	findings: Array<{ isTemporal?: boolean; rule: string }>;
 	holds: Array<string>;
 	mutants: Array<{ mutant: string; replace: string; rule: string }>;
 	properties: Array<string>;
@@ -28,15 +28,8 @@ export const claims = {
 	},
 	'map-scope': {
 		findings: [],
-		holds: [
-			'TypeOK',
-			'NoOlderViewLands',
-			'LocationKeepsOrClearsTheScope',
-			'ScopeHeldWhileOff',
-			'ScopeOnWhenAsked',
-		],
+		holds: ['TypeOK', 'LocationKeepsOrClearsTheScope', 'ScopeHeldWhileOff', 'ScopeOnWhenAsked'],
 		mutants: [
-			{ mutant: 'LocationsWaitForRows', replace: 'AppliesWithoutRows', rule: 'NoOlderViewLands' },
 			{
 				mutant: 'FailureForgetsThePending',
 				replace: 'FailedFetch',
