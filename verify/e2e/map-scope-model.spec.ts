@@ -160,6 +160,14 @@ test.describe('the map Scope model on a wide viewport', () => {
 				step: 'YouFollowALink',
 			},
 			{ act: () => switchTheScope(page), step: 'YouSwitchTheScope' },
+			{
+				act: () => followLinkTo(page, paths.regionDetail),
+				step: 'YouFollowALink',
+			},
+			{
+				act: () => followLinkTo(page, paths.locationOutsideScopes),
+				step: 'YouFollowALink',
+			},
 		];
 
 		expect(witnessPath.map(({ step }) => step)).toEqual(acts.map(({ step }) => step));

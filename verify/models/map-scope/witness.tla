@@ -27,7 +27,9 @@ Path == <<
     [step |-> "YouFollowALink",    seen |-> [page |-> "tainan", scope |-> "tainan", active |-> TRUE,  loaded |-> TRUE,  marker |-> FALSE, pending |-> FALSE]],
     [step |-> "YouSwitchTheScope", seen |-> [page |-> "tainan", scope |-> "tainan", active |-> FALSE, loaded |-> TRUE,  marker |-> FALSE, pending |-> FALSE]],
     [step |-> "YouFollowALink",    seen |-> [page |-> "theater", scope |-> "tainan", active |-> FALSE, loaded |-> TRUE, marker |-> TRUE,  pending |-> FALSE]],
-    [step |-> "YouSwitchTheScope", seen |-> [page |-> "theater", scope |-> "tainan", active |-> TRUE,  loaded |-> TRUE, marker |-> TRUE,  pending |-> FALSE]]
+    [step |-> "YouSwitchTheScope", seen |-> [page |-> "theater", scope |-> "tainan", active |-> TRUE,  loaded |-> TRUE, marker |-> TRUE,  pending |-> FALSE]],
+    [step |-> "YouFollowALink",    seen |-> [page |-> "tainan", scope |-> "tainan", active |-> TRUE,  loaded |-> TRUE,  marker |-> FALSE, pending |-> FALSE]],
+    [step |-> "YouFollowALink",    seen |-> [page |-> "theater", scope |-> "",       active |-> FALSE, loaded |-> TRUE, marker |-> TRUE,  pending |-> FALSE]]
 >>
 
 Step(name) ==
