@@ -25,6 +25,7 @@ const modelsDirectory = import.meta.dirname;
 const composeArguments = ['compose', '-f', path.join(modelsDirectory, 'compose.yaml')];
 
 const tlcExitCode = {
+	deadlock: 11,
 	holds: 0,
 	invariantBroken: 12,
 	propertyBroken: 13,
@@ -56,6 +57,7 @@ function runTlc(runDirectory: string, { cfg, flags = [], label, model, module }:
 			'1',
 			'-fp',
 			'0',
+			// The models mount is read-only and TLC 1.7.4 has no `-noGenerateSpecTE`, so its files stay in the container
 			'-metadir',
 			'/tmp/tlc',
 			...flags,
@@ -69,22 +71,26 @@ function runTlc(runDirectory: string, { cfg, flags = [], label, model, module }:
 	if (result.error) throw result.error;
 
 	const output = `${result.stdout}${result.stderr}`;
+	const { status } = result;
 
-	if (result.status === tlcExitCode.holds) return { output, verdict: 'holds' } as const;
-	if (
-		result.status === tlcExitCode.invariantBroken ||
-		result.status === tlcExitCode.propertyBroken
-	) {
-		return { output, verdict: 'breaks' } as const;
+	if (status === tlcExitCode.holds) return { output, status, verdict: 'holds' } as const;
+	if (status === tlcExitCode.invariantBroken || status === tlcExitCode.propertyBroken) {
+		return { output, status, verdict: 'breaks' } as const;
 	}
 
-	return { output, verdict: 'error' } as const;
+	return { output, status, verdict: 'error' } as const;
 }
 
-function getToolError(model: string, label: string, output: string): CheckResult {
+function getToolError(
+	model: string,
+	label: string,
+	{ output, status }: { output: string; status: null | number },
+): CheckResult {
+	const cause = status === tlcExitCode.deadlock ? 'a deadlock' : `exit ${String(status)}`;
+
 	return {
 		isPassed: false,
-		line: `${model}: TLC could not run ${label}`,
+		line: `${model}: TLC stopped the ${label} run with ${cause}`,
 		output,
 	};
 }
@@ -109,9 +115,10 @@ function readCoverage(output: string) {
 		deadActions.push(action);
 	}
 
-	const deadExpressions = [...finalCoverage.matchAll(deadExpressionPattern)].map(
-		([, line, column, module]) => `${String(module)}.tla:${String(line)}:${String(column)}`,
-	);
+	const deadExpressions = finalCoverage
+		.matchAll(deadExpressionPattern)
+		.map(([, line, column, module]) => `${String(module)}.tla:${String(line)}:${String(column)}`)
+		.toArray();
 
 	return { deadActions, deadExpressions, isInitCovered };
 }
@@ -148,7 +155,7 @@ function getCoverageFailure(model: string, output: string): CheckResult | undefi
 function checkHolds(runDirectory: string, model: string, modelClaims: ModelClaims): CheckResult {
 	const { holds, properties } = modelClaims;
 	const rules = [...holds, ...properties];
-	const { output, verdict } = runTlc(runDirectory, {
+	const run = runTlc(runDirectory, {
 		cfg: [
 			'SPECIFICATION Spec',
 			...getRuleLines('INVARIANT', holds),
@@ -160,20 +167,20 @@ function checkHolds(runDirectory: string, model: string, modelClaims: ModelClaim
 		module: 'spec',
 	});
 
-	if (verdict === 'error') return getToolError(model, 'holds', output);
-	if (verdict === 'breaks') {
+	if (run.verdict === 'error') return getToolError(model, 'holds', run);
+	if (run.verdict === 'breaks') {
 		return {
 			isPassed: false,
 			line: `${model}: a rule that should hold breaks`,
-			output,
+			output: run.output,
 		};
 	}
 
-	const coverageFailure = getCoverageFailure(model, output);
+	const coverageFailure = getCoverageFailure(model, run.output);
 
 	if (coverageFailure) return coverageFailure;
 
-	const states = finalCountPattern.exec(output)?.[1] ?? '?';
+	const states = finalCountPattern.exec(run.output)?.[1] ?? '?';
 	const holding = rules.length > 0 ? `${rules.join(', ')} hold` : 'no rule holds yet';
 
 	return {
@@ -187,7 +194,7 @@ function checkMutant(
 	model: string,
 	{ keyword, mutant, replace, rule }: ModelClaims['mutants'][number] & { keyword: string },
 ): CheckResult {
-	const { output, verdict } = runTlc(runDirectory, {
+	const run = runTlc(runDirectory, {
 		cfg: [
 			'SPECIFICATION Spec',
 			`${keyword} ${rule}`,
@@ -200,8 +207,8 @@ function checkMutant(
 		module: 'mutants',
 	});
 
-	if (verdict === 'error') return getToolError(model, `mutant ${mutant}`, output);
-	if (verdict === 'holds') {
+	if (run.verdict === 'error') return getToolError(model, `mutant ${mutant}`, run);
+	if (run.verdict === 'holds') {
 		return {
 			isPassed: false,
 			line: `${model}: mutant ${mutant} leaves ${rule} holding`,
@@ -216,7 +223,7 @@ function checkFinding(
 	model: string,
 	{ isTemporal = false, rule }: ModelClaims['findings'][number],
 ): CheckResult {
-	const { output, verdict } = runTlc(runDirectory, {
+	const run = runTlc(runDirectory, {
 		cfg: [
 			'SPECIFICATION Spec',
 			`${isTemporal ? 'PROPERTY' : 'INVARIANT'} ${rule}`,
@@ -227,8 +234,8 @@ function checkFinding(
 		module: 'spec',
 	});
 
-	if (verdict === 'error') return getToolError(model, `finding ${rule}`, output);
-	if (verdict === 'holds') {
+	if (run.verdict === 'error') return getToolError(model, `finding ${rule}`, run);
+	if (run.verdict === 'holds') {
 		return {
 			isPassed: false,
 			line: `${model}: finding ${rule} now holds; move it to holds`,
@@ -239,15 +246,15 @@ function checkFinding(
 }
 
 function checkWitness(runDirectory: string, model: string): CheckResult {
-	const { output, verdict } = runTlc(runDirectory, {
+	const run = runTlc(runDirectory, {
 		cfg: ['SPECIFICATION WitnessSpec', 'INVARIANT PathNotReplayed', 'CHECK_DEADLOCK FALSE'],
 		label: 'witness',
 		model,
 		module: 'witness',
 	});
 
-	if (verdict === 'error') return getToolError(model, 'witness', output);
-	if (verdict === 'holds') {
+	if (run.verdict === 'error') return getToolError(model, 'witness', run);
+	if (run.verdict === 'holds') {
 		return {
 			isPassed: false,
 			line: `${model}: the witness path is not reachable`,
@@ -259,12 +266,15 @@ function checkWitness(runDirectory: string, model: string): CheckResult {
 
 function* checkModel(runDirectory: string, model: string, modelClaims: ModelClaims | undefined) {
 	if (!modelClaims) {
-		yield { isPassed: false, line: `${model}: no entry in claims.ts` };
+		yield { isPassed: false, line: `${model}: no entry in claims` };
 		return;
 	}
 
 	if (!existsSync(path.join(modelsDirectory, model, 'spec.tla'))) {
-		yield { isPassed: false, line: `${model}: claims.ts names a model with no spec.tla` };
+		yield {
+			isPassed: false,
+			line: `${model}: claims names a model with no spec.tla`,
+		};
 		return;
 	}
 
