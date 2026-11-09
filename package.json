@@ -1,6 +1,6 @@
 {
 	"name": "@xsynaptic/spectralcodex",
-	"version": "7.34.0",
+	"version": "7.35.0",
 	"scripts": {
 		"build": "astro check && astro build",
 		"check": "lefthook run check",
@@ -73,7 +73,7 @@
 		"@stryker-mutator/core": "^10.1.1",
 		"@stryker-mutator/vitest-runner": "^10.1.1",
 		"@tailwindcss/vite": "^4.3.5",
-		"@tanstack/eslint-plugin-query": "^5.106.1",
+		"@tanstack/eslint-plugin-query": "^5.107.1",
 		"@turf/centroid": "^7.4.0",
 		"@turf/distance": "^7.4.0",
 		"@turf/helpers": "^7.4.0",
@@ -87,8 +87,9 @@
 		"@xsynaptic/astro-image-loader": "^1.4.1",
 		"@xsynaptic/astro-image-pipeline": "^0.12.0",
 		"@xsynaptic/astro-pagefind": "^0.1.0",
-		"@xsynaptic/astro-scripts": "^0.15.1",
+		"@xsynaptic/astro-scripts": "^0.16.1",
 		"@xsynaptic/astro-sitemap-lastmod": "^0.3.1",
+		"@xsynaptic/astro-syndication": "^0.2.0",
 		"@xsynaptic/eslint-config": "^6.8.0",
 		"@xsynaptic/mdxlint-config": "^2.0.0",
 		"@xsynaptic/path-suggestions": "^0.2.1",
@@ -107,12 +108,12 @@
 		"eslint": "^10.14.0",
 		"eslint-plugin-jsx-a11y": "^6.10.2",
 		"eslint-plugin-react-hooks": "^7.1.1",
-		"exiftool-vendored": "^39.1.1",
-		"fallow": "^3.40.0",
+		"exiftool-vendored": "^39.2.0",
+		"fallow": "^3.41.0",
 		"geokdbush": "^2.1.0",
 		"globals": "^17.14.0",
 		"kdbush": "^4.1.0",
-		"knip": "^6.44.1",
+		"knip": "^6.44.2",
 		"lefthook": "^2.2.2",
 		"ohash": "^2.0.12",
 		"p-memoize": "^9.0.0",
@@ -121,7 +122,7 @@
 		"prettier-plugin-astro": "^1.1.2",
 		"prettier-plugin-tailwindcss": "^0.8.1",
 		"remeda": "^2.58.0",
-		"satteri": "^0.11.6",
+		"satteri": "^0.11.7",
 		"sharp": "0.35.5",
 		"stylelint": "^17.16.0",
 		"tailwindcss": "^4.3.5",
@@ -130,5 +131,5 @@
 		"vitest": "^4.1.12",
 		"zod": "^4.6.7"
 	},
-	"packageManager": "pnpm@12.16.1"
+	"packageManager": "pnpm@12.18.0"
 }
