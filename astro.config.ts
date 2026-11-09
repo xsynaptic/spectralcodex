@@ -35,12 +35,14 @@ import atlas from '#lib/atlas/atlas-integration.ts';
 const imageBaseUrlDefault = '/_img';
 
 const env = loadEnv(process.env.NODE_ENV ?? 'development', process.cwd(), '');
-const { BUILD_ASSETS_PATH, DEV_SERVER_URL = 'http://localhost:4321/', PROD_SERVER_URL } = env;
+const buildAssetsPath = env.BUILD_ASSETS_PATH;
+const devServerUrl = env.DEV_SERVER_URL ?? 'http://localhost:4321/';
+const prodServerUrl = env.PROD_SERVER_URL;
 
 // `astro:env` reads an empty value as unset, so these must too or the integrations and pages disagree
-const CONTENT_MEDIA_PATH = env.CONTENT_MEDIA_PATH || contentMediaPathDefault;
-const CUSTOM_CACHE_PATH = env.CUSTOM_CACHE_PATH || customCachePathDefault;
-const IMAGE_BASE_URL = env.IMAGE_BASE_URL || imageBaseUrlDefault;
+const contentMediaPath = env.CONTENT_MEDIA_PATH || contentMediaPathDefault;
+const customCachePath = env.CUSTOM_CACHE_PATH || customCachePathDefault;
+const imageBaseUrl = env.IMAGE_BASE_URL || imageBaseUrlDefault;
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -49,7 +51,7 @@ const isSsr = process.env.BUILD_OUTPUT_PATH === './dist/server';
 const trailingSlash = 'always';
 
 const outDirPath = fileURLToPath(new URL('dist/', import.meta.url));
-const assetsPath = BUILD_ASSETS_PATH ?? '_astro';
+const assetsPath = buildAssetsPath ?? '_astro';
 
 function isPrecompressed(filePath: string) {
 	const distFilePath = path.relative(outDirPath, filePath);
@@ -59,15 +61,15 @@ function isPrecompressed(filePath: string) {
 	return distFilePath.startsWith(`${assetsPath}/`) && /\.(?:css|js)$/.test(distFilePath);
 }
 
-const lastmod = sitemapLastmod({ filePath: getCachePaths(CUSTOM_CACHE_PATH).sitemapLastmodPath });
+const lastmod = sitemapLastmod({ filePath: getCachePaths(customCachePath).sitemapLastmodPath });
 
 export default defineConfig({
 	base: siteBasePath,
 	build: {
-		...(BUILD_ASSETS_PATH ? { assets: BUILD_ASSETS_PATH } : {}),
+		...(buildAssetsPath ? { assets: buildAssetsPath } : {}),
 	},
 	cacheDir: astroCacheDir,
-	site: isProduction && PROD_SERVER_URL ? PROD_SERVER_URL : DEV_SERVER_URL,
+	site: isProduction && prodServerUrl ? prodServerUrl : devServerUrl,
 	trailingSlash: isProduction ? trailingSlash : 'ignore',
 	...(isSsr
 		? {
@@ -179,14 +181,14 @@ export default defineConfig({
 		}),
 		atlas(),
 		imagePipeline({
-			baseUrl: IMAGE_BASE_URL,
+			baseUrl: imageBaseUrl,
 			encoding: {
 				jpg: { quality: imageQualityByFormat.jpg },
 				webp: { quality: imageQualityByFormat.webp },
 			},
-			mediaPath: CONTENT_MEDIA_PATH,
+			mediaPath: contentMediaPath,
 			placeholders: { pixels: 250, quality: 10, saturation: 1.2 },
-			storePath: getCachePaths(CUSTOM_CACHE_PATH).imagesPath,
+			storePath: getCachePaths(customCachePath).imagesPath,
 		}),
 		compressor({
 			gzip: false,
