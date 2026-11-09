@@ -50,3 +50,5 @@ export const millisecondsPerDay = 86_400_000;
 export const siteYearFounded = 2009;
 
 export const siteTimezoneOffsetHours = 8;
+
+export const syndicationItemCount = 20;
