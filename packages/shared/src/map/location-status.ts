@@ -60,8 +60,7 @@ export const LocationStatusRecords = {
 	[LocationStatusEnum.Private]: {
 		color: tailwindColors.amber400,
 		colorDark: tailwindColors.amber500,
-		description:
-			'Private sites that are either still occupied, patrolled, or otherwise inaccessible.',
+		description: 'Privately owned or in institutional use and closed to the public.',
 		stroke: tailwindColors.amber500,
 		strokeDark: tailwindColors.amber600,
 		tint: tailwindColors.amber100,
@@ -89,6 +88,16 @@ export const LocationStatusRecords = {
 		tint: tailwindColors.red100,
 		title: 'Remnants',
 		title_zh: '遺跡',
+	},
+	[LocationStatusEnum.Restricted]: {
+		color: tailwindColors.zinc800,
+		colorDark: tailwindColors.zinc800,
+		description: 'Within an access controlled zone not open to the public.',
+		stroke: tailwindColors.zinc400,
+		strokeDark: tailwindColors.zinc400,
+		tint: tailwindColors.zinc100,
+		title: 'Restricted',
+		title_zh: '管制區',
 	},
 	[LocationStatusEnum.Unknown]: {
 		color: tailwindColors.zinc800,
@@ -118,6 +127,7 @@ export const locationStatusOrder: ReadonlyArray<LocationStatus> = [
 	LocationStatusEnum.Public,
 	LocationStatusEnum.Converted,
 	LocationStatusEnum.Private,
+	LocationStatusEnum.Restricted,
 	LocationStatusEnum.Idle,
 	LocationStatusEnum.Abandoned,
 	LocationStatusEnum.Remnants,

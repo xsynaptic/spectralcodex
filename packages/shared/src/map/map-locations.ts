@@ -78,6 +78,7 @@ export const LocationStatusEnum = {
 	Private: 'private',
 	Public: 'public',
 	Remnants: 'remnants',
+	Restricted: 'restricted',
 	Unknown: 'unknown',
 	Vanished: 'vanished',
 } as const satisfies Record<string, string>;
