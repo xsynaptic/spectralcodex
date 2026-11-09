@@ -1,58 +1,36 @@
-import type { ContainerRenderOptions } from 'astro/container';
-
 import mdxRenderer from '@astrojs/mdx/server.js';
-import { defaultSchema, sanitizeHtml } from '@xsynaptic/unified-tools';
-import { experimental_AstroContainer as AstroContainer } from 'astro/container';
+import { prepareSyndicationHtml, syndicationSchema } from '@xsynaptic/astro-syndication/html';
+import { createSyndicationRenderer } from '@xsynaptic/astro-syndication/render';
 import { render } from 'astro:content';
 
 import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 
 import { stripFootnotes } from '#lib/utils/text.ts';
 
-async function createRenderMdxFunction() {
-	const container = await AstroContainer.create();
-
-	container.addServerRenderer({ name: 'mdx', renderer: mdxRenderer });
-
-	return async function (
-		entry: ComputedEntry<'locations' | 'pages' | 'posts'>,
-		options?: ContainerRenderOptions,
-	) {
-		const { Content } = await render(entry);
-
-		return await container.renderToString(Content, options);
-	};
-}
-
-const feedSanitizeSchema = {
-	...defaultSchema,
+const feedSchema = {
+	...syndicationSchema,
 	// Feed readers ship no stylesheet, so CJK wrapper spans unwrap to plain text
-	tagNames: [...(defaultSchema.tagNames ?? []), 'figure', 'figcaption'].filter(
-		(tagName) => tagName !== 'span',
-	),
+	tagNames: syndicationSchema.tagNames.filter((tagName) => tagName !== 'span'),
 };
-
-function sanitizeFeedContent(contentHtml: string, shouldExcludeFootnotes: boolean) {
-	return sanitizeHtml(
-		shouldExcludeFootnotes ? stripFootnotes(contentHtml) : contentHtml,
-		feedSanitizeSchema,
-	);
-}
 
 export async function createRenderFeedContentFunction({
 	shouldExcludeFootnotes,
 }: {
 	shouldExcludeFootnotes: boolean;
 }) {
-	const renderMdx = await createRenderMdxFunction();
+	const site = new URL(import.meta.env.SITE);
+	const renderFeed = await createSyndicationRenderer({
+		renderers: [{ name: 'mdx', renderer: mdxRenderer }],
+		site,
+	});
 
 	return async function renderFeedContent(entry: ComputedEntry<'locations' | 'posts'>) {
-		const contentHtml = await renderMdx(entry, {
-			locals: {
-				isFeed: true, // This conditional controls the output of MDX components
-			},
-		});
+		const { Content } = await render(entry);
+		const contentHtml = await renderFeed(Content);
 
-		return sanitizeFeedContent(contentHtml, shouldExcludeFootnotes);
+		return prepareSyndicationHtml(
+			shouldExcludeFootnotes ? stripFootnotes(contentHtml) : contentHtml,
+			{ schema: feedSchema, site },
+		);
 	};
 }

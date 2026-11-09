@@ -1,9 +1,12 @@
+import type { SyndicationImage, SyndicationItem } from '@xsynaptic/astro-syndication';
+
 import { getPublicId } from '@spectralcodex/shared/entries';
 import { getImagePresetSize, imageContentTypes, imagePresets } from '@spectralcodex/shared/images';
+import { anchorDateOnly } from '@xsynaptic/astro-syndication';
 
 import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 
-import { millisecondsPerHour, siteTimezoneOffsetHours } from '#constants.ts';
+import { siteTimezoneOffsetHours } from '#constants.ts';
 import { getImageByIdFunction, getImageSource } from '#lib/collections/images/images-data.ts';
 import { createRegionAncestorsByIdFunction } from '#lib/collections/regions/regions-data.ts';
 import { createThemesByIdsFunction } from '#lib/collections/themes/themes-data.ts';
@@ -14,33 +17,13 @@ import { createImageUrlFunction } from '#lib/image/image-url.ts';
 import { createRenderFeedContentFunction } from '#lib/syndication/syndication-render.ts';
 import { getSyndicationTags } from '#lib/syndication/syndication-tags.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description-data.ts';
-import { getContentPath } from '#lib/utils/routing.ts';
+import { getAbsoluteUrl, getContentPath } from '#lib/utils/routing.ts';
 import { sanitizeImageAltAttribute } from '#lib/utils/text.ts';
 
 type SyndicationEntry = ComputedEntry<'locations' | 'posts'>;
 
-export interface SyndicationImage {
-	alt: string;
-	height: number;
-	type: string;
-	url: string;
-	width: number;
-}
-
-export interface SyndicationItem {
-	contentHtml?: string;
-	dateCreated: Date;
-	dateUpdated?: Date;
-	description?: string;
-	image?: SyndicationImage;
-	path: string;
-	tags: Array<string>;
-	title: string;
-}
-
-// Dates sit at 00:00 UTC; re-anchor to the site timezone so today's entries are never future-dated
 function getSiteDate(date: Date) {
-	return new Date(date.getTime() - siteTimezoneOffsetHours * millisecondsPerHour);
+	return anchorDateOnly(date, { utcOffsetHours: siteTimezoneOffsetHours });
 }
 
 async function createSyndicationImageFunction() {
@@ -98,9 +81,9 @@ export async function createSyndicationItemFunction({
 
 		return {
 			dateCreated: getSiteDate(data.dateCreated),
-			path: getContentPath(entry.collection, getPublicId(entry)),
 			tags: getEntryTags(data),
 			title: formatTitleMultilingual(data.title, titleMultilingual),
+			url: getAbsoluteUrl(getContentPath(entry.collection, getPublicId(entry))),
 			...(contentHtml ? { contentHtml } : {}),
 			...(data.dateUpdated ? { dateUpdated: getSiteDate(data.dateUpdated) } : {}),
 			...(description ? { description } : {}),

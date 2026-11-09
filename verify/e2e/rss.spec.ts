@@ -37,4 +37,11 @@ test.describe('rss feed', { tag: '@smoke' }, () => {
 			expect(content.length).toBeGreaterThan(100);
 		}
 	});
+
+	test('item content has no root-relative links', async ({ request }) => {
+		const response = await request.get('/rss.xml');
+		const body = await response.text();
+
+		expect(body).not.toMatch(/(?:href|src)=(?:"|&quot;)\/(?!\/)/);
+	});
 });

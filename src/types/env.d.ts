@@ -4,14 +4,6 @@ interface ImportMetaEnv {
 	readonly BUILD_VERSION: string | undefined;
 }
 
-// Astro.locals typing; must be in a global ambient .d.ts file under the App namespace
-declare namespace App {
-	interface Locals {
-		// Only the feed path sets this, via the Container API; page renders leave locals empty
-		isFeed?: boolean;
-	}
-}
-
 interface Window {
 	umami?: { track: (eventName: string, eventData?: Record<string, unknown>) => void };
 }

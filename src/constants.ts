@@ -46,7 +46,6 @@ export const tailwindContentPaddingSm = '2rem';
 export const tailwindContentPaddingMd = '4rem';
 
 export const millisecondsPerDay = 86_400_000;
-export const millisecondsPerHour = 3_600_000;
 
 export const siteYearFounded = 2009;
 

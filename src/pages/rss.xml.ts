@@ -1,11 +1,10 @@
-import type { APIContext } from 'astro';
+import type { APIRoute } from 'astro';
 
-import rss from '@astrojs/rss';
+import { getRssResponse } from '@xsynaptic/astro-syndication/rss';
 import { performance } from 'node:perf_hooks';
 
 import { siteYearFounded } from '#constants.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
-import { getRssItem, mediaNamespace } from '#lib/rss/rss-item.ts';
 import { getSyndicationItems } from '#lib/syndication/syndication-data.ts';
 import { getAbsoluteUrl, getBasePath } from '#lib/utils/routing.ts';
 import { formatStringTemplate } from '#lib/utils/text.ts';
@@ -19,40 +18,33 @@ const isFeedExcludeFootnotes = true as boolean;
 // How many items should be included in the feed?
 const feedItemCount = 20;
 
-export async function GET(context: APIContext): Promise<Response> {
+export const GET = (async (context) => {
 	const startTime = performance.now();
 
 	if (isFeedDebug) console.log(`[RSS] Initializing feed...`);
 
-	const syndicationItems = await getSyndicationItems({
+	const items = await getSyndicationItems({
 		itemCount: feedItemCount,
 		shouldExcludeFootnotes: isFeedExcludeFootnotes,
 	});
 
-	const items = syndicationItems.map((item) => getRssItem(item));
-
 	const t = getTranslations();
-
-	// Channel freshness tracks the newest item, not build time, so unchanged content keeps its ETag
-	const lastBuildDate = items[0]?.pubDate;
 
 	const copyright = `${formatStringTemplate(t('site.footer.copyright.label'), {
 		currentYear: new Date().getFullYear(),
 		year: siteYearFounded,
 	})} ${t('site.title')}`;
 
-	const rssFeed = rss({
-		customData: [
-			'<language>en-us</language>',
-			`<atom:link href="${getAbsoluteUrl(getBasePath('rss.xml'))}" rel="self" type="application/rss+xml"/>`,
-			...(lastBuildDate ? [`<lastBuildDate>${lastBuildDate.toUTCString()}</lastBuildDate>`] : []),
-			`<copyright>${copyright}</copyright>`,
-		].join(''),
-		description: t('site.description'),
+	const rssFeed = await getRssResponse({
 		items,
-		site: context.site ?? '',
-		title: t('site.title'),
-		xmlns: { atom: 'http://www.w3.org/2005/Atom', media: mediaNamespace },
+		publication: {
+			copyright,
+			description: t('site.description'),
+			language: 'en-us',
+			site: context.site,
+			title: t('site.title'),
+		},
+		selfUrl: getAbsoluteUrl(getBasePath('rss.xml')),
 	});
 
 	if (isFeedDebug) {
@@ -67,4 +59,4 @@ export async function GET(context: APIContext): Promise<Response> {
 	}
 
 	return rssFeed;
-}
+}) satisfies APIRoute;
