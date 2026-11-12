@@ -18,14 +18,14 @@ const t = getTranslations();
 {imageFeaturedGroup && imageFeaturedGroup.length > 0 ? (
 	<image-carousel
 		aria-label={t('collection.images.labelPlural')}
-		aria-roledescription={t('carousel.roledescription')}
+		aria-roledescription={t('carousel.roleDescription')}
 		class:list={[
 			'carousel-group',
 			'relative block max-w-content overflow-hidden sm:rounded-xs',
 			className,
 		]}
 		data-slide-label={t('carousel.slide.label')}
-		data-slide-roledescription={t('carousel.slide.roledescription')}
+		data-slide-roledescription={t('carousel.slide.roleDescription')}
 		role="group"
 	>
 		<div class="carousel-container">

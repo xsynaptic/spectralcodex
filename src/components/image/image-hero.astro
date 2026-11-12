@@ -49,10 +49,10 @@ const hasHeroCarousel = !!imageFeaturedGroup && imageFeaturedGroup.length > 1;
 		{hasHeroCarousel ? (
 			<image-carousel
 				aria-label={formatStringTemplate(t('carousel.label'), { title: alt })}
-				aria-roledescription={t('carousel.roledescription')}
+				aria-roledescription={t('carousel.roleDescription')}
 				class="block"
 				data-slide-label={t('carousel.slide.label')}
-				data-slide-roledescription={t('carousel.slide.roledescription')}
+				data-slide-roledescription={t('carousel.slide.roleDescription')}
 				role="group"
 			>
 				<div class="carousel-container">

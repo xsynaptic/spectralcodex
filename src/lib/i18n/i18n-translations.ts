@@ -21,6 +21,9 @@ const translationStrings = {
 		'home.recent.label': 'Recent Updates',
 		'home.series': `Complete series of photo essays and field notes from some of the many road trips and bicycle journeys I've undertaken over the years, mostly around Taiwan. If you prefer more of a narrative structure to explore the many places documented on this site you might like to start here.`,
 		'home.themes': `Many different themes are explored on this site, generally as a way of making sense of history and socioeconomic change. Each theme features posts, field notes about specific locations, and a map to help navigate the geospatial dimension of a subject. I recommend having at least a glance at my most ambitious project, an extensive overview of nearly 1,200 [movie theaters across Taiwan](/themes/taiwan-theaters).`,
+		'homepage.card.description':
+			'A digital garden, photography portfolio, and geospatial database mainly focusing on the history and culture of Taiwan.',
+		'homepage.card.title': 'Spectral Codex',
 
 		// Images
 		'collection.images.labelPlural': 'Images',
@@ -175,11 +178,12 @@ const translationStrings = {
 		'carousel.label': '{title} images',
 		'carousel.nav.next': 'Next image',
 		'carousel.nav.previous': 'Previous image',
-		'carousel.roledescription': 'carousel',
+		'carousel.roleDescription': 'carousel',
 		'carousel.slide.label': '{current} of {total}',
-		'carousel.slide.roledescription': 'slide',
+		'carousel.slide.roleDescription': 'slide',
 
 		// Atlas
+		'atlas.card.count.label': '{count}+ Locations',
 		'atlas.close.label': 'Close atlas',
 		'atlas.description':
 			'An interactive map of historic, unusual, and neglected locations with extensive field notes and photos. Best explored on a desktop computer.',
@@ -225,7 +229,7 @@ const translationStrings = {
 		'site.breadcrumbs.label': 'Breadcrumb Navigation',
 		'site.colophon.label': 'Colophon',
 		'site.description':
-			'Photo essays, road trips, and a geospatial database with a particular emphasis on the history and culture of Taiwan.',
+			'A digital garden, photography portfolio, and geospatial database mainly focusing on the history and culture of Taiwan.',
 		'site.footer.buildStats.label': 'Build Stats',
 		'site.footer.copyright.label': '©{year}–{currentYear}',
 		'site.footer.feed.label': 'RSS Feed',
