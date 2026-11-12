@@ -1,4 +1,4 @@
-import type { OpenGraphCardTitles } from '@spectralcodex/shared/open-graph';
+import type { OpenGraphCardInput, PageOpenGraphCard } from '@spectralcodex/shared/open-graph';
 import type { Page } from 'astro';
 
 import { probeLuminanceTop } from '@spectralcodex/scripts/og-image';
@@ -15,6 +15,7 @@ import type { MultilingualContent } from '#lib/i18n/i18n-types.ts';
 import type { ImageComponentProps, ImagePlaceholderProps } from '#lib/image/image-types.ts';
 import type { DateRecordedEntry } from '#lib/utils/date.ts';
 
+import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { getImagesCollection, getImageSource } from '#lib/collections/images/images-data.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
 import { getLocationsNearbyList } from '#lib/collections/locations/locations-queries.ts';
@@ -28,7 +29,7 @@ import { ImageLayoutEnum } from '#lib/image/image-types.ts';
 import { createMapDataFunction } from '#lib/map/map-data.ts';
 import { getLocationsMapRule } from '#lib/map/map-locations.ts';
 import { getDayKey } from '#lib/utils/date.ts';
-import { createEntryCardFunction } from '#lib/utils/seo-cards.ts';
+import { createEntryCardFunction, getAtlasCard, getHomepageCard } from '#lib/utils/seo-cards.ts';
 import { sanitizeImageAltAttribute } from '#lib/utils/text.ts';
 
 export const sampleUrl = '/inventory/';
@@ -376,11 +377,11 @@ export const sampleChronologyMonths = ['02', '05', '09', '11'];
 
 interface OpenGraphSample {
 	imagePath: string;
+	input: OpenGraphCardInput;
 	isBlurred: boolean;
-	titles: OpenGraphCardTitles;
 }
 
-interface SampleOpenGraphCard extends OpenGraphSample {
+export interface SampleOpenGraphCard extends OpenGraphSample {
 	key: string;
 }
 
@@ -444,31 +445,35 @@ const openGraphTitleSamples = [
 ];
 
 async function createSampleOpenGraphCards() {
-	const [posts, locations, images, sampleImages, getEntryCard] = await Promise.all([
+	const [posts, locations, images, sampleImages, getEntryCard, catalog] = await Promise.all([
 		getPostsCollection(),
 		getLocationsCollection(),
 		getImagesCollection(),
 		getSampleImages(),
 		createEntryCardFunction(),
+		getCatalog(),
 	]);
 
-	const candidates = [...posts.entries, ...locations.entries].flatMap<OpenGraphSample>((entry) => {
-		const card = getEntryCard(entry);
+	function toSample(card: PageOpenGraphCard): Array<OpenGraphSample> {
 		const image = images.entriesMap.get(card.image.id);
 
 		return image
 			? [
 					{
 						imagePath: path.resolve(image.data.path),
+						input: card.input,
 						isBlurred: card.image.isBlurred,
-						titles: card.titles,
 					},
 				]
 			: [];
-	});
+	}
+
+	const candidates = [...posts.entries, ...locations.entries].flatMap((entry) =>
+		toSample(getEntryCard(entry)),
+	);
 
 	const groundCandidates = candidates.filter(
-		({ isBlurred, titles }) => !isBlurred && !titles.titleZh,
+		({ input, isBlurred }) => !isBlurred && !('titleZh' in input && input.titleZh),
 	);
 
 	const ranked = await Promise.all(
@@ -480,26 +485,48 @@ async function createSampleOpenGraphCards() {
 
 	ranked.sort((first, second) => second.luminance - first.luminance);
 
+	const groundBright = ranked[0]?.candidate;
+	const groundDark = ranked.at(-1)?.candidate;
+
 	const titleImage = sampleImages.landscape[0];
 
 	const titleCards = titleImage
-		? openGraphTitleSamples.map(({ key, ...titles }) => ({
+		? openGraphTitleSamples.map(({ key, ...input }) => ({
 				imagePath: path.resolve(titleImage.data.path),
+				input,
 				isBlurred: false,
 				key,
-				titles,
 			}))
 		: [];
 
+	const [homepage] = toSample(getHomepageCard());
+	const [atlas] = toSample(
+		getAtlasCard({ locationCount: catalog.byCollection('locations').length }),
+	);
+
 	return [
-		...toOpenGraphCard('ground-dark', ranked.at(-1)?.candidate),
-		...toOpenGraphCard('ground-bright', ranked[0]?.candidate),
+		...toOpenGraphCard('ground-dark', groundDark),
+		...toOpenGraphCard('ground-bright', groundBright),
 		...titleCards,
 		...toOpenGraphCard(
 			'image-fallback',
 			candidates.find(({ isBlurred }) => isBlurred),
 		),
+		...toOpenGraphCard('homepage', homepage),
+		...toTemplateGround('homepage-bright', homepage, groundBright),
+		...toTemplateGround('homepage-dark', homepage, groundDark),
+		...toOpenGraphCard('atlas', atlas),
+		...toTemplateGround('atlas-bright', atlas, groundBright),
+		...toTemplateGround('atlas-dark', atlas, groundDark),
 	];
+}
+
+function toTemplateGround(
+	key: string,
+	card: OpenGraphSample | undefined,
+	ground: OpenGraphSample | undefined,
+): Array<SampleOpenGraphCard> {
+	return card && ground ? [{ ...ground, input: card.input, key }] : [];
 }
 
 function toOpenGraphCard(

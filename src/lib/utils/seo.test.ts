@@ -42,7 +42,7 @@ describe('getSeoImageProps', () => {
 		const card = {
 			id: 'taiwan/taipei/some-location',
 			image: { id: 'taiwan/taipei/some-location-1.jpg', isBlurred: false },
-			titles: { title: 'Some Location' },
+			input: { title: 'Some Location' },
 		};
 
 		expect(getSeoImageProps({ alt: 'Alt', card }).url).toBe(

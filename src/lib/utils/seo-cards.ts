@@ -12,10 +12,13 @@ import type { MultilingualContent } from '#lib/i18n/i18n-types.ts';
 import type { DescriptionEntry } from '#lib/utils/description.ts';
 
 import { getRegionsCollection } from '#lib/collections/regions/regions-data.ts';
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+import { LanguageCodeEnum } from '#lib/i18n/i18n-types.ts';
 import { formatTitleMultilingual } from '#lib/i18n/i18n-utils.ts';
 import { getImageFeaturedId } from '#lib/image/image-featured.ts';
 import { getDescriptionRenderedText } from '#lib/utils/description-data.ts';
 import { getSeoImageProps } from '#lib/utils/seo.ts';
+import { formatNumber, formatStringTemplate } from '#lib/utils/text.ts';
 
 interface CardEntry {
 	collection: string;
@@ -33,9 +36,7 @@ interface CardEntry {
 }
 
 const indexCardBlur = {
-	atlas: false,
 	chronology: true,
-	homepage: false,
 	locations: true,
 	'not-found': true,
 	posts: true,
@@ -67,14 +68,14 @@ export async function createEntryCardFunction() {
 	return function getEntryCard(entry: CardEntry): PageOpenGraphCard {
 		const id = getPublicId(entry);
 		const imageFeaturedId = getImageFeaturedId({ imageFeatured: entry.data.imageFeatured });
-		const titles = {
+		const input = {
 			title: stripDiacritics(entry.data.title),
 			titleJa: entry.data.title_ja,
 			titleTh: entry.data.title_th,
 			titleZh: entry.data.title_zh,
 		};
 
-		if (imageFeaturedId) return { id, image: { id: imageFeaturedId, isBlurred: false }, titles };
+		if (imageFeaturedId) return { id, image: { id: imageFeaturedId, isBlurred: false }, input };
 
 		const fallbackImageId = getFallbackImageId({
 			category: entry.data.category,
@@ -84,7 +85,7 @@ export async function createEntryCardFunction() {
 			themes: entry.data.themes?.map((theme) => theme.id),
 		});
 
-		return { id, image: { id: fallbackImageId, isBlurred: true }, titles };
+		return { id, image: { id: fallbackImageId, isBlurred: true }, input };
 	};
 }
 
@@ -112,11 +113,11 @@ export function getChronologyCard({
 	imageId: string | undefined;
 	title: string;
 }): PageOpenGraphCard {
-	if (imageId) return { id, image: { id: imageId, isBlurred: false }, titles: { title } };
+	if (imageId) return { id, image: { id: imageId, isBlurred: false }, input: { title } };
 
 	const fallbackImageId = getFallbackImageId({ collection: 'chronology', id });
 
-	return { id, image: { id: fallbackImageId, isBlurred: true }, titles: { title } };
+	return { id, image: { id: fallbackImageId, isBlurred: true }, input: { title } };
 }
 
 export function getIndexCard({
@@ -129,11 +130,43 @@ export function getIndexCard({
 	titleZh?: string;
 }): PageOpenGraphCard {
 	const id = `index-${key}`;
-	const titles = titleZh === undefined ? { title } : { title, titleZh };
+	const input = titleZh === undefined ? { title } : { title, titleZh };
 
 	return {
 		id,
 		image: { id: resolveFallbackImageId(key, id), isBlurred: indexCardBlur[key] },
-		titles,
+		input,
+	};
+}
+
+export function getHomepageCard(): PageOpenGraphCard {
+	const t = getTranslations();
+	const id = 'index-homepage';
+
+	return {
+		id,
+		image: { id: resolveFallbackImageId('homepage', id), isBlurred: false },
+		input: {
+			description: t('homepage.card.description'),
+			template: 'homepage',
+			title: t('homepage.card.title'),
+		},
+	};
+}
+
+export function getAtlasCard({ locationCount }: { locationCount: number }): PageOpenGraphCard {
+	const t = getTranslations();
+	const id = 'index-atlas';
+	const count = formatNumber({ number: Math.floor(locationCount / 100) * 100 });
+
+	return {
+		id,
+		image: { id: resolveFallbackImageId('atlas', id), isBlurred: false },
+		input: {
+			countLabel: formatStringTemplate(t('atlas.card.count.label'), { count }),
+			template: 'atlas',
+			title: t('atlas.title'),
+			titleZh: t('atlas.title', LanguageCodeEnum.ChineseTraditional),
+		},
 	};
 }

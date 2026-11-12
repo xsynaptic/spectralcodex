@@ -1,12 +1,13 @@
-import type { OpenGraphCardTitles } from '@spectralcodex/shared/open-graph';
-import type { Font } from 'takumi-js';
+import type { OpenGraphCardRecord } from '@spectralcodex/shared/open-graph';
+import type { ReactElement } from 'react';
+import type { Font, MeasuredNode } from 'takumi-js';
 
-import { openGraphImageHeight, openGraphImageWidth } from '@spectralcodex/shared/open-graph';
+import { openGraphDefaultVariant, openGraphVariants } from '@spectralcodex/shared/open-graph';
 import { openImageSource } from '@xsynaptic/astro-image-pipeline/node';
-import { render, setGlyphCacheMaxBytes } from 'takumi-js';
+import { measure, render, setGlyphCacheMaxBytes } from 'takumi-js';
 import { Renderer } from 'takumi-js/node';
 
-import { getOpenGraphElement } from '#og-image/element.tsx';
+import { getOpenGraphElement } from '#og-image/templates/index.tsx';
 
 // A CJK outline runs a few kilobytes, so the 8 MiB default evicts glyphs mid-run
 const glyphCacheBytes = 64 * 1024 * 1024;
@@ -20,6 +21,14 @@ type LuminanceZone = [start: number, end: number];
 const luminanceZoneTop: LuminanceZone = [0.1, 0.2];
 const luminanceZoneBottom: LuminanceZone = [0.7, 0.9];
 
+interface ImageCropRequest {
+	blur?: number;
+	fit: 'cover' | 'inside';
+	height: number;
+	position?: 'centre' | 'top';
+	width: number;
+}
+
 export interface ProcessedImage {
 	data: Buffer;
 	height: number;
@@ -28,6 +37,18 @@ export interface ProcessedImage {
 	// Mean perceived luminance of the top zone, 0-255
 	luminanceTop: number;
 	width: number;
+}
+
+export interface OpenGraphSource {
+	crop: (request: ImageCropRequest) => Promise<ProcessedImage>;
+	isBlurred: boolean;
+}
+
+export type MeasureElement = (element: ReactElement) => Promise<MeasuredNode>;
+
+export interface TemplateContext {
+	measure: MeasureElement;
+	source: OpenGraphSource | undefined;
 }
 
 interface RawImage {
@@ -43,17 +64,50 @@ export function createRenderer({ fonts }: { fonts: Array<Font> }) {
 	const renderer = new Renderer();
 
 	return async function renderOpenGraphImage(
-		titles: OpenGraphCardTitles,
-		image?: ProcessedImage,
+		{ variant = openGraphDefaultVariant, ...input }: OpenGraphCardRecord,
+		source?: OpenGraphSource,
 	): Promise<Uint8Array> {
-		return render(getOpenGraphElement(titles, image), {
+		const { height, width } = openGraphVariants[variant];
+
+		const context = {
+			measure: (element: ReactElement) => measure(element, { fonts, height, renderer, width }),
+			source,
+		};
+
+		return render(await getOpenGraphElement({ context, input, variant }), {
 			fonts,
 			format: 'jpeg',
-			height: openGraphImageHeight,
+			height,
 			quality: jpegQuality,
 			renderer,
-			width: openGraphImageWidth,
+			width,
 		});
+	};
+}
+
+export function decodeSource({
+	imageInput,
+	isBlurred,
+}: {
+	imageInput: string;
+	isBlurred: boolean;
+}): OpenGraphSource {
+	const crops = new Map<string, Promise<ProcessedImage>>();
+
+	return {
+		crop(request) {
+			const key = JSON.stringify(request);
+			const cached = crops.get(key);
+
+			if (cached) return cached;
+
+			const crop = cropImage(imageInput, request);
+
+			crops.set(key, crop);
+
+			return crop;
+		},
+		isBlurred,
 	};
 }
 
@@ -72,23 +126,18 @@ export async function probeLuminanceTop(imageInput: string): Promise<number> {
 }
 
 // Raw RGBA hands off to Takumi without an encode, and luminance reads the same buffer
-export async function processImage({
-	imageInput,
-	isBlurred,
-}: {
-	imageInput: string;
-	isBlurred: boolean;
-}): Promise<ProcessedImage> {
+async function cropImage(
+	imageInput: string,
+	{ blur, fit, height, position, width }: ImageCropRequest,
+): Promise<ProcessedImage> {
 	const pipeline = openImageSource(imageInput).resize({
-		fit: 'cover',
-		height: openGraphImageHeight,
-		position: 'top',
-		width: openGraphImageWidth,
+		fit,
+		height,
+		width,
+		...(position ? { position } : {}),
 	});
 
-	if (isBlurred) {
-		pipeline.blur(16);
-	}
+	if (blur) pipeline.blur(blur);
 
 	const { data, info } = await pipeline.ensureAlpha().raw().toBuffer({ resolveWithObject: true });
 

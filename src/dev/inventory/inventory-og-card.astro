@@ -1,0 +1,37 @@
+---
+import type { OpenGraphVariant } from '@spectralcodex/shared/open-graph';
+
+import { openGraphVariants } from '@spectralcodex/shared/open-graph';
+
+import type { SampleOpenGraphCard } from '#dev/inventory/inventory-fixtures.ts';
+
+interface Props {
+	card: SampleOpenGraphCard | undefined;
+	class?: string | undefined;
+	label: string;
+	missing: string;
+	variant: OpenGraphVariant;
+}
+
+const { card, class: className, label, missing, variant } = Astro.props;
+
+const { height, width } = openGraphVariants[variant];
+
+const captionClass = 'font-mono text-xs text-primary-500 dark:text-primary-400';
+---
+
+<figure class={className}>
+	{card ? (
+		<img
+			alt={card.input.title}
+			class="h-auto w-full rounded-xs"
+			height={height}
+			loading="lazy"
+			src={`/inventory/og/${variant}/${card.key}.jpg`}
+			width={width}
+		/>
+	) : (
+		<p class={captionClass}>{missing}</p>
+	)}
+	<figcaption class:list={['mt-1', captionClass]}>{label}</figcaption>
+</figure>

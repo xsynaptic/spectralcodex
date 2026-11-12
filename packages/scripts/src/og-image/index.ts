@@ -1,25 +1,32 @@
 import {
 	openGraphBlurTreatment,
-	OpenGraphCardTitlesSchema,
-	openGraphImageHeight,
-	openGraphImageWidth,
+	OpenGraphCardRecordSchema,
+	openGraphVariants,
 } from '@spectralcodex/shared/open-graph';
 import { getCachePaths } from '@spectralcodex/shared/paths';
 import { hashTemplateVersion, prepareCardRender } from '@xsynaptic/astro-image-pipeline/node';
 import { createProgress, formatCount, log, UserError, withSpinner } from '@xsynaptic/astro-scripts';
-import { rmSync } from 'node:fs';
+import { readdirSync, rmSync } from 'node:fs';
 
 import type { ScriptPaths } from '#shared/command.ts';
 
 import { loadOpenGraphFonts } from '#og-image/fonts.ts';
-import { createRenderer, processImage } from '#og-image/generate.ts';
+import { createRenderer, decodeSource } from '#og-image/generate.ts';
 import { runCommand } from '#shared/command.ts';
 
+const templatesUrl = new URL('templates/', import.meta.url);
+
 const templateVersion = hashTemplateVersion({
-	files: ['element.tsx', 'fonts.ts', 'generate.ts'].map((file) => new URL(file, import.meta.url)),
+	files: [
+		...readdirSync(templatesUrl)
+			.filter((file) => file.endsWith('.tsx'))
+			.toSorted((first, second) => first.localeCompare(second))
+			.map((file) => new URL(file, templatesUrl)),
+		...['fonts.ts', 'generate.ts'].map((file) => new URL(file, import.meta.url)),
+	],
 	from: import.meta.url,
 	packages: ['takumi-js'],
-	parts: [openGraphImageWidth, openGraphImageHeight],
+	parts: [JSON.stringify(openGraphVariants)],
 });
 
 async function generateCards({
@@ -41,12 +48,14 @@ async function generateCards({
 	const renderCard = createRenderer({ fonts });
 	const render = await prepareCardRender({
 		decode: (source) =>
-			processImage({
-				imageInput: source.filePath,
-				isBlurred: source.treatment === openGraphBlurTreatment,
-			}),
+			Promise.resolve(
+				decodeSource({
+					imageInput: source.filePath,
+					isBlurred: source.treatment === openGraphBlurTreatment,
+				}),
+			),
 		distPath: paths.distPath,
-		render: (input, image) => renderCard(OpenGraphCardTitlesSchema.parse(input), image),
+		render: (input, source) => renderCard(OpenGraphCardRecordSchema.parse(input), source),
 		storePath: imagesPath,
 		templateVersion,
 	});

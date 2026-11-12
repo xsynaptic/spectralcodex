@@ -17,7 +17,7 @@ export default function devInventory({
 				injectRoute({ entrypoint, pattern: route });
 				injectRoute({
 					entrypoint: './src/dev/inventory/inventory-og-image.ts',
-					pattern: `${route}/og/[key].jpg`,
+					pattern: `${route}/og/[variant]/[key].jpg`,
 				});
 			},
 		},
