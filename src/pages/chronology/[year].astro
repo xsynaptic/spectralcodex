@@ -5,16 +5,30 @@ import ChronologyYearly from '#layouts/chronology-yearly.astro';
 import { getChronologyData } from '#lib/collections/chronology/chronology-data.ts';
 
 export const getStaticPaths = (async () => {
-	const { chronologyDailyData, chronologyIndexData, chronologyYearlyData, chronologyYears } =
-		await getChronologyData();
+	const {
+		chronologyDailyData,
+		chronologyIndexData,
+		chronologyMonthlyData,
+		chronologyYearlyData,
+		chronologyYears,
+	} = await getChronologyData();
 
-	return Object.entries(chronologyYearlyData).map(([chronologyYear, chronologyMonthlyData]) => ({
+	function getEarliestMonthHighlights(year: string) {
+		return chronologyMonthlyData
+			.filter((month) => month.year === year)
+			.toSorted((monthA, monthB) => monthA.month.localeCompare(monthB.month))
+			.find((month) => month.highlights)?.highlights;
+	}
+
+	return Object.entries(chronologyYearlyData).map(([chronologyYear, chronologyYearMonths]) => ({
 		params: { year: chronologyYear },
 		props: {
 			chronologyDailyData: chronologyDailyData[chronologyYear] ?? {},
-			chronologyMonthlyData,
+			chronologyMonthlyData: chronologyYearMonths,
 			chronologyYear,
-			chronologyYearHighlights: chronologyIndexData[chronologyYear]?.highlights,
+			chronologyYearHighlights:
+				chronologyIndexData[chronologyYear]?.highlights ??
+				getEarliestMonthHighlights(chronologyYear),
 			chronologyYears,
 		},
 	}));
