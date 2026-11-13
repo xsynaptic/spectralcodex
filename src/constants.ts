@@ -52,3 +52,5 @@ export const siteYearFounded = 2009;
 export const siteTimezoneOffsetHours = 8;
 
 export const syndicationItemCount = 20;
+
+export const buildVersionStorageKey = 'scx-build-version';

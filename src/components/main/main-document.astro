@@ -14,6 +14,7 @@ import type { Thing } from '#lib/utils/seo-structured-data.ts';
 import AtlasMap from '#components/atlas/atlas-map.astro';
 import AtlasSetup from '#components/atlas/atlas-setup.astro';
 import Analytics from '#components/main/main-analytics.astro';
+import BuildVersion from '#components/main/main-build-version.astro';
 import Meta from '#components/main/main-meta.astro';
 import Sprites from '#components/main/main-sprites.astro';
 import Stylesheet from '#components/main/main-stylesheet.astro';
@@ -80,17 +81,7 @@ const t = getTranslations();
 			<Analytics umamiDomain={UMAMI_DOMAIN} umamiId={UMAMI_ID} />
 		) : undefined}
 		<ClientRouter />
-		<meta content={import.meta.env.BUILD_VERSION} name="build-version" />
-		<script is:inline>
-			(() => {
-				const version = document.querySelector('meta[name="build-version"]')?.content;
-				if (!version) return;
-				document.addEventListener('astro:before-swap', (event) => {
-					const next = event.newDocument.querySelector('meta[name="build-version"]')?.content;
-					if (next && next !== version) window.location.assign(event.to.href);
-				});
-			})();
-		</script>
+		<BuildVersion />
 		<link
 			href={getBasePath('rss.xml')}
 			rel="alternate"
