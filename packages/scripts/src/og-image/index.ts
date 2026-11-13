@@ -16,6 +16,7 @@ import { runCommand } from '#shared/command.ts';
 
 const templatesUrl = new URL('templates/', import.meta.url);
 
+// Font and pipeline bumps are left out on purpose; `--clear-cache` re-renders by hand when one shows
 const templateVersion = hashTemplateVersion({
 	files: [
 		...readdirSync(templatesUrl)
