@@ -22,10 +22,7 @@ const samples: Array<ImageSample> = [
 	{ byteLength: 4096, format: 'jpg', path: 'a/temple-1-450.jpg' },
 ];
 
-function probe(
-	html: string | undefined,
-	sampled: ReadonlyArray<ImageSample> | undefined = samples,
-) {
+function probe(html: string | undefined, sampled: ReadonlyArray<ImageSample> = samples) {
 	return getEdgeProbes({ config, html, samples: sampled, token });
 }
 
@@ -112,15 +109,21 @@ describe('getEdgeProbes', () => {
 		expect(findProbe(probes, 'hero image')).toBeDefined();
 	});
 
-	test('a missing manifest or local file fails instead of probing', () => {
+	test('a missing local file fails instead of probing', () => {
 		const html = `${hashedAsset}${openGraph}${cropHero}`;
 
-		expect(getEdgeProbes({ config, html, samples: undefined, token }).failures).toEqual([
-			'image sample: no local image manifest',
-		]);
 		expect(
 			probe(html, [{ byteLength: undefined, format: 'webp', path: 'a/gone-450.webp' }]),
 		).toMatchObject({ failures: ['image sample (/a/gone-450.webp): no local file'] });
+	});
+
+	test('without samples the image host keeps its tier probes and probes no sample', () => {
+		const { failures, probes } = probe(`${hashedAsset}${openGraph}${cropHero}`, []);
+
+		expect(failures).toEqual([]);
+		expect(findProbe(probes, 'hero image')).toBeDefined();
+		expect(findProbe(probes, 'missing image')).toBeDefined();
+		expect(findProbe(probes, 'image sample')).toBeUndefined();
 	});
 
 	test('without a document only the site table is probed', () => {

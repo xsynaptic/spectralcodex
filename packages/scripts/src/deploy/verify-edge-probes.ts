@@ -207,9 +207,7 @@ function getLegacyRedirectProbes(imageBaseUrl: string, imagePath: string, token:
 	return { failures: [], probes: [probe] };
 }
 
-function getSampleProbes(imageBaseUrl: string, samples: ReadonlyArray<ImageSample> | undefined) {
-	if (!samples) return { failures: ['image sample: no local image manifest'], probes: [] };
-
+function getSampleProbes(imageBaseUrl: string, samples: ReadonlyArray<ImageSample>) {
 	const probes: Array<EdgeProbe> = [];
 	const failures: Array<string> = [];
 
@@ -242,7 +240,7 @@ function getImageHostProbes({
 }: {
 	config: Pick<DeployConfig, 'imageBaseUrl' | 'siteUrl'>;
 	html: string;
-	samples: ReadonlyArray<ImageSample> | undefined;
+	samples: ReadonlyArray<ImageSample>;
 	token: string;
 }) {
 	const { imageBaseUrl } = config;
@@ -300,7 +298,7 @@ export function getEdgeProbes({
 }: {
 	config: Pick<DeployConfig, 'imageBaseUrl' | 'siteUrl'>;
 	html: string | undefined;
-	samples: ReadonlyArray<ImageSample> | undefined;
+	samples: ReadonlyArray<ImageSample>;
 	token: string;
 }) {
 	const siteExpectations = getSiteExpectations(token);

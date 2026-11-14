@@ -92,7 +92,7 @@ await runCommand({
 			() => deployApp({ dryRun: isDryRun, rootPath }),
 			() => deployCaddy({ dryRun: isDryRun, rootPath }),
 			async () => {
-				if (!isDryRun) await verifyEdge({ config, paths });
+				if (!isDryRun) await verifyEdge({ config, paths, shouldSampleImages: true });
 			},
 			() => invokeCacheRefresh({ dryRun: isDryRun }),
 		];

@@ -19,7 +19,8 @@ await runCommand({
 		await ensureSshKeychain();
 		await deployCaddy({ dryRun: isDryRun, rootPath });
 
-		if (!isDryRun) await verifyEdge({ config: loadDeployConfig(), paths });
+		if (!isDryRun)
+			await verifyEdge({ config: loadDeployConfig(), paths, shouldSampleImages: false });
 	},
 	summary: 'Validate, upload and reload the Caddy config, then verify the edge cache headers',
 	title: 'Deploy Caddy',

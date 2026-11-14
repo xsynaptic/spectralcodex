@@ -22,7 +22,11 @@ const requestTimeoutMs = 10_000;
 
 const imageSampleSize = 20;
 
-async function runEdgeProbes(paths: ScriptPaths, config: DeployConfig) {
+async function runEdgeProbes(
+	paths: ScriptPaths,
+	config: DeployConfig,
+	shouldSampleImages: boolean,
+) {
 	const token = Date.now().toString();
 	const documentProbe = getDocumentProbe({ config, token });
 	const documentResponse = await request(documentProbe);
@@ -31,11 +35,15 @@ async function runEdgeProbes(paths: ScriptPaths, config: DeployConfig) {
 		getProbeFailure(documentProbe, documentResponse),
 	);
 	const html = documentResponse.status === 200 ? await documentResponse.text() : undefined;
-	const samples = html === undefined ? undefined : await readImageSamples(paths);
-	const edge = getEdgeProbes({ config, html, samples, token });
-	const failures = [documentFailure, ...edge.failures, ...(await runProbes(edge.probes))].filter(
-		R.isNonNullish,
-	);
+	const samples = html !== undefined && shouldSampleImages ? await readImageSamples(paths) : [];
+	const sampleFailure = samples === undefined ? 'image sample: no local image manifest' : undefined;
+	const edge = getEdgeProbes({ config, html, samples: samples ?? [], token });
+	const failures = [
+		documentFailure,
+		sampleFailure,
+		...edge.failures,
+		...(await runProbes(edge.probes)),
+	].filter(R.isNonNullish);
 
 	if (failures.length > 0) {
 		for (const failure of failures) {
@@ -52,13 +60,15 @@ async function runEdgeProbes(paths: ScriptPaths, config: DeployConfig) {
 export async function verifyEdge({
 	config,
 	paths,
+	shouldSampleImages,
 }: {
 	config: DeployConfig;
 	paths: ScriptPaths;
+	shouldSampleImages: boolean;
 }): Promise<void> {
 	await withStep(
 		'Verifying edge cache tiers',
-		() => runEdgeProbes(paths, config),
+		() => runEdgeProbes(paths, config, shouldSampleImages),
 		(probeCount) => `Edge verified · ${formatCount(probeCount)} probes passed`,
 	);
 }
