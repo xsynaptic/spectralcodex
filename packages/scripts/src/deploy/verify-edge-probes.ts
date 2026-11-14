@@ -41,7 +41,7 @@ export interface ImageSample {
 
 const objectivesSessionCookie = 'scx-objectives-session';
 
-const documentCacheControl = 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400';
+export const documentCacheControl = 'public, max-age=0, must-revalidate, s-maxage=86400';
 const renderedCacheControl =
 	'public, max-age=2592000, stale-while-revalidate=604800, s-maxage=31536000, no-transform';
 const renderedNotFoundCacheControl = 'public, max-age=60';

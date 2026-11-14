@@ -57,8 +57,10 @@ spectralcodex.com {
 	import spectralcodex-tls
 	import access-log
 	root * /var/www/spectralcodex
+	# `.~tmp~` is rsync's --delay-updates staging; `hide .*` would also hide /.well-known/
 	file_server {
 		precompressed br
+		hide .superseded .~tmp~
 	}
 	encode gzip
 
@@ -153,7 +155,7 @@ spectralcodex.com {
 	header @meta Cache-Control "public, max-age=3600, s-maxage=86400"
 
 	@html path *.html */
-	header @html Cache-Control "public, max-age=3600, s-maxage=86400, stale-while-revalidate=86400"
+	header @html Cache-Control "public, max-age=0, must-revalidate, s-maxage=86400"
 	header @html No-Vary-Search `params=("utm_source" "utm_medium" "utm_campaign" "utm_content" "utm_term" "utm_id" "gclid" "fbclid" "mc_cid" "mc_eid"), key-order`
 
 	# Half of the gate lives in Cloudflare cache rules; see .claude/docs/deploy-operations.md

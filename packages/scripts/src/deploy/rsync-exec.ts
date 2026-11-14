@@ -237,10 +237,16 @@ export async function sshExec(
 }
 
 // Feed the payload over stdin so secrets never appear on the remote command line (visible in `ps`)
+// zx's `input` never closes stdin on an empty string, which leaves the remote command waiting forever
 export async function sshExecWithInput(
 	config: SshTarget,
 	command: string,
 	input: string,
 ): Promise<void> {
-	await $({ input, stdio: ['pipe', 'inherit', 'inherit'] })`ssh ${getSshArgs(config)} ${command}`;
+	const subprocess = $({
+		stdio: ['pipe', 'inherit', 'inherit'],
+	})`ssh ${getSshArgs(config)} ${command}`;
+
+	subprocess.stdin.end(input);
+	await subprocess;
 }

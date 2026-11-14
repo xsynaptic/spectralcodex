@@ -17,7 +17,7 @@ export const sweepRetentionDays = { cards: 365, renditions: 0 };
 
 const dayMs = 24 * 60 * 60 * 1000;
 
-// Edge-held HTML references the outgoing build for `s-maxage` plus a day of `stale-while-revalidate`
+// A failed purge leaves edge HTML naming the outgoing build for a day of `s-maxage`; the second day is margin
 export const sweepWaitMs = 2 * dayMs;
 
 export interface LiveBuild {
