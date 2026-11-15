@@ -101,7 +101,9 @@ test.describe('on a wide viewport', () => {
 		await markers.nth(1).click();
 
 		await expect(popupTitle).toBeVisible();
-		await expect(popupTitle.locator('a')).toHaveCount(0);
+		await expect(
+			shell.locator(`.maplibregl-popup a.${mapControlClassName.popupHeading}`),
+		).toHaveCount(0);
 		expect(new URL(page.url()).pathname).toBe(paths.locationMultiPoint);
 	});
 

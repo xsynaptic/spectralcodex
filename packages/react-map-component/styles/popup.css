@@ -139,11 +139,13 @@
 	font-weight: 600;
 	line-height: 1.375;
 	color: var(--map-text);
-	border-bottom: 1px solid var(--map-divider);
+}
 
-	& a {
-		color: inherit;
-	}
+.map-popup-heading {
+	display: block;
+	padding-bottom: 0.25rem;
+	color: inherit;
+	border-bottom: 1px solid var(--map-divider);
 }
 
 .map-popup-precision {
@@ -175,6 +177,22 @@
 	color: var(--map-text-body);
 	scrollbar-color: var(--map-divider) transparent;
 	scrollbar-width: thin;
+}
+
+.map-popup-more {
+	font-style: italic;
+	color: var(--map-accent);
+	transition: color var(--map-duration) var(--map-ease);
+
+	&:focus-visible {
+		color: var(--map-accent-deep);
+	}
+}
+
+@media (hover: hover) {
+	.map-popup-more:hover {
+		color: var(--map-accent-deep);
+	}
 }
 
 .map-popup-footer {
@@ -228,6 +246,7 @@
 .map-popup-links {
 	display: flex;
 	gap: 0.5rem;
+	align-items: center;
 	user-select: none;
 }
 

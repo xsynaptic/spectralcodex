@@ -1,5 +1,5 @@
 import type { LngLat, Popup as MapLibrePopup } from 'maplibre-gl';
-import type { FC } from 'react';
+import type { FC, MouseEvent, ReactNode } from 'react';
 
 import { useEffect, useRef } from 'react';
 import { Popup } from 'react-map-gl/maplibre';
@@ -39,11 +39,119 @@ async function copyToClipboard(value: string) {
 	}
 }
 
+const MapPopupPrecision: FC<{ precision: number | undefined }> = function MapPopupPrecision({
+	precision,
+}) {
+	const { messages } = useMapConfig();
+
+	if (precision === undefined || precision > 2) return;
+
+	return (
+		<div className="map-popup-precision">
+			<svg
+				className="map-popup-warning-icon"
+				viewBox="0 0 36 36"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<MapIconWarning />
+			</svg>
+			<span className="map-popup-warning-text">
+				{precision === 2 ? messages.precisionWarning : messages.precisionError}
+			</span>
+		</div>
+	);
+};
+
+function useMapPopupVisit(url: string) {
+	const handleLinkClick = useMapLinkClick(url);
+	const trackMap = useTrackMap();
+
+	return (event: MouseEvent<HTMLAnchorElement>) => {
+		trackMap({ data: { location: url }, name: 'map-popup-visit' });
+		handleLinkClick(event);
+	};
+}
+
+interface MapPopupHeadingProps {
+	title: string;
+	titleMultilingualLang: string | undefined;
+	titleMultilingualValue: string | undefined;
+}
+
+const MapPopupHeadingText: FC<MapPopupHeadingProps> = function MapPopupHeadingText({
+	title,
+	titleMultilingualLang,
+	titleMultilingualValue,
+}) {
+	return (
+		<>
+			{titleMultilingualLang && titleMultilingualValue ? (
+				<div className="map-popup-title-alt">
+					<span lang={titleMultilingualLang}>{titleMultilingualValue}</span>
+				</div>
+			) : undefined}
+			<div className={mapControlClassName.popupTitle}>{title}</div>
+		</>
+	);
+};
+
+const MapPopupHeadingLink: FC<MapPopupHeadingProps & { url: string }> =
+	function MapPopupHeadingLink({ url, ...headingProps }) {
+		const handleVisit = useMapPopupVisit(url);
+
+		return (
+			<a className={mapControlClassName.popupHeading} href={url} onClick={handleVisit}>
+				<MapPopupHeadingText {...headingProps} />
+			</a>
+		);
+	};
+
+const MapPopupHeading: FC<MapPopupHeadingProps & { url: string | undefined }> =
+	function MapPopupHeading({ url, ...headingProps }) {
+		if (url) return <MapPopupHeadingLink {...headingProps} url={url} />;
+
+		return (
+			<div className={mapControlClassName.popupHeading}>
+				<MapPopupHeadingText {...headingProps} />
+			</div>
+		);
+	};
+
+const MapPopupImageLink: FC<{ children: ReactNode; url: string }> = function MapPopupImageLink({
+	children,
+	url,
+}) {
+	const handleVisit = useMapPopupVisit(url);
+
+	return (
+		<a aria-hidden={true} href={url} onClick={handleVisit} tabIndex={-1}>
+			{children}
+		</a>
+	);
+};
+
+const MapPopupMoreLink: FC<{ title: string; url: string }> = function MapPopupMoreLink({
+	title,
+	url,
+}) {
+	const { messages } = useMapConfig();
+	const handleVisit = useMapPopupVisit(url);
+
+	return (
+		<a className="map-popup-more" href={url} onClick={handleVisit}>
+			{messages.popupMoreLabel}
+			<span className="map-sr-only">: {title}</span>
+		</a>
+	);
+};
+
 const MapPopupFooter: FC<{
 	googleMapsUrl: string | undefined;
 	popupCoordinates: LngLat;
+	title: string;
+	url: string | undefined;
 	wikipediaUrl: string | undefined;
-}> = function MapPopupFooter({ googleMapsUrl, popupCoordinates, wikipediaUrl }) {
+}> = function MapPopupFooter({ googleMapsUrl, popupCoordinates, title, url, wikipediaUrl }) {
 	const coordinatesString = `${String(popupCoordinates.lat)}, ${String(popupCoordinates.lng)}`;
 	const mapsUrl = googleMapsUrl ?? getGoogleMapsUrlFromGeometry(popupCoordinates);
 	const { messages } = useMapConfig();
@@ -101,58 +209,11 @@ const MapPopupFooter: FC<{
 						<MapIconGoogle />
 					</svg>
 				</a>
+				{url ? <MapPopupMoreLink title={title} url={url} /> : undefined}
 			</div>
 		</div>
 	);
 };
-
-const MapPopupPrecision: FC<{ precision: number | undefined }> = function MapPopupPrecision({
-	precision,
-}) {
-	const { messages } = useMapConfig();
-
-	if (precision === undefined || precision > 2) return;
-
-	return (
-		<div className="map-popup-precision">
-			<svg
-				className="map-popup-warning-icon"
-				viewBox="0 0 36 36"
-				xmlns="http://www.w3.org/2000/svg"
-			>
-				<MapIconWarning />
-			</svg>
-			<span className="map-popup-warning-text">
-				{precision === 2 ? messages.precisionWarning : messages.precisionError}
-			</span>
-		</div>
-	);
-};
-
-const MapPopupTitleLink: FC<{ title: string; url: string }> = function MapPopupTitleLink({
-	title,
-	url,
-}) {
-	const handleLinkClick = useMapLinkClick(url);
-	const trackMap = useTrackMap();
-
-	return (
-		<a
-			href={url}
-			onClick={(event) => {
-				trackMap({ data: { location: url }, name: 'map-popup-visit' });
-				handleLinkClick(event);
-			}}
-		>
-			{title}
-		</a>
-	);
-};
-
-const MapPopupTitleText: FC<{ title: string; url: string | undefined }> =
-	function MapPopupTitleText({ title, url }) {
-		return url ? <MapPopupTitleLink title={title} url={url} /> : <span>{title}</span>;
-	};
 
 interface MapPopupContentProps {
 	maxWidthPx: number;
@@ -177,29 +238,25 @@ const MapPopupContent: FC<MapPopupContentProps> = function MapPopupContent({
 		wikipediaUrl,
 	} = popupItem;
 
+	const headingProps = { title, titleMultilingualLang, titleMultilingualValue };
+	const image = popupImageSources ? (
+		<img
+			alt={title}
+			className="map-popup-image"
+			loading="eager"
+			sizes={getPopupImageSizes(maxWidthPx)}
+			src={getPopupImageSrc(popupImageSources, imageBaseUrl)}
+			srcSet={getPopupImageSrcSet(popupImageSources, imageBaseUrl)}
+		/>
+	) : undefined;
+
 	return (
 		<>
-			{popupImageSources ? (
-				<div>
-					<img
-						alt={title}
-						className="map-popup-image"
-						loading="eager"
-						sizes={getPopupImageSizes(maxWidthPx)}
-						src={getPopupImageSrc(popupImageSources, imageBaseUrl)}
-						srcSet={getPopupImageSrcSet(popupImageSources, imageBaseUrl)}
-					/>
-				</div>
+			{image ? (
+				<div>{url ? <MapPopupImageLink url={url}>{image}</MapPopupImageLink> : image}</div>
 			) : undefined}
 			<div className="map-popup-body">
-				{titleMultilingualLang && titleMultilingualValue ? (
-					<div className="map-popup-title-alt">
-						<span lang={titleMultilingualLang}>{titleMultilingualValue}</span>
-					</div>
-				) : undefined}
-				<div className={mapControlClassName.popupTitle}>
-					<MapPopupTitleText title={title} url={url} />
-				</div>
+				<MapPopupHeading {...headingProps} url={url} />
 				<MapPopupPrecision precision={precision} />
 				{description ? (
 					<div
@@ -213,6 +270,8 @@ const MapPopupContent: FC<MapPopupContentProps> = function MapPopupContent({
 				<MapPopupFooter
 					googleMapsUrl={popupItem.googleMapsUrl}
 					popupCoordinates={popupCoordinates}
+					title={title}
+					url={url}
 					wikipediaUrl={wikipediaUrl}
 				/>
 			</div>

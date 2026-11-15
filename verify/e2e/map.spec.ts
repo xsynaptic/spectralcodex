@@ -32,7 +32,9 @@ test('one of the Points of a Location opens its own popup', async ({ page }) => 
 	const popupTitle = island.locator(`.maplibregl-popup .${mapControlClassName.popupTitle}`);
 
 	await expect(popupTitle).toBeVisible();
-	await expect(popupTitle.locator('a')).toHaveCount(0);
+	await expect(
+		island.locator(`.maplibregl-popup a.${mapControlClassName.popupHeading}`),
+	).toHaveCount(0);
 });
 
 test('a Location map downloads the directory once', { tag: '@smoke' }, async ({ page, site }) => {
