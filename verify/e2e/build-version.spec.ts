@@ -1,5 +1,7 @@
 import type { Page } from '@playwright/test';
 
+import { setTimeout as sleep } from 'node:timers/promises';
+
 import { millisecondsPerDay } from '#constants.ts';
 import { paths } from '#e2e/constants.ts';
 import { expect, test, visit } from '#e2e/test.ts';
@@ -8,6 +10,15 @@ import { getTracked, recordTracking } from '#e2e/tracking.ts';
 const reloadEventName = 'build-version-reload';
 const gapDays = 10;
 const versionMetaPattern = /content="(\d+)" name="build-version"/;
+
+// Outlasts the loading bar's 200ms threshold, so the bar is showing when the reload leaves the page
+const routerFetchDelay = 500;
+
+// Playwright's headless shell and launch flags both disable the back-forward cache
+test.use({
+	channel: 'chromium',
+	launchOptions: { ignoreDefaultArgs: ['--disable-back-forward-cache'] },
+});
 
 function recordDocumentLoads(page: Page) {
 	const loads: Array<string> = [];
@@ -36,6 +47,7 @@ async function serveNewerBuild(page: Page, path: string) {
 					`content="${String(Number(version) + gapDays * millisecondsPerDay)}" name="build-version"`,
 			);
 
+			await sleep(routerFetchDelay);
 			await route.fulfill({ body, response });
 		},
 	);
@@ -60,9 +72,10 @@ test('a soft navigation onto a newer build does a full load instead', async ({ p
 		.toEqual([{ data: { gapDays }, name: reloadEventName }]);
 	expect(loads).toEqual([paths.postsIndex, site.postDetail]);
 
-	await page.goBack();
+	await page.goBack({ waitUntil: 'commit' });
 
 	await expect(page).toHaveURL(paths.postsIndex);
+	await expect(page.locator('progress-loading')).toHaveCSS('opacity', '0');
 });
 
 test('a soft navigation within the same build stays soft and reports nothing', async ({
