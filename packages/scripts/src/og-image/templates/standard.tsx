@@ -6,7 +6,7 @@ import type { TemplateContext } from '#og-image/generate.ts';
 import type { TitleTokens } from '#og-image/templates/shared.tsx';
 
 import {
-	cropLandscape,
+	cropCover,
 	fitTitles,
 	Frame,
 	landscapeBrandTokens,
@@ -36,7 +36,7 @@ export async function getStandardElement(
 	titles: OpenGraphCardTitles,
 	{ measure, source }: TemplateContext,
 ) {
-	const image = await cropLandscape(source, 'top');
+	const image = await cropCover(source, { height, width }, 'top');
 	const fitted = await fitTitles(measure, titles, titleTokens);
 
 	return (

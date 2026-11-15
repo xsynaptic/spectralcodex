@@ -13,6 +13,7 @@ import type { TemplateContext } from '#og-image/generate.ts';
 
 import { getAtlasElement } from '#og-image/templates/atlas.tsx';
 import { getHomepageElement } from '#og-image/templates/homepage.tsx';
+import { getStandardPortraitElement } from '#og-image/templates/standard-portrait.tsx';
 import { getStandardStoryElement } from '#og-image/templates/standard-story.tsx';
 import { getStandardElement } from '#og-image/templates/standard.tsx';
 
@@ -24,7 +25,11 @@ type ElementBuilder<Template extends OpenGraphCardTemplate> = (
 const templateElements = {
 	atlas: { landscape: getAtlasElement },
 	homepage: { landscape: getHomepageElement },
-	standard: { landscape: getStandardElement, story: getStandardStoryElement },
+	standard: {
+		landscape: getStandardElement,
+		portrait: getStandardPortraitElement,
+		story: getStandardStoryElement,
+	},
 } satisfies {
 	[Template in OpenGraphCardTemplate]: Record<
 		(typeof openGraphTemplateVariants)[Template][number],

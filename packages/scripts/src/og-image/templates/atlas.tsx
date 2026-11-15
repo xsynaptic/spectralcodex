@@ -5,7 +5,7 @@ import { openGraphVariants } from '@spectralcodex/shared/open-graph';
 import type { TemplateContext } from '#og-image/generate.ts';
 
 import {
-	cropLandscape,
+	cropCover,
 	Frame,
 	gradientButtercream,
 	gradientFill,
@@ -23,7 +23,7 @@ export async function getAtlasElement(
 	{ countLabel, title, titleZh }: AtlasInput,
 	{ source }: TemplateContext,
 ) {
-	const image = await cropLandscape(source, 'centre');
+	const image = await cropCover(source, { height, width }, 'centre');
 
 	return (
 		<Frame

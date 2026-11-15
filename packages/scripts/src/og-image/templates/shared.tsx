@@ -2,7 +2,6 @@ import type { OpenGraphCardTitles } from '@spectralcodex/shared/open-graph';
 import type { ReactElement, ReactNode } from 'react';
 import type { MeasuredNode, MeasuredTextRun } from 'takumi-js';
 
-import { openGraphVariants } from '@spectralcodex/shared/open-graph';
 import { Bitmap } from 'takumi-js/helpers/jsx';
 
 import type { MeasureElement, OpenGraphSource, ProcessedImage } from '#og-image/generate.ts';
@@ -38,9 +37,11 @@ function isBrightBackground(luminance?: number): boolean {
 	return !!luminance && luminance >= luminanceThreshold;
 }
 
-export function cropLandscape(source: OpenGraphSource | undefined, position: 'centre' | 'top') {
-	const { height, width } = openGraphVariants.landscape;
-
+export function cropCover(
+	source: OpenGraphSource | undefined,
+	{ height, width }: { height: number; width: number },
+	position: 'centre' | 'top',
+) {
 	return source?.crop({
 		...(source.isBlurred ? { blur: 16 } : {}),
 		fit: 'cover',

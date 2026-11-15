@@ -2,6 +2,7 @@ import { describe, expect, test } from 'vitest';
 
 import {
 	getOpenGraphCardPath,
+	getOpenGraphCardVariant,
 	OpenGraphCardRecordSchema,
 	resolveOpenGraphCardInput,
 } from '#open-graph.ts';
@@ -34,6 +35,21 @@ describe('getOpenGraphCardPath', () => {
 		};
 
 		expect(() => getOpenGraphCardPath(homepage, 'story')).toThrow(/homepage template/);
+	});
+});
+
+describe('getOpenGraphCardVariant', () => {
+	test.each(['landscape', 'portrait', 'story'] as const)(
+		'reads %s back from its card path',
+		(variant) => {
+			const name = getOpenGraphCardPath(card, variant).replace(/^og\//, '');
+
+			expect(getOpenGraphCardVariant(name)).toBe(variant);
+		},
+	);
+
+	test('a folder that names no variant fails loudly', () => {
+		expect(() => getOpenGraphCardVariant('square/some-location.jpg')).toThrow(/no variant folder/);
 	});
 });
 

@@ -1,12 +1,13 @@
 import { getCardName } from '@xsynaptic/astro-image-pipeline/names';
 import { z } from 'zod';
 
-const OpenGraphVariantSchema = z.enum(['landscape', 'story']);
+const OpenGraphVariantSchema = z.enum(['landscape', 'portrait', 'story']);
 
 export type OpenGraphVariant = z.infer<typeof OpenGraphVariantSchema>;
 
 export const openGraphVariants = {
 	landscape: { height: 630, width: 1200 },
+	portrait: { height: 1350, width: 1080 },
 	story: { height: 1920, width: 1080 },
 } as const satisfies Record<OpenGraphVariant, { height: number; width: number }>;
 
@@ -67,7 +68,7 @@ export type ResolvedOpenGraphCardInput =
 export const openGraphTemplateVariants = {
 	atlas: ['landscape'],
 	homepage: ['landscape'],
-	standard: ['landscape', 'story'],
+	standard: ['landscape', 'portrait', 'story'],
 } as const satisfies Record<OpenGraphCardTemplate, ReadonlyArray<OpenGraphVariant>>;
 
 export function resolveOpenGraphCardInput(input: OpenGraphCardInput): ResolvedOpenGraphCardInput {
@@ -110,4 +111,17 @@ export function getOpenGraphCardPath(
 	);
 
 	return `${openGraphBasePath}/${name}`;
+}
+
+// The inverse of the naming above: landscape ids carry no slash, so a folder always names a variant
+export function getOpenGraphCardVariant(name: string): OpenGraphVariant {
+	const [folder, ...rest] = name.split('/');
+
+	if (rest.length === 0) return openGraphDefaultVariant;
+
+	const parsed = OpenGraphVariantSchema.safeParse(folder);
+
+	if (!parsed.success) throw new Error(`Card ${name} sits in no variant folder`);
+
+	return parsed.data;
 }
