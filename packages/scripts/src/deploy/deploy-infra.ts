@@ -34,7 +34,7 @@ function buildServerEnv(config: DeployConfig): string {
 		`DEPLOY_MEDIA_PATH=${config.mediaPath}`,
 		`SITE_URL=${config.siteUrl}`,
 		`CLOUDFLARE_ZONE_ID=${requireEnv('CLOUDFLARE_ZONE_ID')}`,
-		`CLOUDFLARE_API_TOKEN=${requireEnv('CLOUDFLARE_API_TOKEN')}`,
+		`CLOUDFLARE_PURGE_TOKEN=${requireEnv('CLOUDFLARE_PURGE_TOKEN')}`,
 		`CACHE_WARM_CONCURRENCY=${process.env.CACHE_WARM_CONCURRENCY ?? '8'}`,
 		`JMAP_SESSION_URL=${requireEnv('JMAP_SESSION_URL')}`,
 		`JMAP_API_TOKEN=${requireEnv('JMAP_API_TOKEN')}`,

@@ -15,7 +15,7 @@ interface WarmResult {
 const shouldSkipPurge = process.env.SKIP_PURGE === '1' || process.env.SKIP_PURGE === 'true';
 const siteUrl = requireEnv('SITE_URL').replace(/\/$/, '');
 const cloudflareZoneId = shouldSkipPurge ? '' : requireEnv('CLOUDFLARE_ZONE_ID');
-const cloudflareApiToken = shouldSkipPurge ? '' : requireEnv('CLOUDFLARE_API_TOKEN');
+const cloudflareApiToken = shouldSkipPurge ? '' : requireEnv('CLOUDFLARE_PURGE_TOKEN');
 const defaultConcurrency = Number(process.env.CACHE_WARM_CONCURRENCY ?? '8') || 8;
 const warmLimit = process.env.WARM_LIMIT ? Number(process.env.WARM_LIMIT) : undefined;
 

@@ -23,7 +23,7 @@ export async function requestCloudflarePurge(body: PurgeRequestBody) {
 		{
 			body: JSON.stringify(body),
 			headers: {
-				Authorization: `Bearer ${requireEnv('CLOUDFLARE_API_TOKEN')}`,
+				Authorization: `Bearer ${requireEnv('CLOUDFLARE_PURGE_TOKEN')}`,
 				'Content-Type': 'application/json',
 			},
 			method: 'POST',
