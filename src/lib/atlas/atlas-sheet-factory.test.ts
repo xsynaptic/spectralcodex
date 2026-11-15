@@ -9,6 +9,7 @@ import {
 	getSheetStepRest,
 	getSheetTapRest,
 	getSheetTranslate,
+	hasHashTarget,
 	isSheetArrivalAtStart,
 } from '#lib/atlas/atlas-sheet-factory.ts';
 
@@ -190,13 +191,33 @@ describe('getPreferredSheetRest', () => {
 	);
 });
 
+describe('hasHashTarget', () => {
+	const ids = new Set(['intro', '彰化']);
+	const hasElement = (id: string) => ids.has(id);
+
+	test.each([
+		['no hash', '', false],
+		['a hash naming an element', '#intro', true],
+		["a hash naming no element, like the share dialog's", '#share', false],
+		['a percent-encoded id', '#%E5%BD%B0%E5%8C%96', true],
+		['a malformed escape, read as written', '#%E0%A4', false],
+	] as const)('%s: %s', (_label, hash, expected) => {
+		expect(hasHashTarget(hash, hasElement)).toBe(expected);
+	});
+});
+
 describe('isSheetArrivalAtStart', () => {
-	const arrival = { hasHash: false, navigationType: 'push', rest: 'half', scrollY: 0 } as const;
+	const arrival = {
+		hasHashTarget: false,
+		navigationType: 'push',
+		rest: 'half',
+		scrollY: 0,
+	} as const;
 
 	test.each([
 		['a fresh arrival at half', true, {}],
 		['a traversal', false, { navigationType: 'traverse' }],
-		['an address with a hash', false, { hasHash: true }],
+		['a hash naming an element on the page', false, { hasHashTarget: true }],
 		['a page already scrolled', false, { scrollY: 300 }],
 		['a raised sheet', false, { rest: 'raised' }],
 		['a lowered sheet', false, { rest: 'lowered' }],

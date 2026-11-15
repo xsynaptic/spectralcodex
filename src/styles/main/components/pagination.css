@@ -7,10 +7,9 @@
 	right: calc(var(--spacing) * 1);
 }
 
-/* In flow so its box stays reserved; revealing it shifts nothing */
-.pagination-button {
+/* Hidden but still in the layout, so showing it doesn't shift anything */
+.pagination-submit {
 	visibility: hidden;
-	border-color: light-dark(var(--color-primary-300), var(--color-primary-600));
 	opacity: 0;
 	transition:
 		opacity 120ms cubic-bezier(0.22, 1, 0.36, 1),
@@ -21,19 +20,6 @@
 	&[data-visible] {
 		visibility: visible;
 		opacity: 1;
-	}
-}
-
-/* Border stops a step short of the label so the two never read as one tone */
-.pagination-button:focus-visible {
-	background-color: light-dark(var(--color-accent-50), var(--color-accent-950));
-	border-color: light-dark(var(--color-accent-300), var(--color-accent-700));
-}
-
-@media (hover: hover) {
-	.pagination-button:hover {
-		background-color: light-dark(var(--color-accent-50), var(--color-accent-950));
-		border-color: light-dark(var(--color-accent-300), var(--color-accent-700));
 	}
 }
 

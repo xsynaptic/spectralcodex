@@ -178,6 +178,8 @@ img.spectralcodex.com {
 	root * /srv/img
 
 	header X-Content-Type-Options nosniff
+	# Lets the share dialog on the main site download photos so readers can share or save them
+	header Access-Control-Allow-Origin "https://spectralcodex.com"
 	import derivative-cache-control *
 
 	handle_errors 404 {

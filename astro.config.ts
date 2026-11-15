@@ -106,6 +106,11 @@ export default defineConfig({
 				context: 'client',
 				optional: true,
 			}),
+			SHARE_DIALOG_SHOW: envField.boolean({
+				access: 'public',
+				context: 'server',
+				default: false,
+			}),
 			UMAMI_DOMAIN: envField.string({ access: 'public', context: 'client', optional: true }),
 			UMAMI_ID: envField.string({ access: 'public', context: 'client', optional: true }),
 			WEBMENTION_API_KEY: envField.string({

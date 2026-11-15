@@ -1,4 +1,8 @@
-import type { OpenGraphCardInput, PageOpenGraphCard } from '@spectralcodex/shared/open-graph';
+import type {
+	OpenGraphCardInput,
+	OpenGraphVariant,
+	PageOpenGraphCard,
+} from '@spectralcodex/shared/open-graph';
 import type { Page } from 'astro';
 
 import { probeLuminanceTop } from '@spectralcodex/scripts/og-image';
@@ -15,6 +19,7 @@ import type { MultilingualContent } from '#lib/i18n/i18n-types.ts';
 import type { ImageComponentProps, ImagePlaceholderProps } from '#lib/image/image-types.ts';
 import type { DateRecordedEntry } from '#lib/utils/date.ts';
 
+import { getShareDialogDataFunction } from '#components/share/share-dialog-data.ts';
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
 import { getImagesCollection, getImageSource } from '#lib/collections/images/images-data.ts';
 import { getLocationsCollection } from '#lib/collections/locations/locations-data.ts';
@@ -444,6 +449,21 @@ const openGraphTitleSamples = [
 	},
 ];
 
+function getSampleShareEntry(entries: Array<ComputedEntry<'locations'>>) {
+	const withImages = entries.filter((entry) => entry.data.imageFeatured !== undefined);
+
+	return (
+		withImages.find(
+			(candidate) =>
+				Array.isArray(candidate.data.imageFeatured) && candidate.data.imageFeatured.length > 1,
+		) ?? withImages[0]
+	);
+}
+
+export function getSampleOpenGraphCardSrc(variant: OpenGraphVariant, key: string) {
+	return `/inventory/og/${variant}/${key}.jpg`;
+}
+
 async function createSampleOpenGraphCards() {
 	const [posts, locations, images, sampleImages, getEntryCard, catalog] = await Promise.all([
 		getPostsCollection(),
@@ -499,6 +519,8 @@ async function createSampleOpenGraphCards() {
 			}))
 		: [];
 
+	const shareEntry = getSampleShareEntry(locations.entries);
+	const [share] = shareEntry ? toSample(getEntryCard(shareEntry)) : [];
 	const [homepage] = toSample(getHomepageCard());
 	const [atlas] = toSample(
 		getAtlasCard({ locationCount: catalog.byCollection('locations').length }),
@@ -515,6 +537,7 @@ async function createSampleOpenGraphCards() {
 		...toOpenGraphCard('homepage', homepage),
 		...toTemplateGround('homepage-bright', homepage, groundBright),
 		...toTemplateGround('homepage-dark', homepage, groundDark),
+		...toOpenGraphCard('share', share),
 		...toOpenGraphCard('atlas', atlas),
 		...toTemplateGround('atlas-bright', atlas, groundBright),
 		...toTemplateGround('atlas-dark', atlas, groundDark),
@@ -547,3 +570,75 @@ export function getSampleOpenGraphCards() {
 }
 
 export { locationStatusOrder as sampleStatuses } from '@spectralcodex/shared/map';
+
+const shareDialogCapabilities = {
+	desktop: 'copy-image',
+	none: '',
+	phone: 'files link handheld',
+} as const;
+
+export async function getSampleShareDialogs() {
+	const { entries } = await getLocationsCollection();
+	const getShareDialogData = await getShareDialogDataFunction();
+	const entry = getSampleShareEntry(entries);
+
+	if (!entry) return [];
+
+	const shared = getShareDialogData(entry);
+
+	// Dev serves no rendered cards, so the card tiles draw from the Inventory's own renderer
+	const data = {
+		...shared,
+		assets: shared.assets.map((asset) => {
+			if (asset.role === 'photo') return asset;
+
+			const src = getSampleOpenGraphCardSrc(asset.role, 'share');
+
+			return { ...asset, previewSrc: src, src };
+		}),
+	};
+
+	const cards = data.assets.filter((asset) => asset.role !== 'photo');
+
+	return [
+		{ can: shareDialogCapabilities.phone, data, label: 'Phone' },
+		{ can: shareDialogCapabilities.desktop, data, label: 'Desktop' },
+		{
+			can: shareDialogCapabilities.desktop,
+			data: {
+				...data,
+				description: '彰化扇形車庫建於1922年，是臺灣僅存的扇形車庫。'.repeat(12),
+				title: '彰化扇形車庫：臺灣僅存的蒸汽火車頭旅館與鐵道文化資產保存園區歷史建築群',
+			},
+			label: 'Long CJK title',
+		},
+		{
+			can: shareDialogCapabilities.desktop,
+			data: {
+				...data,
+				description: 'โรงภาพยนตร์เก่าแก่แห่งนี้ตั้งอยู่ใจกลางกรุงเทพมหานครและปิดกิจการไปนานแล้ว'.repeat(8),
+				title: 'พหลโยธินรามา',
+			},
+			label: 'Thai description',
+		},
+		{ can: shareDialogCapabilities.desktop, data: { ...data, assets: cards }, label: 'No photos' },
+		{
+			can: shareDialogCapabilities.desktop,
+			data: { ...data, assets: cards.filter((asset) => asset.role === 'landscape') },
+			label: 'Landscape card only',
+		},
+		{ can: shareDialogCapabilities.none, data, label: 'No sharing or image clipboard' },
+		{
+			can: shareDialogCapabilities.desktop,
+			data: {
+				...data,
+				assets: data.assets.map((asset) =>
+					asset.role === 'portrait'
+						? { ...asset, previewSrc: `${asset.previewSrc}.missing`, src: `${asset.src}.missing` }
+						: asset,
+				),
+			},
+			label: 'Failed preview',
+		},
+	];
+}

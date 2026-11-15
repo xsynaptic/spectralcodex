@@ -26,6 +26,7 @@ import {
 	getSheetRests,
 	getSheetSlide,
 	getSheetTranslate,
+	hasHashTarget,
 	isSheetArrivalAtStart,
 } from '#lib/atlas/atlas-sheet-factory.ts';
 import { readStorage, writeStorage } from '#lib/utils/storage.ts';
@@ -89,8 +90,15 @@ function writeFoldPx(linePx: number, paneTop: number) {
 	document.documentElement.style.setProperty(atlasSheetFoldProperty, `${String(foldPx)}px`);
 }
 
+function hasLocationHashTarget() {
+	return hasHashTarget(
+		location.hash,
+		(id) => document.querySelector(`#${CSS.escape(id)}`) !== null,
+	);
+}
+
 function releaseFragmentScroll() {
-	if (document.readyState === 'complete' || location.hash === '') return;
+	if (document.readyState === 'complete' || !hasLocationHashTarget()) return;
 
 	const top = window.scrollY;
 
@@ -172,7 +180,7 @@ export function scrollToSheetStart(
 
 function startSheetArrival(navigationType: string) {
 	const isAtStart = isSheetArrivalAtStart({
-		hasHash: location.hash !== '',
+		hasHashTarget: hasLocationHashTarget(),
 		navigationType,
 		rest: readSheetRest(),
 		scrollY: window.scrollY,

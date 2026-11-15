@@ -22,12 +22,7 @@ export function getImageFeaturedGroup({
 }): Array<ImageFeaturedWithCaption> | undefined {
 	if (!imageFeatured) return undefined;
 
-	// Normalize to array of objects
-	const imageFeaturedObjectGroup: Array<ImageFeaturedObject> = Array.isArray(imageFeatured)
-		? imageFeatured.map((item) => (isImageFeaturedObject(item) ? item : { id: item }))
-		: [{ id: imageFeatured }];
-
-	return enrichImageFeaturedObjects(imageFeaturedObjectGroup, getCaption);
+	return enrichImageFeaturedObjects(getImageFeaturedObjects(imageFeatured), getCaption);
 }
 
 // Rather than accepting image featured items directly from frontmatter this handles catalog items
@@ -81,6 +76,10 @@ export function getImageFeaturedHeroGroup({
 	return enrichImageFeaturedObjects(imageHeroObjectGroup, getCaption);
 }
 
+export function getImageFeaturedIds(imageFeatured: ImageFeatured | undefined) {
+	return getImageFeaturedObjects(imageFeatured).map((item) => item.id);
+}
+
 // Get the first image featured item from a set or array
 export function getImageFeaturedId({
 	imageFeatured,
@@ -89,16 +88,9 @@ export function getImageFeaturedId({
 	imageFeatured: ImageFeatured | undefined;
 	shuffle?: boolean;
 }): string | undefined {
-	if (!imageFeatured) return;
+	const ids = getImageFeaturedIds(imageFeatured);
 
-	if (typeof imageFeatured === 'string') return imageFeatured;
-
-	// Array: get first item (optionally shuffled)
-	const items = shuffle ? R.shuffle(imageFeatured) : imageFeatured;
-
-	if (!items[0]) return;
-
-	return isImageFeaturedObject(items[0]) ? items[0].id : items[0];
+	return shuffle ? R.sample(ids, 1)[0] : ids[0];
 }
 
 // The hero-flagged image is not necessarily the first featured image
@@ -135,6 +127,16 @@ function enrichImageFeaturedObjects(
 				: {}),
 		};
 	});
+}
+
+function getImageFeaturedObjects(
+	imageFeatured: ImageFeatured | undefined,
+): Array<ImageFeaturedObject> {
+	if (!imageFeatured) return [];
+
+	if (typeof imageFeatured === 'string') return [{ id: imageFeatured }];
+
+	return imageFeatured.map((item) => (isImageFeaturedObject(item) ? item : { id: item }));
 }
 
 // Type guard for array items

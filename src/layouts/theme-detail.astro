@@ -15,6 +15,7 @@ import SectionMap from '#components/sections/section-map.astro';
 import SectionPreviewList from '#components/sections/section-preview-list.astro';
 import SectionPreviews from '#components/sections/section-previews.astro';
 import SectionRegions from '#components/sections/section-regions.astro';
+import SectionShare from '#components/sections/section-share.astro';
 import SectionSources from '#components/sections/section-sources.astro';
 import SectionStats from '#components/sections/section-stats.astro';
 import SectionThemes from '#components/sections/section-themes.astro';
@@ -48,6 +49,7 @@ const atlas = await getAtlasScopePage(entry);
 		</DividedItem>
 	</Fragment>
 	<ContentProse entry={entry} />
+	<SectionShare entry={entry} />
 	<SectionMap
 		class="atlas-inline-map"
 		entryTitle={entry.data.title}

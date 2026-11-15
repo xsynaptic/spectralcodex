@@ -225,6 +225,14 @@ const translationStrings = {
 		'notice.severity.warning': 'Warning:',
 		'notice.vanished': `**Note**: this location has vanished. Any information presented here is only for reference.`,
 
+		// Share dialog
+		'share.dialog.card.landscape': 'Landscape',
+		'share.dialog.card.portrait': 'Portrait',
+		'share.dialog.card.story': 'Story',
+		'share.dialog.photo.label': 'Photo {number}',
+		'share.dialog.photo.labelSingle': 'Photo',
+		'share.dialog.trigger.label': 'Share',
+
 		// Site
 		'site.breadcrumbs.label': 'Breadcrumb Navigation',
 		'site.colophon.label': 'Colophon',

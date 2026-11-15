@@ -19,6 +19,7 @@ import SectionLinks from '#components/sections/section-links.astro';
 import SectionMap from '#components/sections/section-map.astro';
 import SectionPreviews from '#components/sections/section-previews.astro';
 import SectionSeries from '#components/sections/section-series.astro';
+import SectionShare from '#components/sections/section-share.astro';
 import SectionSimilar from '#components/sections/section-similar.astro';
 import SectionSources from '#components/sections/section-sources.astro';
 import SectionThemes from '#components/sections/section-themes.astro';
@@ -95,6 +96,7 @@ const t = getTranslations();
 		entry={entry}
 		{...(hasContent ? { 'data-reading-frame': '' } : {})}
 	/>
+	<SectionShare entry={entry} />
 	{hideGeometry ? undefined : (
 		<SectionMap
 			class="atlas-inline-map"

@@ -312,6 +312,9 @@ importers:
       '@xsynaptic/satteri-wrap-cjk':
         specifier: ^0.3.1
         version: 0.3.1(satteri@0.11.7)
+      '@xsynaptic/share-kit':
+        specifier: ^0.1.0
+        version: 0.1.0
       '@xsynaptic/stylelint-config':
         specifier: ^1.1.6
         version: 1.1.6(postcss@8.5.32)(stylelint-order@8.1.2(stylelint@17.16.0(supports-color@10.2.2)(typescript@6.0.3)))(stylelint@17.16.0(supports-color@10.2.2)(typescript@6.0.3))
@@ -3106,6 +3109,9 @@ packages:
     peerDependencies:
       satteri: ^0.10.0 || ^0.11.0
 
+  '@xsynaptic/share-kit@0.1.0':
+    resolution: {integrity: sha512-Pz93MUhLg1KlNB6hzkYUQsHzeqoil8Pp2IeUmtuNg+tNS6SqQpSb9Y868YqQqWf4wcUI7zEEWIOx5/lOCdN9Pg==}
+
   '@xsynaptic/stylelint-config@1.1.6':
     resolution: {integrity: sha512-/stiiCqdr+tnV7/8cUbSBfGNJ/HG8ZYqaChQt75AdtMoxMw1CdX5ZBbKNhurNFh7gXxczuEirOOHxaWr+SvFHQ==}
     peerDependencies:
@@ -4644,6 +4650,10 @@ packages:
 
   launder@1.7.2:
     resolution: {integrity: sha512-DLg3HPnHUfBi5/MxMLmJD12dmlMpFEC2HgMW6vkZ/9JR0RU00kXoRGvDxAvFmdO0o610OA77i4FgNTLucmhDVg==}
+
+  lean-qr@2.7.4:
+    resolution: {integrity: sha512-tlMPFfqhAAZN7+j/djRSvl/2+AYT2+7RRuyq8bvcbV8gMiENiscquQ9WTfCSyeEdxsVaEB+tU7e9nFZC63BFnQ==}
+    hasBin: true
 
   lefthook-android-arm64@2.2.2:
     resolution: {integrity: sha512-wb9rQQFLX7u1dJLxvMrq9VUfMYi5kxM7tJQ6Y4mWEOwaU+SmIm2wjoT/nromKq27Y8fh2Qd7FgCD3G1wfW8CnQ==}
@@ -9217,6 +9227,10 @@ snapshots:
       satteri: 0.11.7
       zod: 4.6.7
 
+  '@xsynaptic/share-kit@0.1.0':
+    dependencies:
+      lean-qr: 2.7.4
+
   '@xsynaptic/stylelint-config@1.1.6(postcss@8.5.32)(stylelint-order@8.1.2(stylelint@17.16.0(supports-color@10.2.2)(typescript@6.0.3)))(stylelint@17.16.0(supports-color@10.2.2)(typescript@6.0.3))':
     dependencies:
       '@double-great/stylelint-a11y': 3.8.1(stylelint@17.16.0(supports-color@10.2.2)(typescript@6.0.3))
@@ -10978,6 +10992,8 @@ snapshots:
   launder@1.7.2:
     dependencies:
       dayjs: 1.11.23
+
+  lean-qr@2.7.4: {}
 
   lefthook-android-arm64@2.2.2:
     optional: true

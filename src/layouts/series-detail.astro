@@ -12,6 +12,7 @@ import DividedItem from '#components/parts/divided-item.astro';
 import SectionDateList from '#components/sections/section-date-list.astro';
 import SectionMap from '#components/sections/section-map.astro';
 import SectionPreviews from '#components/sections/section-previews.astro';
+import SectionShare from '#components/sections/section-share.astro';
 import SectionWebmentions from '#components/sections/section-webmentions.astro';
 import { getAtlasScopePage } from '#lib/atlas/atlas-data.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
@@ -50,6 +51,7 @@ const atlas = await getAtlasScopePage(entry);
 		) : undefined}
 	</Fragment>
 	<ContentProse entry={entry} />
+	<SectionShare entry={entry} />
 	<SectionMap
 		class="atlas-inline-map"
 		entryTitle={entry.data.title}

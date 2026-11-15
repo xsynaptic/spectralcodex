@@ -174,16 +174,31 @@ export function getSheetEnterRest(hasHalf: boolean) {
 	return hasHalf ? atlasSheetRest.half : atlasSheetRest.lowered;
 }
 
+// A hash like `#share` opens a dialog instead of scrolling to an element, so it shouldn't count
+export function hasHashTarget(hash: string, hasElement: (id: string) => boolean) {
+	const id = hash.slice(1);
+
+	if (!id) return false;
+
+	try {
+		return hasElement(decodeURIComponent(id));
+	} catch {
+		return hasElement(id);
+	}
+}
+
 export function isSheetArrivalAtStart({
-	hasHash,
+	hasHashTarget,
 	navigationType,
 	rest,
 	scrollY,
 }: {
-	hasHash: boolean;
+	hasHashTarget: boolean;
 	navigationType: string;
 	rest: AtlasSheetRest;
 	scrollY: number;
 }) {
-	return rest === atlasSheetRest.half && navigationType !== 'traverse' && !hasHash && scrollY <= 0;
+	return (
+		rest === atlasSheetRest.half && navigationType !== 'traverse' && !hasHashTarget && scrollY <= 0
+	);
 }

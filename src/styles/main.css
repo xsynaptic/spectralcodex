@@ -23,6 +23,7 @@
 @import './main/components/activity-graph.css' layer(components);
 @import './main/components/anchor.css' layer(components);
 @import './main/components/atlas.css' layer(components);
+@import './main/components/button.css' layer(components);
 @import './main/components/carousel.css' layer(components);
 @import './main/components/chrome.css' layer(components);
 @import './main/components/colophon.css' layer(components);
@@ -37,6 +38,7 @@
 @import './main/components/preview-card.css' layer(components);
 @import './main/components/prose.css' layer(components);
 @import './main/components/search.css' layer(components);
+@import './main/components/share-dialog.css' layer(components);
 @import './main/components/similar.css' layer(components);
 @import './main/components/text.css' layer(components);
 

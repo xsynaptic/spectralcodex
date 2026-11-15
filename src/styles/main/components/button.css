@@ -1,0 +1,19 @@
+.button-outline {
+	border-color: light-dark(var(--color-primary-300), var(--color-primary-600));
+	transition:
+		border-color 150ms linear,
+		background-color 150ms linear;
+}
+
+/* Border stops a step short of the label so the two never read as one tone */
+.button-outline:focus-visible {
+	background-color: light-dark(var(--color-accent-50), var(--color-accent-950));
+	border-color: light-dark(var(--color-accent-300), var(--color-accent-700));
+}
+
+@media (hover: hover) {
+	.button-outline:hover:not(:disabled) {
+		background-color: light-dark(var(--color-accent-50), var(--color-accent-950));
+		border-color: light-dark(var(--color-accent-300), var(--color-accent-700));
+	}
+}

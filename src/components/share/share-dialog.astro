@@ -1,0 +1,40 @@
+---
+import type { ShareKitPayload } from '@xsynaptic/share-kit';
+
+import { serializeShareKitPayload } from '@xsynaptic/share-kit';
+
+import { getTranslations } from '#lib/i18n/i18n-translations.ts';
+
+interface Props {
+	can?: string | undefined;
+	data: ShareKitPayload;
+	label?: string | undefined;
+}
+
+const { can, data, label } = Astro.props;
+
+const iconSize = 16;
+
+const t = getTranslations();
+
+const payload = serializeShareKitPayload(data);
+---
+
+<share-kit data-can={can} data-pagefind-ignore>
+	<button
+		class="button-outline inline-flex cursor-pointer items-center gap-2 rounded-sm border px-3 py-2 font-medium text-accent-500 disabled:cursor-default disabled:opacity-50 md:py-1 dark:text-accent-400"
+		data-share-kit-trigger
+		disabled={true}
+		type="button"
+	>
+		<span data-nosnippet>{label ?? t('share.dialog.trigger.label')}</span>
+		<svg aria-hidden="true" height={iconSize} viewBox="0 0 24 24" width={iconSize}>
+			<use href="#icon:share"></use>
+		</svg>
+	</button>
+	<script is:inline set:html={payload} type="application/json" />
+</share-kit>
+
+<script>
+	import '#components/share/share-dialog-client.ts';
+</script>

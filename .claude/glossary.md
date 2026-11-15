@@ -124,7 +124,7 @@ Map Scope, Map Filter, Map Target and Map View keep the prefix everywhere outsid
 
 **Placeholder**: A tiny, coarse copy of an Image inlined into the page while its Rendition loads; never a file of its own, so not a Rendition. _Avoid_: thumbnail, preview (a Preview is a listing summary).
 
-**OpenGraph Card**: The picture shown when a page is shared: the page's title over an Image that represents it. _Avoid_: OG image, social image, thumbnail, preview (a Preview is a listing summary).
+**OpenGraph Card**: The picture shown when a page is shared: the page's title over an Image that represents it. It comes in three shapes: landscape (the default, used by link previews), portrait and story. _Avoid_: OG image, social image, thumbnail, preview (a Preview is a listing summary).
 
 ### Multilingual
 

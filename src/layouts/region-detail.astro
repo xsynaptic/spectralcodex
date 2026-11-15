@@ -17,6 +17,7 @@ import SectionLinks from '#components/sections/section-links.astro';
 import SectionMap from '#components/sections/section-map.astro';
 import SectionPreviewList from '#components/sections/section-preview-list.astro';
 import SectionPreviews from '#components/sections/section-previews.astro';
+import SectionShare from '#components/sections/section-share.astro';
 import SectionSources from '#components/sections/section-sources.astro';
 import SectionStats from '#components/sections/section-stats.astro';
 import SectionWebmentions from '#components/sections/section-webmentions.astro';
@@ -57,6 +58,7 @@ const atlas = await getAtlasScopePage(entry);
 		) : undefined}
 	</Fragment>
 	<ContentProse entry={entry} />
+	<SectionShare entry={entry} />
 	<RegionsRelated entry={entry} limit={regionsOption?.termsRelatedLimit}>
 		{regionsOption?.termsChildrenLabel ? (
 			<Fragment slot="regions-children-title">{regionsOption.termsChildrenLabel}</Fragment>

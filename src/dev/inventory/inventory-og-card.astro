@@ -5,6 +5,8 @@ import { openGraphVariants } from '@spectralcodex/shared/open-graph';
 
 import type { SampleOpenGraphCard } from '#dev/inventory/inventory-fixtures.ts';
 
+import { getSampleOpenGraphCardSrc } from '#dev/inventory/inventory-fixtures.ts';
+
 interface Props {
 	card: SampleOpenGraphCard | undefined;
 	class?: string | undefined;
@@ -27,7 +29,7 @@ const captionClass = 'font-mono text-xs text-primary-500 dark:text-primary-400';
 			class="h-auto w-full rounded-xs"
 			height={height}
 			loading="lazy"
-			src={`/inventory/og/${variant}/${card.key}.jpg`}
+			src={getSampleOpenGraphCardSrc(variant, card.key)}
 			width={width}
 		/>
 	) : (

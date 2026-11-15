@@ -56,6 +56,7 @@ import SectionDateList from '#components/sections/section-date-list.astro';
 import SectionPreviewList from '#components/sections/section-preview-list.astro';
 import SectionRegions from '#components/sections/section-regions.astro';
 import SeriesSection from '#components/series/series-section.astro';
+import ShareDialog from '#components/share/share-dialog.astro';
 import ThemesList from '#components/themes/themes-list.astro';
 import { NoticeBoxSeverityEnum } from '#components/types.ts';
 import WebmentionsList from '#components/webmentions/webmentions-list.astro';
@@ -76,6 +77,7 @@ import {
 	getSampleRegions,
 	getSampleRelatedRegion,
 	getSampleResources,
+	getSampleShareDialogs,
 	getSampleThemes,
 	sampleChronologyMonths,
 	sampleChronologyYears,
@@ -126,6 +128,7 @@ const sampleThemes = await getSampleThemes();
 const sampleResources = await getSampleResources();
 const sampleMapData = await createSampleMapData();
 const sampleOpenGraphCards = await getSampleOpenGraphCards();
+const sampleShareDialogs = await getSampleShareDialogs();
 
 const sampleImage = sampleImages.landscape[0]
 	? { entry: sampleImages.landscape[0], ...createSampleImageProps(sampleImages.landscape[0]) }
@@ -156,6 +159,13 @@ const noFallbackImage = 'No Entry falls back to a stand-in image.';
 
 const openGraphSource = 'packages/scripts/src/og-image/templates';
 
+const openGraphTallCards = [
+	{ key: 'ground-dark', label: 'dark ground', missing: noOpenGraphEntry },
+	{ key: 'title-long', label: 'long title', missing: noMedia },
+	{ key: 'title-th', label: 'Thai title', missing: noMedia },
+	{ key: 'image-fallback', label: 'fallback image', missing: noFallbackImage },
+] as const;
+
 const openGraphSpecimens = [
 	{
 		cards: [
@@ -173,14 +183,16 @@ const openGraphSpecimens = [
 		variant: 'landscape',
 	},
 	{
-		cards: [
-			{ key: 'ground-dark', label: 'dark ground', missing: noOpenGraphEntry },
-			{ key: 'title-long', label: 'long title', missing: noMedia },
-			{ key: 'title-th', label: 'Thai title', missing: noMedia },
-			{ key: 'image-fallback', label: 'fallback image', missing: noFallbackImage },
-		],
+		cards: openGraphTallCards,
+		name: 'og-image portrait',
+		note: 'A 4:5 card for feed posts, offered in the share dialog. Never used as the <code>og:image</code>.',
+		source: 'standard-portrait.tsx',
+		variant: 'portrait',
+	},
+	{
+		cards: openGraphTallCards,
 		name: 'og-image story',
-		note: 'The 9:16 share image; never an <code>og:image</code>, and not yet requested.',
+		note: 'A 9:16 card for Stories, offered in the share dialog. Never used as the <code>og:image</code>.',
 		source: 'standard-story.tsx',
 		variant: 'story',
 	},
@@ -210,6 +222,7 @@ const openGraphSpecimens = [
 
 const openGraphGrid = {
 	landscape: { card: undefined, grid: 'grid gap-4 sm:grid-cols-2' },
+	portrait: { card: 'w-68 max-w-full', grid: 'flex flex-wrap gap-4' },
 	story: { card: 'w-68 max-w-full', grid: 'flex flex-wrap gap-4' },
 } as const;
 
@@ -1279,6 +1292,21 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 					<p class={captionClass}>No Region names a Division, so there is no outline to draw.</p>
 				)}
 			</Specimen>
+			<Specimen
+				name="share-dialog"
+				note="Each button opens the real dialog in a different state, with <code>data-can</code> faking the device: a phone that can share files, a desktop that can copy images, then the edge cases. Regions, Themes, Series and Entries with a blurred card get the landscape card only. The failed preview hides the portrait card, so destinations that would suggest it fall back to the next image."
+				source="components/share/share-dialog.astro"
+			>
+				{sampleShareDialogs.length > 0 ? (
+					<div class="flex flex-wrap gap-x-6 gap-y-3">
+						{sampleShareDialogs.map(({ can, data, label }) => (
+							<ShareDialog can={can} data={data} label={label} />
+						))}
+					</div>
+				) : (
+					<p class={captionClass}>No Location has a Featured Image.</p>
+				)}
+			</Specimen>
 			<InventoryAtlasDivider />
 		</Section>
 		<Section note="The batch script's card templates, rendered on demand." title="Open Graph">
@@ -1293,7 +1321,7 @@ const cellClass = 'border-b border-primary-200 py-1.5 align-top dark:border-prim
 						{lead ? (
 							<OpenGraphCard
 								{...lead}
-								class={variant === 'story' ? 'max-w-xs' : undefined}
+								class={variant === 'landscape' ? undefined : 'max-w-xs'}
 								variant={variant}
 							/>
 						) : undefined}

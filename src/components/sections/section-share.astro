@@ -1,0 +1,24 @@
+---
+import { SHARE_DIALOG_SHOW } from 'astro:env/server';
+
+import type { ShareableEntry } from '#components/share/share-dialog-data.ts';
+
+import { getShareDialogDataFunction } from '#components/share/share-dialog-data.ts';
+import ShareDialog from '#components/share/share-dialog.astro';
+
+interface Props {
+	entry: ShareableEntry;
+}
+
+const { entry } = Astro.props;
+
+const getShareDialogData = SHARE_DIALOG_SHOW ? await getShareDialogDataFunction() : undefined;
+
+const data = getShareDialogData?.(entry);
+---
+
+{data ? (
+	<div class="content-column mb-8">
+		<ShareDialog data={data} />
+	</div>
+) : undefined}

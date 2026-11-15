@@ -1,0 +1,17 @@
+@import '@xsynaptic/share-kit/styles.css';
+
+share-kit {
+	--share-kit-surface: light-dark(#fff, var(--color-primary-900));
+	--share-kit-text: light-dark(var(--color-primary-700), var(--color-primary-300));
+	--share-kit-muted: light-dark(var(--color-primary-500), var(--color-primary-400));
+	--share-kit-border: light-dark(var(--color-primary-200), var(--color-primary-700));
+	--share-kit-field: light-dark(var(--color-primary-50), var(--color-primary-800));
+	--share-kit-accent: light-dark(var(--color-accent-500), var(--color-accent-400));
+	--share-kit-accent-text: light-dark(#fff, var(--color-primary-950));
+	--share-kit-hover: light-dark(var(--color-accent-50), var(--color-accent-950));
+	--share-kit-hover-border: light-dark(var(--color-accent-300), var(--color-accent-700));
+	--share-kit-danger: light-dark(var(--color-red-600), var(--color-red-400));
+	--share-kit-radius: var(--radius-lg);
+	--share-kit-shadow: var(--shadow-xl);
+	--share-kit-font-mono: var(--font-mono);
+}
