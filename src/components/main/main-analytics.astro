@@ -32,8 +32,10 @@ const excludedScreens = ['800x600', '1280x1200', '1280x1280', '1600x1600'];
 	data-before-send={beforeSendName}
 	data-do-not-track={true}
 	data-domains={Astro.site?.hostname}
+	data-errors={true}
 	data-exclude-hash={true}
 	data-performance={true}
+	data-release={import.meta.env.BUILD_VERSION}
 	data-website-id={umamiId}
 	src={`${umamiDomain}/script.js`}
 	{...props}
