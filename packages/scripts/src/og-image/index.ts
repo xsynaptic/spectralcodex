@@ -5,7 +5,6 @@ import type {
 } from '@spectralcodex/shared/open-graph';
 
 import {
-	getOpenGraphCardVariant,
 	openGraphBlurTreatment,
 	OpenGraphCardRecordSchema,
 	openGraphDefaultVariant,
@@ -157,7 +156,9 @@ async function generateCards({
 
 	const variantRows = R.pipe(
 		render.cards,
-		R.countBy(getOpenGraphCardVariant),
+		R.countBy(
+			(card) => OpenGraphCardRecordSchema.parse(card.input).variant ?? openGraphDefaultVariant,
+		),
 		R.entries(),
 		R.sortBy(([variant]) => variant),
 		R.map(([variant, count]): [string, number] => [`${R.capitalize(variant)} cards`, count]),

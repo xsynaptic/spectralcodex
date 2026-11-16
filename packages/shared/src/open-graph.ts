@@ -112,16 +112,3 @@ export function getOpenGraphCardPath(
 
 	return `${openGraphBasePath}/${name}`;
 }
-
-// The inverse of the naming above: landscape ids carry no slash, so a folder always names a variant
-export function getOpenGraphCardVariant(name: string): OpenGraphVariant {
-	const [folder, ...rest] = name.split('/');
-
-	if (rest.length === 0) return openGraphDefaultVariant;
-
-	const parsed = OpenGraphVariantSchema.safeParse(folder);
-
-	if (!parsed.success) throw new Error(`Card ${name} sits in no variant folder`);
-
-	return parsed.data;
-}

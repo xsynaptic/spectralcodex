@@ -277,8 +277,8 @@ importers:
         specifier: ^1.4.1
         version: 1.4.1(astro@7.4.12(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(exiftool-vendored@39.3.0)(sharp@0.35.5(@types/node@26.6.5))(zod@4.6.7)
       '@xsynaptic/astro-image-pipeline':
-        specifier: ^0.13.0
-        version: 0.13.0(astro@7.4.12(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(sharp@0.35.5(@types/node@26.6.5))
+        specifier: ^0.14.0
+        version: 0.14.0(astro@7.4.12(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(sharp@0.35.5(@types/node@26.6.5))
       '@xsynaptic/astro-pagefind':
         specifier: ^0.1.0
         version: 0.1.0(@pagefind/component-ui@1.6.0)(astro@7.4.12(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(pagefind@1.6.0)
@@ -313,8 +313,8 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1(satteri@0.11.7)
       '@xsynaptic/share-kit':
-        specifier: ^0.1.0
-        version: 0.1.0
+        specifier: ^0.2.0
+        version: 0.2.0
       '@xsynaptic/stylelint-config':
         specifier: ^1.1.6
         version: 1.1.6(postcss@8.5.32)(stylelint-order@8.1.2(stylelint@17.16.0(supports-color@10.2.2)(typescript@6.0.3)))(stylelint@17.16.0(supports-color@10.2.2)(typescript@6.0.3))
@@ -578,8 +578,8 @@ importers:
         specifier: ^2.16.2
         version: 2.16.2
       '@xsynaptic/astro-image-pipeline':
-        specifier: ^0.13.0
-        version: 0.13.0(astro@7.4.12(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(sharp@0.35.5(@types/node@26.6.5))
+        specifier: ^0.14.0
+        version: 0.14.0(astro@7.4.12(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(sharp@0.35.5(@types/node@26.6.5))
       '@xsynaptic/astro-scripts':
         specifier: ^0.16.1
         version: 0.16.1(astro@7.4.12(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(satteri@0.11.7)
@@ -644,8 +644,8 @@ importers:
   packages/shared:
     dependencies:
       '@xsynaptic/astro-image-pipeline':
-        specifier: ^0.13.0
-        version: 0.13.0(astro@7.4.12(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(sharp@0.35.5(@types/node@26.6.5))
+        specifier: ^0.14.0
+        version: 0.14.0(astro@7.4.12(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(sharp@0.35.5(@types/node@26.6.6))
       zod:
         specifier: ^4.6.7
         version: 4.6.7
@@ -3022,8 +3022,8 @@ packages:
       sharp:
         optional: true
 
-  '@xsynaptic/astro-image-pipeline@0.13.0':
-    resolution: {integrity: sha512-+chQU5FNmGKCo0n87QzURKwa0/rVdeamcYpKzM1gmW+F+WNYo23/4cboprulMrq1DM4HjOsb8HDPstV2tFveaA==}
+  '@xsynaptic/astro-image-pipeline@0.14.0':
+    resolution: {integrity: sha512-KAVmJR/kujSz3Wk9Xe6CCSWT2mlhgBGD3m3Fk7ZFVrZWZXrO9zhIrLO7GsVVtg+kCkgvHkKf0kIWs8Lpc3x6UQ==}
     engines: {node: '>=24.0.0'}
     peerDependencies:
       astro: ^7.4.2
@@ -3109,8 +3109,8 @@ packages:
     peerDependencies:
       satteri: ^0.10.0 || ^0.11.0
 
-  '@xsynaptic/share-kit@0.1.0':
-    resolution: {integrity: sha512-Pz93MUhLg1KlNB6hzkYUQsHzeqoil8Pp2IeUmtuNg+tNS6SqQpSb9Y868YqQqWf4wcUI7zEEWIOx5/lOCdN9Pg==}
+  '@xsynaptic/share-kit@0.2.0':
+    resolution: {integrity: sha512-O4B942cqkgK66cGOLTrIAbUz5eE2ybqixb0E3QXOhjfNECSE4rbs4RODsl7OG1DuS7dB7viuQF7wWzyiVl/I7Q==}
 
   '@xsynaptic/stylelint-config@1.1.6':
     resolution: {integrity: sha512-/stiiCqdr+tnV7/8cUbSBfGNJ/HG8ZYqaChQt75AdtMoxMw1CdX5ZBbKNhurNFh7gXxczuEirOOHxaWr+SvFHQ==}
@@ -9113,11 +9113,18 @@ snapshots:
       exiftool-vendored: 39.3.0
       sharp: 0.35.5(@types/node@26.6.5)
 
-  '@xsynaptic/astro-image-pipeline@0.13.0(astro@7.4.12(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(sharp@0.35.5(@types/node@26.6.5))':
+  '@xsynaptic/astro-image-pipeline@0.14.0(astro@7.4.12(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(sharp@0.35.5(@types/node@26.6.5))':
     dependencies:
       astro: 7.4.12(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)
       p-limit: 7.3.3
       sharp: 0.35.5(@types/node@26.6.5)
+      zod: 4.6.7
+
+  '@xsynaptic/astro-image-pipeline@0.14.0(astro@7.4.12(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(sharp@0.35.5(@types/node@26.6.6))':
+    dependencies:
+      astro: 7.4.12(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)
+      p-limit: 7.3.3
+      sharp: 0.35.5(@types/node@26.6.6)
       zod: 4.6.7
 
   '@xsynaptic/astro-pagefind@0.1.0(@pagefind/component-ui@1.6.0)(astro@7.4.12(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(pagefind@1.6.0)':
@@ -9227,7 +9234,7 @@ snapshots:
       satteri: 0.11.7
       zod: 4.6.7
 
-  '@xsynaptic/share-kit@0.1.0':
+  '@xsynaptic/share-kit@0.2.0':
     dependencies:
       lean-qr: 2.7.4
 
@@ -9449,6 +9456,95 @@ snapshots:
       zod: 4.6.7
     optionalDependencies:
       sharp: 0.35.5(@types/node@26.6.5)
+    transitivePeerDependencies:
+      - '@azure/app-configuration'
+      - '@azure/cosmos'
+      - '@azure/data-tables'
+      - '@azure/identity'
+      - '@azure/keyvault-secrets'
+      - '@azure/storage-blob'
+      - '@capacitor/preferences'
+      - '@deno/kv'
+      - '@netlify/blobs'
+      - '@planetscale/database'
+      - '@types/node'
+      - '@upstash/redis'
+      - '@vercel/blob'
+      - '@vercel/functions'
+      - '@vercel/kv'
+      - '@vitejs/devtools'
+      - aws4fetch
+      - db0
+      - esbuild
+      - idb-keyval
+      - ioredis
+      - jiti
+      - less
+      - sass
+      - sass-embedded
+      - stylus
+      - sugarss
+      - terser
+      - tsx
+      - uploadthing
+      - yaml
+
+  astro@7.4.12(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1):
+    dependencies:
+      '@astrojs/compiler-rs': 0.5.3
+      '@astrojs/internal-helpers': 0.13.2
+      '@astrojs/markdown-satteri': 0.4.10
+      '@astrojs/runtime': 0.1.1
+      '@astrojs/telemetry': 3.4.2
+      '@astrojs/vite-plugin-astro': 0.1.3(vite@8.3.8(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
+      '@capsizecss/unpack': 4.0.1
+      '@clack/prompts': 1.9.0
+      '@oslojs/encoding': 1.1.0
+      am-i-vibing: 0.5.0
+      aria-query: 5.3.2
+      axobject-query: 4.1.0
+      ci-info: 4.5.0
+      cookie: 2.0.2
+      devalue: 6.0.3
+      diff: 9.0.0
+      dset: 3.1.4
+      es-module-lexer: 3.0.4
+      flattie: 1.1.1
+      fontace: 0.4.1
+      get-tsconfig: 5.0.0-beta.6
+      github-slugger: 2.0.0
+      html-escaper: 3.0.3
+      http-cache-semantics: 4.3.0
+      jsonc-parser: 3.3.1
+      magic-string: 1.4.5
+      magicast: 0.5.5
+      mri: 1.2.0
+      mrmime: 2.0.1
+      neotraverse: 1.0.2
+      obug: 3.0.0
+      p-limit: 7.3.3
+      p-queue: 10.0.0
+      package-manager-detector: 1.9.0
+      piccolore: 0.1.3
+      picomatch: 4.0.7
+      rolldown: 1.2.19
+      shiki: 4.6.0
+      smol-toml: 1.9.1
+      svgo: 4.1.0
+      tinyclip: 1.0.3
+      tinyexec: 1.3.1
+      tinyglobby: 0.2.17
+      tinyps: 0.5.2
+      ultrahtml: 1.7.0
+      unifont: 1.0.3
+      unstorage: 1.17.6
+      verkit: 0.5.0
+      vite: 8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)
+      vitefu: 1.1.3(vite@8.3.8(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
+      xxhash-wasm: 1.1.0
+      zod: 4.6.7
+    optionalDependencies:
+      sharp: 0.35.5(@types/node@26.6.6)
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -12846,6 +12942,39 @@ snapshots:
       '@img/sharp-win32-x64': 0.35.5
       '@types/node': 26.6.5
 
+  sharp@0.35.5(@types/node@26.6.6):
+    dependencies:
+      '@img/colour': 1.1.0
+      detect-libc: 2.1.2
+      semver: 7.8.6
+    optionalDependencies:
+      '@img/sharp-darwin-arm64': 0.35.5
+      '@img/sharp-darwin-x64': 0.35.5
+      '@img/sharp-freebsd-wasm32': 0.35.5
+      '@img/sharp-libvips-darwin-arm64': 1.3.4
+      '@img/sharp-libvips-darwin-x64': 1.3.4
+      '@img/sharp-libvips-linux-arm': 1.3.4
+      '@img/sharp-libvips-linux-arm64': 1.3.4
+      '@img/sharp-libvips-linux-ppc64': 1.3.4
+      '@img/sharp-libvips-linux-riscv64': 1.3.4
+      '@img/sharp-libvips-linux-s390x': 1.3.4
+      '@img/sharp-libvips-linux-x64': 1.3.4
+      '@img/sharp-libvips-linuxmusl-arm64': 1.3.4
+      '@img/sharp-libvips-linuxmusl-x64': 1.3.4
+      '@img/sharp-linux-arm': 0.35.5
+      '@img/sharp-linux-arm64': 0.35.5
+      '@img/sharp-linux-ppc64': 0.35.5
+      '@img/sharp-linux-riscv64': 0.35.5
+      '@img/sharp-linux-s390x': 0.35.5
+      '@img/sharp-linux-x64': 0.35.5
+      '@img/sharp-linuxmusl-arm64': 0.35.5
+      '@img/sharp-linuxmusl-x64': 0.35.5
+      '@img/sharp-webcontainers-wasm32': 0.35.5
+      '@img/sharp-win32-arm64': 0.35.5
+      '@img/sharp-win32-ia32': 0.35.5
+      '@img/sharp-win32-x64': 0.35.5
+      '@types/node': 26.6.6
+
   shebang-command@2.0.0:
     dependencies:
       shebang-regex: 3.0.0
@@ -13536,6 +13665,21 @@ snapshots:
       tinyglobby: 0.2.17
     optionalDependencies:
       '@types/node': 26.6.5
+      esbuild: 0.28.2
+      fsevents: 2.3.3
+      jiti: 2.7.0
+      tsx: 4.23.15
+      yaml: 2.9.1
+
+  vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1):
+    dependencies:
+      lightningcss: 1.33.0
+      picomatch: 4.0.7
+      postcss: 8.5.32
+      rolldown: 1.2.19
+      tinyglobby: 0.2.17
+    optionalDependencies:
+      '@types/node': 26.6.6
       esbuild: 0.28.2
       fsevents: 2.3.3
       jiti: 2.7.0
