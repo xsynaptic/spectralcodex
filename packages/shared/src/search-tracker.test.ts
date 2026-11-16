@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { createSearchTracker } from '#search-tracker.ts';
+import { createSearchTracker, reportSearch } from '#search-tracker.ts';
 
 function setup() {
 	const events: Array<[string, Record<string, unknown>]> = [];
@@ -65,5 +65,22 @@ describe('createSearchTracker', () => {
 		tracker.end(false);
 
 		expect(events).toEqual([]);
+	});
+});
+
+describe('reportSearch', () => {
+	test('applies the policy to an outcome reported whole', () => {
+		const events: Array<[string, Record<string, unknown>]> = [];
+		const track = (event: string, data: Record<string, unknown>) => {
+			events.push([event, data]);
+		};
+
+		reportSearch({ clicked: false, query: 't', results: 4 }, track);
+		reportSearch({ clicked: true, query: 'old \n  temple', results: 0 }, track);
+
+		expect(events).toEqual([
+			['query', { clicked: true, query: 'old temple', results: 0 }],
+			['empty', { query: 'old temple' }],
+		]);
 	});
 });

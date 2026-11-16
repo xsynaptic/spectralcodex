@@ -280,8 +280,8 @@ importers:
         specifier: ^0.14.0
         version: 0.14.0(astro@7.4.12(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(sharp@0.35.5(@types/node@26.6.5))
       '@xsynaptic/astro-pagefind':
-        specifier: ^0.1.0
-        version: 0.1.0(@pagefind/component-ui@1.6.0)(astro@7.4.12(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(pagefind@1.6.0)
+        specifier: ^0.2.1
+        version: 0.2.1(@pagefind/component-ui@1.6.0)(astro@7.4.12(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(pagefind@1.6.0)
       '@xsynaptic/astro-scripts':
         specifier: ^0.16.1
         version: 0.16.1(astro@7.4.12(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(satteri@0.11.7)
@@ -297,9 +297,6 @@ importers:
       '@xsynaptic/mdxlint-config':
         specifier: ^2.0.0
         version: 2.0.0(supports-color@10.2.2)
-      '@xsynaptic/path-suggestions':
-        specifier: ^0.2.1
-        version: 0.2.1
       '@xsynaptic/satteri-auto-import':
         specifier: ^0.2.2
         version: 0.2.2(satteri@0.11.7)
@@ -321,6 +318,9 @@ importers:
       '@xsynaptic/unified-tools':
         specifier: ^5.1.3
         version: 5.1.3(supports-color@10.2.2)
+      '@xsynaptic/web-components':
+        specifier: ^0.1.0
+        version: 0.1.0
       '@xsynaptic/word-count':
         specifier: ^1.0.1
         version: 1.0.1
@@ -3029,8 +3029,8 @@ packages:
       astro: ^7.4.2
       sharp: ^0.35
 
-  '@xsynaptic/astro-pagefind@0.1.0':
-    resolution: {integrity: sha512-Riji7n89aF8aUVn5Mhkolr5kvT2EiYauVdS7kIWplWZmrabyHlbLgSMCOLRrxp0JLBif/eUoPEE43tNw2ISzvw==}
+  '@xsynaptic/astro-pagefind@0.2.1':
+    resolution: {integrity: sha512-Pu8Fz6O9iuJGyDDFeja650U6u646Fn0Ne4vy/XHkidr8wRMQtOyvBMte2umvxjlKgYmergq+X7IWnU4MMC/I/A==}
     engines: {node: '>=24.0.0'}
     peerDependencies:
       '@pagefind/component-ui': ^1.6.0
@@ -3076,9 +3076,6 @@ packages:
     engines: {node: '>=24'}
     hasBin: true
 
-  '@xsynaptic/path-suggestions@0.2.1':
-    resolution: {integrity: sha512-y0CcHx2l0hvRO6Qs5lQGFY3HJtsIdUY66XRJThBfToWKINicXRetQ5ZDWWvpbFpV3NyB+pnid7ST51/RlxWCPQ==}
-
   '@xsynaptic/rehype-wrap-cjk@3.0.3':
     resolution: {integrity: sha512-N9NJIIirpXzI48yI3iFCITXJV5ajPXoGPfrKqUJT7kSZqjrO82Y06DgyJCU4nXoxphBEDalCUgJ5codxGYnT0Q==}
     peerDependencies:
@@ -3119,6 +3116,9 @@ packages:
 
   '@xsynaptic/unified-tools@5.1.3':
     resolution: {integrity: sha512-sSVEfcAdFPND8QzT2Ka+nbWLFJ4ggiNhnkHqQJQYNXPTM0lqvaycpvnEv/t3wug9MKwX1lPPUcrpZgcuhK716Q==}
+
+  '@xsynaptic/web-components@0.1.0':
+    resolution: {integrity: sha512-Aqqd6Jit4MQfLSCENdyAd2vtO9tR3v2Swh5ZUeQ9L8fDQeut+eSaPDLna6kMdRmaav2NK7B0BCEWe+3D+B8jUA==}
 
   '@xsynaptic/word-count@1.0.1':
     resolution: {integrity: sha512-KWtaz9Vm17xoFfcekheEVlU7yCNqG5yOZvRGg0b+/a83VHL8/fNLqFLCBnQpqzfT745zXQNRR9kceuKH5L+T8A==}
@@ -9127,7 +9127,7 @@ snapshots:
       sharp: 0.35.5(@types/node@26.6.6)
       zod: 4.6.7
 
-  '@xsynaptic/astro-pagefind@0.1.0(@pagefind/component-ui@1.6.0)(astro@7.4.12(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(pagefind@1.6.0)':
+  '@xsynaptic/astro-pagefind@0.2.1(@pagefind/component-ui@1.6.0)(astro@7.4.12(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(pagefind@1.6.0)':
     dependencies:
       astro: 7.4.12(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)
       pagefind: 1.6.0
@@ -9190,10 +9190,6 @@ snapshots:
     transitivePeerDependencies:
       - bluebird
       - supports-color
-
-  '@xsynaptic/path-suggestions@0.2.1':
-    dependencies:
-      fastest-levenshtein: 1.0.16
 
   '@xsynaptic/rehype-wrap-cjk@3.0.3(unified@11.0.5)':
     dependencies:
@@ -9266,6 +9262,10 @@ snapshots:
       unified: 11.0.5
     transitivePeerDependencies:
       - supports-color
+
+  '@xsynaptic/web-components@0.1.0':
+    dependencies:
+      fastest-levenshtein: 1.0.16
 
   '@xsynaptic/word-count@1.0.1': {}
 

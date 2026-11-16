@@ -75,6 +75,28 @@ export const test = base.extend<{ consoleGuard: ConsoleGuard; site: SitePaths }>
 	},
 });
 
+export async function navigateClientSide(page: Page, path: string) {
+	await page.evaluate(
+		(href) =>
+			new Promise<void>((resolve) => {
+				document.addEventListener(
+					'astro:page-load',
+					() => {
+						resolve();
+					},
+					{ once: true },
+				);
+
+				const link = document.createElement('a');
+
+				link.href = href;
+				document.body.append(link);
+				link.click();
+			}),
+		path,
+	);
+}
+
 export function visit(page: Page, path: string): Promise<null | Response> {
 	return page.goto(path, { waitUntil: 'domcontentloaded' });
 }

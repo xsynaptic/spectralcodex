@@ -9,13 +9,13 @@ import pagefindCssUrl from '#styles/pagefind-component.css?url';
 
 type Props = HTMLAttributes<'div'>;
 
-const props = Astro.props;
+const { class: className, ...props } = Astro.props;
 
 const t = getTranslations();
 ---
 
 <script>
-	import '#components/search/search-toggle.ts';
+	import '#components/search/search-client.ts';
 </script>
 
 <pagefind-config
@@ -24,9 +24,9 @@ const t = getTranslations();
 ></pagefind-config>
 
 <search-toggle
-	class:list={['flex cursor-pointer items-center justify-center rounded-full']}
-	data-pagefind-css-url={pagefindCssUrl}
-	data-shortcut-description={t('site.search.shortcut.description')}
+	class:list={['flex cursor-pointer items-center justify-center rounded-full', className]}
+	shortcut-description={t('site.search.shortcut.description')}
+	stylesheet={pagefindCssUrl}
 	{...props}
 >
 	<button
@@ -36,6 +36,7 @@ const t = getTranslations();
 		class="text-primary-700 dark:text-primary-300"
 		data-umami-event="search-open"
 		title={t('site.search.toggle.title')}
+		type="button"
 	>
 		<svg
 			aria-hidden="true"

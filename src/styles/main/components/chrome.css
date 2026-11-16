@@ -41,12 +41,16 @@ top-button:not(:defined) {
 	width: 100%;
 	pointer-events: none;
 	opacity: 0;
-	transform: translate3d(0, 0, 0) scaleX(var(--progress-bar, 0));
+	transform: translate3d(0, 0, 0) scaleX(var(--progress, 0));
 	transform-origin: 0;
 	transition:
-		background-color 100ms 100ms ease-in-out,
-		opacity 150ms ease-in,
+		opacity 150ms ease-in 300ms,
 		transform 300ms ease-out;
+}
+
+.progress-bar[data-active] {
+	opacity: 1;
+	transition-delay: 0s;
 }
 
 /* Adapted from Daisy UI */

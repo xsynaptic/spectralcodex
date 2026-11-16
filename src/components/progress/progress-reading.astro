@@ -16,5 +16,7 @@ const { class: className, height = '1px', style = {}, ...props } = Astro.props;
 ></progress-reading>
 
 <script>
-	import '#components/progress/progress-reading.ts';
+	import { defineProgressReading } from '@xsynaptic/web-components/progress-reading';
+
+	defineProgressReading();
 </script>

@@ -17,11 +17,12 @@ const t = getTranslations();
 </path-suggestions>
 
 <script>
+	import { definePathSuggestions } from '@xsynaptic/web-components/path-suggestions';
 	import { navigate } from 'astro:transitions/client';
-	import '@xsynaptic/path-suggestions/element';
 
 	document.addEventListener('path-suggestions:redirect', (event) => {
 		event.preventDefault();
 		void navigate(event.detail.url, { history: 'replace' });
 	});
+	definePathSuggestions();
 </script>

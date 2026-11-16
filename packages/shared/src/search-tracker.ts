@@ -16,18 +16,31 @@ interface PendingSearch {
 	results: number;
 }
 
+export function reportSearch(
+	{ clicked, query, results }: SearchEventData['query'],
+	track: TrackSearchEvent,
+) {
+	const reportedQuery = query.replaceAll(/\s+/g, ' ').slice(0, searchQueryMaxLength);
+
+	if (reportedQuery.length < searchQueryMinLength) return;
+
+	track('query', { clicked, query: reportedQuery, results });
+
+	if (results > 0) return;
+
+	track('empty', { query: reportedQuery });
+}
+
 export function createSearchTracker(track: TrackSearchEvent) {
 	let pending: PendingSearch | undefined;
 
 	function update(searchTerm: string, results: number | undefined) {
-		const query = searchTerm.replaceAll(/\s+/g, ' ').trim().slice(0, searchQueryMaxLength);
-
-		if (results === undefined || query.length < searchQueryMinLength) {
+		if (results === undefined) {
 			pending = undefined;
 			return;
 		}
 
-		pending = { query, results };
+		pending = { query: searchTerm.trim(), results };
 	}
 
 	function end(isClicked: boolean) {
@@ -36,11 +49,7 @@ export function createSearchTracker(track: TrackSearchEvent) {
 		const { query, results } = pending;
 
 		pending = undefined;
-		track('query', { clicked: isClicked, query, results });
-
-		if (results > 0) return;
-
-		track('empty', { query });
+		reportSearch({ clicked: isClicked, query, results }, track);
 	}
 
 	return { end, update };

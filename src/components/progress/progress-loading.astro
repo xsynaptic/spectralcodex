@@ -17,5 +17,7 @@ const { class: className, height = '1px', style = {}, ...props } = Astro.props;
 ></progress-loading>
 
 <script>
-	import '#components/progress/progress-loading.ts';
+	import { defineProgressLoading } from '@xsynaptic/web-components/progress-loading';
+
+	defineProgressLoading();
 </script>

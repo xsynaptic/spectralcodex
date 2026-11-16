@@ -1,3 +1,5 @@
+@import '@xsynaptic/astro-pagefind/search-toggle.css';
+
 search-toggle {
 	opacity: 0.6;
 	transition: opacity var(--default-transition-duration) var(--default-transition-timing-function);
@@ -11,22 +13,4 @@ search-toggle:focus-within {
 	search-toggle:hover {
 		opacity: 1;
 	}
-}
-
-/* Hidden rather than dimmed so the inert button leaves the tab order until the element upgrades */
-search-toggle:not(:defined) {
-	visibility: hidden;
-}
-
-/* Eager layout rules so the header never shifts while the deferred stylesheet loads */
-pagefind-config {
-	display: none;
-}
-
-pagefind-modal {
-	display: contents;
-}
-
-pagefind-modal:not(:defined) {
-	display: none;
 }

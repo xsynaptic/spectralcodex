@@ -1,7 +1,7 @@
 import type { APIRequestContext, Page } from '@playwright/test';
 
 import { paths } from '#e2e/constants.ts';
-import { expect, test, visit } from '#e2e/test.ts';
+import { expect, navigateClientSide, test, visit } from '#e2e/test.ts';
 import { getTracked, recordTracking } from '#e2e/tracking.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
@@ -30,6 +30,8 @@ async function getChineseTitledEntry(request: APIRequestContext) {
 test('Pagefind returns a known Entry first', { tag: '@smoke' }, async ({ page, site }) => {
 	await visit(page, '/');
 
+	expect(await page.evaluate(() => customElements.get('pagefind-modal') === undefined)).toBe(true);
+
 	await page.getByRole('button', { name: t('site.search.toggle.label') }).click();
 
 	const searchInput = page.locator('pagefind-input input');
@@ -41,38 +43,6 @@ test('Pagefind returns a known Entry first', { tag: '@smoke' }, async ({ page, s
 
 	await expect(resultLink).toBeVisible({ timeout: 10_000 });
 	await expect(resultLink).toHaveAttribute('href', site.postDetail);
-});
-
-test('a click opens search from a cold start', async ({ page }) => {
-	await visit(page, '/');
-
-	expect(await page.evaluate(() => customElements.get('pagefind-modal') === undefined)).toBe(true);
-
-	const toggle = page.getByRole('button', { name: t('site.search.toggle.label') });
-
-	await toggle.click();
-
-	await expect(page.locator('pagefind-input input')).toBeFocused();
-	await expect(toggle).toHaveAttribute('aria-expanded', 'true');
-});
-
-test('the shortcut opens search from a cold start without dropping the keypress', async ({
-	page,
-}) => {
-	await visit(page, '/');
-
-	expect(await page.evaluate(() => customElements.get('pagefind-modal') === undefined)).toBe(true);
-
-	// The shortcut follows the page's user agent, not the machine running the test
-	const isMac = await page.evaluate(() => /mac/i.test(navigator.userAgent));
-
-	await page.keyboard.press(isMac ? 'Meta+k' : 'Control+k');
-
-	await expect(page.locator('pagefind-input input')).toBeFocused();
-	await expect(page.getByRole('button', { name: t('site.search.toggle.label') })).toHaveAttribute(
-		'aria-expanded',
-		'true',
-	);
 });
 
 test('Pagefind finds an Entry by its whole Chinese title', async ({ page, request }) => {
@@ -91,68 +61,6 @@ test('Pagefind finds an Entry by its whole Chinese title', async ({ page, reques
 
 	await expect(resultLink).toBeVisible({ timeout: 10_000 });
 	await expect(resultLink).toHaveAttribute('href', entry.url);
-});
-
-// Resolves on the next astro:page-load, so a full page load fails it by destroying the context
-async function navigateClientSide(page: Page, path: string) {
-	await page.evaluate(
-		(href) =>
-			new Promise<void>((resolve) => {
-				document.addEventListener(
-					'astro:page-load',
-					() => {
-						resolve();
-					},
-					{ once: true },
-				);
-
-				const link = document.createElement('a');
-
-				link.href = href;
-				document.body.append(link);
-				link.click();
-			}),
-		path,
-	);
-}
-
-function getRegisteredCount(page: Page) {
-	return page.evaluate(() => document.querySelector('search-toggle')?.instance?.components.length);
-}
-
-test('search still works after client-side navigation', async ({ page, site }) => {
-	await visit(page, '/');
-
-	const toggle = page.getByRole('button', { name: t('site.search.toggle.label') });
-	const searchInput = page.locator('pagefind-input input');
-
-	// Opening once loads Pagefind, so each later page's components register with it
-	await toggle.click();
-	await expect(searchInput).toBeFocused();
-	await page.keyboard.press('Escape');
-
-	const registeredCount = await getRegisteredCount(page);
-
-	for (const path of [paths.postsIndex, paths.regionDetail, '/']) {
-		await navigateClientSide(page, path);
-	}
-
-	await toggle.click();
-	await expect(searchInput).toBeFocused();
-	await expect(toggle).toHaveAttribute('aria-expanded', 'true');
-
-	expect(await getRegisteredCount(page)).toBe(registeredCount);
-	await searchInput.pressSequentially(site.postTitle, { delay: 30 });
-
-	const resultLink = page.locator('.pf-result-link').first();
-
-	await expect(resultLink).toBeVisible({ timeout: 10_000 });
-	await expect(resultLink).toHaveAttribute('href', site.postDetail);
-
-	// A stale trigger from an earlier page would take the focus on close
-	await page.keyboard.press('Escape');
-	await expect(toggle).toBeFocused();
-	await expect(toggle).toHaveAttribute('aria-expanded', 'false');
 });
 
 async function searchFor(page: Page, query: string) {

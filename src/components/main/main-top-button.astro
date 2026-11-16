@@ -7,6 +7,7 @@ const t = getTranslations();
 <top-button
 	class="fixed right-2 bottom-2 z-top-button flex cursor-pointer items-center justify-center rounded-full border border-primary-200 bg-white shadow-lg focus-within:bg-primary-50 hover:bg-primary-50 sm:hidden dark:bg-primary-700 dark:focus-within:bg-primary-900 dark:hover:bg-primary-900"
 	inert={true}
+	target="#main-content"
 >
 	<button
 		aria-label={t('site.topButton.label')}
@@ -20,5 +21,7 @@ const t = getTranslations();
 </top-button>
 
 <script>
-	import '#components/main/main-top-button.ts';
+	import { defineTopButton } from '@xsynaptic/web-components/top-button';
+
+	defineTopButton();
 </script>
