@@ -1,27 +1,12 @@
 import type { APIRoute, GetStaticPaths, InferGetStaticPropsType } from 'astro';
 
-import { createRenderer, decodeSource, loadOpenGraphFonts } from '@spectralcodex/scripts/og-image';
+import { decodeSource, openGraphCardRenderer } from '@spectralcodex/scripts/og-image';
 import {
 	openGraphTemplateVariants,
 	resolveOpenGraphCardInput,
 } from '@spectralcodex/shared/open-graph';
 
 import { getSampleOpenGraphCards } from '#dev/inventory/inventory-fixtures.ts';
-
-// Fonts and glyph outlines live on the renderer, so build one and hold it for the dev server
-let renderCard: Promise<ReturnType<typeof createRenderer>> | undefined;
-
-async function createRenderCard() {
-	return createRenderer({ fonts: await loadOpenGraphFonts() });
-}
-
-function getRenderCard() {
-	if (!renderCard) {
-		renderCard = createRenderCard();
-	}
-
-	return renderCard;
-}
 
 export const getStaticPaths = (async () => {
 	const cards = await getSampleOpenGraphCards();
@@ -37,10 +22,10 @@ export const getStaticPaths = (async () => {
 export const GET = (async ({ props: { card, variant } }) => {
 	const source = decodeSource({ imageInput: card.imagePath, isBlurred: card.isBlurred });
 
-	const render = await getRenderCard();
+	const body = await openGraphCardRenderer.render({ ...card.input, variant }, source);
 
-	// Takumi returns a Uint8Array that may be backed by a SharedArrayBuffer, which Response rejects
-	return new Response(new Uint8Array(await render({ ...card.input, variant }, source)), {
+	// The pipeline's render returns `Uint8Array<ArrayBufferLike>`, which `BodyInit` rejects as possibly shared
+	return new Response(new Uint8Array(body), {
 		headers: { 'cache-control': 'no-store', 'content-type': 'image/jpeg' },
 	});
 }) satisfies APIRoute<InferGetStaticPropsType<typeof getStaticPaths>>;

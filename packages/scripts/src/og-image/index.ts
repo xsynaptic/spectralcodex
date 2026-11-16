@@ -5,7 +5,6 @@ import type {
 } from '@spectralcodex/shared/open-graph';
 
 import {
-	openGraphBlurTreatment,
 	OpenGraphCardRecordSchema,
 	openGraphDefaultVariant,
 	openGraphVariants,
@@ -13,14 +12,13 @@ import {
 } from '@spectralcodex/shared/open-graph';
 import { getCachePaths } from '@spectralcodex/shared/paths';
 import { hashTemplateVersion, prepareCardRender } from '@xsynaptic/astro-image-pipeline/node';
-import { createProgress, formatCount, log, UserError, withSpinner } from '@xsynaptic/astro-scripts';
+import { createProgress, formatCount, log, UserError } from '@xsynaptic/astro-scripts';
 import { readdirSync, rmSync } from 'node:fs';
 import * as R from 'remeda';
 
 import type { ScriptPaths } from '#shared/command.ts';
 
-import { loadOpenGraphFonts } from '#og-image/fonts.ts';
-import { createRenderer, decodeSource } from '#og-image/generate.ts';
+import cardRenderer from '#og-image/card-renderer.ts';
 import { runCommand } from '#shared/command.ts';
 
 const templatesUrl = new URL('templates/', import.meta.url);
@@ -101,22 +99,9 @@ async function generateCards({
 }) {
 	const { imagesPath } = getCachePaths(paths.cachePath);
 
-	const fonts = await withSpinner(
-		'Loading fonts',
-		loadOpenGraphFonts,
-		(loaded) => `Loaded ${String(loaded.length)} font variants`,
-	);
-	const renderCard = createRenderer({ fonts });
 	const render = await prepareCardRender({
-		decode: (source) =>
-			Promise.resolve(
-				decodeSource({
-					imageInput: source.filePath,
-					isBlurred: source.treatment === openGraphBlurTreatment,
-				}),
-			),
+		...cardRenderer,
 		distPath: paths.distPath,
-		render: (input, source) => renderCard(OpenGraphCardRecordSchema.parse(input), source),
 		storePath: imagesPath,
 		templateVersion: getTemplateVersion,
 	});

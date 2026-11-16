@@ -519,8 +519,6 @@ async function createSampleOpenGraphCards() {
 			}))
 		: [];
 
-	const shareEntry = getSampleShareEntry(locations.entries);
-	const [share] = shareEntry ? toSample(getEntryCard(shareEntry)) : [];
 	const [homepage] = toSample(getHomepageCard());
 	const [atlas] = toSample(
 		getAtlasCard({ locationCount: catalog.byCollection('locations').length }),
@@ -537,7 +535,6 @@ async function createSampleOpenGraphCards() {
 		...toOpenGraphCard('homepage', homepage),
 		...toTemplateGround('homepage-bright', homepage, groundBright),
 		...toTemplateGround('homepage-dark', homepage, groundDark),
-		...toOpenGraphCard('share', share),
 		...toOpenGraphCard('atlas', atlas),
 		...toTemplateGround('atlas-bright', atlas, groundBright),
 		...toTemplateGround('atlas-dark', atlas, groundDark),
@@ -584,19 +581,7 @@ export async function getSampleShareDialogs() {
 
 	if (!entry) return [];
 
-	const shared = getShareDialogData(entry);
-
-	// Dev serves no rendered cards, so the card tiles draw from the Inventory's own renderer
-	const data = {
-		...shared,
-		assets: shared.assets.map((asset) => {
-			if (asset.role === 'photo') return asset;
-
-			const src = getSampleOpenGraphCardSrc(asset.role, 'share');
-
-			return { ...asset, previewSrc: src, src };
-		}),
-	};
+	const data = getShareDialogData(entry);
 
 	const cards = data.assets.filter((asset) => asset.role !== 'photo');
 

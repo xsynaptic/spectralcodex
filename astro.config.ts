@@ -6,6 +6,7 @@ import sitemap from '@astrojs/sitemap';
 import { astroCacheDir } from '@spectralcodex/shared/constants';
 import { imageQualityByFormat } from '@spectralcodex/shared/images';
 import { getUrlPathIndexing } from '@spectralcodex/shared/indexing';
+import { openGraphBasePath } from '@spectralcodex/shared/open-graph';
 import {
 	contentDataPathDefault,
 	contentMediaPathDefault,
@@ -187,6 +188,10 @@ export default defineConfig({
 		atlas(),
 		imagePipeline({
 			baseUrl: imageBaseUrl,
+			cards: {
+				renderer: 'packages/scripts/src/og-image/card-renderer.ts',
+				route: `/${openGraphBasePath}/`,
+			},
 			encoding: {
 				jpg: { quality: imageQualityByFormat.jpg },
 				webp: { quality: imageQualityByFormat.webp },

@@ -277,8 +277,8 @@ importers:
         specifier: ^1.4.1
         version: 1.4.1(astro@7.4.12(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(exiftool-vendored@39.3.0)(sharp@0.35.5(@types/node@26.6.5))(zod@4.6.7)
       '@xsynaptic/astro-image-pipeline':
-        specifier: ^0.14.0
-        version: 0.14.0(astro@7.4.12(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(sharp@0.35.5(@types/node@26.6.5))
+        specifier: ^0.15.0
+        version: 0.15.0(astro@7.4.12(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(sharp@0.35.5(@types/node@26.6.5))
       '@xsynaptic/astro-pagefind':
         specifier: ^0.2.1
         version: 0.2.1(@pagefind/component-ui@1.6.0)(astro@7.4.12(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(pagefind@1.6.0)
@@ -310,8 +310,8 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1(satteri@0.11.7)
       '@xsynaptic/share-kit':
-        specifier: ^0.2.0
-        version: 0.2.0
+        specifier: ^0.2.1
+        version: 0.2.1
       '@xsynaptic/stylelint-config':
         specifier: ^1.1.6
         version: 1.1.6(postcss@8.5.32)(stylelint-order@8.1.2(stylelint@17.16.0(supports-color@10.2.2)(typescript@6.0.3)))(stylelint@17.16.0(supports-color@10.2.2)(typescript@6.0.3))
@@ -578,8 +578,8 @@ importers:
         specifier: ^2.16.2
         version: 2.16.2
       '@xsynaptic/astro-image-pipeline':
-        specifier: ^0.14.0
-        version: 0.14.0(astro@7.4.12(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(sharp@0.35.5(@types/node@26.6.5))
+        specifier: ^0.15.0
+        version: 0.15.0(astro@7.4.12(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(sharp@0.35.5(@types/node@26.6.5))
       '@xsynaptic/astro-scripts':
         specifier: ^0.16.1
         version: 0.16.1(astro@7.4.12(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(satteri@0.11.7)
@@ -644,8 +644,8 @@ importers:
   packages/shared:
     dependencies:
       '@xsynaptic/astro-image-pipeline':
-        specifier: ^0.14.0
-        version: 0.14.0(astro@7.4.12(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(sharp@0.35.5(@types/node@26.6.6))
+        specifier: ^0.15.0
+        version: 0.15.0(astro@7.4.12(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(sharp@0.35.5(@types/node@26.6.6))
       zod:
         specifier: ^4.6.7
         version: 4.6.7
@@ -3022,8 +3022,8 @@ packages:
       sharp:
         optional: true
 
-  '@xsynaptic/astro-image-pipeline@0.14.0':
-    resolution: {integrity: sha512-KAVmJR/kujSz3Wk9Xe6CCSWT2mlhgBGD3m3Fk7ZFVrZWZXrO9zhIrLO7GsVVtg+kCkgvHkKf0kIWs8Lpc3x6UQ==}
+  '@xsynaptic/astro-image-pipeline@0.15.0':
+    resolution: {integrity: sha512-GyPsH0MqgDxCSBULDrqCZpPXk5CzJXxRj0WavDHqkNJAMm7yqdZ/uhx5XtFMPKNyWBPgWX0BpbQ7O4P9JL7wqA==}
     engines: {node: '>=24.0.0'}
     peerDependencies:
       astro: ^7.4.2
@@ -3106,8 +3106,8 @@ packages:
     peerDependencies:
       satteri: ^0.10.0 || ^0.11.0
 
-  '@xsynaptic/share-kit@0.2.0':
-    resolution: {integrity: sha512-O4B942cqkgK66cGOLTrIAbUz5eE2ybqixb0E3QXOhjfNECSE4rbs4RODsl7OG1DuS7dB7viuQF7wWzyiVl/I7Q==}
+  '@xsynaptic/share-kit@0.2.1':
+    resolution: {integrity: sha512-bh6F5r/FHDDyLOyUQVRX/118Bf68dA0CJek86QXMxxWLpWvcrkz5+JjOGylyymBSVVhl5dpqv5TEs9kLdf6gLQ==}
 
   '@xsynaptic/stylelint-config@1.1.6':
     resolution: {integrity: sha512-/stiiCqdr+tnV7/8cUbSBfGNJ/HG8ZYqaChQt75AdtMoxMw1CdX5ZBbKNhurNFh7gXxczuEirOOHxaWr+SvFHQ==}
@@ -9113,14 +9113,14 @@ snapshots:
       exiftool-vendored: 39.3.0
       sharp: 0.35.5(@types/node@26.6.5)
 
-  '@xsynaptic/astro-image-pipeline@0.14.0(astro@7.4.12(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(sharp@0.35.5(@types/node@26.6.5))':
+  '@xsynaptic/astro-image-pipeline@0.15.0(astro@7.4.12(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(sharp@0.35.5(@types/node@26.6.5))':
     dependencies:
       astro: 7.4.12(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)
       p-limit: 7.3.3
       sharp: 0.35.5(@types/node@26.6.5)
       zod: 4.6.7
 
-  '@xsynaptic/astro-image-pipeline@0.14.0(astro@7.4.12(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(sharp@0.35.5(@types/node@26.6.6))':
+  '@xsynaptic/astro-image-pipeline@0.15.0(astro@7.4.12(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(sharp@0.35.5(@types/node@26.6.6))':
     dependencies:
       astro: 7.4.12(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)
       p-limit: 7.3.3
@@ -9230,7 +9230,7 @@ snapshots:
       satteri: 0.11.7
       zod: 4.6.7
 
-  '@xsynaptic/share-kit@0.2.0':
+  '@xsynaptic/share-kit@0.2.1':
     dependencies:
       lean-qr: 2.7.4
 
