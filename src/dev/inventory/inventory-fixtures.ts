@@ -571,7 +571,7 @@ export { locationStatusOrder as sampleStatuses } from '@spectralcodex/shared/map
 const shareDialogCapabilities = {
 	desktop: 'copy-image',
 	none: '',
-	phone: 'files link handheld',
+	phone: 'files link mobile',
 } as const;
 
 export async function getSampleShareDialogs() {
@@ -583,7 +583,7 @@ export async function getSampleShareDialogs() {
 
 	const data = getShareDialogData(entry);
 
-	const cards = data.assets.filter((asset) => asset.role !== 'photo');
+	const cards = data.assets.filter((asset) => asset.isSuggestable !== false);
 
 	return [
 		{ can: shareDialogCapabilities.phone, data, label: 'Phone' },
@@ -609,7 +609,7 @@ export async function getSampleShareDialogs() {
 		{ can: shareDialogCapabilities.desktop, data: { ...data, assets: cards }, label: 'No photos' },
 		{
 			can: shareDialogCapabilities.desktop,
-			data: { ...data, assets: cards.filter((asset) => asset.role === 'landscape') },
+			data: { ...data, assets: cards.filter((asset) => asset.id === 'landscape') },
 			label: 'Landscape card only',
 		},
 		{ can: shareDialogCapabilities.none, data, label: 'No sharing or image clipboard' },
@@ -618,7 +618,7 @@ export async function getSampleShareDialogs() {
 			data: {
 				...data,
 				assets: data.assets.map((asset) =>
-					asset.role === 'portrait'
+					asset.id === 'portrait'
 						? { ...asset, previewSrc: `${asset.previewSrc}.missing`, src: `${asset.src}.missing` }
 						: asset,
 				),

@@ -14,6 +14,7 @@ import {
 } from '@spectralcodex/shared/open-graph';
 import pMemoize from 'p-memoize';
 
+import type { ShareDialogDestination } from '#components/share/share-dialog-destinations.ts';
 import type { ComputedEntry } from '#lib/collections/collections-types.ts';
 
 import { getImageByIdFunction, getImageSource } from '#lib/collections/images/images-data.ts';
@@ -42,11 +43,11 @@ const photoPreviewWidth = 600;
 
 const shareDialogSettings = {
 	classNames: { destination: 'anchor-base anchor-primary' },
-	destinations: ['any', 'bluesky', 'instagram', 'instagram-story', 'threads'],
-	destinationsMore: ['mastodon', 'x', 'facebook', 'pinterest', 'reddit', 'linkedin', 'messages'],
+	destinations: ['any', 'threads', 'facebook', 'instagram', 'instagram-story'],
+	destinationsMore: ['reddit', 'bluesky', 'mastodon', 'pinterest', 'x', 'line', 'messages'],
 	openHash: 'share',
 	utmMedium: 'share',
-} as const satisfies ShareKitSettings;
+} as const satisfies ShareKitSettings<ShareDialogDestination>;
 
 function isPhotoEntry(entry: ShareableEntry): entry is ShareDialogPhotoEntry {
 	return entry.collection === 'locations' || entry.collection === 'posts';
@@ -82,12 +83,13 @@ async function createPhotosFunction() {
 					alt: sanitizeImageAltAttribute(imageEntry.data.title),
 					filename: `${filenamePrefix}-${id}-${number}.${imagePresets.content.format}`,
 					height: Math.round((previewWidth * imageSource.height) / imageSource.width),
+					id: `photo-${number}`,
+					isSuggestable: false,
 					label:
 						imageSources.length === 1
 							? t('share.dialog.photo.labelSingle')
 							: formatStringTemplate(t('share.dialog.photo.label'), { number }),
 					previewSrc: getImageUrl(previewWidth),
-					role: 'photo',
 					src: getImageUrl(fileWidth),
 					type: imageContentTypes[imagePresets.content.format],
 					width: previewWidth,
@@ -103,7 +105,9 @@ async function createShareDialogDataFunction() {
 	const getPhotos = await createPhotosFunction();
 	const t = getTranslations();
 
-	return function getShareDialogData(entry: ShareableEntry): ShareKitPayload {
+	return function getShareDialogData(
+		entry: ShareableEntry,
+	): ShareKitPayload<ShareDialogDestination> {
 		const card = getEntryCard(entry);
 		const id = getOpenGraphId(card.id);
 		const { title } = entry.data;
@@ -121,9 +125,9 @@ async function createShareDialogDataFunction() {
 						...openGraphVariants[variant],
 						alt: `${title}, ${label.toLowerCase()}`,
 						filename: `${filenamePrefix}-${id}-${variant}.${openGraphImageFormat}`,
+						id: variant,
 						label,
 						previewSrc: src,
-						role: variant,
 						src,
 						type: imageContentTypes[openGraphImageFormat],
 					};
