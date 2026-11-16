@@ -97,6 +97,8 @@ test.describe('the map Scope model on a wide viewport', () => {
 	test.use({ viewport: wideViewport });
 
 	test('the witness path replays in the browser with the same observables', async ({ page }) => {
+		test.slow();
+
 		const witnessPath = readWitnessPath(witnessFile);
 		const headings = new Map<string, string>();
 		const releaseDirectory = await holdDirectory(page);

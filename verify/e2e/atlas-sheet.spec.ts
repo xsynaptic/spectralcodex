@@ -10,10 +10,11 @@ import {
 	expectSameCanvas,
 	expectScopeHeld,
 	expectShellGone,
+	finishSlide,
+	freezeNextSlide,
 	getAtlas,
 	getHeading,
 	getPreviewLink,
-	holdSlide,
 	isRestored,
 	keepCanvas,
 	lowerSheet,
@@ -21,7 +22,6 @@ import {
 	phoneViewport,
 	toggleScope,
 	trackRestore,
-	waitForSlide,
 } from '#e2e/atlas.ts';
 import { paths } from '#e2e/constants.ts';
 import { expectMapSettled, mapLoadTimeout } from '#e2e/map.ts';
@@ -237,13 +237,13 @@ test.describe('a slide interrupted on a phone viewport', () => {
 		await handle.press('ArrowUp');
 		await expect(root).not.toHaveAttribute(atlasSheetAttribute);
 
-		await handle.press('ArrowDown');
 		await recordResizeMidSlide(page);
-		await holdSlide(page);
+		await freezeNextSlide(page);
+		await handle.press('ArrowDown');
 		await page.setViewportSize(phoneSidewaysViewport);
-		await waitForSlide(page);
 
-		expect(await page.evaluate(() => 'isResizedMidSlide' in globalThis)).toBe(true);
+		await expect.poll(() => page.evaluate(() => 'isResizedMidSlide' in globalThis)).toBe(true);
+		await finishSlide(page);
 		await expect(root).not.toHaveAttribute(atlasSheetAttribute);
 	});
 });

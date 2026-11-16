@@ -112,19 +112,33 @@ export async function lowerSheet(page: Page) {
 	await expect(root).toHaveAttribute(atlasSheetAttribute, atlasSheetRest.lowered);
 }
 
-export async function holdSlide(page: Page) {
+export async function freezeNextSlide(page: Page) {
 	await page.locator(atlasPaneSelector).evaluate((pane) => {
-		async function markSlideOver() {
-			await Promise.allSettled(pane.getAnimations().map((slide) => slide.finished));
-			Object.assign(globalThis, { isSlideOver: true });
-		}
+		const animate = pane.animate.bind(pane);
 
-		void markSlideOver();
+		pane.animate = (...slideArguments: Parameters<Element['animate']>) => {
+			Reflect.deleteProperty(pane, 'animate');
+
+			const slide = animate(...slideArguments);
+
+			slide.pause();
+			Object.assign(globalThis, { frozenSlide: slide });
+
+			return slide;
+		};
 	});
 }
 
-export async function waitForSlide(page: Page) {
-	await page.waitForFunction(() => 'isSlideOver' in globalThis);
+export async function finishSlide(page: Page) {
+	await page.evaluate(async () => {
+		const frozenSlide: unknown = Reflect.get(globalThis, 'frozenSlide');
+
+		if (!(frozenSlide instanceof Animation)) throw new TypeError('No slide was frozen');
+		if (frozenSlide.playState === 'idle') return;
+
+		frozenSlide.play();
+		await Promise.allSettled([frozenSlide.finished]);
+	});
 }
 
 export async function trackRestore(page: Page) {

@@ -4,15 +4,15 @@ import { test as baseTest } from '@playwright/test';
 
 import {
 	atlasPath,
+	finishSlide,
+	freezeNextSlide,
 	getAtlas,
 	getSlugQuery,
-	holdSlide,
 	isRestored,
 	lowerSheet,
 	phoneViewport,
 	searchFor,
 	trackRestore,
-	waitForSlide,
 } from '#e2e/atlas.ts';
 import { paths } from '#e2e/constants.ts';
 import { mapLoadTimeout } from '#e2e/map.ts';
@@ -107,13 +107,13 @@ test.describe('closing the atlas on a phone viewport', () => {
 		await page.waitForURL(`**${paths.locationSinglePoint}`);
 
 		await lowerSheet(page);
+		await freezeNextSlide(page);
 		await close.click();
-		await holdSlide(page);
 		await page.goBack();
 
 		await page.waitForURL(`**${atlasPath}`, { waitUntil: 'commit' });
 		await expect(root).toHaveAttribute(atlasPageAttribute, atlasPage.map);
-		await waitForSlide(page);
+		await finishSlide(page);
 
 		await expect(root).toHaveAttribute(atlasFlagAttribute);
 		expect(new URL(page.url()).pathname).toBe(atlasPath);
@@ -131,13 +131,13 @@ test.describe('closing the atlas on a phone viewport', () => {
 		await page.locator(`header a[href="${paths.postsIndex}"]`).first().click();
 		await lowerSheet(page);
 		await postsResponse.fetched;
-		await close.click();
 		await recordSwapMidSlide(page);
-		await holdSlide(page);
+		await freezeNextSlide(page);
+		await close.click();
 		postsResponse.release();
 
 		await expect(root).not.toHaveAttribute(atlasPageAttribute);
-		await waitForSlide(page);
+		await finishSlide(page);
 
 		expect(await isSwappedMidSlide(page)).toBe(true);
 		await expect(root).not.toHaveAttribute(atlasFlagAttribute);
@@ -158,13 +158,13 @@ test.describe('closing the atlas on a phone viewport', () => {
 		await page.locator(`header a[href="${atlasPath}"]`).first().click();
 		await lowerSheet(page);
 		await atlasResponse.fetched;
-		await close.click();
 		await recordSwapMidSlide(page);
-		await holdSlide(page);
+		await freezeNextSlide(page);
+		await close.click();
 		atlasResponse.release();
 
 		await expect(root).toHaveAttribute(atlasPageAttribute, atlasPage.map);
-		await waitForSlide(page);
+		await finishSlide(page);
 
 		expect(await isSwappedMidSlide(page)).toBe(true);
 		await expect(root).toHaveAttribute(atlasFlagAttribute);
@@ -240,8 +240,8 @@ baseTest.describe('the back/forward cache on a phone viewport', { tag: '@bfcache
 
 			await lowerSheet(page);
 			await recordHideMidSlide(page);
+			await freezeNextSlide(page);
 			await close.click();
-			await holdSlide(page);
 			await page.goBack({ waitUntil: 'commit' });
 			await page.waitForURL(`**${paths.postsIndex}`, { waitUntil: 'commit' });
 
@@ -252,7 +252,7 @@ baseTest.describe('the back/forward cache on a phone viewport', { tag: '@bfcache
 			await page.goForward({ waitUntil: 'commit' });
 			await page.waitForURL(`**${paths.locationSinglePoint}*`, { waitUntil: 'commit' });
 			await expect.poll(() => isRestored(page)).toBe(true);
-			await waitForSlide(page);
+			await finishSlide(page);
 
 			expect(await isHiddenMidSlide(page)).toBe(true);
 			await expect(root).toHaveAttribute(atlasFlagAttribute);
