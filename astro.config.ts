@@ -5,7 +5,6 @@ import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 import { astroCacheDir } from '@spectralcodex/shared/constants';
 import { imageQualityByFormat } from '@spectralcodex/shared/images';
-import { getUrlPathIndexing } from '@spectralcodex/shared/indexing';
 import { openGraphBasePath } from '@spectralcodex/shared/open-graph';
 import {
 	contentDataPathDefault,
@@ -32,6 +31,7 @@ import { loadEnv } from 'vite';
 import { mdxComponentFiles } from '#constants.ts';
 import devInventory from '#dev/inventory/inventory-integration.ts';
 import atlas from '#lib/atlas/atlas-integration.ts';
+import { getUrlPathIndexing } from '#lib/utils/seo-indexing.ts';
 
 const imageBaseUrlDefault = '/_img';
 

@@ -1,6 +1,5 @@
 ---
 import { mapViewAttribute } from '@spectralcodex/react-map-component/constants';
-import { getUrlPathIndexing } from '@spectralcodex/shared/indexing';
 import { Font } from 'astro:assets';
 import { UMAMI_DOMAIN, UMAMI_ID, WEBMENTION_DOMAIN } from 'astro:env/client';
 
@@ -26,6 +25,7 @@ import { atlasPage, atlasPageAttribute, atlasRootId } from '#lib/atlas/atlas-con
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import { imageBaseUrl } from '#lib/image/image-url.ts';
 import { getBasePath } from '#lib/utils/routing.ts';
+import { getUrlPathIndexing } from '#lib/utils/seo-indexing.ts';
 import { serializeGraph } from '#lib/utils/seo-structured-data.ts';
 
 interface Props {

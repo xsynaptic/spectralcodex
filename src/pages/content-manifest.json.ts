@@ -1,8 +1,7 @@
 import type { APIRoute } from 'astro';
 
-import { getUrlPathIndexing } from '@spectralcodex/shared/indexing';
-
 import { getCatalog } from '#lib/catalog/catalog-data.ts';
+import { getUrlPathIndexing } from '#lib/utils/seo-indexing.ts';
 
 // Generate JSON consumed by the "page not found" suggestions component
 export const GET: APIRoute = async ({ site }) => {

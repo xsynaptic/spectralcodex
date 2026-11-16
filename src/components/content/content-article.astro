@@ -2,10 +2,10 @@
 import type { HTMLAttributes } from 'astro/types';
 
 import { getImagePresetWidths, imagePresets } from '@spectralcodex/shared/images';
-import { getUrlPathIndexing } from '@spectralcodex/shared/indexing';
 
 import { getImageByIdFunction, getImageSource } from '#lib/collections/images/images-data.ts';
 import { createImageUrlFunction } from '#lib/image/image-url.ts';
+import { getUrlPathIndexing } from '#lib/utils/seo-indexing.ts';
 
 interface Props extends HTMLAttributes<'article'> {
 	imageId: string | undefined;

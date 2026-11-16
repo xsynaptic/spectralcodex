@@ -10,7 +10,6 @@
 		"./entries": "./src/entries.ts",
 		"./i18n": "./src/i18n.ts",
 		"./images": "./src/images.ts",
-		"./indexing": "./src/indexing.ts",
 		"./links": "./src/links.ts",
 		"./map": "./src/map/index.ts",
 		"./open-graph": "./src/open-graph.ts",

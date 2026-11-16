@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 
-import { getUrlPathIndexing } from '#indexing.ts';
+import { getUrlPathIndexing } from '#lib/utils/seo-indexing.ts';
 
 describe('getUrlPathIndexing', () => {
 	test('indexes and follows an ordinary content path', () => {
