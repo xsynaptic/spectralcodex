@@ -56,7 +56,7 @@
 		"@types/sanitize-html": "^2.16.2",
 		"@xsynaptic/astro-image-pipeline": "^0.15.0",
 		"@xsynaptic/astro-scripts": "^0.16.2",
-		"@xsynaptic/unified-tools": "^5.1.4",
+		"@xsynaptic/unified-tools": "^5.1.5",
 		"astro": "^7.4.12",
 		"better-sqlite3": "^13.2.0",
 		"chalk": "^6.0.1",
