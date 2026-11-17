@@ -1,4 +1,4 @@
-import type { MapHostControlName, MapTrackDetail } from '#types.ts';
+import type { MapHostControlName, MapSearchEndDetail, MapTrackDetail } from '#lib/types.ts';
 
 export const fetchTimeoutMs = 10_000;
 export const mapViewportStorageKeyPrefix = 'scx-map-viewport:';
@@ -6,6 +6,7 @@ export const mapTrackEventName = 'map:track';
 export const mapControlEventName = 'map:control';
 export const mapOpenEventName = 'map:open';
 export const mapPrefetchEventName = 'map:prefetch';
+export const mapSearchEndEventName = 'map:search-end';
 export const mapSyncEventName = 'map:sync';
 export const mapViewAttribute = 'data-map-view';
 export const mapActiveAttribute = 'data-active';
@@ -69,6 +70,7 @@ declare global {
 		[mapControlEventName]: CustomEvent<{ name: MapHostControlName }>;
 		[mapOpenEventName]: CustomEvent<{ url: string }>;
 		[mapPrefetchEventName]: CustomEvent<{ url: string }>;
+		[mapSearchEndEventName]: CustomEvent<MapSearchEndDetail>;
 		[mapSyncEventName]: Event;
 		[mapTrackEventName]: CustomEvent<MapTrackDetail>;
 	}

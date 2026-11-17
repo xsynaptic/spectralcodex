@@ -2,7 +2,7 @@ import type { MapSourceItem } from '@spectralcodex/map-codec';
 
 import { createRuleTest, selectMapRows } from '@spectralcodex/map-codec';
 
-import type { MapFeaturesRule, MapScope, MapStoreView } from '#types.ts';
+import type { MapFeaturesRule, MapScope, MapStoreView } from '#lib/types.ts';
 
 function isEveryTargetInRule(
 	items: ReadonlyArray<MapSourceItem>,

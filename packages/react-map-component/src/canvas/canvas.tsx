@@ -4,7 +4,7 @@ import { LngLatBounds } from 'maplibre-gl';
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { Map as ReactMapGlMap, useMap } from 'react-map-gl/maplibre';
 
-import type { MapComponentProps } from '#types.ts';
+import type { MapComponentProps } from '#lib/types.ts';
 
 import '#canvas/canvas-worker.ts';
 import { MapErrorBoundary } from '#canvas/canvas-error-boundary.tsx';
@@ -14,7 +14,6 @@ import { MapSelectionFeatureState } from '#canvas/canvas-feature-state.tsx';
 import { MapHoverLabel } from '#canvas/canvas-hover-label.tsx';
 import { MapCanvasMode } from '#canvas/canvas-mode.tsx';
 import { getInitialViewState } from '#canvas/canvas-viewport.ts';
-import { mapSettledAttribute } from '#constants.ts';
 import { MapScopeBar } from '#controls/controls-scope.tsx';
 import { MapControls } from '#controls/controls.tsx';
 import { CanvasDataProvider } from '#data/data-canvas.tsx';
@@ -22,6 +21,7 @@ import { useIsMapLoading, useMapRows } from '#data/data-query.ts';
 import { useHostViewSync } from '#host/host-view.ts';
 import { getActiveAttribute } from '#lib/active-attribute.ts';
 import { useMapConfig } from '#lib/config.tsx';
+import { mapSettledAttribute } from '#lib/constants.ts';
 import { isDocumentDark, useIsDarkMode } from '#lib/dark-mode.ts';
 import { getBasemapStyle } from '#lib/protomaps.ts';
 import { MapHoverPreload, MapPopup } from '#popup/popup.tsx';

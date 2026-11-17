@@ -1,4 +1,4 @@
-import type { MapClickOutcome } from '#types.ts';
+import type { MapClickOutcome } from '#lib/types.ts';
 
 export type MapClickHit =
 	| { center: [number, number]; clusterId: number | string; kind: 'cluster' }

@@ -7,7 +7,7 @@ import { useCallback, useEffect, useMemo, useRef, useSyncExternalStore } from 'r
 import * as R from 'remeda';
 
 import type { MapCanvasClickInput, MapHoverInput } from '#canvas/canvas-events-factory.ts';
-import type { MapHoverCluster } from '#types.ts';
+import type { MapHoverCluster } from '#lib/types.ts';
 
 import { decideHoverIntent, getCanvasClickHit } from '#canvas/canvas-events-factory.ts';
 import { writeSavedViewport } from '#canvas/canvas-viewport.ts';
@@ -15,9 +15,9 @@ import { useMapRows } from '#data/data-query.ts';
 import { useMapClick } from '#host/host-click.ts';
 import { useMapConfig } from '#lib/config.tsx';
 import { useTrackMap } from '#lib/track-hook.ts';
+import { getTrackedErrorMessage, trackMapErrorOnce } from '#lib/track.ts';
 import { MapLayerIdEnum, MapSourceIdEnum } from '#source/source-config.ts';
 import { useMapStore, useMapStoreApi } from '#store/store.tsx';
-import { getTrackedErrorMessage, trackMapErrorOnce } from '#track.ts';
 
 const hoverQuery = '(hover: hover)';
 

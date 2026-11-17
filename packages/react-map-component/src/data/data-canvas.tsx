@@ -4,7 +4,7 @@ import type { FC, PropsWithChildren } from 'react';
 import { createContext, useContext, useDeferredValue, useMemo } from 'react';
 
 import type { MapCanvasData, MapFilterState } from '#data/data-filter.ts';
-import type { MapFeaturesRule } from '#types.ts';
+import type { MapFeaturesRule } from '#lib/types.ts';
 
 import { getHiddenTargetIds, getMapCanvasData } from '#data/data-filter.ts';
 import { useMapRows } from '#data/data-query.ts';

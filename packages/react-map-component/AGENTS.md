@@ -20,7 +20,7 @@ Location knowledge (Status and its records) enters the package only through the 
 ## Host contract
 
 - The map knows nothing about the page around it: it reads no `location` and uses no viewport media queries (it measures itself with `@container map`). The host decides anything that depends on layout.
-- The host talks to the map through the document (the view attribute with `map:sync`, custom properties on the shell, the site's mode attribute), and the map answers with `map:open`, `map:prefetch`, `map:control` and `map:track` events.
+- The host talks to the map through the document (the view attribute with `map:sync`, custom properties on the shell, the site's mode attribute), and the map answers with `map:open`, `map:prefetch`, `map:control`, `map:search-end` and `map:track` events.
 - Every click and search pick goes through `resolveClick` in `host/host-click-factory.ts`. The host only routes the URL it gets back.
 - The pulse ring marks only the page being read; a selected Point shows as its enlarged symbol under the popup.
 - The Sheet is a pane translated over the document, keeping its rest and the reader's scroll as two offsets; one built on the document's scroll failed on phones.

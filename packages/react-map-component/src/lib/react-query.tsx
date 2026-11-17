@@ -3,7 +3,7 @@ import type { PropsWithChildren } from 'react';
 import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState } from 'react';
 
-import { trackMapErrorOnce } from '#track.ts';
+import { trackMapErrorOnce } from '#lib/track.ts';
 
 const millisecondsPerDay = 1000 * 60 * 60 * 24;
 

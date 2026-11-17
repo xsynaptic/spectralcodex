@@ -3,8 +3,8 @@ import type { FC, KeyboardEvent, ReactNode, RefObject } from 'react';
 import { getNumberFormat } from '@spectralcodex/shared/i18n';
 import { memo, useCallback, useEffect, useId, useRef, useState } from 'react';
 
+import type { MapMessages, MapOverlayClose } from '#lib/types.ts';
 import type { MapSearchResult, MapSearchText } from '#search/search-factory.ts';
-import type { MapMessages, MapOverlayClose } from '#types.ts';
 
 import { useMapConfig } from '#lib/config.tsx';
 import { MapControlIcon, MapIconClose, MapIconSearch } from '#lib/icons.tsx';

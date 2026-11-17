@@ -2,7 +2,7 @@ import type { FC } from 'react';
 
 import { useState } from 'react';
 
-import type { MapComponentProps } from '#types.ts';
+import type { MapComponentProps } from '#lib/types.ts';
 
 import { MapCanvas } from '#canvas/canvas.tsx';
 import { createMapHost } from '#host/host-adapter.ts';

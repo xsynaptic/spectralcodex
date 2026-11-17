@@ -1,14 +1,14 @@
 import * as R from 'remeda';
 
-import type { MapComponentProps, MapHost, MapHostControlName } from '#types.ts';
+import type { MapComponentProps, MapHost, MapHostControlName } from '#lib/types.ts';
 
+import { parseMapView } from '#host/host-view.ts';
 import {
 	mapControlEventName,
 	mapOpenEventName,
 	mapPrefetchEventName,
 	mapViewAttribute,
-} from '#constants.ts';
-import { parseMapView } from '#host/host-view.ts';
+} from '#lib/constants.ts';
 
 function send(name: MapHostControlName) {
 	document.dispatchEvent(new CustomEvent(mapControlEventName, { detail: { name } }));

@@ -3,8 +3,8 @@ import type { MapSourceItem } from '@spectralcodex/map-codec';
 import { createStore } from 'zustand';
 
 import type { MapFilter } from '#data/data-filter.ts';
+import type { MapClickOutcome, MapHoverCluster, MapStoreView } from '#lib/types.ts';
 import type { MapScopeState } from '#store/store-scope.ts';
-import type { MapClickOutcome, MapHoverCluster, MapStoreView } from '#types.ts';
 
 import { defaultMapFilter } from '#data/data-filter.ts';
 import { reduceMapScope, resolveMapScope } from '#store/store-scope.ts';

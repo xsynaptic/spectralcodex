@@ -2,14 +2,14 @@ import type { FC, Ref, RefObject } from 'react';
 
 import { useLayoutEffect, useRef } from 'react';
 
-import type { MapMessages, MapScope } from '#types.ts';
+import type { MapMessages, MapScope } from '#lib/types.ts';
 
-import { mapControlClassName } from '#constants.ts';
 import { TopCenterControlPortal } from '#controls/controls-custom.tsx';
 import { useOverlay } from '#controls/controls-overlay.ts';
 import { useMapLinkClick } from '#host/host-click.ts';
 import { getActiveAttribute } from '#lib/active-attribute.ts';
 import { useMapConfig } from '#lib/config.tsx';
+import { mapControlClassName } from '#lib/constants.ts';
 import { MapControlIcon, MapIconEye, MapIconEyeOff, MapIconSearch } from '#lib/icons.tsx';
 import { useTrackMap } from '#lib/track-hook.ts';
 import { MapSearchBox } from '#search/search-box.tsx';

@@ -3,7 +3,7 @@ import type { PropsWithChildren } from 'react';
 import { Component } from 'react';
 
 import { MapCanvasFallback } from '#canvas/canvas-fallback.tsx';
-import { getTrackedErrorMessage, trackMapErrorOnce } from '#track.ts';
+import { getTrackedErrorMessage, trackMapErrorOnce } from '#lib/track.ts';
 
 interface MapErrorBoundaryState {
 	hasError: boolean;

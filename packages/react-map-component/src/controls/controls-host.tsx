@@ -1,11 +1,11 @@
 import type { FC, ReactNode } from 'react';
 import type { ControlPosition } from 'react-map-gl/maplibre';
 
-import type { MapHostControlName, MapMessages } from '#types.ts';
+import type { MapHostControlName, MapMessages } from '#lib/types.ts';
 
-import { getHostControlClassName } from '#constants.ts';
 import { CustomControlPortal } from '#controls/controls-custom.tsx';
 import { useMapConfig } from '#lib/config.tsx';
+import { getHostControlClassName } from '#lib/constants.ts';
 import { MapControlIcon, MapIconClose } from '#lib/icons.tsx';
 import { useTrackMap } from '#lib/track-hook.ts';
 

@@ -4,7 +4,7 @@ import type { FC } from 'react';
 import { getMapRowLabel } from '@spectralcodex/map-codec';
 import { Marker } from 'react-map-gl/maplibre';
 
-import type { MapHoverCluster } from '#types.ts';
+import type { MapHoverCluster } from '#lib/types.ts';
 
 import { useMapRow } from '#data/data-query.ts';
 import { useIsDarkMode } from '#lib/dark-mode.ts';

@@ -9,7 +9,7 @@ import type {
 import { layers, namedFlavor } from '@protomaps/basemaps';
 import * as R from 'remeda';
 
-import type { MapComponentProps } from '#types.ts';
+import type { MapComponentProps } from '#lib/types.ts';
 
 interface BasemapModeOptions extends Pick<MapComponentProps, 'baseMapTheme'> {
 	isDarkMode: boolean;

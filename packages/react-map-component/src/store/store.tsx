@@ -3,8 +3,8 @@ import type { ReactNode } from 'react';
 import { createContext, useContext, useState } from 'react';
 import { useStore } from 'zustand';
 
+import type { MapStoreView } from '#lib/types.ts';
 import type { MapDataStore } from '#store/store-factory.ts';
-import type { MapStoreView } from '#types.ts';
 
 import { createMapStore } from '#store/store-factory.ts';
 

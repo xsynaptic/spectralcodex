@@ -5,8 +5,8 @@
 	"type": "module",
 	"exports": {
 		".": "./src/index.ts",
-		"./constants": "./src/constants.ts",
-		"./track": "./src/track.ts",
+		"./constants": "./src/lib/constants.ts",
+		"./track": "./src/lib/track.ts",
 		"./styles/map-component.css": "./styles/map-component.css"
 	},
 	"imports": {

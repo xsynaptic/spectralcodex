@@ -5,7 +5,7 @@ import type { MapOptions } from 'maplibre-gl';
 import type { CSSProperties } from 'react';
 import type { MapProps } from 'react-map-gl/maplibre';
 
-import type { defaultMapMessages } from '#constants.ts';
+import type { defaultMapMessages } from '#lib/constants.ts';
 
 export interface MapComponentProps extends Partial<
 	Pick<MapOptions, 'hash' | 'interactive' | 'zoom'>
@@ -62,24 +62,29 @@ export type MapInitialViewState = MapProps['initialViewState'];
 
 export type MapMessages = Record<keyof typeof defaultMapMessages, string>;
 
-type MapTrackName =
+export type MapTrackName =
 	| 'map-error'
 	| 'map-filter-open'
 	| 'map-load'
 	| 'map-popup-open'
 	| 'map-popup-visit'
 	| 'map-scope-toggle'
-	| 'map-search-empty'
 	| 'map-search-pick'
-	| 'map-search-query'
 	| 'map-sheet-toggle'
 	| 'map-unsupported'
 	| `map-${MapHostControlName}`;
 
 export interface MapTrackDetail {
-	data?: Record<string, unknown>;
+	data?: Record<string, boolean | number | string>;
 	mapId?: string | undefined;
 	name: MapTrackName;
+}
+
+export interface MapSearchEndDetail {
+	clicked: boolean;
+	mapId?: string | undefined;
+	query: string;
+	results: number;
 }
 
 export interface MapStoreView {

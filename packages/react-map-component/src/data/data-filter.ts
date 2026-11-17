@@ -4,7 +4,7 @@ import type { LocationStatus } from '@spectralcodex/shared/map';
 import { createRuleTest, selectMapRows } from '@spectralcodex/map-codec';
 import { locationStatusOrder, LocationStatusRecords } from '@spectralcodex/shared/map';
 
-import type { MapFeaturesRule } from '#types.ts';
+import type { MapFeaturesRule } from '#lib/types.ts';
 
 export interface MapFilter {
 	objective: number;

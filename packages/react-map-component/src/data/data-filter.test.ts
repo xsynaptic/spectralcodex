@@ -6,7 +6,7 @@ import { LocationStatusEnum } from '@spectralcodex/shared/map';
 import { describe, expect } from 'vitest';
 
 import type { MapFilterState } from '#data/data-filter.ts';
-import type { MapFeaturesRule } from '#types.ts';
+import type { MapFeaturesRule } from '#lib/types.ts';
 
 import { getHiddenTargetIds, getMapCanvasData } from '#data/data-filter.ts';
 import { makeMapSourceItem } from '#lib/map-test-utils.ts';

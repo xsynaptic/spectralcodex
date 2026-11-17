@@ -18,8 +18,8 @@ import {
 import { queryOptions, skipToken, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 
-import { fetchTimeoutMs } from '#constants.ts';
 import { useMapConfig } from '#lib/config.tsx';
+import { fetchTimeoutMs } from '#lib/constants.ts';
 import { useMapStore } from '#store/store.tsx';
 
 // Payloads are validated when the build encodes them and share a deploy hash with this script

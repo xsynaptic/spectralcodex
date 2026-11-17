@@ -3,9 +3,9 @@ import type { PropsWithChildren } from 'react';
 import { createContext, useContext } from 'react';
 import * as R from 'remeda';
 
-import type { MapComponentProps, MapHost, MapMessages } from '#types.ts';
+import type { MapComponentProps, MapHost, MapMessages } from '#lib/types.ts';
 
-import { defaultMapMessages } from '#constants.ts';
+import { defaultMapMessages } from '#lib/constants.ts';
 
 export interface MapConfig extends Omit<
 	MapComponentProps,

@@ -5,7 +5,6 @@ import { memo, useId, useLayoutEffect } from 'react';
 
 import type { MapFilterStatusOption } from '#data/data-filter.ts';
 
-import { mapControlClassName } from '#constants.ts';
 import { CustomControlPortal } from '#controls/controls-custom.tsx';
 import { useOverlay } from '#controls/controls-overlay.ts';
 import { hasActiveFilter, mapFilterStatusOptions } from '#data/data-filter.ts';
@@ -13,6 +12,7 @@ import { useIsMapLoading } from '#data/data-query.ts';
 import { getActiveAttribute } from '#lib/active-attribute.ts';
 import { getCanvasPalette } from '#lib/canvas-palette.ts';
 import { useMapConfig } from '#lib/config.tsx';
+import { mapControlClassName } from '#lib/constants.ts';
 import { MapControlIcon, MapIconFilters, MapIconRating } from '#lib/icons.tsx';
 import { useTrackMap } from '#lib/track-hook.ts';
 import { useMapStore, useMapStoreApi } from '#store/store.tsx';

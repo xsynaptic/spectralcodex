@@ -6,11 +6,11 @@ import type { MapRef } from 'react-map-gl/maplibre';
 import { useCallback, useEffect, useEffectEvent, useRef } from 'react';
 import { useMap } from 'react-map-gl/maplibre';
 
-import type { MapComponentProps, MapScope } from '#types.ts';
+import type { MapComponentProps, MapScope } from '#lib/types.ts';
 
-import { mapSyncEventName } from '#constants.ts';
 import { useMapRows } from '#data/data-query.ts';
 import { applyHostInset, useHostInset } from '#host/host-inset.ts';
+import { mapSyncEventName } from '#lib/constants.ts';
 import { useDocumentEventValue } from '#lib/document-event.ts';
 import { selectScope, selectTargetIds } from '#store/store-factory.ts';
 import { useMapStore } from '#store/store.tsx';

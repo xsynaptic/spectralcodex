@@ -2,7 +2,7 @@ import type { MapRef } from 'react-map-gl/maplibre';
 
 import { useCallback } from 'react';
 
-import { mapInsetProperty, mapPageHiddenProperty, mapSyncEventName } from '#constants.ts';
+import { mapInsetProperty, mapPageHiddenProperty, mapSyncEventName } from '#lib/constants.ts';
 import { useDocumentEventValue } from '#lib/document-event.ts';
 
 function readHostNumber(container: HTMLElement, property: string) {

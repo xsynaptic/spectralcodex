@@ -1,20 +1,21 @@
 import type { MapFeaturesRule, MapPayloadBase } from '@spectralcodex/map-codec';
-import type { SearchTracker } from '@spectralcodex/shared/search-tracker';
 import type { QueryClient } from '@tanstack/react-query';
 
-import { createSearchTracker } from '@spectralcodex/shared/search-tracker';
 import { queryOptions, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react';
 import { useMap } from 'react-map-gl/maplibre';
 
+import type { MapOverlayClose } from '#lib/types.ts';
 import type { MapSearchResult } from '#search/search-factory.ts';
-import type { MapOverlayClose } from '#types.ts';
+import type { SearchSession } from '#search/search-session.ts';
 
 import { mapRowsQueryOptions, scopeListQueryOptions } from '#data/data-query.ts';
 import { useMapClick } from '#host/host-click.ts';
 import { useMapConfig } from '#lib/config.tsx';
+import { mapSearchEndEventName } from '#lib/constants.ts';
 import { useTrackMap } from '#lib/track-hook.ts';
 import { createSearchIndex, searchMap } from '#search/search-factory.ts';
+import { createSearchSession } from '#search/search-session.ts';
 
 async function queryScopeList(client: QueryClient, payloadBase: MapPayloadBase) {
 	try {
@@ -57,32 +58,34 @@ export function usePrefetchMapSearch() {
 	};
 }
 
-function useSearchTracker() {
-	const trackMap = useTrackMap();
-	const [searchTracker] = useState(() =>
-		createSearchTracker((event, data) => {
-			trackMap({ data, name: `map-search-${event}` });
+function useSearchSession() {
+	const { mapId } = useMapConfig();
+	const [searchSession] = useState(() =>
+		createSearchSession((outcome) => {
+			document.dispatchEvent(
+				new CustomEvent(mapSearchEndEventName, { detail: { ...outcome, mapId } }),
+			);
 		}),
 	);
 
 	useEffect(
 		() => () => {
-			searchTracker.end(false);
+			searchSession.end(false);
 		},
-		[searchTracker],
+		[searchSession],
 	);
 
-	return searchTracker;
+	return searchSession;
 }
 
-function useSearchPick(close: (how: MapOverlayClose) => void, searchTracker: SearchTracker) {
+function useSearchPick(close: (how: MapOverlayClose) => void, searchSession: SearchSession) {
 	const { current: map } = useMap();
 	const click = useMapClick();
 	const trackMap = useTrackMap();
 
 	return useCallback(
 		(result: MapSearchResult, how: MapOverlayClose) => {
-			searchTracker.end(true);
+			searchSession.end(true);
 			close(how);
 			trackMap({ data: { kind: result.kind }, name: 'map-search-pick' });
 
@@ -95,7 +98,7 @@ function useSearchPick(close: (how: MapOverlayClose) => void, searchTracker: Sea
 				map.getMap(),
 			);
 		},
-		[click, close, map, searchTracker, trackMap],
+		[click, close, map, searchSession, trackMap],
 	);
 }
 
@@ -107,12 +110,12 @@ export function useMapSearch(query: string, onClose: (how: MapOverlayClose) => v
 		() => (index ? searchMap(index, deferredQuery) : undefined),
 		[deferredQuery, index],
 	);
-	const searchTracker = useSearchTracker();
-	const pick = useSearchPick(onClose, searchTracker);
+	const searchSession = useSearchSession();
+	const pick = useSearchPick(onClose, searchSession);
 
 	useEffect(() => {
-		searchTracker.update(deferredQuery, results?.length);
-	}, [deferredQuery, results, searchTracker]);
+		searchSession.update(deferredQuery, results?.length);
+	}, [deferredQuery, results, searchSession]);
 
 	function pickOnEnter(activeResult: MapSearchResult | undefined) {
 		if (!index) return;
@@ -124,7 +127,7 @@ export function useMapSearch(query: string, onClose: (how: MapOverlayClose) => v
 
 		const currentResults = searchMap(index, query);
 
-		searchTracker.update(query, currentResults?.length);
+		searchSession.update(query, currentResults?.length);
 
 		if (currentResults?.[0]) pick(currentResults[0], 'keyboard');
 	}

@@ -6,10 +6,10 @@ import { Popup } from 'react-map-gl/maplibre';
 
 import type { MapPopupItemExtended } from '#popup/popup-hooks.ts';
 
-import { mapControlClassName } from '#constants.ts';
 import { useMapLinkClick } from '#host/host-click.ts';
 import { getActiveAttribute } from '#lib/active-attribute.ts';
 import { useMapConfig } from '#lib/config.tsx';
+import { mapControlClassName } from '#lib/constants.ts';
 import { MapIconCopy, MapIconGoogle, MapIconWarning, MapIconWikipedia } from '#lib/icons.tsx';
 import { useTrackMap } from '#lib/track-hook.ts';
 import {

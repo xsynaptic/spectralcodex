@@ -1,7 +1,7 @@
 import { LocationStatusEnum } from '@spectralcodex/shared/map';
 import { describe, expect, test } from 'vitest';
 
-import type { MapScope } from '#types.ts';
+import type { MapScope } from '#lib/types.ts';
 
 import { makeMapSourceItem } from '#lib/map-test-utils.ts';
 import { createMapStore } from '#store/store-factory.ts';

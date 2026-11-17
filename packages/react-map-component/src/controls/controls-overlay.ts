@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 
+import type { MapOverlayClose } from '#lib/types.ts';
 import type { MapOverlay } from '#store/store-factory.ts';
-import type { MapOverlayClose } from '#types.ts';
 
 import { useMapStore } from '#store/store.tsx';
 

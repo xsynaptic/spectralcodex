@@ -1,11 +1,11 @@
 import { isMapView } from '@spectralcodex/map-codec';
 import { useEffect } from 'react';
 
-import type { MapView } from '#types.ts';
+import type { MapView } from '#lib/types.ts';
 
-import { mapSyncEventName } from '#constants.ts';
 import { useMapRows, useReadMapRows } from '#data/data-query.ts';
 import { useMapConfig } from '#lib/config.tsx';
+import { mapSyncEventName } from '#lib/constants.ts';
 import { useMapStore } from '#store/store.tsx';
 
 export function parseMapView(value: string | undefined, isDev = false): MapView {

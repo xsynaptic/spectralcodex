@@ -3,12 +3,12 @@ import type { ControlPosition } from 'react-map-gl/maplibre';
 
 import { getNumberFormat } from '@spectralcodex/shared/i18n';
 
-import { mapControlClassName } from '#constants.ts';
 import { CustomControlPortal } from '#controls/controls-custom.tsx';
 import { useMapCanvasData } from '#data/data-canvas.tsx';
 import { useMapRows } from '#data/data-query.ts';
 import { getActiveAttribute } from '#lib/active-attribute.ts';
 import { useMapConfig } from '#lib/config.tsx';
+import { mapControlClassName } from '#lib/constants.ts';
 
 export const MetricsControl: FC<{
 	position: ControlPosition;

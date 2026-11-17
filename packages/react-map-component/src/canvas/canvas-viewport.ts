@@ -1,6 +1,6 @@
-import type { MapComponentProps, MapInitialViewState } from '#types.ts';
+import type { MapComponentProps, MapInitialViewState } from '#lib/types.ts';
 
-import { mapViewportStorageKeyPrefix } from '#constants.ts';
+import { mapViewportStorageKeyPrefix } from '#lib/constants.ts';
 
 const staleTimeMs = 2 * 60 * 60 * 1000;
 const defaultZoom = 12;

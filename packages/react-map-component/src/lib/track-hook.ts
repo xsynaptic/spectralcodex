@@ -1,9 +1,9 @@
 import { useCallback } from 'react';
 
-import type { MapTrackDetail } from '#types.ts';
+import type { MapTrackDetail } from '#lib/types.ts';
 
 import { useMapConfig } from '#lib/config.tsx';
-import { trackMap } from '#track.ts';
+import { trackMap } from '#lib/track.ts';
 
 export function useTrackMap() {
 	const { mapId } = useMapConfig();

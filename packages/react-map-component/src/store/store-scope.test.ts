@@ -1,7 +1,7 @@
 import { fc, test } from '@fast-check/vitest';
 import { describe, expect } from 'vitest';
 
-import type { MapScope, MapView } from '#types.ts';
+import type { MapScope, MapView } from '#lib/types.ts';
 
 import { resolveClick } from '#host/host-click-factory.ts';
 import { makeMapSourceItem } from '#lib/map-test-utils.ts';

@@ -1,6 +1,6 @@
-import type { MapTrackDetail } from '#types.ts';
+import type { MapTrackDetail } from '#lib/types.ts';
 
-import { mapTrackEventName } from '#constants.ts';
+import { mapTrackEventName } from '#lib/constants.ts';
 
 const trackedErrorKinds = new Set<string>();
 
@@ -17,7 +17,10 @@ export function trackMap(detail: MapTrackDetail) {
 	document.dispatchEvent(new CustomEvent<MapTrackDetail>(mapTrackEventName, { detail }));
 }
 
-export function trackMapErrorOnce(kind: string, getData?: () => Record<string, unknown>) {
+export function trackMapErrorOnce(
+	kind: string,
+	getData?: () => Record<string, boolean | number | string>,
+) {
 	if (trackedErrorKinds.has(kind)) return;
 
 	trackedErrorKinds.add(kind);
