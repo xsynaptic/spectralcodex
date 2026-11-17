@@ -2,7 +2,6 @@ export const LocationCategoryEnum = {
 	Airport: 'airport',
 	AmusementPark: 'amusement-park',
 	AncestralHall: 'ancestral-hall',
-	Base: 'base',
 	Beach: 'beach',
 	Bridge: 'bridge',
 	Buddhist: 'buddhist',
