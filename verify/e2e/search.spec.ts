@@ -77,7 +77,10 @@ test('search analytics survive client-side navigation', async ({ page, site }) =
 	await stubUmami(page);
 	await visit(page, '/');
 
-	await page.getByRole('button', { name: t('site.search.toggle.label') }).click();
+	const searchToggle = page.getByRole('button', { name: t('site.search.toggle.label') });
+
+	await expect(searchToggle).toHaveAttribute('data-umami-event', 'search-open');
+	await searchToggle.click();
 	await page.keyboard.press('Escape');
 	await navigateClientSide(page, paths.postsIndex);
 

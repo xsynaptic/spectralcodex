@@ -15,7 +15,12 @@ const { backlinksCount, entryCount, ...props } = Astro.props;
 const t = getTranslations();
 ---
 
-<ContentSection data-nosnippet data-pagefind-ignore sectionTitle={t('section.stats')} {...props}>
+<ContentSection
+	data-nosnippet={true}
+	data-pagefind-ignore={true}
+	sectionTitle={t('section.stats')}
+	{...props}
+>
 	<div class="gap-x-1 font-serif text-xs sm:flex sm:flex-wrap sm:text-sm">
 		<ContentEntryCounts backlinksCount={backlinksCount} entryCount={entryCount} />
 	</div>

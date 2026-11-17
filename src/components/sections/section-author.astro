@@ -26,8 +26,8 @@ const t = getTranslations();
 		MicroformatClassNames.Author,
 		className,
 	]}
-	data-nosnippet
-	data-pagefind-ignore
+	data-nosnippet={true}
+	data-pagefind-ignore={true}
 	sectionTitle={t('section.author')}
 	{...(showAuthor ? {} : { inert: true })}
 	{...props}

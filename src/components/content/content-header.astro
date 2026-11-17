@@ -51,7 +51,7 @@ const subtitleCaption = hasHeroImage ? undefined : caption;
 			washColor={hasHeroImage ? 'accent-featured' : 'accent'}
 			{...titleMultilingualMeta}
 			{...sheetStart}
-			data-pagefind-ignore
+			data-pagefind-ignore={true}
 		>
 			<Fragment set:html={titleMultilingual} />
 		</TextWash>

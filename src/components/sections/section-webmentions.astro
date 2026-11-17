@@ -41,8 +41,8 @@ const counts = webmentions
 
 {webmentions ? (
 	<ContentSection
-		data-nosnippet
-		data-pagefind-ignore
+		data-nosnippet={true}
+		data-pagefind-ignore={true}
 		sectionTitle={t('section.webmentions')}
 		{...props}
 	>

@@ -25,8 +25,8 @@ const t = getTranslations();
 
 {hasGeodata ? (
 	<ContentSection
-		data-nosnippet
-		data-pagefind-ignore
+		data-nosnippet={true}
+		data-pagefind-ignore={true}
 		fillViewport={true}
 		sectionTitle={t('section.map')}
 		{...props}

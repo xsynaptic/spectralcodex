@@ -51,7 +51,12 @@ if (!hideGeometry && addressMultilingual !== undefined) {
 const t = getTranslations();
 ---
 
-<ContentSection data-nosnippet data-pagefind-ignore sectionTitle={t('section.details')} {...props}>
+<ContentSection
+	data-nosnippet={true}
+	data-pagefind-ignore={true}
+	sectionTitle={t('section.details')}
+	{...props}
+>
 	<ListColumn class="font-serif text-xs sm:text-sm">
 		{status ? (
 			<ListColumnItem class="text-subtle" label={t('locations.status.label')}>

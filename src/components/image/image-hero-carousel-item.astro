@@ -49,7 +49,7 @@ const { imageProps, placeholderProps } = await getImageFeaturedProps({
 				'aspect-3/2 lg:aspect-video xl:aspect-auto',
 				showMicroformats ? MicroformatClassNames.Photo : undefined,
 			]}
-			data-hero-image
+			data-hero-image={true}
 			{...imageProps}
 		/>
 		{caption ? (

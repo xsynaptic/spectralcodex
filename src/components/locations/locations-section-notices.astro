@@ -65,7 +65,12 @@ const notices = noticeKeys.map((key) => ({
 ---
 
 {notices.length > 0 ? (
-	<ContentSection class="flex flex-col gap-2" {...props} data-nosnippet data-pagefind-ignore>
+	<ContentSection
+		class="flex flex-col gap-2"
+		{...props}
+		data-nosnippet={true}
+		data-pagefind-ignore={true}
+	>
 		<LocationsNotices notices={notices} />
 	</ContentSection>
 ) : undefined}

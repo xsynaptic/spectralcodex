@@ -16,7 +16,7 @@ const t = getTranslations();
 	<button
 		class="anchor-base anchor-copy group inline-flex items-center gap-1"
 		data-copy-button
-		disabled={true}
+		disabled
 		title={t('locations.coordinates.copy.label')}
 		type="button"
 	>
@@ -27,7 +27,7 @@ const t = getTranslations();
 				<use href="#icon:copy"></use>
 			</svg>
 		</span>
-		<span class="text-green-600 dark:text-green-500" data-copy-icon-done hidden={true}>
+		<span class="text-green-600 dark:text-green-500" data-copy-icon-done hidden>
 			<svg aria-hidden="true" height={iconSize} viewBox="0 0 24 24" width={iconSize}>
 				<use href="#icon:check"></use>
 			</svg>

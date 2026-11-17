@@ -31,7 +31,7 @@ const { Content } = await render(entry);
 ---
 
 <ContentEntryArticle entry={entry} schemas={schemas} titleMultilingual={titleMultilingual}>
-	<Prose class:list={['e-content', 'pb-4']} data-reading-frame showBlocks={true}>
+	<Prose class:list={['e-content', 'pb-4']} data-reading-frame={true} showBlocks={true}>
 		<Content />
 	</Prose>
 </ContentEntryArticle>

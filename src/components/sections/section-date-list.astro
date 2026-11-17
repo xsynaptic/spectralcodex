@@ -26,7 +26,12 @@ const timeOptions = {
 ---
 
 {dateRanges.length > 0 ? (
-	<ContentSection data-nosnippet data-pagefind-ignore sectionTitle={sectionTitle} {...props}>
+	<ContentSection
+		data-nosnippet={true}
+		data-pagefind-ignore={true}
+		sectionTitle={sectionTitle}
+		{...props}
+	>
 		<ListColumn class="font-serif text-xs sm:text-sm">
 			{dateRanges.map((range) => (
 				<ListColumnItem>

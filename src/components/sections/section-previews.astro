@@ -40,8 +40,8 @@ const t = getTranslations();
 
 <ContentSection
 	class:list={['scroll-mt-4', className]}
-	data-nosnippet
-	data-pagefind-ignore
+	data-nosnippet={true}
+	data-pagefind-ignore={true}
 	data-pagination-target={page ? '' : undefined}
 	sectionTitle={sectionTitle ?? t('section.content')}
 	{...props}

@@ -26,7 +26,7 @@ const payload = serializeShareKitPayload(data);
 	<button
 		class="button-outline inline-flex cursor-pointer items-center gap-2 rounded-sm border px-3 py-2 font-medium text-accent-500 disabled:cursor-default disabled:opacity-50 md:py-1 dark:text-accent-400"
 		data-share-kit-trigger
-		disabled={true}
+		disabled
 		type="button"
 	>
 		<span data-nosnippet>{label ?? t('share.dialog.trigger.label')}</span>

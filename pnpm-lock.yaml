@@ -271,8 +271,8 @@ importers:
         specifier: ^19.3.0
         version: 19.3.0(@types/react@19.3.0)
       '@xsynaptic/analytics':
-        specifier: ^0.1.0
-        version: 0.1.0(@playwright/test@1.65.1)
+        specifier: ^0.1.1
+        version: 0.1.1(@playwright/test@1.65.1)
       '@xsynaptic/astro-build-logger':
         specifier: ^1.2.0
         version: 1.2.0(astro@7.4.12(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
@@ -322,8 +322,8 @@ importers:
         specifier: ^5.1.5
         version: 5.1.5(supports-color@10.2.2)
       '@xsynaptic/web-components':
-        specifier: ^0.1.0
-        version: 0.1.0
+        specifier: ^0.1.1
+        version: 0.1.1
       '@xsynaptic/word-count':
         specifier: ^1.0.1
         version: 1.0.1
@@ -3044,8 +3044,8 @@ packages:
   '@vscode/l10n@0.0.18':
     resolution: {integrity: sha512-KYSIHVmslkaCDyw013pphY+d7x1qV8IZupYfeIfzNA+nsaWHbn5uPuQRvdRFsa9zFzGeudPuoGoZ1Op4jrJXIQ==}
 
-  '@xsynaptic/analytics@0.1.0':
-    resolution: {integrity: sha512-UnlB7ovQ6G0pPn/FTECshdBGKtbz/laeXcc0T7agzkOEjoYIQ4ecRb+UsZz8U1xSW+FLOaRyRKMdSsEVnu7LVw==}
+  '@xsynaptic/analytics@0.1.1':
+    resolution: {integrity: sha512-Vq7+XtxTG6XwPu07kOTjzkcDV7Pe6xrvykwCWkYMocZ8vuHxLv48yft1wxxz+Y5dRWneEPJ0lC/WzrvqX9exlg==}
     peerDependencies:
       '@playwright/test': ^1.40.0
     peerDependenciesMeta:
@@ -3165,8 +3165,8 @@ packages:
   '@xsynaptic/unified-tools@5.1.5':
     resolution: {integrity: sha512-peCYZwlKc+jODhP6BQo/B+/wBl5HK1cwt9b6CYr6IANXsN9zDhCMtm+FAnpZem1Q4+V3O+nxHTnEZ62VtA6UXA==}
 
-  '@xsynaptic/web-components@0.1.0':
-    resolution: {integrity: sha512-Aqqd6Jit4MQfLSCENdyAd2vtO9tR3v2Swh5ZUeQ9L8fDQeut+eSaPDLna6kMdRmaav2NK7B0BCEWe+3D+B8jUA==}
+  '@xsynaptic/web-components@0.1.1':
+    resolution: {integrity: sha512-qPmweL+PrC+QiMxfhzUDUhWjWVcOGSSF/jDD30zc83TH1QgcfNLd3xbUQWKaNkxFdARt4UqfT47ozt/ks+WIMw==}
 
   '@xsynaptic/word-count@1.0.1':
     resolution: {integrity: sha512-KWtaz9Vm17xoFfcekheEVlU7yCNqG5yOZvRGg0b+/a83VHL8/fNLqFLCBnQpqzfT745zXQNRR9kceuKH5L+T8A==}
@@ -9199,7 +9199,7 @@ snapshots:
 
   '@vscode/l10n@0.0.18': {}
 
-  '@xsynaptic/analytics@0.1.0(@playwright/test@1.65.1)':
+  '@xsynaptic/analytics@0.1.1(@playwright/test@1.65.1)':
     optionalDependencies:
       '@playwright/test': 1.65.1
 
@@ -9370,7 +9370,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@xsynaptic/web-components@0.1.0':
+  '@xsynaptic/web-components@0.1.1':
     dependencies:
       fastest-levenshtein: 1.0.16
 

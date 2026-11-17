@@ -21,6 +21,11 @@ const sources = getResolveResourceSources(entry) ?? [];
 const t = getTranslations();
 ---
 
-<ContentSection data-nosnippet data-pagefind-ignore sectionTitle={t('section.sources')} {...props}>
+<ContentSection
+	data-nosnippet={true}
+	data-pagefind-ignore={true}
+	sectionTitle={t('section.sources')}
+	{...props}
+>
 	<ResourcesSources sources={sources} />
 </ContentSection>

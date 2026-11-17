@@ -37,3 +37,16 @@ test('a chosen colour mode survives a reload without a flash of the other', asyn
 
 	expect(new Set(modesSeen)).toEqual(new Set(['dark']));
 });
+
+test('the mode toggle reports the mode it switches to', async ({ page }) => {
+	await visit(page, '/');
+
+	const darkToggle = page.getByRole('button', { name: t('site.mode.toggle.dark.label') });
+
+	await expect(darkToggle).toHaveAttribute('data-umami-event', 'mode-toggle');
+	await expect(darkToggle).toHaveAttribute('data-umami-event-mode', 'dark');
+	await darkToggle.click();
+	await expect(
+		page.getByRole('button', { name: t('site.mode.toggle.light.label') }),
+	).toHaveAttribute('data-umami-event-mode', 'light');
+});

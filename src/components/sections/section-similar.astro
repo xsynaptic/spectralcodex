@@ -43,7 +43,12 @@ const moreItems = similarContentItems.slice(visibleCount);
 const t = getTranslations();
 ---
 
-<ContentSection data-nosnippet data-pagefind-ignore sectionTitle={t('section.similar')} {...props}>
+<ContentSection
+	data-nosnippet={true}
+	data-pagefind-ignore={true}
+	sectionTitle={t('section.similar')}
+	{...props}
+>
 	{showPreviews ? (
 		<PreviewGrid
 			items={visibleItems}

@@ -50,7 +50,7 @@ const isEmptyWithoutScript = !counter && !previous && !next && !middleContent;
 						{counter}
 					</span>
 				) : undefined}
-				<form class="flex items-center gap-2" data-pagination-form hidden={true}>
+				<form class="flex items-center gap-2" data-pagination-form hidden>
 					<span class="relative inline-flex items-center">
 						<select
 							aria-label={selectLabel}
@@ -60,7 +60,7 @@ const isEmptyWithoutScript = !counter && !previous && !next && !middleContent;
 							name="page"
 						>
 							{hasCurrent ? undefined : (
-								<option disabled={true} hidden={true} selected={true} value="">
+								<option disabled hidden selected value="">
 									{placeholderLabel}
 								</option>
 							)}

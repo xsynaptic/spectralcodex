@@ -59,13 +59,13 @@ const t = getTranslations();
 		</svg>
 	</button>
 </search-toggle>
-<pagefind-modal reset-on-close={true}>
+<pagefind-modal reset-on-close>
 	<pagefind-modal-header>
 		<pagefind-input placeholder={t('site.search.placeholder')}></pagefind-input>
 	</pagefind-modal-header>
 	<pagefind-modal-body>
 		<pagefind-summary></pagefind-summary>
-		<pagefind-results max-sub-results="3" set:html={pagefindResultTemplate} show-images={true} />
+		<pagefind-results max-sub-results="3" set:html={pagefindResultTemplate} show-images />
 	</pagefind-modal-body>
 	<pagefind-modal-footer>
 		<pagefind-keyboard-hints></pagefind-keyboard-hints>
