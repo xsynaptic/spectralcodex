@@ -46,6 +46,7 @@ export const tailwindContentPaddingSm = '2rem';
 export const tailwindContentPaddingMd = '4rem';
 
 export const millisecondsPerDay = 86_400_000;
+export const millisecondsPerHour = 3_600_000;
 
 export const siteYearFounded = 2009;
 
@@ -53,4 +54,4 @@ export const siteTimezoneOffsetHours = 8;
 
 export const syndicationItemCount = 20;
 
-export const buildVersionStorageKey = 'scx-build-version';
+export const buildVersionStorageKey = 'scx-build-version-reload';

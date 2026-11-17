@@ -1,6 +1,7 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 
+import { sendEventAttributes } from '#lib/analytics/analytics-events.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 type Props = HTMLAttributes<'div'>;
@@ -22,7 +23,7 @@ const t = getTranslations();
 	<button
 		aria-label={t('site.mode.toggle.dark.label')}
 		class="text-primary-700 dark:text-primary-300"
-		data-umami-event="mode-toggle"
+		{...sendEventAttributes('mode-toggle')}
 		title={t('site.mode.toggle.dark.label')}
 		type="button"
 	>

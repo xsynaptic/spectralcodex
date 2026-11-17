@@ -2,6 +2,8 @@ import { modeAttribute, modeChangedEventName } from '@spectralcodex/shared/const
 
 import type { ModeChangedEvent, ModeSystemType } from '#components/mode-manager/mode-types.ts';
 
+import { setSendEventAttributes } from '#lib/analytics/analytics-events.ts';
+
 class ModeToggle extends HTMLElement {
 	#lastClickTime = 0;
 
@@ -46,7 +48,7 @@ class ModeToggle extends HTMLElement {
 
 		button.setAttribute('aria-label', label);
 		button.title = label;
-		button.dataset.umamiEventMode = nextMode;
+		setSendEventAttributes(button, 'mode-toggle', { mode: nextMode });
 	}
 }
 

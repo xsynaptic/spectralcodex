@@ -1,8 +1,7 @@
 import type { APIRequestContext, Page } from '@playwright/test';
 
 import { paths } from '#e2e/constants.ts';
-import { expect, navigateClientSide, test, visit } from '#e2e/test.ts';
-import { getTracked, recordTracking } from '#e2e/tracking.ts';
+import { expect, getSentEvents, navigateClientSide, stubUmami, test, visit } from '#e2e/test.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 const t = getTranslations();
@@ -75,7 +74,7 @@ async function searchFor(page: Page, query: string) {
 }
 
 test('search analytics survive client-side navigation', async ({ page, site }) => {
-	await recordTracking(page);
+	await stubUmami(page);
 	await visit(page, '/');
 
 	await page.getByRole('button', { name: t('site.search.toggle.label') }).click();
@@ -86,18 +85,18 @@ test('search analytics survive client-side navigation', async ({ page, site }) =
 	await page.keyboard.press('Escape');
 
 	await expect
-		.poll(() => getTracked(page, 'search-query'))
+		.poll(() => getSentEvents(page, 'search-query'))
 		.toEqual([
 			{
 				data: { clicked: false, query: site.postTitle, results: expect.any(Number) },
 				name: 'search-query',
 			},
 		]);
-	expect(await getTracked(page, 'search-empty')).toEqual([]);
+	expect(await getSentEvents(page, 'search-empty')).toEqual([]);
 });
 
 test('search analytics mark a result click', async ({ page, site }) => {
-	await recordTracking(page);
+	await stubUmami(page);
 	await visit(page, '/');
 	await searchFor(page, site.postTitle);
 
@@ -114,7 +113,7 @@ test('search analytics mark a result click', async ({ page, site }) => {
 	await page.locator('.pf-result-link').first().click();
 
 	await expect
-		.poll(() => getTracked(page, 'search-query'))
+		.poll(() => getSentEvents(page, 'search-query'))
 		.toEqual([
 			{
 				data: { clicked: true, query: site.postTitle, results: expect.any(Number) },
@@ -126,15 +125,15 @@ test('search analytics mark a result click', async ({ page, site }) => {
 test('search analytics flag a search with no results', async ({ page }) => {
 	const query = 'qqqqqqqq';
 
-	await recordTracking(page);
+	await stubUmami(page);
 	await visit(page, '/');
 	await searchFor(page, query);
 	await page.keyboard.press('Escape');
 
 	await expect
-		.poll(() => getTracked(page, 'search-empty'))
+		.poll(() => getSentEvents(page, 'search-empty'))
 		.toEqual([{ data: { query }, name: 'search-empty' }]);
-	expect(await getTracked(page, 'search-query')).toEqual([
+	expect(await getSentEvents(page, 'search-query')).toEqual([
 		{ data: { clicked: false, query, results: 0 }, name: 'search-query' },
 	]);
 });

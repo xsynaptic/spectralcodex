@@ -1,9 +1,10 @@
 import { defineShareKit, shareKitActionEventName } from '@xsynaptic/share-kit';
 
 import { shareDialogDestinations } from '#components/share/share-dialog-destinations.ts';
+import { sendEvent } from '#lib/analytics/analytics-events.ts';
 
 document.addEventListener(shareKitActionEventName, ({ detail }) => {
-	window.umami?.track('share-dialog', { ...detail });
+	sendEvent('share-dialog', detail);
 });
 
 defineShareKit({

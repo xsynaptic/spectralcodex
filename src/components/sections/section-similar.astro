@@ -8,6 +8,7 @@ import ContentSection from '#components/content/content-section.astro';
 import PreviewColumn from '#components/parts/preview-column.astro';
 import PreviewGrid from '#components/parts/preview-grid.astro';
 import { getSimilarContentFunction } from '#components/sections/section-similar.ts';
+import { sendEventAttributes } from '#lib/analytics/analytics-events.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 interface Props extends HTMLAttributes<'div'> {
@@ -57,7 +58,7 @@ const t = getTranslations();
 		<details class="group">
 			<summary
 				class="similar-more mt-3 flex cursor-pointer list-none items-center gap-3 py-2 text-sm font-medium text-primary-600 transition-colors duration-75 ease-linear group-open:hidden hover:text-accent-500 focus-visible:text-accent-500 dark:text-primary-400 dark:hover:text-accent-300 dark:focus-visible:text-accent-300"
-				data-umami-event="similar-show-more"
+				{...sendEventAttributes('similar-show-more')}
 			>
 				{t('section.similar.more')}
 			</summary>

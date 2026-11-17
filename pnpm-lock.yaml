@@ -270,6 +270,9 @@ importers:
       '@types/react-dom':
         specifier: ^19.3.0
         version: 19.3.0(@types/react@19.3.0)
+      '@xsynaptic/analytics':
+        specifier: ^0.1.0
+        version: 0.1.0(@playwright/test@1.65.1)
       '@xsynaptic/astro-build-logger':
         specifier: ^1.2.0
         version: 1.2.0(astro@7.4.12(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
@@ -280,8 +283,8 @@ importers:
         specifier: ^0.15.0
         version: 0.15.0(astro@7.4.12(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(sharp@0.35.5(@types/node@26.6.5))
       '@xsynaptic/astro-pagefind':
-        specifier: ^0.2.1
-        version: 0.2.1(@pagefind/component-ui@1.6.0)(astro@7.4.12(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(pagefind@1.6.0)
+        specifier: ^0.3.0
+        version: 0.3.0(@pagefind/component-ui@1.6.0)(astro@7.4.12(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(pagefind@1.6.0)
       '@xsynaptic/astro-scripts':
         specifier: ^0.16.2
         version: 0.16.2(astro@7.4.12(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(satteri@0.11.7)
@@ -3041,6 +3044,14 @@ packages:
   '@vscode/l10n@0.0.18':
     resolution: {integrity: sha512-KYSIHVmslkaCDyw013pphY+d7x1qV8IZupYfeIfzNA+nsaWHbn5uPuQRvdRFsa9zFzGeudPuoGoZ1Op4jrJXIQ==}
 
+  '@xsynaptic/analytics@0.1.0':
+    resolution: {integrity: sha512-UnlB7ovQ6G0pPn/FTECshdBGKtbz/laeXcc0T7agzkOEjoYIQ4ecRb+UsZz8U1xSW+FLOaRyRKMdSsEVnu7LVw==}
+    peerDependencies:
+      '@playwright/test': ^1.40.0
+    peerDependenciesMeta:
+      '@playwright/test':
+        optional: true
+
   '@xsynaptic/astro-build-logger@1.2.0':
     resolution: {integrity: sha512-43hHdzMIrUwmQEqc4EZeWVmJ8mtO8+2XZI9DEhQvsMmlBXB/xR/Ne6ZEwOh5FzOqWtXMo7PEynoB92btC7BgiQ==}
     peerDependencies:
@@ -3066,8 +3077,8 @@ packages:
       astro: ^7.4.2
       sharp: ^0.35
 
-  '@xsynaptic/astro-pagefind@0.2.1':
-    resolution: {integrity: sha512-Pu8Fz6O9iuJGyDDFeja650U6u646Fn0Ne4vy/XHkidr8wRMQtOyvBMte2umvxjlKgYmergq+X7IWnU4MMC/I/A==}
+  '@xsynaptic/astro-pagefind@0.3.0':
+    resolution: {integrity: sha512-Qj+0to/FaPhCfZjxVji8+1Juigibd70jcIauF66GiGuu9MN7z1MAwrnyMVWMgAaNK1lD3DjuB79HCPEIc/xEQQ==}
     engines: {node: '>=24.0.0'}
     peerDependencies:
       '@pagefind/component-ui': ^1.6.0
@@ -9185,6 +9196,10 @@ snapshots:
 
   '@vscode/l10n@0.0.18': {}
 
+  '@xsynaptic/analytics@0.1.0(@playwright/test@1.65.1)':
+    optionalDependencies:
+      '@playwright/test': 1.65.1
+
   '@xsynaptic/astro-build-logger@1.2.0(astro@7.4.12(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))':
     dependencies:
       astro: 7.4.12(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)
@@ -9215,7 +9230,7 @@ snapshots:
       sharp: 0.35.5(@types/node@26.6.6)
       zod: 4.6.7
 
-  '@xsynaptic/astro-pagefind@0.2.1(@pagefind/component-ui@1.6.0)(astro@7.4.12(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(pagefind@1.6.0)':
+  '@xsynaptic/astro-pagefind@0.3.0(@pagefind/component-ui@1.6.0)(astro@7.4.12(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(pagefind@1.6.0)':
     dependencies:
       astro: 7.4.12(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)
       pagefind: 1.6.0

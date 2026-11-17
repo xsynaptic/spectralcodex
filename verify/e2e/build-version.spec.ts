@@ -2,13 +2,13 @@ import type { Page } from '@playwright/test';
 
 import { setTimeout as sleep } from 'node:timers/promises';
 
-import { millisecondsPerDay } from '#constants.ts';
+import { millisecondsPerDay, millisecondsPerHour } from '#constants.ts';
 import { paths } from '#e2e/constants.ts';
-import { expect, test, visit } from '#e2e/test.ts';
-import { getTracked, recordTracking } from '#e2e/tracking.ts';
+import { expect, getSentEvents, stubUmami, test, visit } from '#e2e/test.ts';
 
 const reloadEventName = 'build-version-reload';
-const gapDays = 10;
+const nextBuildOffsetDays = 10;
+const staleHours = 5;
 const versionMetaPattern = /content="(\d+)" name="build-version"/;
 
 // Outlasts the loading bar's 200ms threshold, so the bar is showing when the reload leaves the page
@@ -44,7 +44,7 @@ async function serveNewerBuild(page: Page, path: string) {
 			const body = html.replace(
 				versionMetaPattern,
 				(_match, version: string) =>
-					`content="${String(Number(version) + gapDays * millisecondsPerDay)}" name="build-version"`,
+					`content="${String(Number(version) + nextBuildOffsetDays * millisecondsPerDay)}" name="build-version"`,
 			);
 
 			await sleep(routerFetchDelay);
@@ -56,10 +56,16 @@ async function serveNewerBuild(page: Page, path: string) {
 test('a soft navigation onto a newer build does a full load instead', async ({ page, site }) => {
 	const loads = recordDocumentLoads(page);
 
-	await recordTracking(page);
+	await stubUmami(page);
 	await serveNewerBuild(page, site.postDetail);
 	await visit(page, paths.postsIndex);
 	await page.waitForLoadState('load');
+
+	const currentVersion = await page.locator('meta[name="build-version"]').getAttribute('content');
+	const nextVersion = Number(currentVersion) + nextBuildOffsetDays * millisecondsPerDay;
+
+	// The fixture's next build is days ahead of the real clock, so the report needs a clock past it
+	await page.clock.setFixedTime(nextVersion + staleHours * millisecondsPerHour);
 
 	// Armed after the first load, so it resolves on the full load the navigation turns into
 	const reloaded = page.waitForEvent('load');
@@ -68,8 +74,8 @@ test('a soft navigation onto a newer build does a full load instead', async ({ p
 	await reloaded;
 
 	await expect
-		.poll(() => getTracked(page, reloadEventName))
-		.toEqual([{ data: { gapDays }, name: reloadEventName }]);
+		.poll(() => getSentEvents(page, reloadEventName))
+		.toEqual([{ data: { staleHours }, name: reloadEventName }]);
 	expect(loads).toEqual([paths.postsIndex, site.postDetail]);
 
 	await page.goBack({ waitUntil: 'commit' });
@@ -84,7 +90,7 @@ test('a soft navigation within the same build stays soft and reports nothing', a
 }) => {
 	const loads = recordDocumentLoads(page);
 
-	await recordTracking(page);
+	await stubUmami(page);
 	await visit(page, paths.postsIndex);
 	await page.waitForLoadState('load');
 	await page.evaluate(() => Object.assign(globalThis, { isSameDocument: true }));
@@ -94,5 +100,5 @@ test('a soft navigation within the same build stays soft and reports nothing', a
 
 	expect(await page.evaluate(() => 'isSameDocument' in globalThis)).toBe(true);
 	expect(loads).toEqual([paths.postsIndex]);
-	expect(await getTracked(page, reloadEventName)).toEqual([]);
+	expect(await getSentEvents(page, reloadEventName)).toEqual([]);
 });

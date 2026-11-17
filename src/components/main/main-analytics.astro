@@ -1,47 +1,46 @@
 ---
-import type { HTMLAttributes } from 'astro/types';
-
-interface Props extends HTMLAttributes<'script'> {
-	umamiDomain: string;
-	umamiId: string;
-}
-
-const { umamiDomain, umamiId, ...props } = Astro.props;
+import { UMAMI_DOMAIN, UMAMI_ID } from 'astro:env/client';
 
 const beforeSendName = 'scxUmamiBeforeSend';
+
+// Read here, since `Astro` is out of scope inside the fragment below
+const siteHostname = Astro.site?.hostname;
 
 // Crawler cohorts seen in Umami that hide navigator.webdriver but keep a fixed screen; one that randomizes it lacks WebGL
 const excludedScreens = ['800x600', '1280x1200', '1280x1280', '1600x1600'];
 ---
 
-<script define:vars={{ beforeSendName, excludedScreens }} is:inline>
-	const webglProbe = document.createElement('canvas').getContext('webgl');
+{UMAMI_ID && UMAMI_DOMAIN && import.meta.env.PROD ? (
+	<>
+		<script define:vars={{ beforeSendName, excludedScreens }} is:inline>
+			const webglProbe = document.createElement('canvas').getContext('webgl');
 
-	webglProbe?.getExtension('WEBGL_lose_context')?.loseContext();
+			webglProbe?.getExtension('WEBGL_lose_context')?.loseContext();
 
-	window[beforeSendName] = (_type, payload) => {
-		if (navigator.webdriver) return false;
-		if (!webglProbe) return false;
-		if (excludedScreens.includes(`${screen.width}x${screen.height}`)) return false;
+			window[beforeSendName] = (_type, payload) => {
+				if (navigator.webdriver) return false;
+				if (!webglProbe) return false;
+				if (excludedScreens.includes(`${screen.width}x${screen.height}`)) return false;
 
-		return payload;
-	};
-</script>
+				return payload;
+			};
+		</script>
 
-<script
-	data-before-send={beforeSendName}
-	data-do-not-track={true}
-	data-domains={Astro.site?.hostname}
-	data-errors={true}
-	data-exclude-hash={true}
-	data-performance={true}
-	data-release={import.meta.env.BUILD_VERSION}
-	data-website-id={umamiId}
-	src={`${umamiDomain}/script.js`}
-	{...props}
-	defer
-	is:inline
-></script>
+		<script
+			data-before-send={beforeSendName}
+			data-do-not-track={true}
+			data-domains={siteHostname}
+			data-errors={true}
+			data-exclude-hash={true}
+			data-performance={true}
+			data-release={import.meta.env.BUILD_VERSION}
+			data-website-id={UMAMI_ID}
+			defer
+			is:inline
+			src={`${UMAMI_DOMAIN}/script.js`}
+		></script>
+	</>
+) : undefined}
 
 <script>
 	import '#components/main/main-analytics.ts';

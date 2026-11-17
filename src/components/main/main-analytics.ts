@@ -1,18 +1,49 @@
-import { mapTrackEventName } from '@spectralcodex/react-map-component/constants';
+import {
+	mapSearchEndEventName,
+	mapTrackEventName,
+} from '@spectralcodex/react-map-component/constants';
+import { recordTraversalPageviews } from '@xsynaptic/analytics/umami';
+import {
+	normalizeSearchQuery,
+	searchToggleSearchEndEventName,
+} from '@xsynaptic/astro-pagefind/search-toggle';
 
-let isTraversing = false;
+import { sendEvent } from '#lib/analytics/analytics-events.ts';
 
 document.addEventListener(mapTrackEventName, ({ detail: { data, mapId, name } }) => {
-	window.umami?.track(name, { ...data, mapId });
+	sendEvent(name, mapId === undefined ? data : { ...data, mapId });
 });
 
-// The tracker learns the URL only from pushState and replaceState, which back and forward never call
-document.addEventListener('astro:before-swap', (event) => {
-	isTraversing = event.navigationType === 'traverse';
-});
+document.addEventListener(
+	searchToggleSearchEndEventName,
+	({ detail: { clicked, query, results } }) => {
+		const reportedQuery = normalizeSearchQuery(query);
 
-document.addEventListener('astro:after-swap', () => {
-	if (!isTraversing) return;
+		if (reportedQuery === undefined) return;
 
-	history.replaceState(history.state, '', location.href);
-});
+		sendEvent('search-query', { clicked, query: reportedQuery, results });
+
+		if (results > 0) return;
+
+		sendEvent('search-empty', { query: reportedQuery });
+	},
+);
+
+document.addEventListener(
+	mapSearchEndEventName,
+	({ detail: { clicked, mapId, query, results } }) => {
+		const reportedQuery = normalizeSearchQuery(query);
+
+		if (reportedQuery === undefined) return;
+
+		const scope = mapId === undefined ? {} : { mapId };
+
+		sendEvent('map-search-query', { clicked, query: reportedQuery, results, ...scope });
+
+		if (results > 0) return;
+
+		sendEvent('map-search-empty', { query: reportedQuery, ...scope });
+	},
+);
+
+recordTraversalPageviews();

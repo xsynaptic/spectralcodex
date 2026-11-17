@@ -1,30 +1,36 @@
-import { buildVersionStorageKey, millisecondsPerDay } from '#constants.ts';
+import { buildVersionStorageKey, millisecondsPerHour } from '#constants.ts';
+import { sendEvent } from '#lib/analytics/analytics-events.ts';
 
 const versionSelector = 'meta[name="build-version"]';
 
 const currentVersion = document.querySelector<HTMLMetaElement>(versionSelector)?.content;
 
-function markReload(gapDays: number) {
+// How long this tab ran old code after the newer build; a visitor's clock can run behind the build machine's
+function getStaleHours(nextVersion: number) {
+	return Math.max(0, Math.round((Date.now() - nextVersion) / millisecondsPerHour));
+}
+
+function markReload(staleHours: number) {
 	try {
-		sessionStorage.setItem(buildVersionStorageKey, String(gapDays));
+		sessionStorage.setItem(buildVersionStorageKey, String(staleHours));
 	} catch {
 		// sessionStorage unavailable; the reload goes unreported
 	}
 }
 
 function reportReload() {
-	let gapDays: null | string;
+	let staleHours: null | string;
 
 	try {
-		gapDays = sessionStorage.getItem(buildVersionStorageKey);
+		staleHours = sessionStorage.getItem(buildVersionStorageKey);
 		sessionStorage.removeItem(buildVersionStorageKey);
 	} catch {
 		return;
 	}
 
-	if (gapDays === null) return;
+	if (staleHours === null) return;
 
-	window.umami?.track('build-version-reload', { gapDays: Number(gapDays) });
+	sendEvent('build-version-reload', { staleHours: Number(staleHours) });
 }
 
 // Cancelling here hands the navigation to the browser before the router pushes history or touches the page
@@ -40,7 +46,7 @@ document.addEventListener('astro:before-preparation', (event) => {
 
 		if (!nextVersion || nextVersion === currentVersion) return;
 
-		markReload(Math.round((Number(nextVersion) - Number(currentVersion)) / millisecondsPerDay));
+		markReload(getStaleHours(Number(nextVersion)));
 		// eslint-disable-next-line unicorn/no-late-event-control -- Astro reads `defaultPrevented` only after awaiting the loader
 		event.preventDefault();
 	};

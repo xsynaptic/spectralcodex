@@ -1,3 +1,5 @@
+import { sendEvent } from '#lib/analytics/analytics-events.ts';
+
 // `toggle` does not bubble, so one capturing listener on the document covers every panel
 // Module scripts run once and the document outlives view transitions, so this never stacks
 document.addEventListener(
@@ -9,7 +11,7 @@ document.addEventListener(
 
 		if (!image) return;
 
-		window.umami?.track('image-metadata-open', { image });
+		sendEvent('image-metadata-open', { image });
 	},
 	{ capture: true },
 );
@@ -22,5 +24,5 @@ document.addEventListener('click', ({ target }) => {
 
 	if (!image) return;
 
-	window.umami?.track('image-download', { image });
+	sendEvent('image-download', { image });
 });

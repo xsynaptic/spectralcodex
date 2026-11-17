@@ -4,6 +4,7 @@ import type { HTMLAttributes } from 'astro/types';
 import { getBundlePath } from '@xsynaptic/astro-pagefind/bundle';
 
 import { pagefindResultTemplate } from '#components/search/search-result-template.ts';
+import { sendEventAttributes } from '#lib/analytics/analytics-events.ts';
 import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 import pagefindCssUrl from '#styles/pagefind-component.css?url';
 
@@ -34,7 +35,7 @@ const t = getTranslations();
 		aria-haspopup="dialog"
 		aria-label={t('site.search.toggle.label')}
 		class="text-primary-700 dark:text-primary-300"
-		data-umami-event="search-open"
+		{...sendEventAttributes('search-open')}
 		title={t('site.search.toggle.title')}
 		type="button"
 	>
