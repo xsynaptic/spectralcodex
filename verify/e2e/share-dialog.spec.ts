@@ -10,8 +10,6 @@ import { getTranslations } from '#lib/i18n/i18n-translations.ts';
 
 const t = getTranslations();
 
-const phoneViewport = { height: 844, width: 390 };
-
 const iconsModuleName = 'share-dialog-icons';
 
 let rendered: Promise<boolean> | undefined;
@@ -53,8 +51,7 @@ function readPayload(page: Page) {
 		.evaluate((script) => JSON.parse(script.textContent) as ShareKitPayload<string>);
 }
 
-async function selectMore(dialog: Locator, label: string) {
-	await dialog.locator('[data-share-kit-action="more"]').click();
+async function selectDestination(dialog: Locator, label: string) {
 	await dialog.getByRole('radio', { name: label }).click();
 }
 
@@ -71,19 +68,15 @@ function expectEntryUrl(href: string, entryPath: string) {
 	const url = new URL(href);
 
 	expect(url.pathname).toBe(entryPath);
-	expect(url.searchParams.get('utm_source')).toBe('line');
+	expect(url.searchParams.get('utm_source')).toBe('x');
 	expect(url.searchParams.get('utm_medium')).toBe('share');
 }
 
-// Production has `SHARE_DIALOG_SHOW` off, so this runs against `pnpm dev` started with it on
 test.describe('the share dialog', { tag: '@engines' }, () => {
-	test.skip(!isDev, 'production has SHARE_DIALOG_SHOW off');
+	test.skip(!isDev, 'the local preview has no /og/ cards');
 
 	test.beforeEach(async ({ request, site }) => {
-		test.skip(
-			!(await isDialogRendered(request, site.postDetail)),
-			'start the dev server with SHARE_DIALOG_SHOW=true',
-		);
+		test.skip(!(await isDialogRendered(request, site.postDetail)), 'SHARE_DIALOG_SHOW is off');
 	});
 
 	test('the trigger ships disabled, enables, and opening reports to Umami', async ({
@@ -114,6 +107,27 @@ test.describe('the share dialog', { tag: '@engines' }, () => {
 			.toEqual([{ data: { action: 'open', destination: 'any' }, name: 'share-dialog' }]);
 	});
 
+	test('saving a card reports to Umami once the download finishes', async ({ page, site }) => {
+		await stubUmami(page);
+
+		const dialog = await openDialog(page, site.postDetail);
+		const [download] = await Promise.all([
+			page.waitForEvent('download'),
+			dialog.locator('[data-share-kit-asset="landscape"] [data-share-kit-action="save"]').click(),
+		]);
+
+		expect(download.suggestedFilename()).toMatch(/\.(?:jpe?g|png|webp)$/);
+		await expect
+			.poll(() => getSentEvents(page, 'share-dialog'))
+			.toEqual([
+				{ data: { action: 'open', destination: 'any' }, name: 'share-dialog' },
+				{
+					data: { action: 'save', asset: 'landscape', destination: 'any', outcome: 'saved' },
+					name: 'share-dialog',
+				},
+			]);
+	});
+
 	test('icons load on trigger intent, and every destination gets one', async ({ page, site }) => {
 		const iconRequests: Array<string> = [];
 
@@ -132,46 +146,25 @@ test.describe('the share dialog', { tag: '@engines' }, () => {
 
 		const dialog = getDialog(page);
 		const { settings } = await readPayload(page);
-		const destinationCount =
-			settings.destinations.length + (settings.destinationsMore?.length ?? 0);
-
-		await dialog.locator('[data-share-kit-action="more"]').click();
-		await expect(dialog.locator('[data-share-kit-destination]')).toHaveCount(destinationCount);
+		await expect(dialog.locator('[data-share-kit-destination]')).toHaveCount(
+			settings.destinations.length,
+		);
 		await expect(dialog.locator('[data-share-kit-destination]:not(:has(svg))')).toHaveCount(0);
 	});
 
-	test('LINE opens its web share page on a desktop', async ({ context, page, site }) => {
-		await context.route('https://social-plugins.line.me/**', (route) =>
-			route.fulfill({ body: 'composer' }),
-		);
+	test('X opens its composer with the tagged Entry link', async ({ context, page, site }) => {
+		await context.route('https://x.com/**', (route) => route.fulfill({ body: 'composer' }));
 
 		const dialog = await openDialog(page, site.postDetail);
 
-		await selectMore(dialog, 'LINE');
+		await selectDestination(dialog, 'X');
 
 		const composer = await openComposer(page, dialog);
+		const text = composer.searchParams.get('text') ?? '';
 
-		expect(composer.origin + composer.pathname).toBe('https://social-plugins.line.me/lineit/share');
-		expectEntryUrl(composer.searchParams.get('url') ?? '', site.postDetail);
-		expect(composer.searchParams.get('text')).toContain(site.postTitle);
-	});
-
-	test.describe('on a touchscreen', () => {
-		test.use({ hasTouch: true, viewport: phoneViewport });
-
-		test('LINE opens the app share link', async ({ context, page, site }) => {
-			await context.route('https://line.me/**', (route) => route.fulfill({ body: 'composer' }));
-
-			const dialog = await openDialog(page, site.postDetail);
-
-			await selectMore(dialog, 'LINE');
-
-			const composer = await openComposer(page, dialog);
-			const text = composer.searchParams.get('text') ?? '';
-
-			expect(composer.origin + composer.pathname).toBe('https://line.me/R/share');
-			expectEntryUrl(/https?:\/\/\S+/.exec(text)?.[0] ?? '', site.postDetail);
-		});
+		expect(composer.origin + composer.pathname).toBe('https://x.com/intent/tweet');
+		expect(text).toContain(site.postTitle);
+		expectEntryUrl(/https?:\/\/\S+/.exec(text)?.[0] ?? '', site.postDetail);
 	});
 
 	test('card and photo tiles load', async ({ page, site }) => {

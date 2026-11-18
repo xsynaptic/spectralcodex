@@ -110,7 +110,7 @@ export default defineConfig({
 			SHARE_DIALOG_SHOW: envField.boolean({
 				access: 'public',
 				context: 'server',
-				default: false,
+				default: true,
 			}),
 			UMAMI_DOMAIN: envField.string({ access: 'public', context: 'client', optional: true }),
 			UMAMI_ID: envField.string({ access: 'public', context: 'client', optional: true }),

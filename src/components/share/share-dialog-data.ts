@@ -43,8 +43,17 @@ const photoPreviewWidth = 600;
 
 const shareDialogSettings = {
 	classNames: { destination: 'anchor-base anchor-primary' },
-	destinations: ['any', 'threads', 'facebook', 'instagram', 'instagram-story'],
-	destinationsMore: ['reddit', 'bluesky', 'mastodon', 'pinterest', 'x', 'line', 'messages'],
+	destinations: [
+		'any',
+		'threads',
+		'facebook',
+		'instagram',
+		'instagram-story',
+		'x',
+		'bluesky',
+		'mastodon',
+		'reddit',
+	],
 	openHash: 'share',
 	utmMedium: 'share',
 } as const satisfies ShareKitSettings<ShareDialogDestination>;
