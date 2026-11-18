@@ -55,6 +55,8 @@ describe('OpenGraphCardRecordSchema', () => {
 	});
 
 	test('a templated input missing its fields is rejected', () => {
-		expect(() => OpenGraphCardRecordSchema.parse({ template: 'atlas', title: 'Atlas' })).toThrow();
+		expect(() => OpenGraphCardRecordSchema.parse({ template: 'atlas', title: 'Atlas' })).toThrow(
+			/unrecognized_keys/,
+		);
 	});
 });

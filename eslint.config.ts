@@ -111,6 +111,15 @@ export default getConfig(
 				],
 			},
 		},
+		{
+			files: ['**/*.test.{ts,tsx}'],
+			rules: {
+				'vitest/expect-expect': [
+					'error',
+					{ assertFunctionNames: ['assert', 'expect*', 'fc.assert', 'walk.check'] },
+				],
+			},
+		},
 		getBrowserConfig(['src/components/**/*']),
 		{
 			files: ['verify/e2e/**/*', 'playwright.config.ts'],

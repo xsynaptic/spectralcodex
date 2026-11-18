@@ -53,7 +53,7 @@ describe('the rendered upload', () => {
 	test('temp files stay behind and served files are world-readable', async () => {
 		await syncOutputs();
 
-		expect(() => statSync(path.join(rootPath, 'remote/a/b-1-600.jpg.tmp'))).toThrow();
+		expect(() => statSync(path.join(rootPath, 'remote/a/b-1-600.jpg.tmp'))).toThrow(/ENOENT/);
 		expect(statSync(path.join(rootPath, 'remote/a/b-1-450.jpg')).mode & 0o777).toBe(0o644);
 		expect(statSync(path.join(rootPath, 'remote/a')).mode & 0o777).toBe(0o755);
 	});
