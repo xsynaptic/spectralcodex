@@ -89,7 +89,7 @@ await runCommand({
 			test,
 			() => uploadRenderedSet(getRenditionSet(paths, config), { config, dryRun: isDryRun }),
 			() => uploadRenderedSet(getOpenGraphSet(paths, config), { config, dryRun: isDryRun }),
-			() => deployApp({ dryRun: isDryRun, rootPath }),
+			() => deployApp({ dryRun: isDryRun }),
 			() => deployCaddy({ dryRun: isDryRun, rootPath }),
 			async () => {
 				if (!isDryRun) await verifyEdge({ config, paths, shouldSampleImages: true });

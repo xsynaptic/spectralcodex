@@ -1,5 +1,5 @@
 import { openGraphBasePath } from '@spectralcodex/shared/open-graph';
-import { log, withSpinner, withStep } from '@xsynaptic/astro-scripts';
+import { getAstroPaths, log, withSpinner, withStep } from '@xsynaptic/astro-scripts';
 import { readdirSync } from 'node:fs';
 import path from 'node:path';
 
@@ -16,7 +16,6 @@ import {
 
 interface DeployAppOptions {
 	dryRun?: boolean;
-	rootPath: string;
 	skipDelete?: boolean;
 }
 
@@ -144,11 +143,11 @@ async function pruneStalePagefindVersions(config: DeployConfig, distPath: string
 }
 
 export async function deployApp(options: DeployAppOptions): Promise<void> {
-	const { dryRun = false, rootPath, skipDelete = false } = options;
+	const { dryRun = false, skipDelete = false } = options;
 
 	const config = loadDeployConfig();
 
-	const distPath = path.join(rootPath, 'dist');
+	const { clientDir: distPath } = await getAstroPaths();
 
 	if (dryRun) log.warn('Dry run');
 

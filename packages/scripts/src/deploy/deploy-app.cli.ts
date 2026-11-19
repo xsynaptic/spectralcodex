@@ -12,12 +12,11 @@ await runCommand({
 			type: 'boolean',
 		},
 	},
-	async run({ rootPath, values }) {
+	async run({ values }) {
 		await ensureSshKeychain();
 
 		await deployApp({
 			dryRun: values['dry-run'],
-			rootPath,
 			skipDelete: values['skip-delete'],
 		});
 	},

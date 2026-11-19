@@ -12,7 +12,13 @@ import {
 } from '@spectralcodex/shared/open-graph';
 import { getCachePaths } from '@spectralcodex/shared/paths';
 import { hashTemplateVersion, prepareCardRender } from '@xsynaptic/astro-image-pipeline/node';
-import { createProgress, formatCount, log, UserError } from '@xsynaptic/astro-scripts';
+import {
+	createProgress,
+	formatCount,
+	getAstroPaths,
+	log,
+	UserError,
+} from '@xsynaptic/astro-scripts';
 import { readdirSync, rmSync } from 'node:fs';
 import * as R from 'remeda';
 
@@ -99,9 +105,10 @@ async function generateCards({
 }) {
 	const { imagesPath } = getCachePaths(paths.cachePath);
 
+	const { clientDir } = await getAstroPaths();
 	const render = await prepareCardRender({
 		...cardRenderer,
-		distPath: paths.distPath,
+		distPath: clientDir,
 		storePath: imagesPath,
 		templateVersion: getTemplateVersion,
 	});
