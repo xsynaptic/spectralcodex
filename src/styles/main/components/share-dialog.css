@@ -1,5 +1,3 @@
-@import '@xsynaptic/share-kit/styles.css';
-
 share-kit {
 	--share-kit-surface: light-dark(#fff, var(--color-primary-900));
 	--share-kit-text: light-dark(var(--color-primary-700), var(--color-primary-300));
@@ -13,5 +11,7 @@ share-kit {
 	--share-kit-danger: light-dark(var(--color-red-600), var(--color-red-400));
 	--share-kit-radius: var(--radius-lg);
 	--share-kit-shadow: var(--shadow-xl);
+	--share-kit-backdrop-filter: blur(4px);
+	--share-kit-font-display: var(--font-display);
 	--share-kit-font-mono: var(--font-mono);
 }

@@ -20,6 +20,7 @@
 @import './main/parts/root.css';
 @import './main/parts/global.css';
 @import './main/parts/base.css' layer(base);
+@import '@xsynaptic/share-kit/styles.css' layer(components.share-kit);
 @import './main/components/activity-graph.css' layer(components);
 @import './main/components/anchor.css' layer(components);
 @import './main/components/atlas.css' layer(components);

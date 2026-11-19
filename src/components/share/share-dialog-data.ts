@@ -42,7 +42,6 @@ const photoFileWidth = 1800;
 const photoPreviewWidth = 600;
 
 const shareDialogSettings = {
-	classNames: { destination: 'anchor-base anchor-primary' },
 	destinations: [
 		'any',
 		'threads',

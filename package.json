@@ -97,7 +97,7 @@
 		"@xsynaptic/satteri-img-group": "^2.0.2",
 		"@xsynaptic/satteri-trailing-slash": "^0.2.3",
 		"@xsynaptic/satteri-wrap-cjk": "^0.3.1",
-		"@xsynaptic/share-kit": "^0.8.0",
+		"@xsynaptic/share-kit": "^0.9.0",
 		"@xsynaptic/stylelint-config": "^1.1.7",
 		"@xsynaptic/unified-tools": "^5.1.5",
 		"@xsynaptic/web-components": "^0.1.1",

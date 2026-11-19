@@ -313,8 +313,8 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1(satteri@0.11.7)
       '@xsynaptic/share-kit':
-        specifier: ^0.8.0
-        version: 0.8.0
+        specifier: ^0.9.0
+        version: 0.9.0
       '@xsynaptic/stylelint-config':
         specifier: ^1.1.7
         version: 1.1.7(postcss@8.5.32)(stylelint-order@8.1.2(stylelint@17.16.0(supports-color@10.2.2)(typescript@6.0.3)))(stylelint@17.16.0(supports-color@10.2.2)(typescript@6.0.3))
@@ -3281,8 +3281,8 @@ packages:
     peerDependencies:
       satteri: ^0.10.0 || ^0.11.0
 
-  '@xsynaptic/share-kit@0.8.0':
-    resolution: {integrity: sha512-QB8gnlUqqmGf3ZoNPhkkMXtxwmjdIBuXJfL1qdaV8Efl3CZq5KZwfkv9hjiMldvjyZOs00NASvbjlVpF1w5etw==}
+  '@xsynaptic/share-kit@0.9.0':
+    resolution: {integrity: sha512-y4dupkCPzNPolNU6f+TL3lo2D8k0ngWmvL4Sj3Pdpu0PjoOLNNRFbafTnMmoKzgxXbFMISlKr8yu7BvEplrS+A==}
 
   '@xsynaptic/stylelint-config@1.1.7':
     resolution: {integrity: sha512-FNF4og4Hp4eVzPpAtx6DWqvKoDOJmt7KRfqX6hWU54LhMoZN41aprW7vkbw/nVREHisXUW3FUL556vgaVwx7Tg==}
@@ -9549,7 +9549,7 @@ snapshots:
       satteri: 0.11.7
       zod: 4.6.7
 
-  '@xsynaptic/share-kit@0.8.0':
+  '@xsynaptic/share-kit@0.9.0':
     dependencies:
       lean-qr: 2.7.4
 
