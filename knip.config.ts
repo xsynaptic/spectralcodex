@@ -19,9 +19,6 @@ export default {
 		'packages/content': {
 			entry: ['global.d.ts'],
 			ignoreBinaries: ['check-content', 'content-schemas', 'fix-content', 'validate-content'],
-			ignoreDependencies: [
-				'mdxlint', // Enables knip's MDX plugin here (no `astro` devDep to do it)
-			],
 		},
 		'packages/content-demo': {
 			entry: ['.mdxlintrc.mjs'],
