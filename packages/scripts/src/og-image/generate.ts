@@ -4,13 +4,10 @@ import type { Font, MeasuredNode } from 'takumi-js';
 
 import { openGraphDefaultVariant, openGraphVariants } from '@spectralcodex/shared/open-graph';
 import { openImageSource } from '@xsynaptic/astro-image-pipeline/node';
-import { measure, render, setGlyphCacheMaxBytes } from 'takumi-js';
+import { measure, render } from 'takumi-js';
 import { Renderer } from 'takumi-js/node';
 
 import { getOpenGraphElement } from '#og-image/templates/index.tsx';
-
-// A CJK outline runs a few kilobytes, so the 8 MiB default evicts glyphs mid-run
-const glyphCacheBytes = 64 * 1024 * 1024;
 
 // High-quality output because platforms will re-encode
 const jpegQuality = 90;
@@ -58,9 +55,6 @@ interface RawImage {
 
 // Fonts and glyph outlines live on the renderer, so build one and reuse it for every card
 export function createRenderer({ fonts }: { fonts: Array<Font> }) {
-	// Read when a cache is first used, so this has to run before the first render
-	setGlyphCacheMaxBytes(glyphCacheBytes);
-
 	const renderer = new Renderer();
 
 	return async function renderOpenGraphImage(

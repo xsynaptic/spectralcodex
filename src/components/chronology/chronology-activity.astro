@@ -32,7 +32,7 @@ const ariaLabel = formatStringTemplate(t('chronology.activity.aria'), {
 			{t('chronology.activity.label')}
 		</h2>
 		<ActivityGraph ariaLabel={ariaLabel} values={values} year={year}>
-			<div class="flex flex-wrap gap-x-1">
+			<div class="flex flex-wrap sm:gap-x-1">
 				<DividedItem>
 					{`${formatNumber({ number: totals.created })} ${t('chronology.created.label')}`}
 				</DividedItem>
